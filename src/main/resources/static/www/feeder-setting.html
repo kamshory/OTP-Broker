@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1; user-scalable=no">
+    <meta name="description" content="SMS Gateway">
+    <meta name="author" content="Planetbiru">
+    <meta name="require-login" content="true" data-file="/login-form.html">
+    <link rel="icon" href="favicon.ico">  
+    <title>SMS Gateway</title>
+    <link href="lib.assets/css/bootstrap.css" rel="stylesheet">
+    <link href="lib.assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="lib.assets/css/navbar.css" rel="stylesheet">
+    <link href="lib.assets/css/style.css" rel="stylesheet">
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <script src="lib.assets/js/ie-emulation-modes-warning.js"></script>
+    <script src="lib.assets/js/ie10-viewport-bug-workaround.js"></script>    
+    <script src="lib.assets/js/jquery.min.js"></script>
+    <script src="lib.assets/js/bootstrap.js"></script>
+    <script src="lib.assets/js/ws.js"></script>
+    <script>
+      function handleIncommingMessage(message)
+      {
+        console.log("handleIncommingMessage", message);     
+      }      
+    </script>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="./">SMS Gateway</a>
+          </div>
+          
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class=""><a href="./">Home</a></li>
+              <li class=""><a href="ussd.html">USSD</a></li>
+              <li class=""><a href="sms.html">SMS</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li class=""><a href="admin.html">Administrator Setting</a></li>
+                  <li class="active "><a href="feeder-setting.html">Feeder Setting</a></li>
+                  <li class=""><a href="sms-setting.html">SMS Setting</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li class="dropdown-header">Other Configs</li>
+                  <li><a href="#">Config 1</a></li>
+                  <li><a href="#">Config 2</a></li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class=""><a href="account.html">Account</a></li>
+              <li><a href="logout.html">Logout</a></li>
+            </ul>
+        </div>
+ 
+        </div>
+        <!--/.container-fluid -->
+      </nav>
+      <div class="phone-page">      
+        <h3>Feeder Setting</h3>
+
+        <form action="feeder-setting.html" method="post">
+          <table class="config-table config-table-feeder">
+            <tbody>
+            <tr>
+                <td>Feeder Type</td>
+                <td><select name="feeder_type">
+                    <option value="">None</option>
+                    <option value="wsmb">WSMessageBrocker</option>
+                    <option value="amqp">RabbitMQ</option>
+                  </select>	
+                </td>
+              </tr>
+              <tr>
+                <td>Feeder SSL</td>
+                <td><select name="feeder_ssl">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                  </select>	
+                </td>
+              </tr>
+              <tr>
+                <td>Host</td>
+                <td><input type="text" name="feeder_address" id="feeder_address" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Port</td>
+                <td><input type="number" min="1" max="65535" name="feeder_port" id="feeder_port" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Path</td>
+                <td><input type="text" name="feeder_path" id="feeder_path" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Username</td>
+                <td><input type="text" name="feeder_username" id="feeder_username" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Password</td>
+                <td><input type="text" name="feeder_password" id="feeder_password" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Channel</td>
+                <td><input type="text" name="feeder_channel" id="feeder_channel" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Timeout</td>
+                <td><input type="number" min="0" name="feeder_timeout" id="feeder_timeout" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Refresh Feeder</td>
+                <td><select name="feeder_refresh">
+                    <option value="0">Never</option>
+                    <option value="600">10 Minutes</option>
+                    <option value="1800">30 Minutes</option>
+                    <option value="3600">1 Hour</option>
+                    <option value="7200">2 Hours</option>
+                    <option value="21600">6 Hours</option>
+                    <option value="43200">12 Hours</option>
+                    <option value="86400">24 Hours</option>
+                  </select>	
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>
+                <input type="submit" class="btn btn-success" name="save_feeder_setting" id="save_feeder_setting" value="Save">	
+                <input type="reset" class="btn btn-default" class="btn btn-default" value="Reset">	
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        
+        </form>
+
+        <script type="text/javascript">
+            $(document).ready(function(e){
+                $.ajax({
+                    type:"GET",
+                    url:"feeder-setting/get",
+                    dataType:"json",
+                    success:function(data){
+                        $('select[name="feeder_type"]').val(data.feederType);
+                        $('select[name="feeder_ssl"]').val(data.feederSSL?"1":"0");
+                        $('input[name="feeder_address"]').val(data.feederAddress);
+                        $('input[name="feeder_port"]').val(data.feederPort);
+                        $('input[name="feeder_path"]').val(data.feederPath);
+                        $('input[name="feeder_username"]').val(data.feederUsername);
+                        $('input[name="feeder_password"]').val(data.feederPassword);
+                        $('input[name="feeder_channel"]').val(data.feederChannel);
+                        $('input[name="feeder_timeout"]').val(data.feederTimeout);
+                        $('select[name="feeder_refresh"]').val(data.feederRefresh+"");
+                    }
+                });
+            });
+        </script>
+
+    
+    </div>
+    <!-- /container -->
+  </div>
+</body>
+</html>

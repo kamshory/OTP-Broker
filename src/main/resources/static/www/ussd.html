@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1; user-scalable=no">
+    <meta name="description" content="SMS Gateway">
+    <meta name="author" content="Planetbiru">
+    <meta name="require-login" content="true" data-file="/login-form.html">
+    <link rel="icon" href="favicon.ico">  
+    <title>SMS Gateway</title>
+    <link href="lib.assets/css/bootstrap.css" rel="stylesheet">
+    <link href="lib.assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="lib.assets/css/navbar.css" rel="stylesheet">
+    <link href="lib.assets/css/style.css" rel="stylesheet">
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <script src="lib.assets/js/ie-emulation-modes-warning.js"></script>
+    <script src="lib.assets/js/ie10-viewport-bug-workaround.js"></script>    
+    <script src="lib.assets/js/jquery.min.js"></script>
+    <script src="lib.assets/js/bootstrap.js"></script>
+    <script src="lib.assets/js/ws.js"></script>
+    <script>
+      function handleIncommingMessage(message)
+      {
+        console.log("handleIncommingMessage", message);     
+      }      
+    </script>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="./">SMS Gateway</a>
+          </div>
+          
+                  <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class=""><a href="./">Home</a></li>
+              <li class="active "><a href="ussd.html">USSD</a></li>
+              <li class=""><a href="sms.html">SMS</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li class=""><a href="admin.html">Administrator Setting</a></li>
+                  <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
+                  <li class=""><a href="sms-setting.html">SMS Setting</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li class="dropdown-header">Other Configs</li>
+                  <li><a href="#">Config 1</a></li>
+                  <li><a href="#">Config 2</a></li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class=""><a href="account.html">Account</a></li>
+              <li><a href="logout.html">Logout</a></li>
+            </ul>
+        </div>
+ 
+        </div>
+        <!--/.container-fluid -->
+      </nav>
+      <div class="phone-page">    </div>
+    <!-- /container -->
+        <div class="dialed-number">
+          <div class="dialed-number-delete">
+            <button>&times;</button>
+          </div>
+          <div class="dialed-number-text"></div>
+        </div>
+
+        <div class="ussd">
+          <div class="ussd-progress">
+            <h4>USSD <span class="dialed-number-result"></span> is running &hellip;</h4>
+          </div>
+          <div class="ussd-response">
+            <h4>USSD <span class="dialed-number-result"></span> response</h4>
+            <div class="ussd-response-inner">
+              &nbsp;
+            </div>
+          </div>
+        </div>
+        
+
+        
+        <div class="three-col">
+          <div class="control-wrapper">
+            <button class="number-button" data-value="1"><span class="number">1</span></button>
+          </div>
+          <div class="control-wrapper">
+            <button class="number-button" data-value="2"><span class="number">2</span></button>
+          </div>
+          <div class="control-wrapper">
+            <button class="number-button" data-value="3"><span class="number">3</span></button>
+          </div>
+        </div>
+
+        <div class="three-col">
+          <div class="control-wrapper">
+            <button class="number-button" data-value="4"><span class="number">4</span></button>
+          </div>
+          <div class="control-wrapper">
+            <button class="number-button" data-value="5"><span class="number">5</span></button>
+          </div>
+          <div class="control-wrapper">
+            <button class="number-button" data-value="6"><span class="number">6</span></button>
+          </div>
+        </div>
+
+        <div class="three-col">
+          <div class="control-wrapper">
+            <button class="number-button" data-value="7"><span class="number">7</span></button>
+          </div>
+          <div class="control-wrapper">
+            <button class="number-button" data-value="8"><span class="number">8</span></button>
+          </div>
+          <div class="control-wrapper">
+            <button  class="number-button" data-value="9"><span class="number">9</span></button>
+          </div>
+        </div>
+
+        <div class="three-col">
+          <div class="control-wrapper">
+            <button class="number-button" data-value="*"><span class="number">*</span></button>
+          </div>
+          <div class="control-wrapper">
+            <button class="number-button" data-value="0"><span class="number">0</span></button>
+          </div>
+          <div class="control-wrapper">
+            <button class="number-button" data-value="#"><span class="number">#</span></button>
+          </div>
+        </div>
+        <div class="dial-area">
+          <button class="dial" id="phone"><span class="icon-phone"></span></button>
+        </div>
+
+
+
+    <script>
+      var dialed = [];
+      function renderNumber()
+      {
+        var dialed2 = JSON.parse(JSON.stringify(dialed))
+        var shifted = false;
+        while(dialed2.length > 14)
+        {
+          dialed2.shift();
+          shifted = true;
+        }
+        var rendered = '';
+        if(shifted)
+        {
+          rendered = '&#8230; '+dialed2.join('');
+        }
+        else
+        {
+          rendered = dialed2.join('');
+        }
+        $('.dialed-number-text').html(rendered);
+      }
+      $(document).ready(function(e1){
+        $(document).on('click', '.number-button', function(e2){
+          var val = $(this).attr('data-value');
+          dialed.push(val);
+          renderNumber();
+        });
+        $(document).on('click', '.dialed-number-delete button', function(e2){
+          if(dialed.length > 0)
+          {
+            dialed.pop();
+          }
+          renderNumber();
+        });
+        $(document).on('click', '#phone', function(e){
+          var dialedNumber = dialed.join('').toString();
+          
+          dialed = [];
+          renderNumber();
+          dialing(dialedNumber)
+        });
+      });
+
+      function dialing(number)
+      {
+        if(number.length > 0)
+        {
+          $('.dialed-number-result').text(number)
+          $('.ussd').css({'display':'block'});
+          $('.ussd-response').css({'display':'none'});
+          $('.ussd-progress').css({'display':'block'});
+
+          $('.ussd-response-inner').html('&nbsp;');
+          $.ajax({
+            url:'api/ussd',
+            type:"POST",
+            data:{ussd:number, execute:'execute'},
+            dataType:"json",
+            success(data)
+            {
+              console.log(data);
+              if(data.response_code == "0000")
+              {
+                $('.ussd-response-inner').html(data.data.message);
+              }
+              else
+              {
+                $('.ussd-response-inner').html(data.response_text);
+              }
+              
+              $('.ussd-progress').css({'display':'none'});
+              $('.ussd-response').css({'display':'block'});
+            }
+          })
+
+          
+        }
+      }
+    </script>
+    </div>
+  </body>
+  </html>  
