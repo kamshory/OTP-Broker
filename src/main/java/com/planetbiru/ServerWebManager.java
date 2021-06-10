@@ -911,10 +911,13 @@ public class ServerWebManager {
 		{
 			String receiver = query.getOrDefault("receiver", "");			
 			String message = query.getOrDefault("message", "");	
-			try {
+			try 
+			{
 				this.broardcastWebSocket("Sending a message to "+receiver);
 				smsService.sendSMS(receiver, message);
-			} catch (GSMNotInitalizedException e) {
+			} 
+			catch (GSMNotInitalizedException e) 
+			{
 				e.printStackTrace();
 			}
 		}		

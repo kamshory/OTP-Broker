@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.annotation.PostConstruct;
 import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -20,9 +21,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.planetbiru.constant.JsonKey;
+import com.planetbiru.user.Account;
+import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.util.Utility;
 import com.planetbiru.wstools.MessageDecoder;
 import com.planetbiru.wstools.MessageEncoder;
@@ -34,6 +38,9 @@ import com.planetbiru.wstools.ServletAwareConfigurator;
 	decoders = MessageDecoder.class, 
 	encoders = MessageEncoder.class)
 public class ServerWebSocket {
+	
+	@Value("${sms.path.setting.user}")
+	private String userSettingPath;
 
 	private Session session;
 	private String clientIP = "";
@@ -50,25 +57,46 @@ public class ServerWebSocket {
     
     Random rand = new Random();
     
+    @PostConstruct
+    public void init()
+    {
+    	logger.info("Init...");
+    	Account.init(userSettingPath);
+    }
+    
 	@SuppressWarnings("unchecked")
 	@OnOpen
     public void onOpen(Session session, EndpointConfig config) {
-        this.session = session;
+		this.session = session;
         this.clientIP = (String) config.getUserProperties().get("remote_address");
         Map<String, List<String>> requestHdr = (Map<String, List<String>>) config.getUserProperties().get("request_header");
         Map<String, List<String>> responseHdr = (Map<String, List<String>>) config.getUserProperties().get("response_header");
         Map<String, List<String>> param = (Map<String, List<String>>) config.getUserProperties().get("parameter");       
         
-        this.parseBasicAuth(requestHdr);
         this.requestHeader = requestHdr;
         this.responseHeader = responseHdr;
         this.parameter = param;
-        logger.info(requestHdr);
-        
         this.sessionID = Utility.sha1(""+System.currentTimeMillis()+rand.nextInt(1000000000));
         
-        listeners.add(this);
-        this.sendWelcomeMessage();
+        boolean auth = true;
+        try 
+        {
+        	auth = Account.getUserAccount().checkUserAuth(requestHdr);
+		} 
+        catch (NoUserRegisteredException e) 
+        {
+			/**
+			 * Do nothing
+			 */
+        	e.printStackTrace();
+		}
+        
+        
+        if(auth)
+        {
+            listeners.add(this);
+            this.sendWelcomeMessage();
+        }
 }
     
     private void sendWelcomeMessage() {
@@ -100,34 +128,10 @@ public class ServerWebSocket {
 		return msg.toString(4);
 	}
 
-	
-
-	private void parseBasicAuth(Map<String, List<String>> requestHeaders) 
-    {
-    	for (Map.Entry<String, List<String>> headers : requestHeaders.entrySet()) 
-    	{
-    		  String key = headers.getKey();
-    		  List<String> valueList = headers.getValue();
-    		  for (String value : valueList) 
-    		  {
-    			  if(key.equalsIgnoreCase("authorization") && value.startsWith("Basic "))
-    			  {
-    				  String auth = value.substring(6);
-    				  String decoded = Utility.base64Decode(auth);
-    				  String[] arr = decoded.split(":", 3);
-    				  this.username = arr[0];
-    				  if(arr.length > 1)
-    				  {
-    				  }
-    			  }
-    		  }
-    	}
-	}
-
     @OnMessage 
     public void onMessage(String messageReceived) {
     	
-    		broadcast(messageReceived, this.sessionID);
+    	broadcast(messageReceived, this.sessionID);
     }
 
     @OnClose
@@ -141,6 +145,10 @@ public class ServerWebSocket {
     {
     	listeners.remove(this);
     }
+    public static void broadcast(String message) 
+    {
+    	broadcast(message, "");	
+	}
 
     public static void broadcast(String message, String senderID) 
     {
@@ -220,11 +228,5 @@ public class ServerWebSocket {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
-	public static void broadcast(String string) {
-		// TODO Auto-generated method stub
-		
-	}
-
     
 }
