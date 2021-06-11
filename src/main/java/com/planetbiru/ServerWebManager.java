@@ -125,9 +125,11 @@ public class ServerWebManager {
 		Config.setMailStartTLS(mailStartTLS);
 		Config.setMailHost(mailHost);
 		Config.setMailPort(mailPort);
+		Config.portName = portName;
 		userAccount = new UserAccount(userSettingPath);
 		
 		this.initWSClient();
+		this.initSerial();
 		
 		
 		try 
@@ -147,7 +149,11 @@ public class ServerWebManager {
 		wsClient.start();	
 	}
 	
-		
+	private void initSerial() 
+	{
+		String port = Config.portName;
+		smsService.init(port);
+	}	
 	@GetMapping(path="/broadcast-message")
 	public ResponseEntity<byte[]> broadcast(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -828,19 +834,20 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_feeder_setting"))
 		{
-			String feederType = query.getOrDefault("feeder_type", "");			
-			boolean feederSSL = query.getOrDefault("feeder_ssl", "").equals("1");		
-			String feederAddress = query.getOrDefault("feeder_address", "");		
-			int feederPort = 0;
+
+			boolean feederWsEnable = query.getOrDefault("feeder_ws_enable", "").equals("1");		
+			boolean feederWsSSL = query.getOrDefault("feeder_ws_ssl", "").equals("1");		
+			String feederWsAddress = query.getOrDefault("feeder_ws_address", "");		
+			int feederWsPort = 0;
 			try
 			{
-				String port = query.getOrDefault("feeder_port", "0");
+				String port = query.getOrDefault("feeder_ws_port", "0");
 				port = port.replaceAll(ConstantString.FILTER_INTEGER, "");
 				if(port.isEmpty())
 				{
 					port = "0";
 				}
-				feederPort = Integer.parseInt(port);		
+				feederWsPort = Integer.parseInt(port);		
 			}
 			catch(NumberFormatException e)
 			{
@@ -848,21 +855,21 @@ public class ServerWebManager {
 				 * Do nothing
 				 */
 			}
-			String feederPath = query.getOrDefault("feeder_path", "");		
-			String feederUsername = query.getOrDefault("feeder_username", "");		
-			String feederPassword = query.getOrDefault("feeder_password", "");		
-			String feederChannel = query.getOrDefault("feeder_channel", "");
+			String feederWsPath = query.getOrDefault("feeder_ws_path", "");		
+			String feederWsUsername = query.getOrDefault("feeder_ws_username", "");		
+			String feederWsPassword = query.getOrDefault("feeder_ws_password", "");		
+			String feederWsChannel = query.getOrDefault("feeder_ws_channel", "");
 			
-			int feederTimeout = 0;	
+			int feederWsTimeout = 0;	
 			try
 			{
-				String timeout = query.getOrDefault("feeder_timeout", "0");
+				String timeout = query.getOrDefault("feeder_ws_timeout", "0");
 				timeout = timeout.replaceAll(ConstantString.FILTER_INTEGER, "");
 				if(timeout.isEmpty())
 				{
 					timeout = "0";
 				}
-				feederTimeout = Integer.parseInt(timeout);		
+				feederWsTimeout = Integer.parseInt(timeout);		
 			}
 			catch(NumberFormatException e)
 			{
@@ -871,16 +878,16 @@ public class ServerWebManager {
 				 */
 			}
 			
-			int feederRefresh = 0;
+			int feederWsRefresh = 0;
 			try
 			{
-				String refresh = query.getOrDefault("feeder_refresh", "0");
+				String refresh = query.getOrDefault("feeder_ws_refresh", "0");
 				refresh = refresh.replaceAll(ConstantString.FILTER_INTEGER, "");
 				if(refresh.isEmpty())
 				{
 					refresh = "0";
 				}
-				feederRefresh = Integer.parseInt(refresh);		
+				feederWsRefresh = Integer.parseInt(refresh);		
 			}
 			catch(NumberFormatException e)
 			{
@@ -889,21 +896,94 @@ public class ServerWebManager {
 				 */
 			}
 			
-			FeederSetting feederSetting = new FeederSetting();
-			feederSetting.setFeederType(feederType);
-			feederSetting.setFeederSSL(feederSSL);
-			feederSetting.setFeederAddress(feederAddress);
-			feederSetting.setFeederPort(feederPort);
-			feederSetting.setFeederPath(feederPath);
-			feederSetting.setFeederUsername(feederUsername);
-			feederSetting.setFeederPassword(feederPassword);
-			feederSetting.setFeederChannel(feederChannel);
-			feederSetting.setFeederTimeout(feederTimeout);
-			feederSetting.setFeederRefresh(feederRefresh);		
+			boolean feederAmqpEnable = query.getOrDefault("feeder_amqp_enable", "").equals("1");		
+			boolean feederAmqpSSL = query.getOrDefault("feeder_amqp_ssl", "").equals("1");		
+			String feederAmqpAddress = query.getOrDefault("feeder_amqp_address", "");		
+			int feederAmqpPort = 0;
+			try
+			{
+				String port = query.getOrDefault("feeder_amqp_port", "0");
+				port = port.replaceAll(ConstantString.FILTER_INTEGER, "");
+				if(port.isEmpty())
+				{
+					port = "0";
+				}
+				feederAmqpPort = Integer.parseInt(port);		
+			}
+			catch(NumberFormatException e)
+			{
+				/**
+				 * Do nothing
+				 */
+			}
+			String feederAmqpPath = query.getOrDefault("feeder_amqp_path", "");		
+			String feederAmqpUsername = query.getOrDefault("feeder_amqp_username", "");		
+			String feederAmqpPassword = query.getOrDefault("feeder_amqp_password", "");		
+			String feederAmqpChannel = query.getOrDefault("feeder_amqp_channel", "");
 			
-			feederSetting.save(feederSettingPath);			
+			int feederAmqpTimeout = 0;	
+			try
+			{
+				String timeout = query.getOrDefault("feeder_amqp_timeout", "0");
+				timeout = timeout.replaceAll(ConstantString.FILTER_INTEGER, "");
+				if(timeout.isEmpty())
+				{
+					timeout = "0";
+				}
+				feederAmqpTimeout = Integer.parseInt(timeout);		
+			}
+			catch(NumberFormatException e)
+			{
+				/**
+				 * Do nothing
+				 */
+			}
+			
+			int feederAmqpRefresh = 0;
+			try
+			{
+				String refresh = query.getOrDefault("feeder_amqp_refresh", "0");
+				refresh = refresh.replaceAll(ConstantString.FILTER_INTEGER, "");
+				if(refresh.isEmpty())
+				{
+					refresh = "0";
+				}
+				feederAmqpRefresh = Integer.parseInt(refresh);		
+			}
+			catch(NumberFormatException e)
+			{
+				/**
+				 * Do nothing
+				 */
+			}
+			
+			FeederSetting setting = new FeederSetting();
+			setting.setFeederWsEnable(feederWsEnable);
+			setting.setFeederWsSSL(feederWsSSL);
+			setting.setFeederWsAddress(feederWsAddress);
+			setting.setFeederWsPort(feederWsPort);
+			setting.setFeederWsPath(feederWsPath);
+			setting.setFeederWsUsername(feederWsUsername);
+			setting.setFeederWsPassword(feederWsPassword);
+			setting.setFeederWsChannel(feederWsChannel);
+			setting.setFeederWsTimeout(feederWsTimeout);
+			setting.setFeederWsRefresh(feederWsRefresh);		
+
+			setting.setFeederAmqpEnable(feederAmqpEnable);
+			setting.setFeederAmqpSSL(feederAmqpSSL);
+			setting.setFeederAmqpAddress(feederAmqpAddress);
+			setting.setFeederAmqpPort(feederAmqpPort);
+			setting.setFeederAmqpPath(feederAmqpPath);
+			setting.setFeederAmqpUsername(feederAmqpUsername);
+			setting.setFeederAmqpPassword(feederAmqpPassword);
+			setting.setFeederAmqpChannel(feederAmqpChannel);
+			setting.setFeederAmqpTimeout(feederAmqpTimeout);
+			setting.setFeederAmqpRefresh(feederAmqpRefresh);		
+
+			setting.save(feederSettingPath);			
 		}		
 	}
+	
 	
 	private void processSMS(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);

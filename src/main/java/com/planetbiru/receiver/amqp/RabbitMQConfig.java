@@ -38,6 +38,8 @@ public class RabbitMQConfig {
     private void init()
     {
     }
+	
+	
 
 	@Bean
 	ConnectionFactory normalConnectionFactory() {

@@ -78,17 +78,13 @@
           <table class="config-table config-table-feeder">
             <tbody>
             <tr>
-                <td>Feeder Type</td>
-                <td><select name="feeder_type">
-                    <option value="">None</option>
-                    <option value="wsmb">WSMessageBrocker</option>
-                    <option value="amqp">RabbitMQ</option>
-                  </select>	
+                <td>Enable WebSocket</td>
+                <td><label><input type="checkbox" name="feeder_ws_enable" value="1"> Enable</label>
                 </td>
               </tr>
               <tr>
-                <td>Feeder SSL</td>
-                <td><select name="feeder_ssl">
+                <td>SSL</td>
+                <td><select name="feeder_ws_ssl">
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                   </select>	
@@ -96,42 +92,42 @@
               </tr>
               <tr>
                 <td>Host</td>
-                <td><input type="text" name="feeder_address" id="feeder_address" value="">	
+                <td><input type="text" name="feeder_ws_address" id="feeder_address" value="">	
                 </td>
               </tr>
               <tr>
                 <td>Port</td>
-                <td><input type="number" min="1" max="65535" name="feeder_port" id="feeder_port" value="">	
+                <td><input type="number" min="1" max="65535" name="feeder_ws_port" id="feeder_port" value="">	
                 </td>
               </tr>
               <tr>
                 <td>Path</td>
-                <td><input type="text" name="feeder_path" id="feeder_path" value="">	
+                <td><input type="text" name="feeder_ws_path" id="feeder_path" value="">	
                 </td>
               </tr>
               <tr>
                 <td>Username</td>
-                <td><input type="text" name="feeder_username" id="feeder_username" value="">	
+                <td><input type="text" name="feeder_ws_username" id="feeder_username" value="">	
                 </td>
               </tr>
               <tr>
                 <td>Password</td>
-                <td><input type="text" name="feeder_password" id="feeder_password" value="">	
+                <td><input type="text" name="feeder_ws_password" id="feeder_password" value="">	
                 </td>
               </tr>
               <tr>
                 <td>Channel</td>
-                <td><input type="text" name="feeder_channel" id="feeder_channel" value="">	
+                <td><input type="text" name="feeder_ws_channel" id="feeder_channel" value="">	
                 </td>
               </tr>
               <tr>
                 <td>Timeout</td>
-                <td><input type="number" min="0" name="feeder_timeout" id="feeder_timeout" value="">	
+                <td><input type="number" min="0" name="feeder_ws_timeout" id="feeder_timeout" value="">	
                 </td>
               </tr>
               <tr>
-                <td>Refresh Feeder</td>
-                <td><select name="feeder_refresh">
+                <td>Refresh Connection</td>
+                <td><select name="feeder_ws_refresh">
                     <option value="0">Never</option>
                     <option value="600">10 Minutes</option>
                     <option value="1800">30 Minutes</option>
@@ -143,11 +139,80 @@
                   </select>	
                 </td>
               </tr>
+
+              <tr>
+                <td></td>
+                <td>&nbsp;</td>
+              </tr>
+
+              <tr>
+                <td>Enable AMQP</td>
+                <td><label><input type="checkbox" name="feeder_amqp_enable" value="1"> Enable</label>
+                </td>
+              </tr>
+              <tr>
+                <td>SSL</td>
+                <td><select name="feeder_amqp_ssl">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                  </select>	
+                </td>
+              </tr>
+              <tr>
+                <td>Host</td>
+                <td><input type="text" name="feeder_amqp_address" id="feeder_address" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Port</td>
+                <td><input type="number" min="1" max="65535" name="feeder_amqp_port" id="feeder_port" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Path</td>
+                <td><input type="text" name="feeder_amqp_path" id="feeder_path" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Username</td>
+                <td><input type="text" name="feeder_amqp_username" id="feeder_username" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Password</td>
+                <td><input type="text" name="feeder_amqp_password" id="feeder_password" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Channel</td>
+                <td><input type="text" name="feeder_amqp_channel" id="feeder_channel" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Timeout</td>
+                <td><input type="number" min="0" name="feeder_amqp_timeout" id="feeder_timeout" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Refresh Connection</td>
+                <td><select name="feeder_ws_refresh">
+                    <option value="0">Never</option>
+                    <option value="600">10 Minutes</option>
+                    <option value="1800">30 Minutes</option>
+                    <option value="3600">1 Hour</option>
+                    <option value="7200">2 Hours</option>
+                    <option value="21600">6 Hours</option>
+                    <option value="43200">12 Hours</option>
+                    <option value="86400">24 Hours</option>
+                  </select>	
+                </td>
+              </tr>
+
               <tr>
                 <td></td>
                 <td>
                 <input type="submit" class="btn btn-success" name="save_feeder_setting" id="save_feeder_setting" value="Save">	
-                <input type="reset" class="btn btn-default" class="btn btn-default" value="Reset">	
+                <input type="reset" class="btn btn-default"  value="Reset">	
                 </td>
               </tr>
             </tbody>
@@ -162,16 +227,27 @@
                     url:"feeder-setting/get",
                     dataType:"json",
                     success:function(data){
-                        $('select[name="feeder_type"]').val(data.feederType);
-                        $('select[name="feeder_ssl"]').val(data.feederSSL?"1":"0");
-                        $('input[name="feeder_address"]').val(data.feederAddress);
-                        $('input[name="feeder_port"]').val(data.feederPort);
-                        $('input[name="feeder_path"]').val(data.feederPath);
-                        $('input[name="feeder_username"]').val(data.feederUsername);
-                        $('input[name="feeder_password"]').val(data.feederPassword);
-                        $('input[name="feeder_channel"]').val(data.feederChannel);
-                        $('input[name="feeder_timeout"]').val(data.feederTimeout);
-                        $('select[name="feeder_refresh"]').val(data.feederRefresh+"");
+                      $('select[name="feeder_ws_enable"]').val(data.feederWsEnable?"1":"0");
+                      $('select[name="feeder_ws_ssl"]').val(data.feederWsSSL?"1":"0");
+                      $('input[name="feeder_ws_address"]').val(data.feederWsAddress);
+                      $('input[name="feeder_ws_port"]').val(data.feederWsPort);
+                      $('input[name="feeder_ws_path"]').val(data.feederWsPath);
+                      $('input[name="feeder_ws_username"]').val(data.feederWsUsername);
+                      $('input[name="feeder_ws_password"]').val(data.feederWsPassword);
+                      $('input[name="feeder_ws_channel"]').val(data.feederWsChannel);
+                      $('input[name="feeder_ws_timeout"]').val(data.feederWsTimeout);
+                      $('select[name="feeder_ws_refresh"]').val(data.feederWsRefresh+"");
+
+                      $('select[name="feeder_amqp_enable"]').val(data.feederAmqpEnable?"1":"0");
+                      $('select[name="feeder_amqp_ssl"]').val(data.feederAmqpSSL?"1":"0");
+                      $('input[name="feeder_amqp_address"]').val(data.feederAmqpAddress);
+                      $('input[name="feeder_amqp_port"]').val(data.feederAmqpPort);
+                      $('input[name="feeder_amqp_path"]').val(data.feederAmqpPath);
+                      $('input[name="feeder_amqp_username"]').val(data.feederAmqpUsername);
+                      $('input[name="feeder_amqp_password"]').val(data.feederAmqpPassword);
+                      $('input[name="feeder_amqp_channel"]').val(data.feederAmqpChannel);
+                      $('input[name="feeder_amqp_timeout"]').val(data.feederAmqpTimeout);
+                      $('select[name="feeder_amqp_refresh"]').val(data.feederAmqpRefresh+"");
                     }
                 });
             });

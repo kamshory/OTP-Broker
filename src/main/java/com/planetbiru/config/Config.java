@@ -28,6 +28,7 @@ public class Config {
 	public static String ssClientEndpoint = "ws://localhost:8888/ws";
 	private static String wsClientUsername = "qa";
 	private static String wsClientPassword = "4lt0@1234";
+	public static String portName = "usbtty";
 	
 	private Config()
 	{
