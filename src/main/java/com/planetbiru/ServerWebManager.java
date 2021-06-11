@@ -125,7 +125,7 @@ public class ServerWebManager {
 		Config.setMailStartTLS(mailStartTLS);
 		Config.setMailHost(mailHost);
 		Config.setMailPort(mailPort);
-		Config.portName = portName;
+		Config.setPortName(portName);
 		userAccount = new UserAccount(userSettingPath);
 		
 		this.initWSClient();
@@ -151,7 +151,7 @@ public class ServerWebManager {
 	
 	private void initSerial() 
 	{
-		String port = Config.portName;
+		String port = Config.getPortName();
 		smsService.init(port);
 	}	
 	@GetMapping(path="/broadcast-message")

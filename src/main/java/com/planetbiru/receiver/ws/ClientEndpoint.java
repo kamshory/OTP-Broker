@@ -97,7 +97,7 @@ public class ClientEndpoint extends Endpoint {
 		System.out.println("on close : "+closeReason.getReasonPhrase());
 		try 
 		{
-			Thread.sleep(Config.reconnectDelay);
+			Thread.sleep(Config.getReconnectDelay());
 		} 
 		catch (InterruptedException e) 
 		{
