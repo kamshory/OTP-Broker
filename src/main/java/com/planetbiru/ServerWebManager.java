@@ -174,12 +174,12 @@ public class ServerWebManager {
 	public void broardcastWebSocket(String message)
 	{
 		JSONObject messageJSON = new JSONObject();
-		messageJSON.put("command", "broadcast-message");
+		messageJSON.put(JsonKey.COMMAND, "broadcast-message");
 		JSONArray data = new JSONArray();
 		JSONObject itemData = new JSONObject();
 		String uuid = UUID.randomUUID().toString();
 		itemData.put("id", uuid);
-		itemData.put("message", message);
+		itemData.put(JsonKey.MESSAGE, message);
 		data.put(itemData);
 		messageJSON.put("data", data);
 		
@@ -626,7 +626,7 @@ public class ServerWebManager {
 			}		
 		}
 		JSONObject data = new JSONObject();
-		data.put("message", message);
+		data.put(JsonKey.MESSAGE, message);
 		responseJSON.put(JsonKey.RESPONSE_CODE, responseCode);
 		responseJSON.put(JsonKey.RESPONSE_TEXT, responseText);
 		responseJSON.put(JsonKey.DATA, data);		
@@ -1009,8 +1009,8 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("send"))
 		{
-			String receiver = query.getOrDefault("receiver", "");			
-			String message = query.getOrDefault("message", "");	
+			String receiver = query.getOrDefault(JsonKey.RECEIVER, "");			
+			String message = query.getOrDefault(JsonKey.MESSAGE, "");	
 			try 
 			{
 				this.broardcastWebSocket("Sending a message to "+receiver);
@@ -1493,8 +1493,8 @@ public class ServerWebManager {
 		try
 		{
 			requestJSON = new JSONObject(requestBody);
-			String command = requestJSON.optString("command", "");
-			if(command.equals("send-message"))
+			String command = requestJSON.optString(JsonKey.COMMAND, "");
+			if(command.equals(JsonKey.SEND_MESSAGE))
 			{
 				JSONArray data = requestJSON.optJSONArray(JsonKey.DATA);
 				if(data != null && !data.isEmpty())
@@ -1521,8 +1521,8 @@ public class ServerWebManager {
 	{
 		if(data != null)
 		{
-			String receiver = data.optString("receiver", "");
-			String textMessage = data.optString("message", "");
+			String receiver = data.optString(JsonKey.RECEIVER, "");
+			String textMessage = data.optString(JsonKey.MESSAGE, "");
 			try 
 			{
 				this.smsService.sendSMS(receiver, textMessage);
