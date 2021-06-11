@@ -5,11 +5,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1; user-scalable=no">
-    <meta name="description" content="SMS Gateway">
+    <meta name="description" content="OTP Broker">
     <meta name="author" content="Planetbiru">
     <meta name="require-login" content="true" data-file="/login-form.html">
     <link rel="icon" href="favicon.ico">  
-    <title>SMS Gateway</title>
+    <title>OTP Broker</title>
     <link href="lib.assets/css/bootstrap.css" rel="stylesheet">
     <link href="lib.assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
     <link href="lib.assets/css/navbar.css" rel="stylesheet">
@@ -41,7 +41,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="./">SMS Gateway</a>
+            <a class="navbar-brand" href="./">OTP Broker</a>
           </div>
           
           <div id="navbar" class="navbar-collapse collapse">
@@ -123,6 +123,11 @@
               <tr>
                 <td>Timeout</td>
                 <td><input type="number" min="0" name="feeder_ws_timeout" id="feeder_timeout" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>Reconnect Delay</td>
+                <td><input type="number" min="0" name="feeder_ws_reconnect_delay" id="feeder_ws_reconnect_delay" value="">	
                 </td>
               </tr>
               <tr>
@@ -236,6 +241,7 @@
                       $('input[name="feeder_ws_password"]').val(data.feederWsPassword);
                       $('input[name="feeder_ws_channel"]').val(data.feederWsChannel);
                       $('input[name="feeder_ws_timeout"]').val(data.feederWsTimeout);
+                      $('input[name="feeder_ws_reconnect_delay"]').val(data.feederWsReconnectDelay);
                       $('select[name="feeder_ws_refresh"]').val(data.feederWsRefresh+"");
 
                       $('select[name="feeder_amqp_enable"]').val(data.feederAmqpEnable?"1":"0");
