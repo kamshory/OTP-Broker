@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -129,8 +130,7 @@ public class ServerWebManager {
 		userAccount = new UserAccount(userSettingPath);
 		
 		this.initWSClient();
-		this.initSerial();
-		
+		this.initSerial();		
 		
 		try 
 		{
@@ -139,10 +139,16 @@ public class ServerWebManager {
 		catch (IOException e) 
 		{
 			e.printStackTrace();
-			
 		}
 	}
 	
+	@PreDestroy
+	public void destroy()
+	{
+		logger.info("Stop WSClient...");
+		this.wsClient.stopService();
+		this.wsClient = null;
+	}
 	private void initWSClient() 
 	{
 		wsClient.setSMSService(smsService);
@@ -154,8 +160,6 @@ public class ServerWebManager {
 		String port = Config.getPortName();
 		smsService.init(port);
 	}	
-	
-	
 	
 	@GetMapping(path="/broadcast-message")
 	public ResponseEntity<byte[]> broadcast(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -169,7 +173,6 @@ public class ServerWebManager {
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
 	
 	public void broardcastWebSocket(String message)
 	{

@@ -85,12 +85,15 @@ public class WebSocketClient extends Thread implements WebSocket
 	}
 	public void stopService()
 	{
-		try {
+		try 
+		{
 			if(this.session != null && this.session.isOpen())
 			{
 				this.session.close();
 			}
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
 		this.stoped = true;
