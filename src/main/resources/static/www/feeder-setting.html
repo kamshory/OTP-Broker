@@ -97,7 +97,7 @@
               </tr>
               <tr>
                 <td>Port</td>
-                <td><input type="number" min="1" max="65535" name="feeder_ws_port" id="feeder_port" value="">	
+                <td><input type="number" max="65535" name="feeder_ws_port" id="feeder_port" value="">	
                 </td>
               </tr>
               <tr>
@@ -170,7 +170,7 @@
               </tr>
               <tr>
                 <td>Port</td>
-                <td><input type="number" min="1" max="65535" name="feeder_amqp_port" id="feeder_port" value="">	
+                <td><input type="number" max="65535" name="feeder_amqp_port" id="feeder_port" value="">	
                 </td>
               </tr>
               <tr>
@@ -232,7 +232,7 @@
                     url:"feeder-setting/get",
                     dataType:"json",
                     success:function(data){
-                      $('select[name="feeder_ws_enable"]').val(data.feederWsEnable?"1":"0");
+                      $('input[name="feeder_ws_enable"]').prop("checked", data.feederWsEnable);
                       $('select[name="feeder_ws_ssl"]').val(data.feederWsSSL?"1":"0");
                       $('input[name="feeder_ws_address"]').val(data.feederWsAddress);
                       $('input[name="feeder_ws_port"]').val(data.feederWsPort);
@@ -244,7 +244,7 @@
                       $('input[name="feeder_ws_reconnect_delay"]').val(data.feederWsReconnectDelay);
                       $('select[name="feeder_ws_refresh"]').val(data.feederWsRefresh+"");
 
-                      $('select[name="feeder_amqp_enable"]').val(data.feederAmqpEnable?"1":"0");
+                      $('input[name="feeder_amqp_enable"]').prop("checked", data.feederAmqpEnable);
                       $('select[name="feeder_amqp_ssl"]').val(data.feederAmqpSSL?"1":"0");
                       $('input[name="feeder_amqp_address"]').val(data.feederAmqpAddress);
                       $('input[name="feeder_amqp_port"]').val(data.feederAmqpPort);

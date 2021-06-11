@@ -154,6 +154,9 @@ public class ServerWebManager {
 		String port = Config.getPortName();
 		smsService.init(port);
 	}	
+	
+	
+	
 	@GetMapping(path="/broadcast-message")
 	public ResponseEntity<byte[]> broadcast(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
