@@ -21,6 +21,7 @@ public class FeederSetting {
 	private String feederWsPassword = "";
 	private String feederWsChannel = "";
 	private int feederWsTimeout = 0;
+	private int feederWsReconnectDelay = 0;
 	private int feederWsRefresh = 0;
 
 	private boolean feederAmqpEnable = false;
@@ -46,8 +47,8 @@ public class FeederSetting {
 		setting.put("feederWsPassword", this.feederWsPassword);
 		setting.put("feederWsChannel", this.feederWsChannel);
 		setting.put("feederWsTimeout", this.feederWsTimeout);
+		setting.put("feederWsReconnectDelay", this.feederWsReconnectDelay);
 		setting.put("feederWsRefresh", this.feederWsRefresh);
-
 		setting.put("feederAmqpEnable", this.feederAmqpEnable);
 		setting.put("feederAmqpSSL", this.feederAmqpSSL);
 		setting.put("feederAmqpAddress", this.feederAmqpAddress);
@@ -58,7 +59,6 @@ public class FeederSetting {
 		setting.put("feederAmqpChannel", this.feederAmqpChannel);
 		setting.put("feederAmqpTimeout", this.feederAmqpTimeout);
 		setting.put("feederAmqpRefresh", this.feederAmqpRefresh);
-
 		return setting;
 	}
 	
@@ -109,6 +109,7 @@ public class FeederSetting {
 				this.feederWsPassword = setting.optString("feederWsPassword", "");
 				this.feederWsChannel = setting.optString("feederWsChannel", "");
 				this.feederWsTimeout = setting.optInt("feederWsTimeout", 0);
+				this.feederWsReconnectDelay = setting.optInt("feederWsReconnectDelay", 0);
 				this.feederWsRefresh = setting.optInt("feederWsRefresh", 0);
 
 				this.feederAmqpEnable = setting.optBoolean("feederAmqpEnable", false);
@@ -226,6 +227,14 @@ public class FeederSetting {
 		this.feederWsTimeout = feederWsTimeout;
 	}
 
+	public int getFeederWsReconnectDelay() {
+		return feederWsReconnectDelay;
+	}
+
+	public void setFeederWsReconnectDelay(int feederWsReconnectDelay) {
+		this.feederWsReconnectDelay = feederWsReconnectDelay;
+	}
+
 	public int getFeederWsRefresh() {
 		return feederWsRefresh;
 	}
@@ -313,6 +322,7 @@ public class FeederSetting {
 	public void setFeederAmqpRefresh(int feederAmqpRefresh) {
 		this.feederAmqpRefresh = feederAmqpRefresh;
 	}
+
 	
 	
 	

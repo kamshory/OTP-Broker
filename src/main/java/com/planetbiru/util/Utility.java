@@ -1587,5 +1587,8 @@ public class Utility {
 		list.add(input);
 		return list;
 	}
- 
+	public static String basicAuth(String username, String password)
+	{
+		return "Basic " + Utility.base64Encode(username+":"+password);
+	}
 }

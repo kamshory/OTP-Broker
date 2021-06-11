@@ -22,13 +22,14 @@ public class Config {
 	private static String mailStartTLS = "true";
 	private static String mailHost = "smtp.gmail.com";
 	private static String mailPort = "587";
-	public static boolean otpViaWebSocket = true;
-	public static boolean otpViaRabbitMQ = true;
-	public static long reconnectDelay = 5000;
-	public static String ssClientEndpoint = "ws://localhost:8888/ws";
+	private static boolean otpViaWebSocket = true;
+	private static boolean otpViaRabbitMQ = true;
+	private static long reconnectDelay = 5000;
+	private static String ssClientEndpoint = "ws://localhost:8888/ws";
 	private static String wsClientUsername = "qa";
 	private static String wsClientPassword = "4lt0@1234";
-	public static String portName = "usbtty";
+	private static String portName = "usbtty";
+	private static String defaultFile = "/index.html";
 	
 	private Config()
 	{
@@ -146,9 +147,54 @@ public class Config {
 		Config.tablePrefix = tablePrefix;
 	}
 
+	
+
+	public static boolean isOtpViaWebSocket() {
+		return otpViaWebSocket;
+	}
+
+	public static void setOtpViaWebSocket(boolean otpViaWebSocket) {
+		Config.otpViaWebSocket = otpViaWebSocket;
+	}
+
+	public static boolean isOtpViaRabbitMQ() {
+		return otpViaRabbitMQ;
+	}
+
+	public static void setOtpViaRabbitMQ(boolean otpViaRabbitMQ) {
+		Config.otpViaRabbitMQ = otpViaRabbitMQ;
+	}
+
+	public static long getReconnectDelay() {
+		return reconnectDelay;
+	}
+
+	public static void setReconnectDelay(long reconnectDelay) {
+		Config.reconnectDelay = reconnectDelay;
+	}
+
+	public static String getSsClientEndpoint() {
+		return ssClientEndpoint;
+	}
+
+	public static void setSsClientEndpoint(String ssClientEndpoint) {
+		Config.ssClientEndpoint = ssClientEndpoint;
+	}
+
+	public static String getPortName() {
+		return portName;
+	}
+
+	public static void setPortName(String portName) {
+		Config.portName = portName;
+	}
+
 	public static String getDefaultFile() {
-		// TODO Auto-generated method stub
-		return "/index.html";
+		return defaultFile;
+	}
+
+	public static void setDefaultFile(String efaultFile) {
+		Config.defaultFile = efaultFile;
 	}
 
 	public static String getWsClientUsername() {
@@ -166,6 +212,7 @@ public class Config {
 	public static void setWsClientPassword(String wsClientPassword) {
 		Config.wsClientPassword = wsClientPassword;
 	}
+
 	
 	
 

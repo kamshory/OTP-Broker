@@ -16,6 +16,8 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.planetbiru.config.Config;
@@ -25,6 +27,7 @@ import com.planetbiru.util.Utility;
 @Service
 public class WebSocketClient extends Thread implements WebSocket
 {
+	private Logger logger = LogManager.getLogger(WebSocketClient.class);
 	private static Object waitLock = new Object();
 	private Session session = null;
 	private SMSInstance smsService;
@@ -35,20 +38,21 @@ public class WebSocketClient extends Thread implements WebSocket
 	}
 
 	public WebSocketClient() {
-		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		logger.info("Default constructor");
 	}
 
 	public void initWSClient() throws WSConnectionException {
 		
 		initWSClient(null);
 	}
+	
+	@Override
 	public void run()
 	{
-		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		boolean connected = false;
 		do
 		{
-			System.out.println("Connecting...");
+			logger.info("Connecting...");
 			try 
 			{
 				this.initWSClient(smsService);
@@ -60,7 +64,7 @@ public class WebSocketClient extends Thread implements WebSocket
 				e.printStackTrace();
 				try 
 				{
-					Thread.sleep(Config.reconnectDelay);
+					Thread.sleep(Config.getReconnectDelay());
 				} 
 				catch (InterruptedException e1) 
 				{
@@ -101,7 +105,7 @@ public class WebSocketClient extends Thread implements WebSocket
 			{
 				this.smsService = smss;
 			}
-			String url = Config.ssClientEndpoint;
+			String url = Config.getSsClientEndpoint();
 			this.container = ContainerProvider.getWebSocketContainer(); 	
 			
 			javax.websocket.ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
@@ -109,7 +113,7 @@ public class WebSocketClient extends Thread implements WebSocket
 			    @Override
 			    public void beforeRequest(Map<String, List<String>> headers) 
 			    {
-			        headers.put("Authorization", Utility.asList(basicAuth(Config.getWsClientUsername(), Config.getWsClientPassword())));
+			        headers.put("Authorization", Utility.asList(Utility.basicAuth(Config.getWsClientUsername(), Config.getWsClientPassword())));
 			    }
 			});
 			ClientEndpointConfig clientConfig = configBuilder.build();
@@ -150,12 +154,6 @@ public class WebSocketClient extends Thread implements WebSocket
 			e.printStackTrace();
 		}		
 	}
-
-	
-	private static String basicAuth(String username, String password)
-	{
-		return "Basic " + Utility.base64Encode(username+":"+password);
-	}
 	
 	private static void wait4TerminateSignal()
 	{
@@ -174,7 +172,7 @@ public class WebSocketClient extends Thread implements WebSocket
 
 	public void reconnect() 
 	{
-		System.out.println("Reconnect...");
+		logger.info("Reconnect...");
 		try 
 		{
 			initWSClient();
@@ -202,61 +200,55 @@ public class WebSocketClient extends Thread implements WebSocket
 
 	@Override
 	public void abort() {
-		// TODO Auto-generated method stub
-		
+		/**
+		 * Do nothing
+		 */
 	}
 
 	@Override
 	public String getSubprotocol() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean isInputClosed() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isOutputClosed() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void request(long arg0) {
-		// TODO Auto-generated method stub
-		
+		/**
+		 * Do nothing
+		 */
 	}
 
 	@Override
 	public CompletableFuture<WebSocket> sendBinary(ByteBuffer arg0, boolean arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<WebSocket> sendClose(int arg0, String arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<WebSocket> sendPing(ByteBuffer arg0) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<WebSocket> sendPong(ByteBuffer arg0) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<WebSocket> sendText(CharSequence arg0, boolean arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

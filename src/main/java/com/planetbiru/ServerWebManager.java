@@ -125,7 +125,7 @@ public class ServerWebManager {
 		Config.setMailStartTLS(mailStartTLS);
 		Config.setMailHost(mailHost);
 		Config.setMailPort(mailPort);
-		Config.portName = portName;
+		Config.setPortName(portName);
 		userAccount = new UserAccount(userSettingPath);
 		
 		this.initWSClient();
@@ -151,9 +151,12 @@ public class ServerWebManager {
 	
 	private void initSerial() 
 	{
-		String port = Config.portName;
+		String port = Config.getPortName();
 		smsService.init(port);
 	}	
+	
+	
+	
 	@GetMapping(path="/broadcast-message")
 	public ResponseEntity<byte[]> broadcast(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -626,9 +629,7 @@ public class ServerWebManager {
 		data.put("message", message);
 		responseJSON.put(JsonKey.RESPONSE_CODE, responseCode);
 		responseJSON.put(JsonKey.RESPONSE_TEXT, responseText);
-		responseJSON.put(JsonKey.DATA, data);
-		
-		
+		responseJSON.put(JsonKey.DATA, data);		
 		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		String responseBody = responseJSON.toString(4);
@@ -878,6 +879,24 @@ public class ServerWebManager {
 				 */
 			}
 			
+			int feederWsReconnectDelay = 0;
+			try
+			{
+				String reconnect = query.getOrDefault("feeder_ws_reconnect_delay", "0");
+				reconnect = reconnect.replaceAll(ConstantString.FILTER_INTEGER, "");
+				if(reconnect.isEmpty())
+				{
+					reconnect = "0";
+				}
+				feederWsReconnectDelay = Integer.parseInt(reconnect);		
+			}
+			catch(NumberFormatException e)
+			{
+				/**
+				 * Do nothing
+				 */
+			}
+			
 			int feederWsRefresh = 0;
 			try
 			{
@@ -967,6 +986,7 @@ public class ServerWebManager {
 			setting.setFeederWsPassword(feederWsPassword);
 			setting.setFeederWsChannel(feederWsChannel);
 			setting.setFeederWsTimeout(feederWsTimeout);
+			setting.setFeederWsReconnectDelay(feederWsReconnectDelay);
 			setting.setFeederWsRefresh(feederWsRefresh);		
 
 			setting.setFeederAmqpEnable(feederAmqpEnable);
