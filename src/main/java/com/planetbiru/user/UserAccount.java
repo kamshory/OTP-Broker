@@ -143,7 +143,6 @@ public class UserAccount {
 		return user.getPassword().equals(password) && user.isActive() && !user.isBlocked();
 	}
 	
-	
 	private void prepareDir(String fileName) {
 		File file = new File(fileName);
 		String directory1 = file.getParent();
