@@ -26,7 +26,7 @@ public class RabbitMQConfig {
 	@Value("${otpbroker.rabbitmq.port}")
 	private int rabbitMQPort;
 
-	@Value("${otpbroker.mq.queue}")
+	@Value("${otpbroker.rabbitmq.queue}")
 	private String normalQueueName;
 
 	@Bean

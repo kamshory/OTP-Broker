@@ -42,7 +42,7 @@ import com.planetbiru.user.User;
 import com.planetbiru.user.UserAccount;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
-import com.planetbiru.util.SendMail;
+import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.Utility;
 import com.planetbiru.util.WebContent;
 
@@ -227,7 +227,7 @@ public class ServerWebManager {
 				    boolean starttls = Config.getMailStartTLS();   
 				    boolean debug = false;
 					
-					SendMail senEmail = new SendMail(smtpHost, smtpPort, smtpUser, smtpPassword, ssl, starttls, debug);
+					MailUtil senEmail = new MailUtil(smtpHost, smtpPort, smtpUser, smtpPassword, ssl, starttls, debug);
 					try 
 					{
 						senEmail.send(email, "Account Information", message);
