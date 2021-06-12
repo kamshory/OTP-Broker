@@ -27,10 +27,10 @@ public class ServerScheduler {
 
 	private Logger logger = LogManager.getLogger(ServerScheduler.class);
 	
-	@Value("${sms.cron.time.resolution:minute}")
+	@Value("${otpbroker.cron.time.resolution:minute}")
 	private String timeResolution;
 		
-	@Scheduled(cron = "${sms.cron.expression}")
+	@Scheduled(cron = "${otpbroker.cron.expression}")
 	public void task() 
 	{	
 		logger.info("Run...");

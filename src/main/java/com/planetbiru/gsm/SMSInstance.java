@@ -2,8 +2,6 @@ package com.planetbiru.gsm;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-@Service
 public class SMSInstance {
 	private GSM gsm;
 	public SMSInstance()

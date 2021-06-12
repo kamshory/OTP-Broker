@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.planetbiru</groupId>
-	<artifactId>otp-broker</artifactId>
+	<artifactId>ksps</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ksps</name>
 	<description>Koperasi Simpan Pinjam Syariah Planetbiru</description>
@@ -72,12 +72,14 @@
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-		</dependency>	
+		</dependency>
+		
 		
 		<dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
+
 		
         <dependency>
             <groupId>org.springframework</groupId>
@@ -95,7 +97,8 @@
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-log4j2</artifactId>
-		</dependency>		
+		</dependency>
+		
 		
 		<dependency>
 		    <groupId>commons-net</groupId>
@@ -132,7 +135,10 @@
 		</dependency>
 		
 		
-			
+		
+		
+		
+		
 		
 		
 		

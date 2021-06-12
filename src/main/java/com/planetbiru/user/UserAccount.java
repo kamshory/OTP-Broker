@@ -240,5 +240,25 @@ public class UserAccount {
 	public String list() {
 		return this.toString();
 	}
+	public User getUserByPhone(String userID) {
+		for (Map.Entry<String, User> entry : this.users.entrySet())
+		{
+			if(entry.getValue().getPhone().equals(userID))
+			{
+				return entry.getValue();
+			}
+		}
+		return new User();
+	}
+	public User getUserByEmail(String userID) {
+		for (Map.Entry<String, User> entry : this.users.entrySet())
+		{
+			if(entry.getValue().getEmail().equals(userID))
+			{
+				return entry.getValue();
+			}
+		}
+		return new User();
+	}
 
 }

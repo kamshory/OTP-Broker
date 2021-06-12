@@ -12,6 +12,8 @@ public class OTPApplication {
 
 	public static void main(String[] args) {
 		context = SpringApplication.run(OTPApplication.class);
+		
+		
 	}
 	
 	public static void restart() {
@@ -31,5 +33,8 @@ public class OTPApplication {
 	    thread.setDaemon(false);
 	    thread.start();
 	}
+	
+	
+	
 }
 
