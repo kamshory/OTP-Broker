@@ -249,23 +249,27 @@ public class CookieServer {
 	            }
 	            else 
 	            {
-	            	long lasModifued = file.lastModified();
-	            	if(lasModifued < (System.currentTimeMillis() - this.sessionLifetime))
-	            	{
-	            		Path path = Paths.get(file.getPath());
-	            		try 
-	            		{
-							Files.delete(path);
-						} 
-	            		catch (IOException e) 
-	            		{
-							logger.error(e.getMessage());
-						}
-	            	}
+	            	this.deleteFile(file);
 	            }
 	        }
         }
     }
+	public void deleteFile(File file)
+	{
+		long lasModifued = file.lastModified();
+    	if(lasModifued < (System.currentTimeMillis() - this.sessionLifetime))
+    	{
+    		Path path = Paths.get(file.getPath());
+    		try 
+    		{
+				Files.delete(path);
+			} 
+    		catch (IOException e) 
+    		{
+				logger.error(e.getMessage());
+			}
+    	}
+	}
 	
 	public void saveSessionData() {
 		String sessionFile = this.getSessionFile();

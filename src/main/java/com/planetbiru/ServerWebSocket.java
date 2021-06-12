@@ -32,6 +32,7 @@ import com.planetbiru.wstools.MessageDecoder;
 import com.planetbiru.wstools.MessageEncoder;
 import com.planetbiru.wstools.ServletAwareConfigurator;
 
+
 @Component
 @ServerEndpoint(value = "/websocket", 
 	configurator = ServletAwareConfigurator.class,
@@ -57,6 +58,7 @@ public class ServerWebSocket {
     
     Random rand = new Random();
     
+    
     @PostConstruct
     public void init()
     {
@@ -81,6 +83,7 @@ public class ServerWebSocket {
         boolean auth = true;
         try 
         {
+        	Account.getUserAccount().load();
         	auth = Account.getUserAccount().checkUserAuth(requestHdr);
 		} 
         catch (NoUserRegisteredException e) 
@@ -88,16 +91,15 @@ public class ServerWebSocket {
 			/**
 			 * Do nothing
 			 */
-        	e.printStackTrace();
-		}
-        
+        	logger.error(e.getMessage());
+		}     
         
         if(auth)
         {
             listeners.add(this);
             this.sendWelcomeMessage();
         }
-}
+	}
     
     private void sendWelcomeMessage() {
 		String welcomeMessage = this.createWelcomeMessage();	

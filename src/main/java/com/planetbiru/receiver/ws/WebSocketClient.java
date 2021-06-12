@@ -18,34 +18,21 @@ import javax.websocket.WebSocketContainer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Service;
-
 import com.planetbiru.config.Config;
-import com.planetbiru.gsm.SMSInstance;
 import com.planetbiru.util.Utility;
 
-@Service
 public class WebSocketClient extends Thread implements WebSocket
 {
 	private Logger logger = LogManager.getLogger(WebSocketClient.class);
 	private static Object waitLock = new Object();
 	private Session session = null;
-	private SMSInstance smsService;
 	private WebSocketContainer container;
-	private boolean stoped = false;
+	private static boolean stoped = false;
 	
-	public WebSocketClient(SMSInstance smsService) {
-		this.smsService = smsService;
-	}
-
 	public WebSocketClient() {
 		logger.info("Default constructor");
 	}
 
-	public void initWSClient() throws WSConnectionException {		
-		initWSClient(null);
-	}
-	
 	@Override
 	public void run()
 	{
@@ -55,24 +42,24 @@ public class WebSocketClient extends Thread implements WebSocket
 			logger.info("Connecting...");
 			try 
 			{
-				this.initWSClient(smsService);
+				this.initWSClient();
 				connected = true;
 			} 
-			catch (WSConnectionException e) 
+			catch (WebSocketConnectionException e) 
 			{
 				connected = false;
 				sleep(Config.getReconnectDelay());			
 				try 
 				{
-					this.initWSClient(smsService);
+					this.initWSClient();
 				} 
-				catch (WSConnectionException e1) 
+				catch (WebSocketConnectionException e1) 
 				{
 					e1.printStackTrace();
 				}
 			}
 		}
-		while(!connected && !stoped);
+		while(!connected && !isStoped());
 	}
 	public static void sleep(long interval)
 	{
@@ -85,36 +72,17 @@ public class WebSocketClient extends Thread implements WebSocket
 			Thread.currentThread().interrupt();
 		}
 	}
-	public void stopService()
-	{
-		try 
-		{
-			if(this.session != null && this.session.isOpen())
-			{
-				this.session.close();
-			}
-		} 
-		catch (IOException e) 
-		{
-			logger.error(e.getMessage());
-		}
-		this.stoped = true;
-	}
 	
-	public void initWSClient(SMSInstance smss) throws WSConnectionException
+	public void initWSClient() throws WebSocketConnectionException
 	{
-		this.session = null;
-		this.container = null;
+		setSession(null);
+		setContainer(null);
 		try
 		{
-			if(smss != null)
-			{
-				this.smsService = smss;
-			}
 			String url = Config.getSsClientEndpoint();
-			this.container = ContainerProvider.getWebSocketContainer(); 	
+			setContainer(ContainerProvider.getWebSocketContainer()); 	
 			
-			javax.websocket.ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
+			ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
 			configBuilder.configurator(new Configurator() {
 			    @Override
 			    public void beforeRequest(Map<String, List<String>> headers) 
@@ -124,21 +92,21 @@ public class WebSocketClient extends Thread implements WebSocket
 			});
 			ClientEndpointConfig clientConfig = configBuilder.build();
 			
-			this.session = container.connectToServer(new ClientEndpoint(this, smsService), clientConfig, URI.create(url)); 
+			setSession(getContainer().connectToServer(new WebSocketEndpoint(this), clientConfig, URI.create(url))); 
 			wait4TerminateSignal();
 			
 		} 
 		catch (DeploymentException | IOException e) 
 		{
-			throw new WSConnectionException(e);
+			throw new WebSocketConnectionException(e);
 		}
 		finally
 		{
-			if(this.session != null)
+			if(getSession() != null)
 			{
 				try 
 				{
-					this.session.close();
+					getSession().close();
 				} 
 				catch (IOException e) 
 				{     
@@ -146,14 +114,12 @@ public class WebSocketClient extends Thread implements WebSocket
 				}
 			}         
 		} 
-		
-
 	}
 	
 	public void close() {
 		try 
 		{
-			this.session.close();
+			getSession().close();
 		} 
 		catch (IOException e) 
 		{
@@ -183,7 +149,7 @@ public class WebSocketClient extends Thread implements WebSocket
 		{
 			initWSClient();
 		} 
-		catch (WSConnectionException e) 
+		catch (WebSocketConnectionException e) 
 		{
 			sleep(Config.getReconnectDelay());
 			reconnect();
@@ -191,10 +157,6 @@ public class WebSocketClient extends Thread implements WebSocket
 	}
 
 	
-
-	public void setSMSService(SMSInstance smsService) {
-		this.smsService = smsService;	
-	}
 
 	@Override
 	public void abort() {
@@ -248,6 +210,30 @@ public class WebSocketClient extends Thread implements WebSocket
 	@Override
 	public CompletableFuture<WebSocket> sendText(CharSequence arg0, boolean arg1) {
 		return null;
+	}
+
+	public Session getSession() {
+		return session;
+	}
+
+	public void setSession(Session session) {
+		this.session = session;
+	}
+
+	public WebSocketContainer getContainer() {
+		return container;
+	}
+
+	public void setContainer(WebSocketContainer container) {
+		this.container = container;
+	}
+
+	public static boolean isStoped() {
+		return stoped;
+	}
+
+	public static void setStoped(boolean stoped) {
+		WebSocketClient.stoped = stoped;
 	}
 
 	

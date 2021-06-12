@@ -57,7 +57,7 @@
                                 <li class=""><a href="admin.html">Administrator Setting</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                                 <li class=""><a href="sms-setting.html">SMS Setting</a></li>
-                                <li class=""><a href="email-setting.html">Email Setting</a></li>
+                                <li class="active "><a href="email-setting.html">Email Setting</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="dropdown-header">Other Configs</li>
                                 <li><a href="#">Config 1</a></li>
@@ -75,11 +75,79 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>Error 1000</h3>
-            <h4>Serial Port is NULL</h4>
-            <p>The modem or device must be connected to the server before sending messages or executing USSD codes. </p>
-            <p>Consider to replug the modem/device or restart the server. If it still happened, please reconfigure the connection setting on Setting &gt; SMS Setting</p>
-            <p><a href="sms-setting.html">Link to solve</a></p>
+            <h3>Email Setting</h3>
+            <form action="email-setting.html" method="post">
+                <table class="config-table config-table-connection">
+                    <tbody>
+                        <tr>
+                            <td>SMTP Host</td>
+                            <td><input type="text" name="host" id="host" value="usb/tty">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SMTP Port</td>
+                            <td><input type="number" name="port" id="port" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TLS</td>
+                            <td><input type="text" name="tls" id="tls" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SSL</td>
+                            <td><input type="text" name="ssl" id="ssl" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Minimum Interval (Second)</td>
+                            <td><input type="number" name="incomming_interval" id="incomming_interval" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Time Range (Second)</td>
+                            <td><input type="number" name="time_range" id="time_range" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Maximum Per Time Range</td>
+                            <td><input type="number" name="max_per_time_range" id="max_per_time_range" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="submit" class="btn btn-success" name="save_sms_setting"
+                                    id="save_sms_setting" value="Save">
+                                <input type="button" class="btn btn-primary" name="detect_device" id="detect_device"
+                                    value="Detect Device">
+                                <input type="reset" class="btn btn-default" class="btn btn-default" value="Reset">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </form>
+            <script type="text/javascript">
+                $(document).ready(function (e) {
+                    $.ajax({
+                        type: "GET",
+                        url: "sms-setting/get",
+                        dataType: "json",
+                        success: function (data) {
+                            $('input[name="connection_type"]').val(data.connectionType);
+                            $('input[name="imei"]').val(data.imei);
+                            $('input[name="sim_card_pin"]').val(data.simCardPIN);
+                            $('input[name="sms_center"]').val(data.smsCenter);
+                            $('input[name="incomming_interval"]').val(data.incommingInterval + "");
+                            $('input[name="time_range"]').val(data.timeRange + "");
+                            $('input[name="max_per_time_range"]').val(data.maxPerTimeRange + "");
+                        }
+                    });
+                });
+            </script>
+
+
         </div>
         <!-- /container -->
     </div>

@@ -13,16 +13,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.planetbiru.config.Config;
-import com.planetbiru.gsm.GSMNotInitalizedException;
-import com.planetbiru.gsm.SMSInstance;
+import com.planetbiru.gsm.GSMNullException;
+import com.planetbiru.gsm.SMSUtil;
 
-public class ClientEndpoint extends Endpoint {
+public class WebSocketEndpoint extends Endpoint {
 	private WebSocketClient webSocketClient;
-	private SMSInstance smsService;
 	private Session session;
-	public ClientEndpoint(WebSocketClient webSocketClient, SMSInstance smsService) {
+	public WebSocketEndpoint(WebSocketClient webSocketClient) {
 		this.webSocketClient = webSocketClient;
-		this.smsService = smsService;
 	}
 	@Override
 	public void onOpen(Session ses, EndpointConfig config) {
@@ -61,9 +59,12 @@ public class ClientEndpoint extends Endpoint {
 						{
 							String receiver = dt.optString("receiver", "");
 							String textMessage = dt.optString("message", "");
-							try {
-								this.smsService.sendSMS(receiver, textMessage);
-							} catch (GSMNotInitalizedException e) {
+							try 
+							{
+								this.sendSMS(receiver, textMessage);
+							} 
+							catch (GSMNullException e) 
+							{
 								e.printStackTrace();
 							}
 						}
@@ -75,6 +76,10 @@ public class ClientEndpoint extends Endpoint {
 		{
 			e.printStackTrace();
 		}
+	}
+	private void sendSMS(String receiver, String textMessage) throws GSMNullException {
+		SMSUtil.sendSMS(receiver, textMessage);
+		
 	}
 	private void login() throws IOException {
 		String text = "";

@@ -18,6 +18,8 @@ public class SMSSetting {
 	private int incommingInterval = 0;
 	private int timeRange = 0;
 	private int maxPerTimeRange = 0;
+	private String imei = "";
+	private String simCardPIN = "";
 	
 	public JSONObject toJSONObject()
 	{
@@ -27,6 +29,8 @@ public class SMSSetting {
 		smsSetting.put(JsonKey.INCOMMING_INTERVAL, this.incommingInterval);
 		smsSetting.put(JsonKey.TIME_RANGE, this.timeRange);
 		smsSetting.put(JsonKey.MAX_PER_TIME_RANGE, this.maxPerTimeRange);
+		smsSetting.put(JsonKey.IMEI, this.getImei());
+		smsSetting.put(JsonKey.SIM_CARD_PIN, this.getSimCardPIN());
 		return smsSetting;
 	}
 	
@@ -71,6 +75,8 @@ public class SMSSetting {
 				JSONObject smsSetting = new JSONObject(text);
 				this.connectionType = smsSetting.optString(JsonKey.CONNECTION_TYPE, "");
 				this.smsCenter = smsSetting.optString(JsonKey.SMS_CENTER, "");
+				this.setImei(smsSetting.optString(JsonKey.IMEI, ""));
+				this.setSimCardPIN(smsSetting.optString(JsonKey.SIM_CARD_PIN, ""));
 				this.incommingInterval = smsSetting.optInt(JsonKey.INCOMMING_INTERVAL, 0);
 				this.timeRange = smsSetting.optInt(JsonKey.TIME_RANGE, 0);
 				this.maxPerTimeRange = smsSetting.optInt(JsonKey.MAX_PER_TIME_RANGE, 0);
@@ -146,6 +152,22 @@ public class SMSSetting {
 
 	public void setMaxPerTimeRange(int maxPerTimeRange) {
 		this.maxPerTimeRange = maxPerTimeRange;
+	}
+
+	public String getImei() {
+		return imei;
+	}
+
+	public void setImei(String imei) {
+		this.imei = imei;
+	}
+
+	public String getSimCardPIN() {
+		return simCardPIN;
+	}
+
+	public void setSimCardPIN(String simCardPIN) {
+		this.simCardPIN = simCardPIN;
 	}
 
 	

@@ -26,15 +26,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.config.Config;
-import com.planetbiru.config.ResourceConfig;
+import com.planetbiru.config.ConfigEmail;
+import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.gsm.ErrorCode;
-import com.planetbiru.gsm.GSMNotInitalizedException;
-import com.planetbiru.gsm.PortUtils;
-import com.planetbiru.gsm.SMSInstance;
-import com.planetbiru.receiver.ws.WebSocketClient;
+import com.planetbiru.gsm.GSMNullException;
+import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.receiver.ws.WebSocketContent;
 import com.planetbiru.settings.FeederSetting;
 import com.planetbiru.settings.SMSSetting;
 import com.planetbiru.user.NoUserRegisteredException;
@@ -44,23 +44,15 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.Utility;
-import com.planetbiru.util.WebContent;
 
 @RestController
 public class ServerWebManager {
 	
-	private ResourceConfig mime = new ResourceConfig();
+	private ConfigSaved mime = new ConfigSaved();
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
-	@Autowired
-	WebSocketClient wsClient;
-
-	SMSInstance smsService = new SMSInstance();
 	private UserAccount userAccount;
 
-	@Value("${otpbroker.secret.key}")
-	private String secretKey;
-	
 	@Value("${otpbroker.mail.sender.address}")
 	private String mailSenderAddress;
 
@@ -68,7 +60,7 @@ public class ServerWebManager {
 	private String mailSenderPassword;
 	
 	@Value("${otpbroker.mail.auth}")
-	private String mailAuth;
+	private boolean mailAuth;
 	
 	@Value("${otpbroker.mail.start.tls}")
 	private boolean mailStartTLS;
@@ -80,9 +72,11 @@ public class ServerWebManager {
 	private String mailHost;
 	
 	@Value("${otpbroker.mail.port}")
-	private String mailPort;
+	private int mailPort;
 
 
+	
+	
 	@Value("${otpbroker.ws.endpoint}")
 	private String wsClientEndpoint;
 
@@ -114,6 +108,9 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
+	@Value("${otpbroker.path.setting.email}")
+	private String emailSettingPath;
+
 	@Value("${otpbroker.device.connection.type}")
 	private String portName;
 
@@ -129,27 +126,18 @@ public class ServerWebManager {
 	{
 		logger.info("Init...");
 		
-		
-		Config.setMailSenderAddress(mailSenderAddress);
-		Config.setMailSenderPassword(mailSenderPassword);
-		Config.setMailAuth(mailAuth);
-		Config.setMailSSL(mailSSL);
-		Config.setMailStartTLS(mailStartTLS);
-		Config.setMailHost(mailHost);
-		Config.setMailPort(mailPort);
 		Config.setPortName(portName);
-		
-		
 		
 		userAccount = new UserAccount(userSettingPath);
 		
-		this.initWSClient();
+		this.loadConfigEmail();
+		
 		this.initSerial();
 		
 		
 		try 
 		{
-			mime = new ResourceConfig(mimeSettingPath);
+			mime = new ConfigSaved(mimeSettingPath);
 		} 
 		catch (IOException e) 
 		{
@@ -158,43 +146,51 @@ public class ServerWebManager {
 		}
 	}
 	
-	private void initWSClient() 
+	private void loadConfigEmail()
 	{
-		wsClient.setSMSService(smsService);
-		wsClient.start();	
+		ConfigEmail.setMailSenderAddress(mailSenderAddress);
+		ConfigEmail.setMailSenderPassword(mailSenderPassword);
+		ConfigEmail.setMailAuth(mailAuth);
+		ConfigEmail.setMailSSL(mailSSL);
+		ConfigEmail.setMailStartTLS(mailStartTLS);
+		ConfigEmail.setMailHost(mailHost);
+		ConfigEmail.setMailPort(mailPort);	
+		/**
+		 * Override email setting if exists
+		 */
+		ConfigEmail.load(emailSettingPath);
 	}
 	
+	private void saveConfigEmail(JSONObject config)
+	{
+		ConfigEmail.save(emailSettingPath, config);
+	}
 	
 	private void initSerial() 
 	{
 		String port = Config.getPortName();
-		smsService.init(port);
+		SMSUtil.init(port);
 	}	
+	
 	
 	@PostMapping(path="/send-token")
 	public ResponseEntity<byte[]> sendTokenResetPassword1(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
-	{
-		
-		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
-		
-		String userID = queryPairs.getOrDefault("userid", "");
-		
+	{		
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);	
+		String userID = queryPairs.getOrDefault("userid", "");		
 		return this.sendTokenResetPassword(userID);
 	}
 	
 	@GetMapping(path="/send-token")
 	public ResponseEntity<byte[]> sendTokenResetPassword2(@RequestHeader HttpHeaders headers, HttpServletRequest request)
-	{
-		
+	{	
 		String userID = request.getParameter("userid");
-		
 		return this.sendTokenResetPassword(userID);
 	}
 	
 	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
 		byte[] responseBody = "".getBytes();
 		HttpHeaders responseHeaders = new HttpHeaders();
-
 		userAccount.load();
 		
 		try 
@@ -219,12 +215,12 @@ public class ServerWebManager {
 				if(!email.isEmpty() && userID.equalsIgnoreCase(email))
 				{
 					String message = "Username : "+user.getUsername()+"\r\nPassword : "+user.getPassword();
-					String smtpHost = Config.getMailHost();
-					String smtpPort = Config.getMailPort();
-				    String smtpUser = Config.getMailSenderAddress();
-				    String smtpPassword = Config.getMailSenderPassword();
-				    boolean ssl = Config.isMailSSL();
-				    boolean starttls = Config.getMailStartTLS();   
+					String smtpHost = ConfigEmail.getMailHost();
+					int smtpPort = ConfigEmail.getMailPort();
+				    String smtpUser = ConfigEmail.getMailSenderAddress();
+				    String smtpPassword = ConfigEmail.getMailSenderPassword();
+				    boolean ssl = ConfigEmail.isMailSSL();
+				    boolean starttls = ConfigEmail.isMailStartTLS();   
 				    boolean debug = false;
 					
 					MailUtil senEmail = new MailUtil(smtpHost, smtpPort, smtpUser, smtpPassword, ssl, starttls, debug);
@@ -242,9 +238,9 @@ public class ServerWebManager {
 					String message = "Username : "+user.getUsername()+"\r\nPassword : "+user.getPassword();
 					try 
 					{
-						smsService.sendSMS(phone, message);
+						SMSUtil.sendSMS(phone, message);
 					} 
-					catch (GSMNotInitalizedException e) 
+					catch (GSMNullException e) 
 					{
 						e.printStackTrace();
 					}
@@ -273,6 +269,16 @@ public class ServerWebManager {
 		
 		String message = Utility.date("yyyy-MM-dd HH:mm:ss.SSS")+" This page uses the non standard property “zoom”. Consider using calc() in the relevant property values, or using “transform” along with “transform-origin: 0 0...";
 		this.broardcastWebSocket(message);
+		
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	@GetMapping(path="/restart")
+	public ResponseEntity<byte[]> restart(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		ServerApplication.restart();
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
@@ -724,9 +730,9 @@ public class ServerWebManager {
 		{
 			try 
 			{
-				message = smsService.executeUSSD(ussd);
+				message = SMSUtil.executeUSSD(ussd);
 			} 
-			catch (GSMNotInitalizedException e) 
+			catch (GSMNullException e) 
 			{
 				responseCode = e.getErrorCode();
 				responseText = "<strong>Error: "+e.getErrorCode()+"</strong> "+e.getMessage()+". <a href=\"error-"+e.getErrorCode()+".html\">Detail</a>";
@@ -774,7 +780,7 @@ public class ServerWebManager {
 		}
 		CookieServer cookie = new CookieServer(headers);
 		
-		WebContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
+		WebSocketContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
 		
 		responseBody = newContent.getResponseBody();
 		responseHeaders = newContent.getResponseHeaders();
@@ -926,9 +932,13 @@ public class ServerWebManager {
 				 * Do nothing
 				 */
 			}
+			String imei = query.getOrDefault("imei", "");		
+			String simCardPIN = query.getOrDefault("sim_card_pin", "");		
 			
 			SMSSetting smsSetting = new SMSSetting();
 			smsSetting.setConnectionType(connectionType);
+			smsSetting.setImei(imei);
+			smsSetting.setSimCardPIN(simCardPIN);
 			smsSetting.setSmsCenter(smsCenter);
 			smsSetting.setIncommingInterval(incommingInterval);
 			smsSetting.setTimeRange(timeRange);
@@ -1121,9 +1131,9 @@ public class ServerWebManager {
 			try 
 			{
 				this.broardcastWebSocket("Sending a message to "+receiver);
-				smsService.sendSMS(receiver, message);
+				SMSUtil.sendSMS(receiver, message);
 			} 
-			catch (GSMNotInitalizedException e) 
+			catch (GSMNullException e) 
 			{
 				e.printStackTrace();
 			}
@@ -1392,10 +1402,10 @@ public class ServerWebManager {
 		return 	mime.getString("MIME", ext, "");
 	}
 
-	private WebContent updateContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie) 
+	private WebSocketContent updateContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie) 
 	{
 		String contentType = this.getMIMEType(fileName);
-		WebContent webContent = new WebContent(fileName, responseHeaders, responseBody, statusCode, cookie, contentType);
+		WebSocketContent webContent = new WebSocketContent(fileName, responseHeaders, responseBody, statusCode, cookie, contentType);
 		boolean requireLogin = false;
 		String fileSub = "";
 		
@@ -1632,9 +1642,9 @@ public class ServerWebManager {
 			String textMessage = data.optString(JsonKey.MESSAGE, "");
 			try 
 			{
-				this.smsService.sendSMS(receiver, textMessage);
+				SMSUtil.sendSMS(receiver, textMessage);
 			} 
-			catch (GSMNotInitalizedException e) 
+			catch (GSMNullException e) 
 			{
 				
 				e.printStackTrace();
