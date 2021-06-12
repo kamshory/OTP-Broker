@@ -114,7 +114,7 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
-	@Value("${otpbroker.connection.type}")
+	@Value("${otpbroker.device.connection.type}")
 	private String portName;
 
 	@Autowired

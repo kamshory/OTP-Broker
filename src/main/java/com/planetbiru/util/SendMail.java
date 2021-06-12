@@ -67,10 +67,17 @@ public class SendMail {
 	}
 	public boolean send(String to, String subject, String message) throws MessagingException
 	{
- 		boolean sent = false;
+ 		return this.send(to, subject, message, this.smtpUser);
+	}
+	
+	public boolean send(String to, String subject, String message, String from) throws MessagingException
+	{
+		boolean sent = false;
 
         // Create a default MimeMessage object.
         MimeMessage mimeMessage = new MimeMessage(session);
+
+		mimeMessage.setFrom(new InternetAddress(from, false));
 
         // Set From: header field of the header.
         mimeMessage.setFrom(new InternetAddress(this.smtpUser));
@@ -92,12 +99,12 @@ public class SendMail {
         return sent;
 	}
 	
-	public boolean send(String to, String subject, String message, String contentType, List<String> files) throws MessagingException
+	public boolean send(String to, String subject, String message, String from, String contentType, List<String> files) throws MessagingException
 	{
  		boolean sent = false;
 
  		Message mimeMessage = new MimeMessage(session);
-		mimeMessage.setFrom(new InternetAddress(this.smtpUser, false));
+		mimeMessage.setFrom(new InternetAddress(from, false));
 		
 		mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 		mimeMessage.setSubject(subject);
@@ -132,4 +139,5 @@ public class SendMail {
 		sent = true;
 		return sent;
 	}
+	
 }
