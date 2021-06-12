@@ -58,63 +58,63 @@ public class ServerWebManager {
 	SMSInstance smsService = new SMSInstance();
 	private UserAccount userAccount;
 
-	@Value("${sms.secret.key}")
+	@Value("${otpbroker.secret.key}")
 	private String secretKey;
 	
-	@Value("${sms.mail.sender.address}")
+	@Value("${otpbroker.mail.sender.address}")
 	private String mailSenderAddress;
 
-	@Value("${sms.mail.sender.password}")
+	@Value("${otpbroker.mail.sender.password}")
 	private String mailSenderPassword;
 	
-	@Value("${sms.mail.auth}")
+	@Value("${otpbroker.mail.auth}")
 	private String mailAuth;
 	
-	@Value("${sms.mail.start.tls}")
+	@Value("${otpbroker.mail.start.tls}")
 	private boolean mailStartTLS;
 	
-	@Value("${sms.mail.ssl}")
+	@Value("${otpbroker.mail.ssl}")
 	private boolean mailSSL;
 	
-	@Value("${sms.mail.host}")
+	@Value("${otpbroker.mail.host}")
 	private String mailHost;
 	
-	@Value("${sms.mail.port}")
+	@Value("${otpbroker.mail.port}")
 	private String mailPort;
 
 
-	@Value("${sms.ws.endpoint}")
+	@Value("${otpbroker.ws.endpoint}")
 	private String wsClientEndpoint;
 
-	@Value("${sms.ws.username}")
+	@Value("${otpbroker.ws.username}")
 	private String wsClientUsername;
 
-	@Value("${sms.ws.password}")
+	@Value("${otpbroker.ws.password}")
 	private String wsClientPassword;
 
-	@Value("${sms.web.session.name}")
+	@Value("${otpbroker.web.session.name}")
 	private String sessionName;
 
-	@Value("${sms.web.session.lifetime}")
+	@Value("${otpbroker.web.session.lifetime}")
 	private int cacheLifetime;
 
-	@Value("${sms.web.document.root}")
+	@Value("${otpbroker.web.document.root}")
 	private String documentRoot;
 
-	@Value("${sms.path.setting.feeder}")
+	@Value("${otpbroker.path.setting.feeder}")
 	private String feederSettingPath;
 
-	@Value("${sms.path.setting.sms}")
+	@Value("${otpbroker.path.setting.sms}")
 	private String smsSettingPath;
 	
-	@Value("${sms.path.setting.all}")
+	@Value("${otpbroker.path.setting.all}")
 	private String mimeSettingPath;	
 
 	
-	@Value("${sms.path.setting.user}")
+	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
-	@Value("${sms.connection.type}")
+	@Value("${otpbroker.connection.type}")
 	private String portName;
 
 	@Autowired

@@ -39,7 +39,7 @@ import com.planetbiru.wstools.ServletAwareConfigurator;
 	encoders = MessageEncoder.class)
 public class ServerWebSocket {
 	
-	@Value("${sms.path.setting.user}")
+	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
 	private Session session;
