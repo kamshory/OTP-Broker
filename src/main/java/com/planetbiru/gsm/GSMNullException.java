@@ -1,6 +1,6 @@
 package com.planetbiru.gsm;
 
-public class GSMNotInitalizedException extends Exception {
+public class GSMNullException extends Exception {
 	/**
 	 * 
 	 */
@@ -9,7 +9,7 @@ public class GSMNotInitalizedException extends Exception {
 	/**
 	 * Default constructor
 	 */
-	public GSMNotInitalizedException() 
+	public GSMNullException() 
 	{ 
 		super(); 
 	}
@@ -17,7 +17,7 @@ public class GSMNotInitalizedException extends Exception {
 	 * Constructor with the message
 	 * @param message Message
 	 */
-	public GSMNotInitalizedException(String message) 
+	public GSMNullException(String message) 
 	{ 
 		super(message); 
 	}
@@ -25,7 +25,7 @@ public class GSMNotInitalizedException extends Exception {
 	 * Constructor with the message
 	 * @param message Message
 	 */
-	public GSMNotInitalizedException(String message, String errorCode) 
+	public GSMNullException(String message, String errorCode) 
 	{ 
 		super(message); 
 		this.setErrorCode(errorCode);
@@ -35,7 +35,7 @@ public class GSMNotInitalizedException extends Exception {
 	 * @param message Message
 	 * @param cause Cause
 	 */
-	public GSMNotInitalizedException(String message, Throwable cause) 
+	public GSMNullException(String message, Throwable cause) 
 	{ 
 		super(message, cause); 
 	}
@@ -43,7 +43,7 @@ public class GSMNotInitalizedException extends Exception {
 	 * Constructor with cause
 	 * @param cause Cause
 	 */
-	public GSMNotInitalizedException(Throwable cause) 
+	public GSMNullException(Throwable cause) 
 	{ 
 		super(cause); 
 	}

@@ -32,6 +32,7 @@ import com.planetbiru.wstools.MessageDecoder;
 import com.planetbiru.wstools.MessageEncoder;
 import com.planetbiru.wstools.ServletAwareConfigurator;
 
+
 @Component
 @ServerEndpoint(value = "/websocket", 
 	configurator = ServletAwareConfigurator.class,
@@ -56,6 +57,7 @@ public class ServerWebSocket {
     private static Logger logger = LogManager.getLogger(ServerWebSocket.class);   
     
     Random rand = new Random();
+    
     
     @PostConstruct
     public void init()

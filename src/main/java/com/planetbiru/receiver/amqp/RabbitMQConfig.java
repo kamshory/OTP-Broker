@@ -37,8 +37,8 @@ public class RabbitMQConfig {
 	@PostConstruct
     private void init()
     {
+		
     }
-	
 	
 
 	@Bean

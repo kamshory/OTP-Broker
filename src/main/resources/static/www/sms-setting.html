@@ -55,6 +55,7 @@
                   <li class=""><a href="admin.html">Administrator Setting</a></li>
                   <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                   <li class="active "><a href="sms-setting.html">SMS Setting</a></li>
+                  <li class=""><a href="email-setting.html">Email Setting</a></li>
                   <li role="separator" class="divider"></li>
                   <li class="dropdown-header">Other Configs</li>
                   <li><a href="#">Config 1</a></li>
@@ -81,8 +82,18 @@
                 </td>
               </tr>
               <tr>
+                <td>IMEI</td>
+                <td><input type="text" name="imei" id="imei" value="">	
+                </td>
+              </tr>
+              <tr>
+                <td>SIM Card PIN</td>
+                <td><input type="text" name="sim_card_pin" id="sim_card_pin" value="">	
+                </td>
+              </tr>
+              <tr>
                 <td>SMS Center</td>
-                <td><input type="text" name="sms_center" id="sms_center" value="+62811000000">	
+                <td><input type="text" name="sms_center" id="sms_center" value="">	
                 </td>
               </tr>
               <tr>
@@ -119,7 +130,9 @@
                     url:"sms-setting/get",
                     dataType:"json",
                     success:function(data){
-                        $('input[name="connection_type"]').val(data.connectionType);
+                      $('input[name="connection_type"]').val(data.connectionType);
+                      $('input[name="imei"]').val(data.imei);
+                      $('input[name="sim_card_pin"]').val(data.simCardPIN);
                         $('input[name="sms_center"]').val(data.smsCenter);
                         $('input[name="incomming_interval"]').val(data.incommingInterval+"");
                         $('input[name="time_range"]').val(data.timeRange+"");

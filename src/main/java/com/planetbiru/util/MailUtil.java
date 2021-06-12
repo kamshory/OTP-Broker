@@ -20,13 +20,13 @@ import javax.mail.internet.MimeMultipart;
 public class MailUtil {
 	private Session session;
 	private String smtpHost = "smtp.gmail.com";
-	private String smtpPort = "587";
+	private int smtpPort = 587;
     private String smtpUser = "";
     private String smtpPassword = "";
     private boolean ssl = false;
     private boolean starttls = true;   
     private boolean debug = false;
-    public MailUtil(String smtpHost, String smtpPort, String smtpUser, String smtpPassword, boolean ssl, boolean starttls, boolean debug)
+    public MailUtil(String smtpHost, int smtpPort, String smtpUser, String smtpPassword, boolean ssl, boolean starttls, boolean debug)
     {
     	this.smtpHost = smtpHost;
     	this.smtpPort = smtpPort;

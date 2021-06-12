@@ -64,6 +64,8 @@ public class JsonKey {
 	public static final String CRON_EXPRESSION              = "cron_expression";
 	public static final String JOB_ID                       = "job_id";
 	public static final Object SEND_MESSAGE                 = "send-message";
+	public static final String IMEI = "imei";
+	public static final String SIM_CARD_PIN = "simCardPIN";
 	
 	private JsonKey()
 	{

@@ -39,14 +39,14 @@ public class GSM {
      * @param at : the AT command
      * @param waitingTime
      * @return String contains the response
-     * @throws GSMNotInitalizedException 
+     * @throws GSMNullException 
      */
-    public String executeAT(String at, int waitingTime) throws GSMNotInitalizedException 
+    public String executeAT(String at, int waitingTime) throws GSMNullException 
     {
     	System.out.println("AT Command : "+at);
     	if(getSerialPort() == null)
     	{
-    		throw new GSMNotInitalizedException("GSM is not initilized yet");
+    		throw new GSMNullException("GSM is not initilized yet");
     	}
         at = at + "\r\n";
         String result = "";
@@ -77,9 +77,9 @@ public class GSM {
      *
      * @param ussd : the USSD command
      * @return String contains the response
-     * @throws GSMNotInitalizedException 
+     * @throws GSMNullException 
      */
-    public String executeUSSD(String ussd) throws GSMNotInitalizedException 
+    public String executeUSSD(String ussd) throws GSMNullException 
     {
     	// executeAT("AT+CUSD=1", 1);
         String cmd = "AT+CUSD=1,\"" + ussd + "\",15";
@@ -130,9 +130,9 @@ public class GSM {
      * Read the SMS stored in the sim card
      *
      * @return ArrayList contains the SMS
-     * @throws GSMNotInitalizedException 
+     * @throws GSMNullException 
      */
-    public List<SMS> readSMS() throws GSMNotInitalizedException 
+    public List<SMS> readSMS() throws GSMNullException 
     {
         executeAT("ATE0", 1);
         executeAT("AT+CSCS=\"GSM\"", 1);
@@ -204,9 +204,9 @@ public class GSM {
      * @param recipient the destination number
      * @param message the body of the SMS
      * @return ?
-     * @throws GSMNotInitalizedException 
+     * @throws GSMNullException 
      */
-    public String sendSMS(String recipient, String message) throws GSMNotInitalizedException 
+    public String sendSMS(String recipient, String message) throws GSMNullException 
     {
     	String result = "";
     	recipient = recipient.trim();
@@ -221,7 +221,7 @@ public class GSM {
         return result;
     }
 
-    public String deleteSMS(int smsId, String storage) throws GSMNotInitalizedException 
+    public String deleteSMS(int smsId, String storage) throws GSMNullException 
     {
     	String result = "";
     	result = executeAT("AT+CPMS=\"" + storage + "\"", 1);
@@ -229,7 +229,7 @@ public class GSM {
         return result;
     }
 
-    public String deleteAllSMS(String storage) throws GSMNotInitalizedException 
+    public String deleteAllSMS(String storage) throws GSMNullException 
     {
     	String result = "";
     	result = executeAT("AT+CPMS=\"" + storage + "\"", 1);
@@ -259,6 +259,7 @@ public class GSM {
     	}
     	if(this.serialPort.openPort()) 
         {
+  
     		this.serialPort.addDataListener(new SerialPortDataListener() 
             {
                 @Override

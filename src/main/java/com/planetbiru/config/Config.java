@@ -2,28 +2,14 @@ package com.planetbiru.config;
 
 public class Config {
 
-	private static String databaseType = "mariadb";
-	private static boolean keepBalamceDorman = true;
-	private static boolean dormanCostMonthly = true;
-	private static String websocketURL = "ws://localhost:8888/ws";
-	private static String sessid = "sessid";
-	private static boolean saveUnsentMessage = true;
-	private static String tablePrefix = "mq_";
+
 	private static String otpSalt = "IJUjhrfytR^&r7jkjojO";
-	private static String otpFormat = "OTP Anda adalah >> %s <<";
 	private static String secretKey = "planetsecret";
 	private static String apiUsername = "planet";
 	private static String apiPassword = "planetpass";
 	
 	
-	private static String mailSenderAddress = "user@domain.com";
-	private static String mailSenderPassword;
-	private static String mailAuth = "true";
 	
-	private static boolean mailStartTLS = true;
-	private static boolean mailSSL = false;
-	private static String mailHost = "smtp.gmail.com";
-	private static String mailPort = "587";
 	
 	private static boolean otpViaWebSocket = true;
 	private static boolean otpViaRabbitMQ = true;
@@ -39,48 +25,7 @@ public class Config {
 		
 	}
 	
-	public static String getDatabaseType() {
-		return databaseType;
-	}
-	public static void setDatabaseType(String databaseType) {
-		Config.databaseType = databaseType;
-	}
-	public static boolean isKeepBalamceDorman() {
-		return keepBalamceDorman;
-	}
-	public static void setKeepBalamceDorman(boolean keepBalamceDorman) {
-		Config.keepBalamceDorman = keepBalamceDorman;
-	}
-	public static boolean isDormanCostMonthly() {
-		return dormanCostMonthly;
-	}
-	public static void setDormanCostMonthly(boolean dormanCostMonthly) {
-		Config.dormanCostMonthly = dormanCostMonthly;
-	}
-	public static String getWebsocketURL() {
-		return websocketURL;
-	}
-	public static void setWebsocketURL(String websocketURL) {
-		Config.websocketURL = websocketURL;
-	}
-	public static String getSessid() {
-		return sessid;
-	}
-	public static void setSessid(String sessid) {
-		Config.sessid = sessid;
-	}
-	public static boolean isSaveUnsentMessage() {
-		return saveUnsentMessage;
-	}
-	public static void setSaveUnsentMessage(boolean saveUnsentMessage) {
-		Config.saveUnsentMessage = saveUnsentMessage;
-	}
-	public static String getOtpFormat() {
-		return otpFormat;
-	}
-	public static void setOtpFormat(String otpFormat) {
-		Config.otpFormat = otpFormat;
-	}
+	
 	public static String getOtpSalt() {
 		return otpSalt;
 	}
@@ -105,51 +50,7 @@ public class Config {
 	public static void setSecretKey(String secretKey) {
 		Config.secretKey = secretKey;
 	}
-	public static String getMailSenderAddress() {
-		return mailSenderAddress;
-	}
-	public static void setMailSenderAddress(String mailSenderAddress) {
-		Config.mailSenderAddress = mailSenderAddress;
-	}
-	public static String getMailSenderPassword() {
-		return mailSenderPassword;
-	}
-	public static void setMailSenderPassword(String mailSenderPassword) {
-		Config.mailSenderPassword = mailSenderPassword;
-	}
-	public static String getMailAuth() {
-		return mailAuth;
-	}
-	public static void setMailAuth(String mailAuth) {
-		Config.mailAuth = mailAuth;
-	}
-	public static boolean getMailStartTLS() {
-		return mailStartTLS;
-	}
-	public static void setMailStartTLS(boolean mailStartTLS) {
-		Config.mailStartTLS = mailStartTLS;
-	}
-	public static String getMailHost() {
-		return mailHost;
-	}
-	public static void setMailHost(String mailHost) {
-		Config.mailHost = mailHost;
-	}
-	public static String getMailPort() {
-		return mailPort;
-	}
-	public static void setMailPort(String mailPort) {
-		Config.mailPort = mailPort;
-	}
-
-	public static String getTablePrefix() {
-		return tablePrefix;
-	}
-
-	public static void setTablePrefix(String tablePrefix) {
-		Config.tablePrefix = tablePrefix;
-	}
-
+	
 	
 
 	public static boolean isOtpViaWebSocket() {
@@ -214,14 +115,6 @@ public class Config {
 
 	public static void setWsClientPassword(String wsClientPassword) {
 		Config.wsClientPassword = wsClientPassword;
-	}
-
-	public static boolean isMailSSL() {
-		return mailSSL;
-	}
-
-	public static void setMailSSL(boolean mailSSL) {
-		Config.mailSSL = mailSSL;
 	}
 
 	
