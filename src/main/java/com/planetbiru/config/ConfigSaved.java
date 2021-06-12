@@ -11,16 +11,16 @@ import java.util.regex.Pattern;
 
 import com.planetbiru.util.FileUtil;
 
-public class ResourceConfig {
+public class ConfigSaved {
 	private Pattern mSection = Pattern.compile("\\s*\\[([^]]*)\\]\\s*");
 	private Pattern mKeyValue = Pattern.compile("\\s*([^=]*)=(.*)");
 	private Map <String, Map<String, String>> mEntries = new HashMap<>();
 
-	public ResourceConfig(String path) throws IOException {
+	public ConfigSaved(String path) throws IOException {
 	    load(path);
 	}
 
-	public ResourceConfig() {
+	public ConfigSaved() {
 		/**
 		 * Do nothing
 		 */

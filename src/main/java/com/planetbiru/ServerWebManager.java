@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.config.Config;
-import com.planetbiru.config.ResourceConfig;
+import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
@@ -49,7 +49,7 @@ import com.planetbiru.util.Utility;
 @RestController
 public class ServerWebManager {
 	
-	private ResourceConfig mime = new ResourceConfig();
+	private ConfigSaved mime = new ConfigSaved();
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
 	@Autowired
@@ -146,7 +146,7 @@ public class ServerWebManager {
 		
 		try 
 		{
-			mime = new ResourceConfig(mimeSettingPath);
+			mime = new ConfigSaved(mimeSettingPath);
 		} 
 		catch (IOException e) 
 		{

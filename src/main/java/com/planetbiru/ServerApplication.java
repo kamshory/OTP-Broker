@@ -7,11 +7,11 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.AbstractApplicationContext;
 
 @SpringBootApplication
-public class OTPApplication {
+public class ServerApplication {
 	private static ConfigurableApplicationContext context;
 
 	public static void main(String[] args) {
-		context = SpringApplication.run(OTPApplication.class);
+		context = SpringApplication.run(ServerApplication.class);
 		
 		
 	}
@@ -22,7 +22,7 @@ public class OTPApplication {
 	        {
 	        	context.close();
 	        }
-	        context = SpringApplication.run(OTPApplication.class);
+	        context = SpringApplication.run(ServerApplication.class);
 	    });
 
 	    AbstractApplicationContext appContext = new AnnotationConfigApplicationContext();
