@@ -142,13 +142,7 @@ public class ServerWebManager {
 		}
 	}
 	
-	@PreDestroy
-	public void destroy()
-	{
-		logger.info("Stop WSClient...");
-		this.wsClient.stopService();
-		this.wsClient = null;
-	}
+	
 	private void initWSClient() 
 	{
 		wsClient.setSMSService(smsService);

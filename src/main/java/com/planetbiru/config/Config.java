@@ -213,7 +213,4 @@ public class Config {
 		Config.wsClientPassword = wsClientPassword;
 	}
 
-	
-	
-
 }

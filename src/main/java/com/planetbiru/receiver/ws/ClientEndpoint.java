@@ -30,7 +30,11 @@ public class ClientEndpoint extends Endpoint {
 		this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message) {
-            	onReceiveMessage(message);
+            	try {
+					onReceiveMessage(message);
+				} catch (GSMNotInitalizedException e) {
+					e.printStackTrace();
+				}
             }
         });
 		try 
@@ -41,8 +45,10 @@ public class ClientEndpoint extends Endpoint {
 		{
 		}
 	}
-	public void onReceiveMessage(String message)
+	public void onReceiveMessage(String message) throws GSMNotInitalizedException
 	{
+		System.out.println("=============================================");
+		System.out.println("Receive Message "+message);
 		try
 		{
 			JSONObject requestJSON = new JSONObject(message);
@@ -61,11 +67,7 @@ public class ClientEndpoint extends Endpoint {
 						{
 							String receiver = dt.optString("receiver", "");
 							String textMessage = dt.optString("message", "");
-							try {
-								this.smsService.sendSMS(receiver, textMessage);
-							} catch (GSMNotInitalizedException e) {
-								e.printStackTrace();
-							}
+							this.smsService.sendSMS(receiver, textMessage);
 						}
 					}
 				}

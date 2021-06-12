@@ -31,8 +31,5 @@ public class OTPApplication {
 	    thread.setDaemon(false);
 	    thread.start();
 	}
-	
-	
-	
 }
 
