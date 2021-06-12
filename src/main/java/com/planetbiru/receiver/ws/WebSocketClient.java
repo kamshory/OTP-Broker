@@ -33,6 +33,7 @@ public class WebSocketClient extends Thread implements WebSocket
 	private SMSInstance smsService;
 	private WebSocketContainer container;
 	private boolean stoped = false;
+	
 	public WebSocketClient(SMSInstance smsService) {
 		this.smsService = smsService;
 	}
@@ -41,8 +42,7 @@ public class WebSocketClient extends Thread implements WebSocket
 		logger.info("Default constructor");
 	}
 
-	public void initWSClient() throws WSConnectionException {
-		
+	public void initWSClient() throws WSConnectionException {		
 		initWSClient(null);
 	}
 	
@@ -61,16 +61,7 @@ public class WebSocketClient extends Thread implements WebSocket
 			catch (WSConnectionException e) 
 			{
 				connected = false;
-				e.printStackTrace();
-				try 
-				{
-					Thread.sleep(Config.getReconnectDelay());
-				} 
-				catch (InterruptedException e1) 
-				{
-					e1.printStackTrace();
-					Thread.currentThread().interrupt();
-				}
+				sleep(Config.getReconnectDelay());			
 				try 
 				{
 					this.initWSClient(smsService);
@@ -83,18 +74,33 @@ public class WebSocketClient extends Thread implements WebSocket
 		}
 		while(!connected && !stoped);
 	}
+	public static void sleep(long interval)
+	{
+		try 
+		{
+			Thread.sleep(interval);
+		} 
+		catch (InterruptedException e1) 
+		{
+			Thread.currentThread().interrupt();
+		}
+	}
 	public void stopService()
 	{
-		try {
+		try 
+		{
 			if(this.session != null && this.session.isOpen())
 			{
 				this.session.close();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} 
+		catch (IOException e) 
+		{
+			logger.error(e.getMessage());
 		}
 		this.stoped = true;
 	}
+	
 	public void initWSClient(SMSInstance smss) throws WSConnectionException
 	{
 		this.session = null;
@@ -179,15 +185,7 @@ public class WebSocketClient extends Thread implements WebSocket
 		} 
 		catch (WSConnectionException e) 
 		{
-			e.printStackTrace();
-			try 
-			{
-				Thread.sleep(1000);
-			} 
-			catch (InterruptedException e1) 
-			{
-				Thread.currentThread().interrupt();
-			}
+			sleep(Config.getReconnectDelay());
 			reconnect();
 		}
 	}

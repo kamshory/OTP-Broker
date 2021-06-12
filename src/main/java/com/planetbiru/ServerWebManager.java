@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -41,37 +42,46 @@ import com.planetbiru.user.User;
 import com.planetbiru.user.UserAccount;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
+import com.planetbiru.util.SendMail;
 import com.planetbiru.util.Utility;
 import com.planetbiru.util.WebContent;
 
 @RestController
 public class ServerWebManager {
 	
+	private ResourceConfig mime = new ResourceConfig();
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
 	@Autowired
 	WebSocketClient wsClient;
 
 	SMSInstance smsService = new SMSInstance();
+	private UserAccount userAccount;
 
 	@Value("${sms.secret.key}")
 	private String secretKey;
 	
 	@Value("${sms.mail.sender.address}")
 	private String mailSenderAddress;
+
 	@Value("${sms.mail.sender.password}")
 	private String mailSenderPassword;
 	
 	@Value("${sms.mail.auth}")
 	private String mailAuth;
+	
 	@Value("${sms.mail.start.tls}")
-	private String mailStartTLS;
+	private boolean mailStartTLS;
+	
+	@Value("${sms.mail.ssl}")
+	private boolean mailSSL;
+	
 	@Value("${sms.mail.host}")
 	private String mailHost;
+	
 	@Value("${sms.mail.port}")
 	private String mailPort;
 
-	private UserAccount userAccount;
 
 	@Value("${sms.ws.endpoint}")
 	private String wsClientEndpoint;
@@ -100,7 +110,6 @@ public class ServerWebManager {
 	@Value("${sms.path.setting.all}")
 	private String mimeSettingPath;	
 
-	private ResourceConfig mime = new ResourceConfig();
 	
 	@Value("${sms.path.setting.user}")
 	private String userSettingPath;
@@ -119,13 +128,19 @@ public class ServerWebManager {
 	public void init()
 	{
 		logger.info("Init...");
+		
+		
 		Config.setMailSenderAddress(mailSenderAddress);
 		Config.setMailSenderPassword(mailSenderPassword);
 		Config.setMailAuth(mailAuth);
+		Config.setMailSSL(mailSSL);
 		Config.setMailStartTLS(mailStartTLS);
 		Config.setMailHost(mailHost);
 		Config.setMailPort(mailPort);
 		Config.setPortName(portName);
+		
+		
+		
 		userAccount = new UserAccount(userSettingPath);
 		
 		this.initWSClient();
@@ -149,14 +164,106 @@ public class ServerWebManager {
 		wsClient.start();	
 	}
 	
+	
 	private void initSerial() 
 	{
 		String port = Config.getPortName();
 		smsService.init(port);
 	}	
 	
+	@PostMapping(path="/send-token")
+	public ResponseEntity<byte[]> sendTokenResetPassword1(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{
+		
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		
+		String userID = queryPairs.getOrDefault("userid", "");
+		
+		return this.sendTokenResetPassword(userID);
+	}
 	
+	@GetMapping(path="/send-token")
+	public ResponseEntity<byte[]> sendTokenResetPassword2(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		
+		String userID = request.getParameter("userid");
+		
+		return this.sendTokenResetPassword(userID);
+	}
 	
+	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
+		byte[] responseBody = "".getBytes();
+		HttpHeaders responseHeaders = new HttpHeaders();
+
+		userAccount.load();
+		
+		try 
+		{
+			User user = userAccount.getUser(userID);
+			if(user.getUsername().isEmpty())
+			{
+				/**
+				 * User not found
+				 */
+				user = userAccount.getUserByPhone(userID);
+				if(user.getUsername().isEmpty())
+				{
+					user = userAccount.getUserByEmail(userID);
+				}
+			}
+			
+			if(!user.getUsername().isEmpty())
+			{
+				String phone = user.getPhone();
+				String email = user.getEmail();
+				if(!email.isEmpty() && userID.equalsIgnoreCase(email))
+				{
+					String message = "Username : "+user.getUsername()+"\r\nPassword : "+user.getPassword();
+					String smtpHost = Config.getMailHost();
+					String smtpPort = Config.getMailPort();
+				    String smtpUser = Config.getMailSenderAddress();
+				    String smtpPassword = Config.getMailSenderPassword();
+				    boolean ssl = Config.isMailSSL();
+				    boolean starttls = Config.getMailStartTLS();   
+				    boolean debug = false;
+					
+					SendMail senEmail = new SendMail(smtpHost, smtpPort, smtpUser, smtpPassword, ssl, starttls, debug);
+					try 
+					{
+						senEmail.send(email, "Account Information", message);
+					} 
+					catch (MessagingException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+				else if(!phone.isEmpty())
+				{
+					String message = "Username : "+user.getUsername()+"\r\nPassword : "+user.getPassword();
+					try 
+					{
+						smsService.sendSMS(phone, message);
+					} 
+					catch (GSMNotInitalizedException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+
+		} 
+		catch (NoUserRegisteredException e1) 
+		{
+			e1.printStackTrace();
+		}
+		
+
+		
+		HttpStatus statusCode = HttpStatus.OK;
+		
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+
 	@GetMapping(path="/broadcast-message")
 	public ResponseEntity<byte[]> broadcast(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{

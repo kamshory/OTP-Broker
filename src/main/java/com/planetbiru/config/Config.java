@@ -19,9 +19,12 @@ public class Config {
 	private static String mailSenderAddress = "user@domain.com";
 	private static String mailSenderPassword;
 	private static String mailAuth = "true";
-	private static String mailStartTLS = "true";
+	
+	private static boolean mailStartTLS = true;
+	private static boolean mailSSL = false;
 	private static String mailHost = "smtp.gmail.com";
 	private static String mailPort = "587";
+	
 	private static boolean otpViaWebSocket = true;
 	private static boolean otpViaRabbitMQ = true;
 	private static long reconnectDelay = 5000;
@@ -120,10 +123,10 @@ public class Config {
 	public static void setMailAuth(String mailAuth) {
 		Config.mailAuth = mailAuth;
 	}
-	public static String getMailStartTLS() {
+	public static boolean getMailStartTLS() {
 		return mailStartTLS;
 	}
-	public static void setMailStartTLS(String mailStartTLS) {
+	public static void setMailStartTLS(boolean mailStartTLS) {
 		Config.mailStartTLS = mailStartTLS;
 	}
 	public static String getMailHost() {
@@ -211,6 +214,14 @@ public class Config {
 
 	public static void setWsClientPassword(String wsClientPassword) {
 		Config.wsClientPassword = wsClientPassword;
+	}
+
+	public static boolean isMailSSL() {
+		return mailSSL;
+	}
+
+	public static void setMailSSL(boolean mailSSL) {
+		Config.mailSSL = mailSSL;
 	}
 
 	

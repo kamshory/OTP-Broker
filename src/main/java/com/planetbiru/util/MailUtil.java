@@ -35,7 +35,7 @@ public class MailUtil {
 		Properties props = new Properties();
 		
 		String mailAuth = Config.getMailAuth();
-		String mailStartTLS = Config.getMailStartTLS();
+		boolean mailStartTLS = Config.getMailStartTLS();
 		String mailHost = Config.getMailHost();
 		String mailPort = Config.getMailPort();
 		
