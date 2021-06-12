@@ -42,7 +42,7 @@ public class WebSocketClient extends Thread implements WebSocket
 		logger.info("Default constructor");
 	}
 
-	public void initWSClient() throws WSConnectionException {		
+	public void initWSClient() throws WebSocketConnectionException {		
 		initWSClient(null);
 	}
 	
@@ -58,7 +58,7 @@ public class WebSocketClient extends Thread implements WebSocket
 				this.initWSClient(smsService);
 				connected = true;
 			} 
-			catch (WSConnectionException e) 
+			catch (WebSocketConnectionException e) 
 			{
 				connected = false;
 				sleep(Config.getReconnectDelay());			
@@ -66,7 +66,7 @@ public class WebSocketClient extends Thread implements WebSocket
 				{
 					this.initWSClient(smsService);
 				} 
-				catch (WSConnectionException e1) 
+				catch (WebSocketConnectionException e1) 
 				{
 					e1.printStackTrace();
 				}
@@ -101,10 +101,10 @@ public class WebSocketClient extends Thread implements WebSocket
 		this.stoped = true;
 	}
 	
-	public void initWSClient(SMSInstance smss) throws WSConnectionException
+	public void initWSClient(SMSInstance smss) throws WebSocketConnectionException
 	{
-		this.session = null;
-		this.container = null;
+		session = null;
+		container = null;
 		try
 		{
 			if(smss != null)
@@ -112,9 +112,9 @@ public class WebSocketClient extends Thread implements WebSocket
 				this.smsService = smss;
 			}
 			String url = Config.getSsClientEndpoint();
-			this.container = ContainerProvider.getWebSocketContainer(); 	
+			container = ContainerProvider.getWebSocketContainer(); 	
 			
-			javax.websocket.ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
+			ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
 			configBuilder.configurator(new Configurator() {
 			    @Override
 			    public void beforeRequest(Map<String, List<String>> headers) 
@@ -124,21 +124,21 @@ public class WebSocketClient extends Thread implements WebSocket
 			});
 			ClientEndpointConfig clientConfig = configBuilder.build();
 			
-			this.session = container.connectToServer(new ClientEndpoint(this, smsService), clientConfig, URI.create(url)); 
+			session = container.connectToServer(new WebSocketEndpoint(this, smsService), clientConfig, URI.create(url)); 
 			wait4TerminateSignal();
 			
 		} 
 		catch (DeploymentException | IOException e) 
 		{
-			throw new WSConnectionException(e);
+			throw new WebSocketConnectionException(e);
 		}
 		finally
 		{
-			if(this.session != null)
+			if(session != null)
 			{
 				try 
 				{
-					this.session.close();
+					session.close();
 				} 
 				catch (IOException e) 
 				{     
@@ -153,7 +153,7 @@ public class WebSocketClient extends Thread implements WebSocket
 	public void close() {
 		try 
 		{
-			this.session.close();
+			session.close();
 		} 
 		catch (IOException e) 
 		{
@@ -183,7 +183,7 @@ public class WebSocketClient extends Thread implements WebSocket
 		{
 			initWSClient();
 		} 
-		catch (WSConnectionException e) 
+		catch (WebSocketConnectionException e) 
 		{
 			sleep(Config.getReconnectDelay());
 			reconnect();

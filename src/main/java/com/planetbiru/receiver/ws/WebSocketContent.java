@@ -1,11 +1,11 @@
-package com.planetbiru.util;
+package com.planetbiru.receiver.ws;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import com.planetbiru.cookie.CookieServer;
 
-public class WebContent {
+public class WebSocketContent {
 
 	private String fileName;
 	private HttpHeaders responseHeaders;
@@ -14,7 +14,7 @@ public class WebContent {
 	private CookieServer cookie;
 	private String contentType;
 
-	public WebContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie, String contentType) {
+	public WebSocketContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie, String contentType) {
 		this.fileName = fileName;
 		this.responseHeaders = responseHeaders;
 		this.responseBody = responseBody;

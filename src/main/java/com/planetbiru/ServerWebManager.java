@@ -34,6 +34,7 @@ import com.planetbiru.gsm.ErrorCode;
 import com.planetbiru.gsm.GSMNotInitalizedException;
 import com.planetbiru.gsm.PortUtils;
 import com.planetbiru.gsm.SMSInstance;
+import com.planetbiru.receiver.ws.WebSocketContent;
 import com.planetbiru.receiver.ws.WebSocketClient;
 import com.planetbiru.settings.FeederSetting;
 import com.planetbiru.settings.SMSSetting;
@@ -44,7 +45,6 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.Utility;
-import com.planetbiru.util.WebContent;
 
 @RestController
 public class ServerWebManager {
@@ -58,9 +58,6 @@ public class ServerWebManager {
 	SMSInstance smsService = new SMSInstance();
 	private UserAccount userAccount;
 
-	@Value("${otpbroker.secret.key}")
-	private String secretKey;
-	
 	@Value("${otpbroker.mail.sender.address}")
 	private String mailSenderAddress;
 
@@ -173,12 +170,9 @@ public class ServerWebManager {
 	
 	@PostMapping(path="/send-token")
 	public ResponseEntity<byte[]> sendTokenResetPassword1(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
-	{
-		
-		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
-		
-		String userID = queryPairs.getOrDefault("userid", "");
-		
+	{		
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);	
+		String userID = queryPairs.getOrDefault("userid", "");		
 		return this.sendTokenResetPassword(userID);
 	}
 	
@@ -774,7 +768,7 @@ public class ServerWebManager {
 		}
 		CookieServer cookie = new CookieServer(headers);
 		
-		WebContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
+		WebSocketContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
 		
 		responseBody = newContent.getResponseBody();
 		responseHeaders = newContent.getResponseHeaders();
@@ -1392,10 +1386,10 @@ public class ServerWebManager {
 		return 	mime.getString("MIME", ext, "");
 	}
 
-	private WebContent updateContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie) 
+	private WebSocketContent updateContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie) 
 	{
 		String contentType = this.getMIMEType(fileName);
-		WebContent webContent = new WebContent(fileName, responseHeaders, responseBody, statusCode, cookie, contentType);
+		WebSocketContent webContent = new WebSocketContent(fileName, responseHeaders, responseBody, statusCode, cookie, contentType);
 		boolean requireLogin = false;
 		String fileSub = "";
 		

@@ -1,6 +1,6 @@
 package com.planetbiru.receiver.ws;
 
-public class WSConnectionException extends Exception {
+public class WebSocketConnectionException extends Exception {
 	/**
 	 * 
 	 */
@@ -8,7 +8,7 @@ public class WSConnectionException extends Exception {
 	/**
 	 * Default constructor
 	 */
-	public WSConnectionException() 
+	public WebSocketConnectionException() 
 	{ 
 		super(); 
 	}
@@ -16,7 +16,7 @@ public class WSConnectionException extends Exception {
 	 * Constructor with the message
 	 * @param message Message
 	 */
-	public WSConnectionException(String message) 
+	public WebSocketConnectionException(String message) 
 	{ 
 		super(message); 
 	}
@@ -25,7 +25,7 @@ public class WSConnectionException extends Exception {
 	 * @param message Message
 	 * @param cause Cause
 	 */
-	public WSConnectionException(String message, Throwable cause) 
+	public WebSocketConnectionException(String message, Throwable cause) 
 	{ 
 		super(message, cause); 
 	}
@@ -33,7 +33,7 @@ public class WSConnectionException extends Exception {
 	 * Constructor with cause
 	 * @param cause Cause
 	 */
-	public WSConnectionException(Throwable cause) 
+	public WebSocketConnectionException(Throwable cause) 
 	{ 
 		super(cause); 
 	}

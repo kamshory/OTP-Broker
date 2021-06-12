@@ -16,11 +16,11 @@ import com.planetbiru.config.Config;
 import com.planetbiru.gsm.GSMNotInitalizedException;
 import com.planetbiru.gsm.SMSInstance;
 
-public class ClientEndpoint extends Endpoint {
+public class WebSocketEndpoint extends Endpoint {
 	private WebSocketClient webSocketClient;
 	private SMSInstance smsService;
 	private Session session;
-	public ClientEndpoint(WebSocketClient webSocketClient, SMSInstance smsService) {
+	public WebSocketEndpoint(WebSocketClient webSocketClient, SMSInstance smsService) {
 		this.webSocketClient = webSocketClient;
 		this.smsService = smsService;
 	}
