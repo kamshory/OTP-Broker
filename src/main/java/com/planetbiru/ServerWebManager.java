@@ -27,7 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigSaved;
-import com.planetbiru.config.ConfigFeeder;
+import com.planetbiru.config.ConfigFeederAMQP;
+import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
@@ -90,8 +91,11 @@ public class ServerWebManager {
 	@Value("${otpbroker.web.document.root}")
 	private String documentRoot;
 
-	@Value("${otpbroker.path.setting.feeder}")
-	private String feederSettingPath;
+	@Value("${otpbroker.path.setting.feeder.ws}")
+	private String feederWSSettingPath;
+
+	@Value("${otpbroker.path.setting.feeder.amqp}")
+	private String feederAMQPSettingPath;
 
 	@Value("${otpbroker.path.setting.sms}")
 	private String smsSettingPath;
@@ -119,7 +123,7 @@ public class ServerWebManager {
 		Config.setPortName(portName);		
 		userAccount = new UserAccount(userSettingPath);		
 		this.loadConfigEmail();		
-		this.initSerial();	
+		this.initSerial();		
 		
 		try 
 		{
@@ -153,7 +157,6 @@ public class ServerWebManager {
 		String port = Config.getPortName();
 		SMSUtil.init(port);
 	}	
-	
 	
 	@PostMapping(path="/send-token")
 	public ResponseEntity<byte[]> sendTokenResetPassword1(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -284,7 +287,7 @@ public class ServerWebManager {
 	
 	@PostMapping(path="/login.html")
 	public ResponseEntity<byte[]> handleLogin(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
-	{		
+	{
 		HttpHeaders responseHeaders = new HttpHeaders();
 		CookieServer cookie = new CookieServer(headers);
 		
@@ -303,9 +306,6 @@ public class ServerWebManager {
 	    
 	    JSONObject res = new JSONObject();
 	    JSONObject payload = new JSONObject();
-	    payload.put("nextURL", next);
-	    res.put("code", 0);
-	    res.put("payload", payload);
 	    
 		cookie.setSessionValue(JsonKey.USERNAME, username);
 		cookie.setSessionValue(JsonKey.PASSWORD, password);
@@ -319,17 +319,30 @@ public class ServerWebManager {
 			{
 				userAccount.updateLastActive(username);
 				userAccount.save();
+			    payload.put("nextURL", next);
+			    res.put("code", 0);
+			    res.put("payload", payload);
+				responseBody = res.toString().getBytes();
+			}
+			else
+			{
+			    payload.put("nextURL", "/");
+			    res.put("code", 0);
+			    res.put("payload", payload);
+				responseBody = res.toString().getBytes();				
 			}
 			cookie.saveSessionData();
 			cookie.putToHeaders(responseHeaders);
-			responseBody = res.toString().getBytes();
+			
 		}
 		catch(NoUserRegisteredException e)
 		{
-			responseHeaders.add(ConstantString.LOCATION, "/admin-init.html");
-			responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
-			statusCode = HttpStatus.MOVED_PERMANENTLY;
+		    payload.put("nextURL", "/admin-init.html");
+		    res.put("code", 0);
+		    res.put("payload", payload);
+			responseBody = res.toString().getBytes();				
 		}
+		
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
@@ -385,8 +398,8 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	@GetMapping(path="/feeder-setting/get")
-	public ResponseEntity<byte[]> handleFeederSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	@GetMapping(path="/feeder-ws-setting/get")
+	public ResponseEntity<byte[]> handleFeederWSSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
 		CookieServer cookie = new CookieServer(headers);
@@ -396,8 +409,41 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigFeeder.load(feederSettingPath);
-				String list = ConfigFeeder.toJSONObject().toString();
+				ConfigFeederWS.load(feederWSSettingPath);
+				String list = ConfigFeederWS.toJSONObject().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/feeder-amqp-setting/get")
+	public ResponseEntity<byte[]> handleFeederAMQPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigFeederAMQP.load(feederAMQPSettingPath);
+				String list = ConfigFeederAMQP.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -495,7 +541,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				String list = userAccount.list();
+				String list = userAccount.listAsString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -996,7 +1042,7 @@ public class ServerWebManager {
 	
 	private void processFeederSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("save_feeder_setting"))
+		if(query.containsKey("save_feeder_ws_setting"))
 		{
 
 			boolean feederWsEnable = query.getOrDefault("feeder_ws_enable", "").equals("1");		
@@ -1076,8 +1122,24 @@ public class ServerWebManager {
 				/**
 				 * Do nothing
 				 */
-			}
+			}		
 			
+			ConfigFeederWS.setFeederWsEnable(feederWsEnable);
+			ConfigFeederWS.setFeederWsSSL(feederWsSSL);
+			ConfigFeederWS.setFeederWsAddress(feederWsAddress);
+			ConfigFeederWS.setFeederWsPort(feederWsPort);
+			ConfigFeederWS.setFeederWsPath(feederWsPath);
+			ConfigFeederWS.setFeederWsUsername(feederWsUsername);
+			ConfigFeederWS.setFeederWsPassword(feederWsPassword);
+			ConfigFeederWS.setFeederWsChannel(feederWsChannel);
+			ConfigFeederWS.setFeederWsTimeout(feederWsTimeout);
+			ConfigFeederWS.setFeederWsReconnectDelay(feederWsReconnectDelay);
+			ConfigFeederWS.setFeederWsRefresh(feederWsRefresh);		
+			
+			ConfigFeederWS.save(feederWSSettingPath);
+		}
+		if(query.containsKey("save_feeder_amqp_setting"))
+		{
 			boolean feederAmqpEnable = query.getOrDefault("feeder_amqp_enable", "").equals("1");		
 			boolean feederAmqpSSL = query.getOrDefault("feeder_amqp_ssl", "").equals("1");		
 			String feederAmqpAddress = query.getOrDefault("feeder_amqp_address", "");		
@@ -1139,33 +1201,20 @@ public class ServerWebManager {
 				 */
 			}
 			
-			ConfigFeeder.setFeederWsEnable(feederWsEnable);
-			ConfigFeeder.setFeederWsSSL(feederWsSSL);
-			ConfigFeeder.setFeederWsAddress(feederWsAddress);
-			ConfigFeeder.setFeederWsPort(feederWsPort);
-			ConfigFeeder.setFeederWsPath(feederWsPath);
-			ConfigFeeder.setFeederWsUsername(feederWsUsername);
-			ConfigFeeder.setFeederWsPassword(feederWsPassword);
-			ConfigFeeder.setFeederWsChannel(feederWsChannel);
-			ConfigFeeder.setFeederWsTimeout(feederWsTimeout);
-			ConfigFeeder.setFeederWsReconnectDelay(feederWsReconnectDelay);
-			ConfigFeeder.setFeederWsRefresh(feederWsRefresh);		
+			ConfigFeederAMQP.setFeederAmqpEnable(feederAmqpEnable);
+			ConfigFeederAMQP.setFeederAmqpSSL(feederAmqpSSL);
+			ConfigFeederAMQP.setFeederAmqpAddress(feederAmqpAddress);
+			ConfigFeederAMQP.setFeederAmqpPort(feederAmqpPort);
+			ConfigFeederAMQP.setFeederAmqpPath(feederAmqpPath);
+			ConfigFeederAMQP.setFeederAmqpUsername(feederAmqpUsername);
+			ConfigFeederAMQP.setFeederAmqpPassword(feederAmqpPassword);
+			ConfigFeederAMQP.setFeederAmqpChannel(feederAmqpChannel);
+			ConfigFeederAMQP.setFeederAmqpTimeout(feederAmqpTimeout);
+			ConfigFeederAMQP.setFeederAmqpRefresh(feederAmqpRefresh);		
 
-			ConfigFeeder.setFeederAmqpEnable(feederAmqpEnable);
-			ConfigFeeder.setFeederAmqpSSL(feederAmqpSSL);
-			ConfigFeeder.setFeederAmqpAddress(feederAmqpAddress);
-			ConfigFeeder.setFeederAmqpPort(feederAmqpPort);
-			ConfigFeeder.setFeederAmqpPath(feederAmqpPath);
-			ConfigFeeder.setFeederAmqpUsername(feederAmqpUsername);
-			ConfigFeeder.setFeederAmqpPassword(feederAmqpPassword);
-			ConfigFeeder.setFeederAmqpChannel(feederAmqpChannel);
-			ConfigFeeder.setFeederAmqpTimeout(feederAmqpTimeout);
-			ConfigFeeder.setFeederAmqpRefresh(feederAmqpRefresh);		
-
-			ConfigFeeder.save(feederSettingPath);			
+			ConfigFeederAMQP.save(feederAMQPSettingPath);			
 		}		
 	}
-	
 	
 	private void processSMS(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
@@ -1184,11 +1233,6 @@ public class ServerWebManager {
 			}
 		}		
 	}
-	
-	
-	
-	
-	
 	
 	private void processAccount(String requestBody, CookieServer cookie) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);

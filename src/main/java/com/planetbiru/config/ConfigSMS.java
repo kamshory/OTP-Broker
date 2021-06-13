@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.user.UserAccount;
 import com.planetbiru.util.FileNotFoundException;
-import com.planetbiru.util.FileUtil;
 
 public class ConfigSMS {
 	
@@ -44,7 +43,7 @@ public class ConfigSMS {
 		ConfigSMS.prepareDir(fileName);	
 		try 
 		{
-			FileUtil.write(fileName, ConfigSMS.toJSONObject().toString().getBytes());
+			FileConfigUtil.write(fileName, ConfigSMS.toJSONObject().toString().getBytes());
 		} 
 		catch (IOException e) 
 		{
@@ -59,7 +58,7 @@ public class ConfigSMS {
 		byte[] data = null;
 		try 
 		{
-			data = FileUtil.read(fileName);
+			data = FileConfigUtil.read(fileName);
 		} 
 		catch (FileNotFoundException e1) 
 		{

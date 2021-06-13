@@ -74,12 +74,12 @@
       </nav>
       <div class="phone-page">      
         <h3>Feeder Setting</h3>
-
+        <h4>WSMessageBroker</h4>
         <form action="feeder-setting.html" method="post">
           <table class="config-table config-table-feeder">
             <tbody>
             <tr>
-                <td>Enable WebSocket</td>
+                <td>Enable</td>
                 <td><label><input type="checkbox" name="feeder_ws_enable" value="1"> Enable</label>
                 </td>
               </tr>
@@ -145,14 +145,25 @@
                   </select>	
                 </td>
               </tr>
-
               <tr>
                 <td></td>
-                <td>&nbsp;</td>
+                <td>
+                <input type="submit" class="btn btn-success" name="save_feeder_ws_setting" id="save_feeder_ws_setting" value="Save">	
+                <input type="reset" class="btn btn-default"  value="Reset">	
+                </td>
               </tr>
+            </tbody>
+          </table>
+        
+        </form>
 
+        <h4>RabbitMQ</h4>
+        <form action="feeder-setting.html" method="post">
+          <table class="config-table config-table-feeder">
+            <tbody>
+            
               <tr>
-                <td>Enable AMQP</td>
+                <td>Enable</td>
                 <td><label><input type="checkbox" name="feeder_amqp_enable" value="1"> Enable</label>
                 </td>
               </tr>
@@ -201,7 +212,7 @@
               </tr>
               <tr>
                 <td>Refresh Connection</td>
-                <td><select name="feeder_ws_refresh">
+                <td><select name="feeder_ampq_refresh">
                     <option value="0">Never</option>
                     <option value="600">10 Minutes</option>
                     <option value="1800">30 Minutes</option>
@@ -217,7 +228,7 @@
               <tr>
                 <td></td>
                 <td>
-                <input type="submit" class="btn btn-success" name="save_feeder_setting" id="save_feeder_setting" value="Save">	
+                <input type="submit" class="btn btn-success" name="save_feeder_amqp_setting" id="save_feeder_amqp_setting" value="Save">	
                 <input type="reset" class="btn btn-default"  value="Reset">	
                 </td>
               </tr>
@@ -230,7 +241,7 @@
             $(document).ready(function(e){
                 $.ajax({
                     type:"GET",
-                    url:"feeder-setting/get",
+                    url:"feeder-ws-setting/get",
                     dataType:"json",
                     success:function(data){
                       $('input[name="feeder_ws_enable"]').prop("checked", data.feederWsEnable);
@@ -245,6 +256,14 @@
                       $('input[name="feeder_ws_reconnect_delay"]').val(data.feederWsReconnectDelay);
                       $('select[name="feeder_ws_refresh"]').val(data.feederWsRefresh+"");
 
+                    }
+                });
+
+                $.ajax({
+                    type:"GET",
+                    url:"feeder-amqp-setting/get",
+                    dataType:"json",
+                    success:function(data){
                       $('input[name="feeder_amqp_enable"]').prop("checked", data.feederAmqpEnable);
                       $('select[name="feeder_amqp_ssl"]').val(data.feederAmqpSSL?"1":"0");
                       $('input[name="feeder_amqp_address"]').val(data.feederAmqpAddress);

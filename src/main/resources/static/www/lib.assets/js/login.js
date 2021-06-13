@@ -90,6 +90,7 @@ function register(regData) {
         data:regData,
         success:function(res)
         {
+            console.log(res);
             hideLoading();
             if (res.code === 0) 
             {

@@ -28,17 +28,6 @@ public class User {
 		this.blocked = jsonObject.optBoolean("blocked", false);
 		this.active = jsonObject.optBoolean("active", true);
 	}
-	public User(String username, String name, String email, String password, String phone, long lastActive, boolean blocked, boolean active)
-	{
-		this.username = username;
-		this.name = name;
-		this.email = email;
-		this.password = password;
-		this.phone = phone;
-		this.lastActive = lastActive;
-		this.blocked = blocked;
-		this.active = active;
-	}
 
 	public JSONObject toJSONObject() {
 		JSONObject jsonObject = new JSONObject();

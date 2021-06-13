@@ -11,6 +11,10 @@ import java.io.PrintStream;
 import com.planetbiru.util.FileNotFoundException;
 
 public class FileConfigUtil {
+	private FileConfigUtil()
+	{
+		
+	}
 	public static byte[] read(String fileName) throws FileNotFoundException
 	{
 		byte[] allBytes = null;
