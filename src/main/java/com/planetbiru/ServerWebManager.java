@@ -184,7 +184,6 @@ public class ServerWebManager {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		userAccount.load();
 		HttpStatus statusCode = HttpStatus.OK;
-		
 		try 
 		{
 			User user = userAccount.getUser(userID);
@@ -199,7 +198,6 @@ public class ServerWebManager {
 					user = userAccount.getUserByEmail(userID);
 				}
 			}
-			
 			if(!user.getUsername().isEmpty())
 			{
 				String phone = user.getPhone();
@@ -224,6 +222,7 @@ public class ServerWebManager {
 					{
 						e.printStackTrace();
 					}
+					System.out.println("Send email");
 				}
 				else if(!phone.isEmpty())
 				{
@@ -236,8 +235,12 @@ public class ServerWebManager {
 					{
 						e.printStackTrace();
 					}
+					System.out.println("Send SMS");
 				}
 			}
+			responseHeaders.add(ConstantString.LOCATION, "/");
+			responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+			statusCode = HttpStatus.MOVED_PERMANENTLY;
 
 		} 
 		catch (NoUserRegisteredException e1) 

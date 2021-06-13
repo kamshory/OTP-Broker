@@ -91,8 +91,7 @@ public class APIUser {
 			    JSONObject user = jsonObject.optJSONObject(username);
 			    APIUser.addUser(username, user);
 			}
-		}
-		
+		}	
 	}
 	public static void addUser(User user)
 	{
@@ -104,7 +103,8 @@ public class APIUser {
 		APIUser.users.put(username, user);
 	}
 	
-	public static void addUser(JSONObject jsonObject) {
+	public static void addUser(JSONObject jsonObject) 
+	{
 		User user = new User(jsonObject);
 		APIUser.users.put(jsonObject.optString(JsonKey.USERNAME, ""), user);
 	}
