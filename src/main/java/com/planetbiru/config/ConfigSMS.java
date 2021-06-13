@@ -7,7 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.user.UserAccount;
+import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
 
 public class ConfigSMS {
@@ -110,7 +110,7 @@ public class ConfigSMS {
 	
 	private static String getBaseDir()
 	{
-		return UserAccount.class.getResource("/").getFile();
+		return WebUserAccount.class.getResource("/").getFile();
 	}
 
 	public static String getConnectionType() {

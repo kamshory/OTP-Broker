@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.user.APIUserAccount;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.Utility;
 
@@ -37,7 +37,7 @@ public class ServerWebAPI {
 	@PostConstruct
 	public void init()
 	{
-		ConfigAPI.load(userAPISettingPath);
+		APIUserAccount.load(userAPISettingPath);
 	}
 	
 	@PostMapping(path="/api/email**")
@@ -180,7 +180,7 @@ public class ServerWebAPI {
 					if(arr.length > 1)
 					{
 						password = arr[1];
-						return ConfigAPI.checkUserAuth(username, password);
+						return APIUserAccount.checkUserAuth(username, password);
 					}
 				}
 			}

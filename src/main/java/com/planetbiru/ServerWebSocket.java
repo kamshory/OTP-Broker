@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.user.Account;
+import com.planetbiru.user.WebSocketUserAccount;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.util.Utility;
 import com.planetbiru.wstools.MessageDecoder;
@@ -62,8 +62,7 @@ public class ServerWebSocket {
     @PostConstruct
     public void init()
     {
-    	logger.info("Init...");
-    	Account.init(userSettingPath);
+    	WebSocketUserAccount.init(userSettingPath);
     }
     
 	@SuppressWarnings("unchecked")
@@ -83,8 +82,8 @@ public class ServerWebSocket {
         boolean auth = true;
         try 
         {
-        	Account.getUserAccount().load();
-        	auth = Account.getUserAccount().checkUserAuth(requestHdr);
+        	WebSocketUserAccount.getUserAccount().load();
+        	auth = WebSocketUserAccount.getUserAccount().checkUserAuth(requestHdr);
 		} 
         catch (NoUserRegisteredException e) 
         {

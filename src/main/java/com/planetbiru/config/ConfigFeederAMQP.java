@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.planetbiru.user.UserAccount;
+import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 
@@ -119,7 +119,7 @@ public class ConfigFeederAMQP {
 	}
 	private static String getBaseDir()
 	{
-		return UserAccount.class.getResource("/").getFile();
+		return WebUserAccount.class.getResource("/").getFile();
 	}
 
 	public static boolean isFeederAmqpEnable() {

@@ -18,14 +18,14 @@ import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 
-public class UserAccount {
+public class WebUserAccount {
 	private static final String USER_FILE = "/static/data/user/urses.json";
-	private static final Logger logger = LoggerFactory.getLogger(UserAccount.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebUserAccount.class);
 	private String path = USER_FILE;
 	
 	private Map<String, User> users = new HashMap<>();
 	
-	public UserAccount(String userSettingPath) {
+	public WebUserAccount(String userSettingPath) {
 		this.path = userSettingPath;
 		this.init();
 	}
@@ -38,7 +38,7 @@ public class UserAccount {
 	{
 		this.load();
 	}
-	public UserAccount() {
+	public WebUserAccount() {
 	}
 	public boolean isEmpty()
 	{
@@ -171,7 +171,7 @@ public class UserAccount {
 	
 	private String getBaseDir()
 	{
-		return UserAccount.class.getResource("/").getFile();
+		return WebUserAccount.class.getResource("/").getFile();
 	}
 	
 	public void load()
