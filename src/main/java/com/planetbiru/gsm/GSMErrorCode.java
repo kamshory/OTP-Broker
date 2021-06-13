@@ -1,7 +1,7 @@
 package com.planetbiru.gsm;
 
-public class ErrorCode {
-	private ErrorCode()
+public class GSMErrorCode {
+	private GSMErrorCode()
 	{
 		
 	}

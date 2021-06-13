@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.gsm.ErrorCode;
+import com.planetbiru.gsm.GSMErrorCode;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.Utility;
 
 @RestController
-public class ServerAPI {
+public class ServerWebAPI {
 	@PostMapping(path="/api/sms**")
 	public ResponseEntity<String> sendSMS(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
@@ -46,7 +46,7 @@ public class ServerAPI {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		String ussd = query.getOrDefault("ussd", "");
 		String message = "";
-		String responseCode = ErrorCode.SUCCESS;
+		String responseCode = GSMErrorCode.SUCCESS;
 		String responseText = "";
 		if(ussd != null && !ussd.isEmpty())
 		{
