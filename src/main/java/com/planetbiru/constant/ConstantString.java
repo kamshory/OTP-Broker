@@ -27,6 +27,7 @@ public class ConstantString {
 	public static final String ISO_DATE_TIME_FORMAT          = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 	public static final String REKENING_WRITE_TABUNGAN_WRITE = "rekening write, tabungan write";
 	public static final String MYSQL_DATE                    = "yyyy-MM-dd";
+	public static final String SERIAL_PORT_NULL              = "Serial port is null";
 	
 	private ConstantString()
 	{

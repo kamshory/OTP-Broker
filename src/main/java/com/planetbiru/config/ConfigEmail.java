@@ -75,7 +75,7 @@ public class ConfigEmail {
 		String fileName = dir + path;
 		
 		try {
-			byte[] data = ConfigLoader.read(fileName);
+			byte[] data = FileConfigUtil.read(fileName);
 			
 			if(data != null)
 			{
@@ -128,7 +128,7 @@ public class ConfigEmail {
 		
 		try 
 		{
-			ConfigLoader.write(fileName, config.toString().getBytes());
+			FileConfigUtil.write(fileName, config.toString().getBytes());
 		}
 		catch (IOException e) 
 		{

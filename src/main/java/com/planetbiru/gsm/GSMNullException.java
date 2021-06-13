@@ -28,7 +28,7 @@ public class GSMNullException extends Exception {
 	public GSMNullException(String message, String errorCode) 
 	{ 
 		super(message); 
-		this.setErrorCode(errorCode);
+		this.errorCode = errorCode;
 	}
 	/**
 	 * Constructor with the message and cause
@@ -49,8 +49,5 @@ public class GSMNullException extends Exception {
 	}
 	public String getErrorCode() {
 		return errorCode;
-	}
-	public void setErrorCode(String errorCode) {
-		this.errorCode = errorCode;
 	}
 }
