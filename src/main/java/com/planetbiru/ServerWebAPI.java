@@ -2,6 +2,7 @@ package com.planetbiru;
 
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
@@ -20,10 +21,29 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.gsm.GSMErrorCode;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.Utility;
 
 @RestController
 public class ServerWebAPI {
+	@PostMapping(path="/api/email**")
+	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{		
+		HttpHeaders responseHeaders = new HttpHeaders();
+		HttpStatus statusCode = HttpStatus.OK;
+		JSONObject responseJSON = new JSONObject();
+		try {
+			responseJSON = this.processEmailRequest(requestBody);
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		String responseBody = responseJSON.toString(4);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
 	@PostMapping(path="/api/sms**")
 	public ResponseEntity<String> sendSMS(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
@@ -78,7 +98,7 @@ public class ServerWebAPI {
 		{
 			requestJSON = new JSONObject(requestBody);
 			String command = requestJSON.optString(JsonKey.COMMAND, "");
-			if(command.equals(JsonKey.SEND_MESSAGE))
+			if(command.equals(ConstantString.SEND_MESSAGE))
 			{
 				JSONArray data = requestJSON.optJSONArray(JsonKey.DATA);
 				if(data != null && !data.isEmpty())
@@ -100,7 +120,55 @@ public class ServerWebAPI {
 		}
 		return requestJSON;
 	}
+	private JSONObject processEmailRequest(String requestBody) throws MessagingException 
+	{
+		JSONObject requestJSON = new JSONObject();
+		try
+		{
+			requestJSON = new JSONObject(requestBody);
+			String command = requestJSON.optString(JsonKey.COMMAND, "");
+			if(command.equals(ConstantString.SEND_MESSAGE))
+			{
+				JSONArray data = requestJSON.optJSONArray(JsonKey.DATA);
+				if(data != null && !data.isEmpty())
+				{
+					int length = data.length();
+					int i;
+					for(i = 0; i<length; i++)
+					{
+						this.sendMail(data.getJSONObject(i));					
+					}
+				}
+			}
+		}
+		catch(JSONException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		return requestJSON;
+	}
 	
+	private void sendMail(JSONObject data) throws MessagingException {
+		if(data != null)
+		{
+			String receiver = data.optString(JsonKey.RECEIVER, "");
+			String textMessage = data.optString(JsonKey.MESSAGE, "");
+			String subject = data.optString(JsonKey.SUBJECT, "");
+			try 
+			{
+				MailUtil mailUtil = new MailUtil();
+				mailUtil.send(receiver, subject, textMessage);
+			} 
+			catch (MessagingException e) 
+			{
+				
+				throw new MessagingException(e.getMessage());
+			}
+		}	
+	}
+
 	private void sendMessage(JSONObject data)
 	{
 		if(data != null)

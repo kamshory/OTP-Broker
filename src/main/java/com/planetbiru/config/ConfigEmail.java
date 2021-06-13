@@ -76,42 +76,32 @@ public class ConfigEmail {
 		
 		try 
 		{
-			byte[] data = FileConfigUtil.read(fileName);
-			
+			byte[] data = FileConfigUtil.read(fileName);		
 			if(data != null)
 			{
 				String text = new String(data);
 				if(text.length() > 7)
 				{
-					try
-					{
-						JSONObject json = new JSONObject(text);
-						String lMailSenderAddress = json.optString("mailSenderAddress", "");
-						String lMailSenderPassword = json.optString("mailSenderPassword", "");
-						boolean lMailAuth = json.optBoolean("mailAuth", false);
-						boolean lMailStartTLS  = json.optBoolean("mailStartTLS", false);
-						boolean lMailSSL = json.optBoolean("mailSSL", false);
-						String lMailHost = json.optString("mailHost", "");
-						int lMailPort = json.optInt("mailPort", 0);
-						
-						ConfigEmail.mailSenderAddress = lMailSenderAddress;
-						ConfigEmail.mailSenderPassword = lMailSenderPassword;
-						ConfigEmail.mailAuth = lMailAuth;
-						ConfigEmail.mailStartTLS = lMailStartTLS;
-						ConfigEmail.mailSSL = lMailSSL;
-						ConfigEmail.mailHost = lMailHost;
-						ConfigEmail.mailPort = lMailPort;
-					}
-					catch(JSONException e)
-					{
-						/**
-						 * Do nothing
-						 */
-					}
+					JSONObject json = new JSONObject(text);
+					String lMailSenderAddress = json.optString("mailSenderAddress", "");
+					String lMailSenderPassword = json.optString("mailSenderPassword", "");
+					boolean lMailAuth = json.optBoolean("mailAuth", false);
+					boolean lMailStartTLS  = json.optBoolean("mailStartTLS", false);
+					boolean lMailSSL = json.optBoolean("mailSSL", false);
+					String lMailHost = json.optString("mailHost", "");
+					int lMailPort = json.optInt("mailPort", 0);
+					
+					ConfigEmail.mailSenderAddress = lMailSenderAddress;
+					ConfigEmail.mailSenderPassword = lMailSenderPassword;
+					ConfigEmail.mailAuth = lMailAuth;
+					ConfigEmail.mailStartTLS = lMailStartTLS;
+					ConfigEmail.mailSSL = lMailSSL;
+					ConfigEmail.mailHost = lMailHost;
+					ConfigEmail.mailPort = lMailPort;
 				}
 			}
 		} 
-		catch (FileNotFoundException e) 
+		catch (FileNotFoundException | JSONException e) 
 		{
 			e.printStackTrace();
 		}
@@ -141,9 +131,6 @@ public class ConfigEmail {
 		{
 			e.printStackTrace();
 		}
-		
-		
-		
 	}
 	
 	private static void prepareDir(String fileName) {

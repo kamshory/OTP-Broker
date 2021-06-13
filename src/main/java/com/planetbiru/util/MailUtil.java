@@ -17,12 +17,15 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import com.planetbiru.config.ConfigEmail;
+
 public class MailUtil {
 	private Session session;
 	private String smtpHost = "smtp.gmail.com";
 	private int smtpPort = 587;
     private String smtpUser = "";
     private String smtpPassword = "";
+    private boolean mailAuth = false;
     private boolean ssl = false;
     private boolean starttls = true;   
     private boolean debug = false;
@@ -39,6 +42,16 @@ public class MailUtil {
     }
     
     
+	public MailUtil() {
+		this.smtpHost = ConfigEmail.getMailHost();
+    	this.smtpPort = ConfigEmail.getMailPort();
+    	this.smtpUser = ConfigEmail.getMailSenderAddress();
+    	this.smtpPassword = ConfigEmail.getMailSenderPassword();
+    	this.ssl = ConfigEmail.isMailSSL();
+    	this.starttls = ConfigEmail.isMailStartTLS();
+	}
+
+
 	public void init()
 	{
         Properties properties = System.getProperties();
@@ -54,7 +67,10 @@ public class MailUtil {
         	properties.put("mail.smtp.starttls.enable","true");
         }
 
-        properties.put("mail.smtp.auth", "true");
+        if(this.mailAuth)
+        {
+        	properties.put("mail.smtp.auth", "true");
+        }
 
         session = Session.getInstance(properties, new Authenticator() {
         	@Override
