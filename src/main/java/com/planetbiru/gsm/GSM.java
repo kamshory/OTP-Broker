@@ -309,12 +309,12 @@ public class GSM {
                 @Override
                 public void serialEvent(SerialPortEvent event) 
                 {
-                	System.out.println("AAAAAAAAA ");
                     byte[] msg = new byte[getSerialPort().bytesAvailable()];
                     getSerialPort().readBytes(msg, msg.length);
                     //logger.info(res);
                     String result = new String(msg);
                     onChangeStateSerial(result);
+                    
                     
                     //event.getEventType()
                     
