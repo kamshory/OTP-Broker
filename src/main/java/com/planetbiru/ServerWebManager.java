@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.config.Config;
-import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.config.ConfigFeederAMQP;
@@ -37,9 +36,10 @@ import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.receiver.ws.WebSocketContent;
+import com.planetbiru.user.APIUserAccount;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.user.User;
-import com.planetbiru.user.UserAccount;
+import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
@@ -51,8 +51,8 @@ public class ServerWebManager {
 	private ConfigSaved configSaved = new ConfigSaved();
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
-	private UserAccount userAccount;
-	private UserAccount userAPIAccount;
+	private WebUserAccount userAccount;
+	private WebUserAccount userAPIAccount;
 
 	@Value("${otpbroker.mail.sender.address}")
 	private String mailSenderAddress;
@@ -127,8 +127,8 @@ public class ServerWebManager {
 	{
 		logger.info("Init...");	
 		Config.setPortName(portName);		
-		userAccount = new UserAccount(userSettingPath);		
-		userAPIAccount = new UserAccount(userAPISettingPath);		
+		userAccount = new WebUserAccount(userSettingPath);		
+		userAPIAccount = new WebUserAccount(userAPISettingPath);		
 		this.loadConfigEmail();		
 		this.initSerial();		
 		
@@ -811,7 +811,7 @@ public class ServerWebManager {
 				{
 					userAPIAccount.addUser(new User(jsonObject));		
 					userAPIAccount.save();
-					ConfigAPI.update(userAPIAccount.toJSONObject().toString());
+					APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 				}		    
 			}
 		}
@@ -917,7 +917,7 @@ public class ServerWebManager {
 				}
 				userAPIAccount.updateUser(new User(jsonObject));		
 				userAPIAccount.save();	
-				ConfigAPI.update(userAPIAccount.toJSONObject().toString());
+				APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -1004,8 +1004,7 @@ public class ServerWebManager {
 				}
 			}
 		}
-		CookieServer cookie = new CookieServer(headers);
-		
+		CookieServer cookie = new CookieServer(headers);		
 		WebSocketContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
 		
 		responseBody = newContent.getResponseBody();
@@ -1058,6 +1057,7 @@ public class ServerWebManager {
 		return lifetime;
 	}
 
+	
 	private void processFeedbackPost(HttpHeaders headers, String requestBody, HttpServletRequest request) 
 	{		
 		try {
@@ -1530,7 +1530,7 @@ public class ServerWebManager {
 				userAPIAccount.deleteUser(value);
 			}
 			userAPIAccount.save();
-			ConfigAPI.update(userAPIAccount.toJSONObject().toString());
+			APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 		}
 		if(query.containsKey("deactivate"))
 		{
@@ -1749,7 +1749,7 @@ public class ServerWebManager {
 			}
 		}
 		userAPIAccount.save();
-		ConfigAPI.update(userAPIAccount.toJSONObject().toString());
+		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 	}
 	private void processAPIUserActivate(Map<String, String> query)
 	{
@@ -1772,7 +1772,7 @@ public class ServerWebManager {
 			}
 		}
 		userAPIAccount.save();
-		ConfigAPI.update(userAPIAccount.toJSONObject().toString());
+		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 	}
 	private void processAPIUserBlock(Map<String, String> query)
 	{
@@ -1795,7 +1795,7 @@ public class ServerWebManager {
 			}
 		}
 		userAPIAccount.save();
-		ConfigAPI.update(userAPIAccount.toJSONObject().toString());
+		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 	}
 	private void processAPIUserUnblock(Map<String, String> query)
 	{
@@ -1818,7 +1818,7 @@ public class ServerWebManager {
 			}
 		}
 		userAPIAccount.save();
-		ConfigAPI.update(userAPIAccount.toJSONObject().toString());
+		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 	}
 	
 	private void processAPIUserUpdate(Map<String, String> query)
@@ -1855,7 +1855,7 @@ public class ServerWebManager {
 				user.setActive(active);
 				userAPIAccount.updateUser(user);
 				userAPIAccount.save();
-				ConfigAPI.update(userAPIAccount.toJSONObject().toString());
+				APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 			} 
 			catch (NoUserRegisteredException e) 
 			{
