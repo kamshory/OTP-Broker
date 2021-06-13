@@ -10,3 +10,18 @@ Untuk menggunakan Message Broker, silakan gunakan RabbitMQ dengan link https://w
 
 ![OTP Broker Topology](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology.png)
 
+Sekenario 1 - OTP Broker Dapat Diakses App Server
+
+Pada skenario ini, App Server dapat langsung mengirimkan OTP ke OTP Broker melalui HTTP.
+
+![OTP Broker Topology Skenario 1](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology-1.png)
+
+Sekenario 2 - OTP Broker Tidak Dapat Diakses App Server
+
+Pada skenario ini, App Server dapat mengirimkan OTP ke RabbitMQ Server atau WSMessageBroker. WSMessageBroker menggunakan protokol WebSoket dan Basic Authentication. Baik App Server maupun OTP Broker bertindak sebagai client dari WSMessageBroker.
+
+App Server bertindak sebagai publisher dan OTP Broker menjadi consumer dari RabbitMQ Server dan WSMessageBroker. Keduanya harus menggunakan channel yang sama agar semua OTP yang dikirimkan oleh App Server dapat diterima oleh OTP Broker.
+
+![OTP Broker Topology Skenario 2](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology-2.png)
+
+Dari kedua skenario di atas, OTP Broker akan mengirmkan SMS menggunakan modem GSM yang terpasang secara fisik pada perangkat OTP Broker.
