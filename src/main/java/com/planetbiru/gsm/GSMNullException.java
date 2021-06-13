@@ -5,7 +5,6 @@ public class GSMNullException extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String errorCode = "";
 	/**
 	 * Default constructor
 	 */
@@ -20,15 +19,6 @@ public class GSMNullException extends Exception {
 	public GSMNullException(String message) 
 	{ 
 		super(message); 
-	}
-	/**
-	 * Constructor with the message
-	 * @param message Message
-	 */
-	public GSMNullException(String message, String errorCode) 
-	{ 
-		super(message); 
-		this.errorCode = errorCode;
 	}
 	/**
 	 * Constructor with the message and cause
@@ -46,8 +36,5 @@ public class GSMNullException extends Exception {
 	public GSMNullException(Throwable cause) 
 	{ 
 		super(cause); 
-	}
-	public String getErrorCode() {
-		return errorCode;
 	}
 }

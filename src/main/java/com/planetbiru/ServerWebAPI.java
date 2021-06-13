@@ -116,8 +116,7 @@ public class ServerWebAPI {
 				} 
 				catch (GSMNullException e) 
 				{
-					responseCode = e.getErrorCode();
-					responseText = "<strong>Error: "+e.getErrorCode()+"</strong> "+e.getMessage()+". <a href=\"error-"+e.getErrorCode()+".html\">Detail</a>";
+					responseText = ""+e.getMessage()+". <a href=\"error-1000.html\">Detail</a>";
 				}		
 			}
 			JSONObject data = new JSONObject();
