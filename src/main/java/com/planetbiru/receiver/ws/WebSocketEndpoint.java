@@ -37,6 +37,9 @@ public class WebSocketEndpoint extends Endpoint {
 		}
 		catch (IOException e) 
 		{
+			/**
+			 * Do nothing
+			 */
 		}
 	}
 	public void onReceiveMessage(String message)
@@ -54,20 +57,8 @@ public class WebSocketEndpoint extends Endpoint {
 					int i;
 					for(i = 0; i<length; i++)
 					{
-						JSONObject dt = data.getJSONObject(i);
-						if(dt != null)
-						{
-							String receiver = dt.optString("receiver", "");
-							String textMessage = dt.optString("message", "");
-							try 
-							{
-								this.sendSMS(receiver, textMessage);
-							} 
-							catch (GSMNullException e) 
-							{
-								e.printStackTrace();
-							}
-						}
+						this.sendSMS(data.getJSONObject(i));
+						
 					}
 				}
 			}
@@ -75,6 +66,22 @@ public class WebSocketEndpoint extends Endpoint {
 		catch(JSONException e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	private void sendSMS(JSONObject dt) {
+		if(dt != null)
+		{
+			String receiver = dt.optString("receiver", "");
+			String textMessage = dt.optString("message", "");
+			try 
+			{
+				this.sendSMS(receiver, textMessage);
+			} 
+			catch (GSMNullException e) 
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	private void sendSMS(String receiver, String textMessage) throws GSMNullException {

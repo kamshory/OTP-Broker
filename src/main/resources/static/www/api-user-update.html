@@ -54,10 +54,10 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li class=""><a href="admin.html">Administrator Setting</a></li>
+                                <li class="active"><a href="admin.html">Administrator Setting</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                                 <li class=""><a href="sms-setting.html">SMS Setting</a></li>
-                                <li class="active "><a href="email-setting.html">Email Setting</a></li>
+                                <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="dropdown-header">Other Configs</li>
                                 <li class=""><a href="api-user.html">API User</a></li>
@@ -66,7 +66,7 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li class=""><a href="account.html">Account</a></li>
+                        <li><a href="account.html">Account</a></li>
                         <li><a href="logout.html">Logout</a></li>
                     </ul>
                 </div>
@@ -75,80 +75,78 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>Email Setting</h3>
-            <form action="email-setting.html" method="post">
-                <table class="config-table config-table-connection">
+            <h3>API User</h3>
+            <form action="api-user-update.html" method="post">
+                <table class="two-cols-responsive">
                     <tbody>
                         <tr>
-                            <td>SMTP Host</td>
-                            <td><input type="text" name="smtp_host" id="smtp_host" value="">
-                            </td>
+                            <td>Username</td>
+                            <td><input type="text" class="form-control" name="username" value=""></td>
                         </tr>
                         <tr>
-                            <td>SMTP Port</td>
-                            <td><input type="number" name="smtp_port" id="smtp_port" value="">
-                            </td>
+                            <td>Name</td>
+                            <td><input type="text" class="form-control" name="name" value=""></td>
                         </tr>
                         <tr>
-                            <td>SSL</td>
-                            <td><label><input type="checkbox" name="ssl" id="ssl" value="1"> Using SSL</label>
-                            </td>
+                            <td>Email</td>
+                            <td><input type="email" class="form-control" name="email" value=""></td>
                         </tr>
                         <tr>
-                            <td>TLS</td>
-                            <td><label><input type="checkbox" name="start_tls" id="start_tls" value="1"> Start TLS Before Send</label>
-                            </td>
+                            <td>Phone Number</td>
+                            <td><input type="tel" class="form-control" name="phone" value=""></td>
                         </tr>
                         <tr>
-                            <td>Authentication</td>
-                            <td><label><input type="checkbox" name="mail_auth" id="mail_auth" value="1"> Use Authentication</label>
-                            </td>
+                            <td>Password</td>
+                            <td><input type="password" class="form-control" name="password"></td>
                         </tr>
                         <tr>
-                            <td>Sender Account</td>
-                            <td><input type="email" name="sender_address" id="sender_address" value="">
-                            </td>
+                            <td>Blocked</td>
+                            <td><label><input type="checkbox" name="blocked" value="1"> Yes</label></td>
                         </tr>
                         <tr>
-                            <td>Sender Password</td>
-                            <td><input type="password" name="sender_password" id="sender_password" value="">
-                            </td>
+                            <td>Active</td>
+                            <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
                         </tr>
-                        
-                        
+                    </tbody>
+                </table>
+                <table class="two-cols-responsive">
+                    <tbody>
                         <tr>
                             <td></td>
                             <td>
-                                <input type="submit" class="btn btn-success" name="save_email_setting"
-                                    id="save_email_setting" value="Save">
-                                <input type="button" class="btn btn-primary" name="test_send_email" id="test_send_email"
-                                    value="Test Send EMail">
-                                <input type="reset" class="btn btn-default" class="btn btn-default" value="Reset">
+                                <input type="submit" class="btn btn-success" value="Save Changes"
+                                    onclick="return confirm('Are you sure you want to save changes')" name="update">
+                                <input type="button" class="btn btn-primary" value="Cancel"
+                                    onclick="window.location='api-user.html'">
                             </td>
                         </tr>
                     </tbody>
                 </table>
-
             </form>
             <script type="text/javascript">
                 $(document).ready(function (e) {
-                    $.ajax({
-                        type: "GET",
-                        url: "email-setting/get",
-                        dataType: "json",
-                        success: function (data) {
-                            $('input[name="smtp_host"]').val(data.mailHost);
-                            $('input[name="smtp_port"]').val(data.mailPort);
-                            $('input[name="sender_address"]').val(data.mailSenderAddress);
-                            $('input[name="mail_auth"]').prop("checked", data.mailAuth);
-                            $('input[name="ssl"]').prop("checked", data.mailSSL);
-                            $('input[name="start_tls"]').prop("checked", data.mailStartTLS);
-                        }
-                    });
+                    var urlParams = new URLSearchParams(window.location.search);
+                    var username = urlParams.get('username') || '';
+                    if (username.length > 0) {
+                        $.ajax({
+                            type: "GET",
+                            url: "/api-user/detail/" + username,
+                            dataType: "json",
+                            success: function (data) {
+                                $('input[name="name"]').val(data.name);
+                                $('input[name="username"]').val(data.username);
+                                $('input[name="phone"]').val(data.phone);
+                                $('input[name="email"]').val(data.email);
+                                $('input[name="blocked"]').prop('checked', data.blocked);
+                                $('input[name="active"]').prop('checked', data.active);
+                            }
+                        });
+                    }
+                    else {
+                        window.location = "api-user.html";
+                    }
                 });
             </script>
-
-
         </div>
         <!-- /container -->
     </div>

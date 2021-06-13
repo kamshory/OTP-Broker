@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +23,35 @@ public class ConfigSaved {
 		/**
 		 * Do nothing
 		 */
+	}
+	
+	public void load(List<String> lines) {
+        String section = null;
+		for(int i = 0; i<lines.size(); i++)
+		{
+			String line = lines.get(i);
+            Matcher m = mSection.matcher(line);
+            if(m.matches()) 
+            {
+                section = m.group(1).trim();
+            } 
+            else if (section != null) 
+            {
+                m = mKeyValue.matcher(line);
+                if(m.matches()) 
+                {
+                    String key = m.group(1).trim();
+                    String value = m.group(2).trim();
+                    Map<String, String> kv = mEntries.get(section);
+                    if (kv == null) 
+                    {
+                    	kv = new HashMap<>();
+                        mEntries.put(section, kv);
+                    }
+                    kv.put(key, value);
+                }
+            }
+		}
 	}
 
 	public void load(String fileName) throws IOException {

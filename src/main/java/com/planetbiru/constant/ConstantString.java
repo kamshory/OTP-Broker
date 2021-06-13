@@ -14,8 +14,11 @@ public class ConstantString {
 	public static final String APPLICATION_JSON              = "application/json";
 	public static final String LOCATION                      = "Location";
 	public static final String ADMIN_FILE_LEVEL_3            = "../../admin.html";
+	public static final String API_USER_FILE_LEVEL_3         = "../../api-user.html";
 	public static final String FILTER_INTEGER                = "[^\\d]";
 	public static final String ADMIN_INIT                    = "admin-init.html";
+	public static final String SEND_MESSAGE                  = "send-message";
+	public static final String SEND_MAIL                     = "send-mail";
 	
 	
 	
