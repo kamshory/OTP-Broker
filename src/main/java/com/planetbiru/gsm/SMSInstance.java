@@ -20,7 +20,7 @@ public class SMSInstance {
 	public void close() throws GSMNullException {
 		if(this.gsm.getSerialPort() == null)
 		{
-			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, ErrorCode.SERIAL_PORT_NULL);
+			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, GSMErrorCode.SERIAL_PORT_NULL);
 		}
 		this.gsm.closePort();
 	}
@@ -28,7 +28,7 @@ public class SMSInstance {
 	{
 		if(this.gsm.getSerialPort() == null)
 		{
-			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, ErrorCode.SERIAL_PORT_NULL);
+			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, GSMErrorCode.SERIAL_PORT_NULL);
 		}
 		return this.gsm.sendSMS(receiver, message);
 	}
@@ -36,14 +36,14 @@ public class SMSInstance {
 	{
 		if(this.gsm.getSerialPort() == null)
 		{
-			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, ErrorCode.SERIAL_PORT_NULL);
+			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, GSMErrorCode.SERIAL_PORT_NULL);
 		}
 		return this.gsm.readSMS();
 	}
 	public String executeUSSD(String ussd) throws GSMNullException {
 		if(this.gsm.getSerialPort() == null)
 		{
-			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, ErrorCode.SERIAL_PORT_NULL);
+			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, GSMErrorCode.SERIAL_PORT_NULL);
 		}
 		return this.gsm.executeUSSD(ussd);
 		

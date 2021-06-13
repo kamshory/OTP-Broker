@@ -17,7 +17,7 @@ public class ServletAwareConfigurator extends ServerEndpointConfig.Configurator{
 
 	private static Logger logger = LogManager.getLogger(ServletAwareConfigurator.class);
 	@Override
-    public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
+    public void modifyHandshake(ServerEndpointConfig serverEndpointConfig, HandshakeRequest request, HandshakeResponse response) {
         HttpServletRequest httpservletRequest = getField(request, HttpServletRequest.class);
         String sClientIP = "";
         if(httpservletRequest != null)
@@ -27,10 +27,10 @@ public class ServletAwareConfigurator extends ServerEndpointConfig.Configurator{
         Map<String, List<String>> requestHeader = request.getHeaders();
         Map<String, List<String>> responseHeader = response.getHeaders();
         Map<String, List<String>> parameters = request.getParameterMap();
-        config.getUserProperties().put("remote_address", sClientIP);
-        config.getUserProperties().put("parameter", parameters);
-        config.getUserProperties().put("request_header", requestHeader);
-        config.getUserProperties().put("response_header", responseHeader);
+        serverEndpointConfig.getUserProperties().put("remote_address", sClientIP);
+        serverEndpointConfig.getUserProperties().put("parameter", parameters);
+        serverEndpointConfig.getUserProperties().put("request_header", requestHeader);
+        serverEndpointConfig.getUserProperties().put("response_header", responseHeader);
     }
 
     //hacking reflector to expose fields...
