@@ -67,8 +67,6 @@ public class ServerScheduler {
 	
 	public JSONArray getTaskList() 
 	{
-		
-		
 		JSONArray list = new JSONArray();
 		return list;
 	}

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.config.ConfigFeederAMQP;
@@ -184,7 +185,6 @@ public class ServerWebManager {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		userAccount.load();
 		HttpStatus statusCode = HttpStatus.OK;
-		
 		try 
 		{
 			User user = userAccount.getUser(userID);
@@ -199,7 +199,6 @@ public class ServerWebManager {
 					user = userAccount.getUserByEmail(userID);
 				}
 			}
-			
 			if(!user.getUsername().isEmpty())
 			{
 				String phone = user.getPhone();
@@ -222,7 +221,9 @@ public class ServerWebManager {
 					} 
 					catch (MessagingException e) 
 					{
-						e.printStackTrace();
+						/**
+						 * Do nothing
+						 */
 					}
 				}
 				else if(!phone.isEmpty())
@@ -234,10 +235,15 @@ public class ServerWebManager {
 					} 
 					catch (GSMNullException e) 
 					{
-						e.printStackTrace();
+						/**
+						 * Do nothing
+						 */
 					}
 				}
 			}
+			responseHeaders.add(ConstantString.LOCATION, "/");
+			responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+			statusCode = HttpStatus.MOVED_PERMANENTLY;
 
 		} 
 		catch (NoUserRegisteredException e1) 
@@ -246,8 +252,6 @@ public class ServerWebManager {
 			responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 			statusCode = HttpStatus.MOVED_PERMANENTLY;
 		}
-		
-		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 
@@ -263,6 +267,7 @@ public class ServerWebManager {
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+	
 	@GetMapping(path="/restart")
 	public ResponseEntity<byte[]> restart(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -272,8 +277,7 @@ public class ServerWebManager {
 		ServerApplication.restart();
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
-	}
-	
+	}	
 	
 	public void broardcastWebSocket(String message)
 	{
@@ -285,10 +289,8 @@ public class ServerWebManager {
 		itemData.put("id", uuid);
 		itemData.put(JsonKey.MESSAGE, message);
 		data.put(itemData);
-		messageJSON.put("data", data);
-		
-		ServerWebSocket.broadcast(messageJSON.toString(4));
-		
+		messageJSON.put("data", data);		
+		ServerWebSocket.broadcast(messageJSON.toString(4));	
 	}
 	
 	@PostMapping(path="/login.html")
@@ -325,16 +327,16 @@ public class ServerWebManager {
 			{
 				userAccount.updateLastActive(username);
 				userAccount.save();
-			    payload.put("nextURL", next);
+			    payload.put(JsonKey.NEXT_URL, next);
 			    res.put("code", 0);
-			    res.put("payload", payload);
+			    res.put(JsonKey.PAYLOAD, payload);
 				responseBody = res.toString().getBytes();
 			}
 			else
 			{
-			    payload.put("nextURL", "/");
+			    payload.put(JsonKey.NEXT_URL, "/");
 			    res.put("code", 0);
-			    res.put("payload", payload);
+			    res.put(JsonKey.PAYLOAD, payload);
 				responseBody = res.toString().getBytes();				
 			}
 			cookie.saveSessionData();
@@ -343,9 +345,9 @@ public class ServerWebManager {
 		}
 		catch(NoUserRegisteredException e)
 		{
-		    payload.put("nextURL", "/admin-init.html");
+		    payload.put(JsonKey.NEXT_URL, "/admin-init.html");
 		    res.put("code", 0);
-		    res.put("payload", payload);
+		    res.put(JsonKey.PAYLOAD, payload);
 			responseBody = res.toString().getBytes();				
 		}
 		
@@ -502,6 +504,7 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+	
 	@GetMapping(path="/email-setting/get")
 	public ResponseEntity<byte[]> handleEmailSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -716,8 +719,7 @@ public class ServerWebManager {
 					/**
 					 * Do nothing
 					 */
-				}
-				
+				}			
 				cookie.saveSessionData();
 				cookie.putToHeaders(responseHeaders);
 				
@@ -809,7 +811,7 @@ public class ServerWebManager {
 				{
 					userAPIAccount.addUser(new User(jsonObject));		
 					userAPIAccount.save();
-					APIUser.update(userAPIAccount.toJSONObject().toString());
+					ConfigAPI.update(userAPIAccount.toJSONObject().toString());
 				}		    
 			}
 		}
@@ -915,7 +917,7 @@ public class ServerWebManager {
 				}
 				userAPIAccount.updateUser(new User(jsonObject));		
 				userAPIAccount.save();	
-				APIUser.update(userAPIAccount.toJSONObject().toString());
+				ConfigAPI.update(userAPIAccount.toJSONObject().toString());
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -990,7 +992,7 @@ public class ServerWebManager {
 		catch (FileNotFoundException e) 
 		{
 			statusCode = HttpStatus.NOT_FOUND;
-			if(fileName.endsWith(".html"))
+			if(fileName.endsWith(ConstantString.EXT_HTML))
 			{
 				try 
 				{
@@ -1013,7 +1015,7 @@ public class ServerWebManager {
 		
 		responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
 		
-		if(fileName.endsWith(".html"))
+		if(fileName.endsWith(ConstantString.EXT_HTML))
 		{
 			cookie.saveSessionData();
 		}
@@ -1528,7 +1530,7 @@ public class ServerWebManager {
 				userAPIAccount.deleteUser(value);
 			}
 			userAPIAccount.save();
-			APIUser.update(userAPIAccount.toJSONObject().toString());
+			ConfigAPI.update(userAPIAccount.toJSONObject().toString());
 		}
 		if(query.containsKey("deactivate"))
 		{
@@ -1747,7 +1749,7 @@ public class ServerWebManager {
 			}
 		}
 		userAPIAccount.save();
-		APIUser.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPI.update(userAPIAccount.toJSONObject().toString());
 	}
 	private void processAPIUserActivate(Map<String, String> query)
 	{
@@ -1770,7 +1772,7 @@ public class ServerWebManager {
 			}
 		}
 		userAPIAccount.save();
-		APIUser.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPI.update(userAPIAccount.toJSONObject().toString());
 	}
 	private void processAPIUserBlock(Map<String, String> query)
 	{
@@ -1793,7 +1795,7 @@ public class ServerWebManager {
 			}
 		}
 		userAPIAccount.save();
-		APIUser.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPI.update(userAPIAccount.toJSONObject().toString());
 	}
 	private void processAPIUserUnblock(Map<String, String> query)
 	{
@@ -1816,7 +1818,7 @@ public class ServerWebManager {
 			}
 		}
 		userAPIAccount.save();
-		APIUser.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPI.update(userAPIAccount.toJSONObject().toString());
 	}
 	
 	private void processAPIUserUpdate(Map<String, String> query)
@@ -1853,7 +1855,7 @@ public class ServerWebManager {
 				user.setActive(active);
 				userAPIAccount.updateUser(user);
 				userAPIAccount.save();
-				APIUser.update(userAPIAccount.toJSONObject().toString());
+				ConfigAPI.update(userAPIAccount.toJSONObject().toString());
 			} 
 			catch (NoUserRegisteredException e) 
 			{
@@ -1878,7 +1880,7 @@ public class ServerWebManager {
 		boolean requireLogin = false;
 		String fileSub = "";
 		
-		if(fileName.toLowerCase().endsWith(".html"))
+		if(fileName.toLowerCase().endsWith(ConstantString.EXT_HTML))
 		{
 			JSONObject authFileInfo = this.processAuthFile(responseBody);
 			requireLogin = authFileInfo.optBoolean(JsonKey.CONTENT, false);
@@ -2054,28 +2056,15 @@ public class ServerWebManager {
 		if(file == null || file.isEmpty() || file.equals("/"))
 		{
 			file = Config.getDefaultFile();
-		}
-		
+		}		
 		String dir = "";
-		/**
-		dir = FileUtil.class.getResource("/").getFile();
-		if(dir.endsWith("/") && documentRoot.startsWith("/"))
-		{
-			dir = dir.substring(0, dir.length() - 1);
-		}
-		*/
-		return dir + documentRoot+file;
-		
+		return dir + documentRoot+file;		
 	}
 	
 	private String getFileName(String request) 
 	{
 		return documentRoot+request;
 	}
-	
-	
-	
-	
 	
 	
 }

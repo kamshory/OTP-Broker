@@ -248,7 +248,7 @@ public class UserAccount {
 	public User getUserByPhone(String userID) {
 		for (Map.Entry<String, User> entry : this.users.entrySet())
 		{
-			if(entry.getValue().getPhone().equals(userID))
+			if(!userID.isEmpty() && entry.getValue().getPhone().equals(userID))
 			{
 				return entry.getValue();
 			}
@@ -258,7 +258,7 @@ public class UserAccount {
 	public User getUserByEmail(String userID) {
 		for (Map.Entry<String, User> entry : this.users.entrySet())
 		{
-			if(entry.getValue().getEmail().equals(userID))
+			if(!userID.isEmpty() && entry.getValue().getEmail().equals(userID))
 			{
 				return entry.getValue();
 			}

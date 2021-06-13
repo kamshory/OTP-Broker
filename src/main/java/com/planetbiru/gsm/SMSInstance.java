@@ -3,6 +3,7 @@ package com.planetbiru.gsm;
 import java.util.List;
 
 import com.planetbiru.constant.ConstantString;
+import com.planetbiru.constant.ResponseCode;
 
 public class SMSInstance {
 	private GSM gsm;
@@ -20,7 +21,7 @@ public class SMSInstance {
 	public void close() throws GSMNullException {
 		if(this.gsm.getSerialPort() == null)
 		{
-			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, GSMErrorCode.SERIAL_PORT_NULL);
+			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, ResponseCode.SERIAL_PORT_NULL);
 		}
 		this.gsm.closePort();
 	}
@@ -28,7 +29,7 @@ public class SMSInstance {
 	{
 		if(this.gsm.getSerialPort() == null)
 		{
-			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, GSMErrorCode.SERIAL_PORT_NULL);
+			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, ResponseCode.SERIAL_PORT_NULL);
 		}
 		return this.gsm.sendSMS(receiver, message);
 	}
@@ -36,14 +37,14 @@ public class SMSInstance {
 	{
 		if(this.gsm.getSerialPort() == null)
 		{
-			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, GSMErrorCode.SERIAL_PORT_NULL);
+			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, ResponseCode.SERIAL_PORT_NULL);
 		}
 		return this.gsm.readSMS();
 	}
 	public String executeUSSD(String ussd) throws GSMNullException {
 		if(this.gsm.getSerialPort() == null)
 		{
-			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, GSMErrorCode.SERIAL_PORT_NULL);
+			throw new GSMNullException(ConstantString.SERIAL_PORT_NULL, ResponseCode.SERIAL_PORT_NULL);
 		}
 		return this.gsm.executeUSSD(ussd);
 		

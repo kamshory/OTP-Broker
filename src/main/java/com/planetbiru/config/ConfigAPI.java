@@ -1,4 +1,4 @@
-package com.planetbiru;
+package com.planetbiru.config;
 
 import java.io.File;
 import java.util.HashMap;
@@ -16,23 +16,23 @@ import com.planetbiru.user.User;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 
-public class APIUser {
+public class ConfigAPI {
 
 	private static Map<String, User> users = new HashMap<>();
 	
-	private APIUser()
+	private ConfigAPI()
 	{
 		
 	}
 	public static void load(String path)
 	{
-		String dir = APIUser.getBaseDir();
+		String dir = ConfigAPI.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = dir + path;
-		APIUser.prepareDir(fileName);
+		ConfigAPI.prepareDir(fileName);
 		try 
 		{
 			byte[] data = FileUtil.read(fileName);
@@ -44,7 +44,7 @@ public class APIUser {
 				while(keys.hasNext()) {
 				    String username = keys.next();
 				    JSONObject user = jsonObject.optJSONObject(username);
-				    APIUser.addUser(username, user);
+				    ConfigAPI.addUser(username, user);
 				}
 			}
 		} 
@@ -55,6 +55,7 @@ public class APIUser {
 			 */
 		}
 	}
+	
 	private static void prepareDir(String fileName) 
 	{
 		File file = new File(fileName);
@@ -77,43 +78,45 @@ public class APIUser {
 	
 	private static String getBaseDir()
 	{
-		return APIUser.class.getResource("/").getFile();
+		return ConfigAPI.class.getResource("/").getFile();
 	}
 	
 	public static void update(String text) {
 		if(text != null)
 		{
-			APIUser.users = new HashMap<>();
+			ConfigAPI.users = new HashMap<>();
 			JSONObject jsonObject = new JSONObject(text);
 			Iterator<String> keys = jsonObject.keys();
 			while(keys.hasNext()) {
 			    String username = keys.next();
 			    JSONObject user = jsonObject.optJSONObject(username);
-			    APIUser.addUser(username, user);
+			    ConfigAPI.addUser(username, user);
 			}
-		}
-		
+		}	
 	}
 	public static void addUser(User user)
 	{
-		APIUser.users.put(user.getUsername(), user);
+		ConfigAPI.users.put(user.getUsername(), user);
 	}
+	
 	public static void addUser(String username, JSONObject jsonObject) 
 	{
 		User user = new User(jsonObject);
-		APIUser.users.put(username, user);
+		ConfigAPI.users.put(username, user);
 	}
 	
-	public static void addUser(JSONObject jsonObject) {
+	public static void addUser(JSONObject jsonObject) 
+	{
 		User user = new User(jsonObject);
-		APIUser.users.put(jsonObject.optString(JsonKey.USERNAME, ""), user);
+		ConfigAPI.users.put(jsonObject.optString(JsonKey.USERNAME, ""), user);
 	}
+	
 	public static boolean checkUserAuth(Map<String, List<String>> headers) 
 	{
 		CookieServer cookie = new CookieServer(headers);
 		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
 		String password = cookie.getSessionData().optString(JsonKey.PASSWORD, "");
-		return APIUser.checkUserAuth(username, password);
+		return ConfigAPI.checkUserAuth(username, password);
 	}
 	
 	public boolean checkUserAuth(HttpHeaders headers)
@@ -121,7 +124,7 @@ public class APIUser {
 		CookieServer cookie = new CookieServer(headers);
 		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
 		String password = cookie.getSessionData().optString(JsonKey.PASSWORD, "");
-		return APIUser.checkUserAuth(username, password);
+		return ConfigAPI.checkUserAuth(username, password);
 	}
 	
 	public static boolean checkUserAuth(String username, String password) 
@@ -130,11 +133,12 @@ public class APIUser {
 		{
 			return false;
 		}
-		User user = APIUser.getUser(username);
+		User user = ConfigAPI.getUser(username);
 		return user.getPassword().equals(password) && user.isActive() && !user.isBlocked();
 	}
+	
 	public static User getUser(String username)
 	{		
-		return APIUser.users.getOrDefault(username, new User());
+		return ConfigAPI.users.getOrDefault(username, new User());
 	}
 }
