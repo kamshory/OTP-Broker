@@ -66,6 +66,8 @@ public class JsonKey {
 	public static final String IMEI                          = "imei";
 	public static final String SIM_CARD_PIN                  = "simCardPIN";
 	public static final String SUBJECT                       = "subject";
+	public static final String PAYLOAD                       = "payload";
+	public static final String NEXT_URL                      = "nextURL";
 	
 	private JsonKey()
 	{

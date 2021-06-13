@@ -15,7 +15,6 @@ public class ServerApplication {
 	}
 	public static void stop()
 	{
-		System.out.println("Stop app");
 		ProcessKiller killer = new ProcessKiller("java.exe", true);
 		killer.stop();		
 	}

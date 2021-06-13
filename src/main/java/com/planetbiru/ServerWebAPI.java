@@ -19,9 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.gsm.GSMErrorCode;
+import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.MailUtil;
@@ -36,7 +37,7 @@ public class ServerWebAPI {
 	@PostConstruct
 	public void init()
 	{
-		APIUser.load(userAPISettingPath);
+		ConfigAPI.load(userAPISettingPath);
 	}
 	
 	@PostMapping(path="/api/email**")
@@ -105,7 +106,7 @@ public class ServerWebAPI {
 			Map<String, String> query = Utility.parseURLEncoded(requestBody);
 			String ussd = query.getOrDefault("ussd", "");
 			String message = "";
-			String responseCode = GSMErrorCode.SUCCESS;
+			String responseCode = ResponseCode.SUCCESS;
 			String responseText = "";
 			if(ussd != null && !ussd.isEmpty())
 			{
@@ -137,7 +138,24 @@ public class ServerWebAPI {
 	}
 	
 	private JSONObject unauthorized(String requestBody) {
-		return new JSONObject();
+		JSONObject requestJSON = new JSONObject();
+		String command = "";
+		try
+		{
+			requestJSON = new JSONObject(requestBody);
+			command = requestJSON.optString(JsonKey.COMMAND, "");
+		}
+		catch(JSONException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		JSONArray data = new JSONArray();
+		requestJSON.put(JsonKey.DATA, data);
+		requestJSON.put(JsonKey.COMMAND, command);
+		requestJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.UNAUTHORIZED);
+		return requestJSON;
 	}
 
 	private boolean validRequest(HttpHeaders headers) {
@@ -162,7 +180,7 @@ public class ServerWebAPI {
 					if(arr.length > 1)
 					{
 						password = arr[1];
-						return APIUser.checkUserAuth(username, password);
+						return ConfigAPI.checkUserAuth(username, password);
 					}
 				}
 			}
