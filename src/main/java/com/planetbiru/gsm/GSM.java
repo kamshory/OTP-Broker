@@ -28,10 +28,7 @@ public class GSM {
     {
     	logger.info("Constructor GSM called");
     	//listPort();
-    	
-    	
-    }
-    
+    }  
    
     /**
      * Execute AT command
@@ -140,8 +137,19 @@ public class GSM {
         ArrayList<SMS> str = new ArrayList<>();
         for (String value : smsStorage) 
         {
-        	String result = executeAT("AT+CPMS=\"" + value + "\"", 1);
-        	result = executeAT("AT+CMGL=\"ALL\"", 5);
+        	String result = "";
+        	String result1 = executeAT("AT+CPMS=\"" + value + "\"", 1);
+			if(result1.isEmpty())
+        	{
+        		result = result1;
+        	}
+
+        	String result2 = executeAT("AT+CMGL=\"ALL\"", 5);
+			if(result2.isEmpty())
+        	{
+        		result = result2;
+        	}
+        	
             if (result.contains("+CMGL")) 
             {
                 String[] strs = result.replace("\"", "").split("(?:,)|(?:\r\n)");
@@ -196,8 +204,6 @@ public class GSM {
         return str;
     }
 
-    
-
     /**
      * Send an SMS
      *
@@ -212,20 +218,52 @@ public class GSM {
     	recipient = recipient.trim();
     	message = message.trim();
     	System.out.println("Send SMS to "+recipient+" "+message+" port "+this.getSerialPort().toString()+" "+this.portName);
-    	result = executeAT("ATE0", 1);
-    	result = executeAT("AT+CSCS=\"GSM\"", 1);
-    	result = executeAT("AT+CMGF=1", 1);
-    	result = executeAT("AT+CMGS=\"" + recipient + "\"", 2);
-    	result = executeAT(message, 2);
-    	result = executeAT(Character.toString((char) 26), 10);
+    	String result1 = executeAT("ATE0", 1);
+    	if(result1.isEmpty())
+    	{
+    		result = result1;
+    	}
+    	String result2 = executeAT("AT+CSCS=\"GSM\"", 1);
+    	if(result2.isEmpty())
+    	{
+    		result = result2;
+    	}
+    	String result3 = executeAT("AT+CMGF=1", 1);
+    	if(result3.isEmpty())
+    	{
+    		result = result3;
+    	}
+    	String result4 = executeAT("AT+CMGS=\"" + recipient + "\"", 2);
+    	if(result4.isEmpty())
+    	{
+    		result = result4;
+    	}
+    	String result5 = executeAT(message, 2);
+    	if(result5.isEmpty())
+    	{
+    		result = result5;
+    	}
+    	String result6 = executeAT(Character.toString((char) 26), 10);
+    	if(result6.isEmpty())
+    	{
+    		result = result6;
+    	} 	
         return result;
     }
 
     public String deleteSMS(int smsId, String storage) throws GSMNullException 
     {
     	String result = "";
-    	result = executeAT("AT+CPMS=\"" + storage + "\"", 1);
-    	result = executeAT("AT+CMGD=" + smsId, 1);
+    	String result1 = executeAT("AT+CPMS=\"" + storage + "\"", 1);
+    	if(result1.isEmpty())
+    	{
+    		result = result1;
+    	}
+    	String result2 = executeAT("AT+CMGD=" + smsId, 1);
+    	if(result2.isEmpty())
+    	{
+    		result = result2;
+    	}
         return result;
     }
 

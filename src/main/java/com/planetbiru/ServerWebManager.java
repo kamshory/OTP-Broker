@@ -27,14 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigSaved;
+import com.planetbiru.config.ConfigFeeder;
+import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.receiver.ws.WebSocketContent;
-import com.planetbiru.settings.FeederSetting;
-import com.planetbiru.settings.SMSSetting;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.user.User;
 import com.planetbiru.user.UserAccount;
@@ -46,7 +46,7 @@ import com.planetbiru.util.Utility;
 @RestController
 public class ServerWebManager {
 	
-	private ConfigSaved mime = new ConfigSaved();
+	private ConfigSaved configSaved = new ConfigSaved();
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
 	private UserAccount userAccount;
@@ -115,25 +115,19 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
-		logger.info("Init...");
-		
-		Config.setPortName(portName);
-		
-		userAccount = new UserAccount(userSettingPath);
-		
-		this.loadConfigEmail();
-		
-		this.initSerial();
-		
+		logger.info("Init...");	
+		Config.setPortName(portName);		
+		userAccount = new UserAccount(userSettingPath);		
+		this.loadConfigEmail();		
+		this.initSerial();	
 		
 		try 
 		{
-			mime = new ConfigSaved(mimeSettingPath);
+			configSaved = new ConfigSaved(mimeSettingPath);
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
-			
+			e.printStackTrace();			
 		}
 	}
 	
@@ -402,9 +396,8 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				FeederSetting feederSetting = new FeederSetting();
-				feederSetting.load(feederSettingPath);
-				String list = feederSetting.toString();
+				ConfigFeeder.load(feederSettingPath);
+				String list = ConfigFeeder.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -436,9 +429,8 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				SMSSetting smsSetting = new SMSSetting();
-				smsSetting.load(smsSettingPath);
-				String list = smsSetting.toString();
+				ConfigSMS.load(smsSettingPath);
+				String list = ConfigSMS.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -815,7 +807,7 @@ public class ServerWebManager {
 		{
 			String[] arr = fileName.split("\\.");
 			String ext = arr[arr.length - 1];
-			String lt = mime.getString("CACHE", ext, "0");
+			String lt = configSaved.getString("CACHE", ext, "0");
 			lt = lt.replaceAll("[^\\d]", "");
 			if(!lt.isEmpty())
 			{
@@ -990,16 +982,15 @@ public class ServerWebManager {
 			String imei = query.getOrDefault("imei", "");		
 			String simCardPIN = query.getOrDefault("sim_card_pin", "");		
 			
-			SMSSetting smsSetting = new SMSSetting();
-			smsSetting.setConnectionType(connectionType);
-			smsSetting.setImei(imei);
-			smsSetting.setSimCardPIN(simCardPIN);
-			smsSetting.setSmsCenter(smsCenter);
-			smsSetting.setIncommingInterval(incommingInterval);
-			smsSetting.setTimeRange(timeRange);
-			smsSetting.setMaxPerTimeRange(maxPerTimeRange);			
+			ConfigSMS.setConnectionType(connectionType);
+			ConfigSMS.setImei(imei);
+			ConfigSMS.setSimCardPIN(simCardPIN);
+			ConfigSMS.setSmsCenter(smsCenter);
+			ConfigSMS.setIncommingInterval(incommingInterval);
+			ConfigSMS.setTimeRange(timeRange);
+			ConfigSMS.setMaxPerTimeRange(maxPerTimeRange);			
 			
-			smsSetting.save(smsSettingPath);			
+			ConfigSMS.save(smsSettingPath);			
 		}		
 	}
 	
@@ -1148,31 +1139,30 @@ public class ServerWebManager {
 				 */
 			}
 			
-			FeederSetting setting = new FeederSetting();
-			setting.setFeederWsEnable(feederWsEnable);
-			setting.setFeederWsSSL(feederWsSSL);
-			setting.setFeederWsAddress(feederWsAddress);
-			setting.setFeederWsPort(feederWsPort);
-			setting.setFeederWsPath(feederWsPath);
-			setting.setFeederWsUsername(feederWsUsername);
-			setting.setFeederWsPassword(feederWsPassword);
-			setting.setFeederWsChannel(feederWsChannel);
-			setting.setFeederWsTimeout(feederWsTimeout);
-			setting.setFeederWsReconnectDelay(feederWsReconnectDelay);
-			setting.setFeederWsRefresh(feederWsRefresh);		
+			ConfigFeeder.setFeederWsEnable(feederWsEnable);
+			ConfigFeeder.setFeederWsSSL(feederWsSSL);
+			ConfigFeeder.setFeederWsAddress(feederWsAddress);
+			ConfigFeeder.setFeederWsPort(feederWsPort);
+			ConfigFeeder.setFeederWsPath(feederWsPath);
+			ConfigFeeder.setFeederWsUsername(feederWsUsername);
+			ConfigFeeder.setFeederWsPassword(feederWsPassword);
+			ConfigFeeder.setFeederWsChannel(feederWsChannel);
+			ConfigFeeder.setFeederWsTimeout(feederWsTimeout);
+			ConfigFeeder.setFeederWsReconnectDelay(feederWsReconnectDelay);
+			ConfigFeeder.setFeederWsRefresh(feederWsRefresh);		
 
-			setting.setFeederAmqpEnable(feederAmqpEnable);
-			setting.setFeederAmqpSSL(feederAmqpSSL);
-			setting.setFeederAmqpAddress(feederAmqpAddress);
-			setting.setFeederAmqpPort(feederAmqpPort);
-			setting.setFeederAmqpPath(feederAmqpPath);
-			setting.setFeederAmqpUsername(feederAmqpUsername);
-			setting.setFeederAmqpPassword(feederAmqpPassword);
-			setting.setFeederAmqpChannel(feederAmqpChannel);
-			setting.setFeederAmqpTimeout(feederAmqpTimeout);
-			setting.setFeederAmqpRefresh(feederAmqpRefresh);		
+			ConfigFeeder.setFeederAmqpEnable(feederAmqpEnable);
+			ConfigFeeder.setFeederAmqpSSL(feederAmqpSSL);
+			ConfigFeeder.setFeederAmqpAddress(feederAmqpAddress);
+			ConfigFeeder.setFeederAmqpPort(feederAmqpPort);
+			ConfigFeeder.setFeederAmqpPath(feederAmqpPath);
+			ConfigFeeder.setFeederAmqpUsername(feederAmqpUsername);
+			ConfigFeeder.setFeederAmqpPassword(feederAmqpPassword);
+			ConfigFeeder.setFeederAmqpChannel(feederAmqpChannel);
+			ConfigFeeder.setFeederAmqpTimeout(feederAmqpTimeout);
+			ConfigFeeder.setFeederAmqpRefresh(feederAmqpRefresh);		
 
-			setting.save(feederSettingPath);			
+			ConfigFeeder.save(feederSettingPath);			
 		}		
 	}
 	
@@ -1454,7 +1444,7 @@ public class ServerWebManager {
 	{
 		String[] arr = fileName.split("\\.");	
 		String ext = arr[arr.length - 1];
-		return 	mime.getString("MIME", ext, "");
+		return 	configSaved.getString("MIME", ext, "");
 	}
 
 	private WebSocketContent updateContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie) 
