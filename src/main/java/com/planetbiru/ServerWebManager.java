@@ -51,6 +51,7 @@ public class ServerWebManager {
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
 	private UserAccount userAccount;
+	private UserAccount userAPIAccount;
 
 	@Value("${otpbroker.mail.sender.address}")
 	private String mailSenderAddress;
@@ -106,11 +107,15 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
+	@Value("${otpbroker.path.setting.api}")
+	private String userAPISettingPath;
+
 	@Value("${otpbroker.path.setting.email}")
 	private String emailSettingPath;
 
 	@Value("${otpbroker.device.connection.type}")
 	private String portName;
+	
 	
 	private ServerWebManager()
     {
@@ -122,6 +127,7 @@ public class ServerWebManager {
 		logger.info("Init...");	
 		Config.setPortName(portName);		
 		userAccount = new UserAccount(userSettingPath);		
+		userAPIAccount = new UserAccount(userAPISettingPath);		
 		this.loadConfigEmail();		
 		this.initSerial();		
 		
@@ -596,6 +602,74 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 
+	
+	@GetMapping(path="/api-user/list")
+	public ResponseEntity<byte[]> handleUserAPIList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				String list = userAPIAccount.listAsString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/api-user/detail/{username}")
+	public ResponseEntity<byte[]> handleUserAPIGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.USERNAME) String username, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				String data = userAPIAccount.getUser(username).toString();
+				responseBody = data.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+
+	
 	@PostMapping(path="/user/init**")
 	public ResponseEntity<byte[]> userInit(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
@@ -704,7 +778,53 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	
+	@PostMapping(path="/api-user/add**")
+	public ResponseEntity<byte[]> userAPIAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{		
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
+			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
+			    String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "");
+			    String email = queryPairs.getOrDefault(JsonKey.EMAIL, "");
+			    String name = queryPairs.getOrDefault(JsonKey.NAME, "");
+			    String phone = queryPairs.getOrDefault(JsonKey.PHONE, "");
+		
+			    JSONObject jsonObject = new JSONObject();
+				jsonObject.put(JsonKey.USERNAME, username);
+				jsonObject.put(JsonKey.NAME, name);
+				jsonObject.put(JsonKey.EMAIL, email);
+				jsonObject.put(JsonKey.PASSWORD, password);
+				jsonObject.put(JsonKey.PHONE, phone);
+				jsonObject.put(JsonKey.BLOCKED, false);
+				jsonObject.put(JsonKey.ACTIVE, true);
+				
+				if(!username.isEmpty())
+				{
+					userAPIAccount.addUser(new User(jsonObject));		
+					userAPIAccount.save();
+					APIUser.update(userAPIAccount.toJSONObject().toString());
+				}		    
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		responseHeaders.add(ConstantString.LOCATION, ConstantString.API_USER_FILE_LEVEL_3);
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
 	
 	@PostMapping(path="/user/update**")
 	public ResponseEntity<byte[]> userUpdate(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -752,6 +872,59 @@ public class ServerWebManager {
 			 */
 		}
 		responseHeaders.add(ConstantString.LOCATION, ConstantString.ADMIN_FILE_LEVEL_3);
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@PostMapping(path="/api-user/update**")
+	public ResponseEntity<byte[]> userAPIUpdate(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);				
+			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
+			    String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "");
+			    String name = queryPairs.getOrDefault(JsonKey.NAME, "");
+			    String email = queryPairs.getOrDefault(JsonKey.EMAIL, "");
+			    String phone = queryPairs.getOrDefault(JsonKey.PHONE, "");
+			    boolean blocked = queryPairs.getOrDefault(JsonKey.BLOCKED, "").equals("1");
+			    boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+		
+			    JSONObject jsonObject = new JSONObject();
+				jsonObject.put(JsonKey.USERNAME, username);
+				jsonObject.put(JsonKey.NAME, name);
+				jsonObject.put(JsonKey.EMAIL, email);
+				jsonObject.put(JsonKey.PHONE, phone);
+				jsonObject.put(JsonKey.BLOCKED, blocked);
+				jsonObject.put(JsonKey.ACTIVE, active);
+				if(!username.isEmpty())
+				{
+					jsonObject.put(JsonKey.USERNAME, username);
+				}
+				if(!password.isEmpty())
+				{
+					jsonObject.put(JsonKey.PASSWORD, password);
+				}
+				userAPIAccount.updateUser(new User(jsonObject));		
+				userAPIAccount.save();	
+				APIUser.update(userAPIAccount.toJSONObject().toString());
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		responseHeaders.add(ConstantString.LOCATION, ConstantString.API_USER_FILE_LEVEL_3);
 		cookie.saveSessionData();
 		cookie.putToHeaders(responseHeaders);
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
@@ -890,6 +1063,14 @@ public class ServerWebManager {
 				if(path.equals("/account-update.html"))
 				{
 					this.processAccount(requestBody, cookie);
+				}
+				if(path.equals("/api-user.html"))
+				{
+					this.processAPIUser(requestBody);
+				}
+				if(path.equals("/api-user-update.html"))
+				{
+					this.processAPIUser(requestBody);
 				}
 				if(path.equals("/feeder-setting.html"))
 				{
@@ -1323,6 +1504,56 @@ public class ServerWebManager {
 			this.processAdminUpdate(query);
 		}
 	}
+	private void processAPIUser(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		if(query.containsKey("delete"))
+		{
+			/**
+			 * Delete
+			 */
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String value = entry.getValue();
+				userAPIAccount.deleteUser(value);
+			}
+			userAPIAccount.save();
+			APIUser.update(userAPIAccount.toJSONObject().toString());
+		}
+		if(query.containsKey("deactivate"))
+		{
+			/**
+			 * Deactivate
+			 */
+			this.processAPIUserDeactivate(query);
+		}
+		if(query.containsKey("activate"))
+		{
+			/**
+			 * Activate
+			 */
+			this.processAPIUserActivate(query);
+		}
+		if(query.containsKey("block"))
+		{
+			/**
+			 * Block
+			 */
+			this.processAPIUserBlock(query);
+			
+		}
+		if(query.containsKey("unblock"))
+		{
+			/**
+			 * Unblock
+			 */
+			this.processAPIUserUnblock(query);
+		}
+		if(query.containsKey("update"))
+		{
+			this.processAPIUserUpdate(query);
+		}
+	}
+	
 	private void processAdminDeactivate(Map<String, String> query, String loggedUsername)
 	{
 		for (Map.Entry<String, String> entry : query.entrySet()) 
@@ -1342,6 +1573,7 @@ public class ServerWebManager {
 		}
 		userAccount.save();
 	}
+	
 	private void processAdminActivate(Map<String, String> query)
 	{
 		for (Map.Entry<String, String> entry : query.entrySet()) 
@@ -1364,6 +1596,7 @@ public class ServerWebManager {
 		}
 		userAccount.save();
 	}
+	
 	private void processAdminBlock(Map<String, String> query, String loggedUsername)
 	{
 		for (Map.Entry<String, String> entry : query.entrySet()) 
@@ -1386,6 +1619,7 @@ public class ServerWebManager {
 		}
 		userAccount.save();
 	}
+	
 	private void processAdminUnblock(Map<String, String> query)
 	{
 		for (Map.Entry<String, String> entry : query.entrySet()) 
@@ -1408,6 +1642,7 @@ public class ServerWebManager {
 		}
 		userAccount.save();
 	}
+	
 	private void processAdminUpdateData(Map<String, String> query)
 	{
 		String pkID = query.getOrDefault("pk_id", "");
@@ -1483,6 +1718,140 @@ public class ServerWebManager {
 		}
 	}
 	
+	private void processAPIUserDeactivate(Map<String, String> query)
+	{
+		for (Map.Entry<String, String> entry : query.entrySet()) 
+		{
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if(key.startsWith("id["))
+			{
+				try {
+					userAPIAccount.deactivate(value);
+				} catch (NoUserRegisteredException e) {
+					/**
+					 * Do nothing
+					 */
+				}
+			}
+		}
+		userAPIAccount.save();
+		APIUser.update(userAPIAccount.toJSONObject().toString());
+	}
+	private void processAPIUserActivate(Map<String, String> query)
+	{
+		for (Map.Entry<String, String> entry : query.entrySet()) 
+		{
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if(key.startsWith("id["))
+			{
+				try 
+				{
+					userAPIAccount.activate(value);
+				} 
+				catch (NoUserRegisteredException e) 
+				{
+					/**
+					 * Do nothing
+					 */
+				}
+			}
+		}
+		userAPIAccount.save();
+		APIUser.update(userAPIAccount.toJSONObject().toString());
+	}
+	private void processAPIUserBlock(Map<String, String> query)
+	{
+		for (Map.Entry<String, String> entry : query.entrySet()) 
+		{
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if(key.startsWith("id["))
+			{
+				try 
+				{
+					userAPIAccount.block(value);
+				} 
+				catch (NoUserRegisteredException e) 
+				{
+					/**
+					 * Do nothing
+					 */
+				}
+			}
+		}
+		userAPIAccount.save();
+		APIUser.update(userAPIAccount.toJSONObject().toString());
+	}
+	private void processAPIUserUnblock(Map<String, String> query)
+	{
+		for (Map.Entry<String, String> entry : query.entrySet()) 
+		{
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if(key.startsWith("id["))
+			{
+				try 
+				{
+					userAPIAccount.unblock(value);
+				} 
+				catch (NoUserRegisteredException e) 
+				{
+					/**
+					 * Do nothing
+					 */
+				}
+			}
+		}
+		userAPIAccount.save();
+		APIUser.update(userAPIAccount.toJSONObject().toString());
+	}
+	
+	private void processAPIUserUpdate(Map<String, String> query)
+	{
+		String username = query.getOrDefault(JsonKey.USERNAME, "").trim();
+		String name = query.getOrDefault(JsonKey.NAME, "").trim();
+		String phone = query.getOrDefault(JsonKey.PHONE, "").trim();
+		String email = query.getOrDefault(JsonKey.EMAIL, "").trim();
+		String password = query.getOrDefault(JsonKey.PASSWORD, "").trim();
+		boolean blocked = query.getOrDefault(JsonKey.BLOCKED, "").equals("1");
+		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+
+		if(!username.isEmpty())
+		{
+			User user;
+			try 
+			{
+				user = userAPIAccount.getUser(username);
+				if(user.getUsername().isEmpty())
+				{
+					user.setUsername(username);
+				}
+				if(!name.isEmpty())
+				{
+					user.setName(name);
+				}
+				user.setPhone(phone);
+				user.setEmail(email);
+				if(!password.isEmpty())
+				{
+					user.setPassword(password);
+				}
+				user.setBlocked(blocked);
+				user.setActive(active);
+				userAPIAccount.updateUser(user);
+				userAPIAccount.save();
+				APIUser.update(userAPIAccount.toJSONObject().toString());
+			} 
+			catch (NoUserRegisteredException e) 
+			{
+				/**
+				 * Do nothing
+				 */
+			}
+		}
+	}
 	
 	private String getMIMEType(String fileName) 
 	{

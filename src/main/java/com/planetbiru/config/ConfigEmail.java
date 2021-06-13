@@ -15,12 +15,12 @@ public class ConfigEmail {
 		
 	}
 
-	private static String mailSenderAddress = "user@domain.com";
+	private static String mailSenderAddress = "";
 	private static String mailSenderPassword;
 	private static boolean mailAuth = true;	
 	private static boolean mailStartTLS = true;
 	private static boolean mailSSL = false;
-	private static String mailHost = "smtp.gmail.com";
+	private static String mailHost = "";
 	private static int mailPort = 587;
 	public static String getMailSenderAddress() {
 		return mailSenderAddress;

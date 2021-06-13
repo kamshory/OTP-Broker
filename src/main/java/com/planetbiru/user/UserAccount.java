@@ -40,10 +40,6 @@ public class UserAccount {
 	}
 	public UserAccount() {
 	}
-	public void addUser(User user)
-	{
-		this.users.put(user.getUsername(), user);
-	}
 	public boolean isEmpty()
 	{
 		if(this.users.isEmpty())
@@ -51,6 +47,10 @@ public class UserAccount {
 			this.load();
 		}
 		return this.users.isEmpty();
+	}
+	public void addUser(User user)
+	{
+		this.users.put(user.getUsername(), user);
 	}
 	public void addUser(String username, JSONObject jsonObject) 
 	{
