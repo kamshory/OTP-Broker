@@ -3,12 +3,8 @@ package com.planetbiru.receiver.ws;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.WebSocket;
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ClientEndpointConfig.Configurator;
 import javax.websocket.ContainerProvider;
@@ -21,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import com.planetbiru.config.Config;
 import com.planetbiru.util.Utility;
 
-public class WebSocketClient extends Thread implements WebSocket
+public class WebSocketClient extends Thread
 {
 	private Logger logger = LogManager.getLogger(WebSocketClient.class);
 	private static Object waitLock = new Object();
@@ -157,60 +153,6 @@ public class WebSocketClient extends Thread implements WebSocket
 	}
 
 	
-
-	@Override
-	public void abort() {
-		/**
-		 * Do nothing
-		 */
-	}
-
-	@Override
-	public String getSubprotocol() {
-		return null;
-	}
-
-	@Override
-	public boolean isInputClosed() {
-		return false;
-	}
-
-	@Override
-	public boolean isOutputClosed() {
-		return false;
-	}
-
-	@Override
-	public void request(long arg0) {
-		/**
-		 * Do nothing
-		 */
-	}
-
-	@Override
-	public CompletableFuture<WebSocket> sendBinary(ByteBuffer arg0, boolean arg1) {
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<WebSocket> sendClose(int arg0, String arg1) {
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<WebSocket> sendPing(ByteBuffer arg0) {
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<WebSocket> sendPong(ByteBuffer arg0) {
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<WebSocket> sendText(CharSequence arg0, boolean arg1) {
-		return null;
-	}
 
 	public Session getSession() {
 		return session;

@@ -1,5 +1,6 @@
 package com.planetbiru.config;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.json.JSONException;
@@ -65,10 +66,16 @@ public class ConfigEmail {
 	}
 	
 	
-	public static void load(String emailSettingPath) {
+	public static void load(String path) {
+		String dir = getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
 		
 		try {
-			byte[] data = ConfigLoader.read(emailSettingPath);
+			byte[] data = ConfigLoader.read(fileName);
 			
 			if(data != null)
 			{
@@ -102,49 +109,75 @@ public class ConfigEmail {
 					}
 				}
 			}
-			
-
-		} catch (FileNotFoundException e) {
+		} 
+		catch (FileNotFoundException e) 
+		{
 			e.printStackTrace();
 		}
 		
 	}
-	public static void save(String emailSettingPath, JSONObject config) {
-
-		config.put("mailSenderAddress", ConfigEmail.mailSenderAddress);
-		config.put("mailSenderPassword", ConfigEmail.mailSenderAddress);
-		config.put("mailAuth", ConfigEmail.mailSenderAddress);
-		config.put("mailStartTLS", ConfigEmail.mailSenderAddress);
-		config.put("mailSSL", ConfigEmail.mailSenderAddress);
-		config.put("mailHost", ConfigEmail.mailSenderAddress);
-		config.put("mailPort", ConfigEmail.mailSenderAddress);
+	public static void save(String path, JSONObject config) {
 		
-		try {
-			ConfigLoader.write(emailSettingPath, config.toString().getBytes());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		String dir = getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
+		prepareDir(fileName);
+		
+		try 
+		{
+			ConfigLoader.write(fileName, config.toString().getBytes());
+		}
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
 		
+		
+		
 	}
-	public static void save(String emailSettingPath) {
+	
+	private static void prepareDir(String fileName) {
+		File file = new File(fileName);
+		String directory1 = file.getParent();
+		File file2 = new File(directory1);
+		String directory2 = file2.getParent();
+		
+		File d1 = new File(directory1);
+		File d2 = new File(directory2);		
+
+		if(!d2.exists())
+		{
+			d2.mkdir();
+		}
+		if(!d1.exists())
+		{
+			d1.mkdir();
+		}		
+	}
+	
+	private static String getBaseDir()
+	{
+		return ConfigEmail.class.getResource("/").getFile();
+	}
+	
+	public static void save(String path) {
+		JSONObject config = getJSONObject();
+		save(path, config);
+	}
+	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
 
+		config.put("mailAuth", ConfigEmail.mailAuth);
+		config.put("mailHost", ConfigEmail.mailHost);
+		config.put("mailPort", ConfigEmail.mailPort);
 		config.put("mailSenderAddress", ConfigEmail.mailSenderAddress);
-		config.put("mailSenderPassword", ConfigEmail.mailSenderAddress);
-		config.put("mailAuth", ConfigEmail.mailSenderAddress);
-		config.put("mailStartTLS", ConfigEmail.mailSenderAddress);
-		config.put("mailSSL", ConfigEmail.mailSenderAddress);
-		config.put("mailHost", ConfigEmail.mailSenderAddress);
-		config.put("mailPort", ConfigEmail.mailSenderAddress);
-		
-		try {
-			ConfigLoader.write(emailSettingPath, config.toString().getBytes());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		config.put("mailSenderPassword", ConfigEmail.mailSenderPassword);
+		config.put("mailSSL", ConfigEmail.mailSSL);
+		config.put("mailStartTLS", ConfigEmail.mailStartTLS);
+		return config;
 	}
 	
 	
