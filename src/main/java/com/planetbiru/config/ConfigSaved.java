@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.planetbiru.util.FileUtil;
-
 public class ConfigSaved {
 	private Pattern mSection = Pattern.compile("\\s*\\[([^]]*)\\]\\s*");
 	private Pattern mKeyValue = Pattern.compile("\\s*([^=]*)=(.*)");
@@ -27,7 +25,7 @@ public class ConfigSaved {
 	}
 
 	public void load(String fileName) throws IOException {
-		InputStream resourceStream = FileUtil.class.getResourceAsStream(fileName);
+		InputStream resourceStream = ConfigSaved.class.getResourceAsStream(fileName);
 		if(resourceStream != null)
 		{
 		    try (

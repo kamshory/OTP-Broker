@@ -117,15 +117,20 @@ public class UserAccount {
 	{
 		this.users.remove(user.getUsername());
 	}
-	public void deleteUser(String username) {
+	
+	public void deleteUser(String username) 
+	{
 		this.users.remove(username);
 	}
-	public boolean checkUserAuth(Map<String, List<String>> headers) throws NoUserRegisteredException {
+	
+	public boolean checkUserAuth(Map<String, List<String>> headers) throws NoUserRegisteredException 
+	{
 		CookieServer cookie = new CookieServer(headers);
 		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
 		String password = cookie.getSessionData().optString(JsonKey.PASSWORD, "");
 		return this.checkUserAuth(username, password);
 	}
+	
 	public boolean checkUserAuth(HttpHeaders headers) throws NoUserRegisteredException
 	{
 		CookieServer cookie = new CookieServer(headers);
@@ -134,7 +139,8 @@ public class UserAccount {
 		return this.checkUserAuth(username, password);
 	}
 	
-	public boolean checkUserAuth(String username, String password) throws NoUserRegisteredException {
+	public boolean checkUserAuth(String username, String password) throws NoUserRegisteredException 
+	{
 		if(username.isEmpty())
 		{
 			return false;
@@ -143,7 +149,8 @@ public class UserAccount {
 		return user.getPassword().equals(password) && user.isActive() && !user.isBlocked();
 	}
 	
-	private void prepareDir(String fileName) {
+	private void prepareDir(String fileName) 
+	{
 		File file = new File(fileName);
 		String directory1 = file.getParent();
 		File file2 = new File(directory1);
@@ -193,16 +200,9 @@ public class UserAccount {
 		} 
 		catch (FileNotFoundException | JSONException e) 
 		{
-			try 
-			{
-				FileUtil.write(fileName, "{}".getBytes());
-			} 
-			catch (IOException e2) 
-			{
-				/**
-				 * Do nothing
-				 */
-			}
+			/**
+			 * Do nothing
+			 */
 		}
 	}
 	
@@ -212,7 +212,10 @@ public class UserAccount {
 		String userData = this.toString();
 		try 
 		{
-			FileUtil.write(fileName, userData.getBytes());
+			if(userData.length() > 20)
+			{
+				FileUtil.write(fileName, userData.getBytes());
+			}
 		} 
 		catch (IOException e) 
 		{
@@ -237,9 +240,11 @@ public class UserAccount {
 		return json;
 	}
 	
-	public String list() {
+	public String listAsString() 
+	{
 		return this.toString();
 	}
+	
 	public User getUserByPhone(String userID) {
 		for (Map.Entry<String, User> entry : this.users.entrySet())
 		{

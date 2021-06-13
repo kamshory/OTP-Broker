@@ -74,7 +74,8 @@ public class ConfigEmail {
 		}
 		String fileName = dir + path;
 		
-		try {
+		try 
+		{
 			byte[] data = FileConfigUtil.read(fileName);
 			
 			if(data != null)
@@ -115,7 +116,13 @@ public class ConfigEmail {
 			e.printStackTrace();
 		}
 		
+	}	
+
+	public static void save(String path) {
+		JSONObject config = getJSONObject();
+		save(path, config);
 	}
+
 	public static void save(String path, JSONObject config) {
 		
 		String dir = getBaseDir();
@@ -163,10 +170,6 @@ public class ConfigEmail {
 		return ConfigEmail.class.getResource("/").getFile();
 	}
 	
-	public static void save(String path) {
-		JSONObject config = getJSONObject();
-		save(path, config);
-	}
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
 

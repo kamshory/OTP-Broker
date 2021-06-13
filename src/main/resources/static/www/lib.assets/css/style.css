@@ -69,6 +69,7 @@ legend{
 }
 .config-table tr td input[type="text"],
 .config-table tr td input[type="email"],
+.config-table tr td input[type="tel"],
 .config-table tr td input[type="number"],
 .config-table tr td input[type="password"],
 .config-table tr td select
@@ -81,11 +82,13 @@ legend{
 }
 .config-table tr td input[type="text"]:focus,
 .config-table tr td input[type="email"]:focus,
+.config-table tr td input[type="tel"]:focus,
 .config-table tr td input[type="number"]:focus,
 .config-table tr td input[type="password"]:focus,
 .config-table tr td select:focus,
 .config-table tr td input[type="text"]:active,
 .config-table tr td input[type="email"]:active,
+.config-table tr td input[type="tel"]:active,
 .config-table tr td input[type="number"]:active,
 .config-table tr td input[type="password"]:active,
 .config-table tr td select:active
@@ -94,6 +97,7 @@ legend{
 }
 .config-table tr td input[type="text"],
 .config-table tr td input[type="email"],
+.config-table tr td input[type="tel"],
 .config-table tr td input[type="number"],
 .config-table tr td input[type="password"]{
 	padding:7px 11px;
