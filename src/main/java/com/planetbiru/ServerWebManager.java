@@ -990,6 +990,17 @@ public class ServerWebManager {
 		catch (FileNotFoundException e) 
 		{
 			statusCode = HttpStatus.NOT_FOUND;
+			if(fileName.endsWith(".html"))
+			{
+				try 
+				{
+					responseBody = FileUtil.readResource(this.getFileName("/404.html"));
+				} 
+				catch (FileNotFoundException e1) 
+				{
+					e1.printStackTrace();
+				}
+			}
 		}
 		CookieServer cookie = new CookieServer(headers);
 		
