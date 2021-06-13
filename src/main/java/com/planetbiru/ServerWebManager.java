@@ -13,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.apache.logging.log4j.LogManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,7 +30,6 @@ import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
-import com.planetbiru.gsm.ErrorCode;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.receiver.ws.WebSocketContent;
@@ -74,9 +72,6 @@ public class ServerWebManager {
 	@Value("${otpbroker.mail.port}")
 	private int mailPort;
 
-
-	
-	
 	@Value("${otpbroker.ws.endpoint}")
 	private String wsClientEndpoint;
 
@@ -103,7 +98,6 @@ public class ServerWebManager {
 	
 	@Value("${otpbroker.path.setting.all}")
 	private String mimeSettingPath;	
-
 	
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
@@ -113,9 +107,6 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.device.connection.type}")
 	private String portName;
-
-	@Autowired
-	PortUtils portUtils;
 	
 	private ServerWebManager()
     {
@@ -161,10 +152,7 @@ public class ServerWebManager {
 		ConfigEmail.load(emailSettingPath);
 	}
 	
-	private void saveConfigEmail(JSONObject config)
-	{
-		ConfigEmail.save(emailSettingPath, config);
-	}
+	
 	
 	private void initSerial() 
 	{
@@ -192,6 +180,7 @@ public class ServerWebManager {
 		byte[] responseBody = "".getBytes();
 		HttpHeaders responseHeaders = new HttpHeaders();
 		userAccount.load();
+		HttpStatus statusCode = HttpStatus.OK;
 		
 		try 
 		{
@@ -250,12 +239,11 @@ public class ServerWebManager {
 		} 
 		catch (NoUserRegisteredException e1) 
 		{
-			e1.printStackTrace();
+			responseHeaders.add(ConstantString.LOCATION, "/admin-init.html");
+			responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+			statusCode = HttpStatus.MOVED_PERMANENTLY;
 		}
 		
-
-		
-		HttpStatus statusCode = HttpStatus.OK;
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
@@ -327,6 +315,9 @@ public class ServerWebManager {
 	    
 		cookie.setSessionValue(JsonKey.USERNAME, username);
 		cookie.setSessionValue(JsonKey.PASSWORD, password);
+		
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			userAccount.load();
@@ -335,18 +326,16 @@ public class ServerWebManager {
 				userAccount.updateLastActive(username);
 				userAccount.save();
 			}
+			cookie.saveSessionData();
+			cookie.putToHeaders(responseHeaders);
+			responseBody = res.toString().getBytes();
 		}
 		catch(NoUserRegisteredException e)
 		{
-			/**
-			 * Do nothing
-			 */
+			responseHeaders.add(ConstantString.LOCATION, "/admin-init.html");
+			responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+			statusCode = HttpStatus.MOVED_PERMANENTLY;
 		}
-		
-		cookie.saveSessionData();
-		cookie.putToHeaders(responseHeaders);
-		byte[] responseBody = res.toString().getBytes();
-		HttpStatus statusCode = HttpStatus.OK;
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
@@ -392,6 +381,7 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
 		}
 		
 		cookie.saveSessionData();
@@ -468,6 +458,39 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+	@GetMapping(path="/email-setting/get")
+	public ResponseEntity<byte[]> handleEmailSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigEmail.load(emailSettingPath);
+				
+				responseBody = ConfigEmail.getJSONObject().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
 	
 	@GetMapping(path="/user/list")
 	public ResponseEntity<byte[]> handleUserList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -493,6 +516,7 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
 		}
 		cookie.saveSessionData();
 		cookie.putToHeaders(responseHeaders);
@@ -525,6 +549,7 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
 		}
 		cookie.saveSessionData();
 		cookie.putToHeaders(responseHeaders);
@@ -533,6 +558,67 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 
+	@PostMapping(path="/user/init**")
+	public ResponseEntity<byte[]> userInit(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{		
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
+		if(userAccount.isEmpty())
+		{
+			Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
+		    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
+		    String email = queryPairs.getOrDefault(JsonKey.EMAIL, "").trim();
+		    String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "").trim();
+		    String name = queryPairs.getOrDefault(JsonKey.NAME, "").trim();
+		    String phone = queryPairs.getOrDefault(JsonKey.PHONE, "").trim();
+
+			if(!username.isEmpty() && !name.isEmpty() && !phone.isEmpty() && password.length() >= 6)
+			{
+			    JSONObject jsonObject = new JSONObject();
+				jsonObject.put(JsonKey.USERNAME, username);
+				jsonObject.put(JsonKey.NAME, name);
+				jsonObject.put(JsonKey.EMAIL, email);
+				jsonObject.put(JsonKey.PASSWORD, password);
+				jsonObject.put(JsonKey.PHONE, phone);
+				jsonObject.put(JsonKey.BLOCKED, false);
+				jsonObject.put(JsonKey.ACTIVE, true);
+				
+				userAccount.addUser(new User(jsonObject));		
+				userAccount.save();				
+				
+				cookie.setSessionValue(JsonKey.USERNAME, username);
+				cookie.setSessionValue(JsonKey.PASSWORD, password);
+				try
+				{
+					userAccount.load();
+					if(userAccount.checkUserAuth(username, password))
+					{
+						userAccount.updateLastActive(username);
+						userAccount.save();
+					}
+				}
+				catch(NoUserRegisteredException e)
+				{
+					/**
+					 * Do nothing
+					 */
+				}
+				
+				cookie.saveSessionData();
+				cookie.putToHeaders(responseHeaders);
+				
+			}		    
+		}
+		
+		responseHeaders.add(ConstantString.LOCATION, ConstantString.ADMIN_FILE_LEVEL_3);
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
 	@PostMapping(path="/user/add**")
 	public ResponseEntity<byte[]> userAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
@@ -580,44 +666,7 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	@PostMapping(path="/user/init**")
-	public ResponseEntity<byte[]> userInit(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
-	{		
-		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
-		byte[] responseBody = "".getBytes();
-		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
-		if(userAccount.isEmpty())
-		{
-			Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
-		    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
-		    String email = queryPairs.getOrDefault(JsonKey.EMAIL, "").trim();
-		    String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "").trim();
-		    String name = queryPairs.getOrDefault(JsonKey.NAME, "").trim();
-		    String phone = queryPairs.getOrDefault(JsonKey.PHONE, "").trim();
-
-			if(!username.isEmpty() && !name.isEmpty() && !phone.isEmpty() && password.length() >= 6)
-			{
-			    JSONObject jsonObject = new JSONObject();
-				jsonObject.put(JsonKey.USERNAME, username);
-				jsonObject.put(JsonKey.NAME, name);
-				jsonObject.put(JsonKey.EMAIL, email);
-				jsonObject.put(JsonKey.PASSWORD, password);
-				jsonObject.put(JsonKey.PHONE, phone);
-				jsonObject.put(JsonKey.BLOCKED, false);
-				jsonObject.put(JsonKey.ACTIVE, true);
-				
-				userAccount.addUser(new User(jsonObject));		
-				userAccount.save();
-			}		    
-		}
-		
-		responseHeaders.add(ConstantString.LOCATION, ConstantString.ADMIN_FILE_LEVEL_3);
-		cookie.saveSessionData();
-		cookie.putToHeaders(responseHeaders);
-		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
-		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
-	}
+	
 	
 	@PostMapping(path="/user/update**")
 	public ResponseEntity<byte[]> userUpdate(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -702,52 +751,6 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	@PostMapping(path="/api/sms**")
-	public ResponseEntity<String> sendSMS(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
-	{		
-		HttpHeaders responseHeaders = new HttpHeaders();
-		HttpStatus statusCode = HttpStatus.OK;
-		JSONObject responseJSON = this.processMessageRequest(requestBody);
-		
-		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
-		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
-		String responseBody = responseJSON.toString(4);
-		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
-	}
-	
-	@PostMapping(path="/api/ussd**")
-	public ResponseEntity<String> sendUSSD(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
-	{		
-		HttpHeaders responseHeaders = new HttpHeaders();
-		HttpStatus statusCode = HttpStatus.OK;
-		JSONObject responseJSON = new JSONObject();
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		String ussd = query.getOrDefault("ussd", "");
-		String message = "";
-		String responseCode = ErrorCode.SUCCESS;
-		String responseText = "";
-		if(ussd != null && !ussd.isEmpty())
-		{
-			try 
-			{
-				message = SMSUtil.executeUSSD(ussd);
-			} 
-			catch (GSMNullException e) 
-			{
-				responseCode = e.getErrorCode();
-				responseText = "<strong>Error: "+e.getErrorCode()+"</strong> "+e.getMessage()+". <a href=\"error-"+e.getErrorCode()+".html\">Detail</a>";
-			}		
-		}
-		JSONObject data = new JSONObject();
-		data.put(JsonKey.MESSAGE, message);
-		responseJSON.put(JsonKey.RESPONSE_CODE, responseCode);
-		responseJSON.put(JsonKey.RESPONSE_TEXT, responseText);
-		responseJSON.put(JsonKey.DATA, data);		
-		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
-		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
-		String responseBody = responseJSON.toString(4);
-		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
-	}
 	
 	@GetMapping(path="/**")
 	public ResponseEntity<byte[]> handleDocumentRootGet(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -758,7 +761,6 @@ public class ServerWebManager {
 	@PostMapping(path="/**")
 	public ResponseEntity<byte[]> handleDocumentRootPost(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
-		System.out.println("AAAAAAAAAAAAAA");
 		this.processFeedbackPost(headers, requestBody, request);
 		return this.serveDocumentRoot(headers, request);
 	}
@@ -859,6 +861,10 @@ public class ServerWebManager {
 				{
 					this.processSMSSetting(requestBody);
 				}
+				if(path.equals("/email-setting.html"))
+				{
+					this.processEmailSetting(requestBody);
+				}
 				if(path.equals("/sms.html"))
 				{
 					this.processSMS(requestBody);
@@ -871,6 +877,55 @@ public class ServerWebManager {
 			 * Do nothing
 			 */
 		}
+	}
+	
+	private void processEmailSetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		if(query.containsKey("save_email_setting"))
+		{
+			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
+			String lMailHost = query.getOrDefault("smtp_host", "").trim();
+	
+			int lMailPort = 0;
+			String v1 = query.getOrDefault("smtp_port", "0").trim();
+			try
+			{
+				lMailPort = Integer.parseInt(v1);
+			}
+			catch(NumberFormatException e)
+			{
+				/**
+				 * Do nothing
+				 */
+			}			
+			
+			String lMailSenderAddress = query.getOrDefault("sender_address", "").trim();
+			String lMailSenderPassword = query.getOrDefault("sender_password", "").trim();
+			if(lMailSenderPassword.isEmpty())
+			{
+				lMailSenderPassword = ConfigEmail.getMailSenderPassword();
+			}
+			boolean lMailSSL = query.getOrDefault("ssl", "").trim().equals("1");
+			boolean lMailStartTLS = query.getOrDefault("start_tls", "").trim().equals("1");
+			
+			JSONObject config = new JSONObject();
+			
+			config.put("mailAuth", lMailAuth);
+			config.put("mailHost", lMailHost);
+			config.put("mailPort", lMailPort);
+			config.put("mailSenderAddress", lMailSenderAddress);
+			config.put("mailSenderPassword", lMailSenderPassword);
+			config.put("mailSSL", lMailSSL);
+			config.put("mailStartTLS", lMailStartTLS);
+			
+			saveConfigEmail(config);
+		}
+		
+	}
+
+	private void saveConfigEmail(JSONObject config)
+	{
+		ConfigEmail.save(emailSettingPath, config);
 	}
 	
 	private void processSMSSetting(String requestBody) {
@@ -1604,53 +1659,7 @@ public class ServerWebManager {
 		return documentRoot+request;
 	}
 	
-	private JSONObject processMessageRequest(String requestBody) 
-	{
-		JSONObject requestJSON = new JSONObject();
-		try
-		{
-			requestJSON = new JSONObject(requestBody);
-			String command = requestJSON.optString(JsonKey.COMMAND, "");
-			if(command.equals(JsonKey.SEND_MESSAGE))
-			{
-				JSONArray data = requestJSON.optJSONArray(JsonKey.DATA);
-				if(data != null && !data.isEmpty())
-				{
-					int length = data.length();
-					int i;
-					for(i = 0; i<length; i++)
-					{
-						this.sendMessage(data.getJSONObject(i));					
-					}
-				}
-			}
-		}
-		catch(JSONException e)
-		{
-			/**
-			 * Do nothing
-			 */
-		}
-		return requestJSON;
-	}
 	
-	public void sendMessage(JSONObject data)
-	{
-		if(data != null)
-		{
-			String receiver = data.optString(JsonKey.RECEIVER, "");
-			String textMessage = data.optString(JsonKey.MESSAGE, "");
-			try 
-			{
-				SMSUtil.sendSMS(receiver, textMessage);
-			} 
-			catch (GSMNullException e) 
-			{
-				
-				e.printStackTrace();
-			}
-		}		
-	}
 	
 	
 	

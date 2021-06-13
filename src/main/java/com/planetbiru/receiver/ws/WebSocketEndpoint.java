@@ -99,7 +99,7 @@ public class WebSocketEndpoint extends Endpoint {
 	
 	@Override
 	public void onClose(Session ses, CloseReason closeReason) {
-		System.out.println("on close : "+closeReason.getReasonPhrase());
+		System.out.println("Session on close : "+closeReason.getReasonPhrase());
 		try 
 		{
 			Thread.sleep(Config.getReconnectDelay());
