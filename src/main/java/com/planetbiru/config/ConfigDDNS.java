@@ -31,8 +31,7 @@ public class ConfigDDNS {
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = dir + path;
-		prepareDir(fileName);
-		
+		prepareDir(fileName);	
 		
 		try 
 		{
@@ -52,16 +51,17 @@ public class ConfigDDNS {
 
 					    	JSONObject json = list.getJSONObject(key);
 							
-							String lID = json.optString("id", "");
-							String lZone = json.optString("zone", "");
-							String lRecordName = json.optString("recordName", "");
+							String lID = json.optString("id", "").trim();
+							String lZone = json.optString("zone", "").trim();
+							String lRecordName = json.optString("recordName", "").trim();
+							String lProvider = json.optString("provider", "").trim();
 							boolean lProxied = json.optBoolean("proxied", false);
 							int lTTL = json.optInt("ttl", 0);
 							boolean lActive = json.optBoolean("active", false);
 							boolean lForceCreateZone = json.optBoolean("forceCreateZone", false);
-							String lcronExpression = json.optString("cronExpression", "");
+							String lcronExpression = json.optString("cronExpression", "").trim();
 							String type = "A";
-							DDNSRecord rec = new DDNSRecord(lID, lZone, lRecordName, type, lProxied, lTTL, lForceCreateZone, lActive, lcronExpression);
+							DDNSRecord rec = new DDNSRecord(lID, lZone, lRecordName, type, lProxied, lTTL, lForceCreateZone, lProvider, lActive, lcronExpression);
 							ConfigDDNS.getRecords().put(lID, rec);
 					    }
 					}

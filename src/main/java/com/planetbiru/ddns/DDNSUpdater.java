@@ -7,13 +7,11 @@ import com.planetbiru.config.ConfigCloudflare;
 public class DDNSUpdater extends Thread{
 
 	private DDNSRecord ddnsRecord;
-	private String ddnsProvider;
 	private String prevFireTimeStr;
 	private String currentTimeStr;
 	private String nextValidTimeAfterStr;
 
-	public DDNSUpdater(String ddnsProvider, DDNSRecord ddnsRecord, String prevFireTimeStr, String currentTimeStr, String nextValidTimeAfterStr) {
-		this.ddnsProvider = ddnsProvider;
+	public DDNSUpdater(DDNSRecord ddnsRecord, String prevFireTimeStr, String currentTimeStr, String nextValidTimeAfterStr) {
 		this.ddnsRecord = ddnsRecord;
 		this.prevFireTimeStr = prevFireTimeStr;
 		this.currentTimeStr = currentTimeStr;
@@ -24,7 +22,7 @@ public class DDNSUpdater extends Thread{
 	public void run()
 	{
 		DNS ddns;
-		if(this.ddnsProvider.equals("cloudflare"))
+		if(this.ddnsRecord.getProvider().equals("cloudflare"))
 		{
 			ddns = new DNSCloudflare();
 			

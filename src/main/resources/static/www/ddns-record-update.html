@@ -78,6 +78,12 @@
         <table class="two-cols-responsive">
             <tbody>
                 <tr>
+                <td>Provider</td>
+                <td><select name="provider" id="provider" class="form-control">
+                    <option value="cloudflare">Cloudflare</option>
+                </select></td>
+                </tr>
+                <tr>
                 <td>Zone</td>
                 <td><input type="text" class="form-control" name="zone" value=""></td>
                 </tr>
@@ -152,13 +158,14 @@
                       url:"/ddns-record/detail/"+id,
                       dataType:"json",
                       success:function(data){
-                          $('input[name="zone"]').val(data.zone);
-                          $('input[name="record_name"]').val(data.recordName);
-                          $('input[name="ttl"]').val(data.ttl);
-                          $('input[name="cron_expression"]').val(data.cronExpression);
-                          $('input[name="proxied"]').prop('checked', data.proxied);
-                          $('input[name="force_create_zone"]').prop('checked', data.forceCreateZone);
-                          $('input[name="active"]').prop('checked', data.active);
+                        $('input[name="provider"]').val(data.provider);
+                        $('input[name="zone"]').val(data.zone);
+                        $('input[name="record_name"]').val(data.recordName);
+                        $('input[name="ttl"]').val(data.ttl);
+                        $('input[name="cron_expression"]').val(data.cronExpression);
+                        $('input[name="proxied"]').prop('checked', data.proxied);
+                        $('input[name="force_create_zone"]').prop('checked', data.forceCreateZone);
+                        $('input[name="active"]').prop('checked', data.active);
                       }
                   });
                 }

@@ -34,9 +34,6 @@ public class ServerScheduler {
 	@Value("${otpbroker.cron.time.resolution:minute}")
 	private String timeResolution;
 	
-	@Value("${otpbroker.ddns.provider}")
-	private String ddnsProvider;
-	
 	@Value("${otpbroker.path.setting.ddns}")
 	private String ddnsSettingPath;
 	
@@ -74,7 +71,7 @@ public class ServerScheduler {
 				String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
 				String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
 				
-				DDNSUpdater ddns = new DDNSUpdater(ddnsProvider, ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
+				DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
 				ddns.start();
 				
 			}

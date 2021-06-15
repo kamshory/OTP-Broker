@@ -297,7 +297,7 @@ public class ServerWebManager {
 		JSONArray data = new JSONArray();
 		JSONObject itemData = new JSONObject();
 		String uuid = UUID.randomUUID().toString();
-		itemData.put("id", uuid);
+		itemData.put(JsonKey.ID, uuid);
 		itemData.put(JsonKey.MESSAGE, message);
 		data.put(itemData);
 		messageJSON.put("data", data);		
@@ -651,7 +651,7 @@ public class ServerWebManager {
 	}
 
 	@GetMapping(path="/ddns-record/detail/{id}")
-	public ResponseEntity<byte[]> handleDDNSRecordGet(@RequestHeader HttpHeaders headers, @PathVariable(value="id") String id, HttpServletRequest request)
+	public ResponseEntity<byte[]> handleDDNSRecordGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
 		CookieServer cookie = new CookieServer(headers);
@@ -1090,18 +1090,19 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
-			    String zone = queryPairs.getOrDefault("zone", "").translateEscapes();
-			    String recordName = queryPairs.getOrDefault("record_name", "").trim();
+			    String provider = queryPairs.getOrDefault(JsonKey.PROVIDER, "").translateEscapes();
+			    String zone = queryPairs.getOrDefault(JsonKey.ZONE, "").translateEscapes();
+			    String recordName = queryPairs.getOrDefault(JsonKey.RECORD_NAME, "").trim();
 			    String cronExpression = queryPairs.getOrDefault("cron_expression", "").trim();
-			    boolean proxied = queryPairs.getOrDefault("proxied", "").trim().equals("1");
-			    boolean forceCreateZone = queryPairs.getOrDefault("force_create_zone", "").trim().equals("1");
+			    boolean proxied = queryPairs.getOrDefault(JsonKey.PROXIED, "").trim().equals("1");
+			    boolean forceCreateZone = queryPairs.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").trim().equals("1");
 			    boolean active = queryPairs.getOrDefault("active", "").trim().equals("1");
 			    
-				String ttls = queryPairs.getOrDefault("ttl", "0");
+				String ttls = queryPairs.getOrDefault(JsonKey.TTL, "0");
 			    int ttl = Utility.atoi(ttls);
 			    String type = "A";
 			    String id = Utility.md5(zone+":"+recordName);
-				DDNSRecord record = new DDNSRecord(id, zone, recordName, type, proxied, ttl, forceCreateZone, active, cronExpression);
+				DDNSRecord record = new DDNSRecord(id, zone, recordName, type, proxied, ttl, forceCreateZone, provider, active, cronExpression);
 				if(!zone.isEmpty() && !recordName.isEmpty())
 				{
 					ConfigDDNS.getRecords().put(id, record);	
@@ -1446,7 +1447,7 @@ public class ServerWebManager {
 		String password = query.getOrDefault(JsonKey.PASSWORD, "");
 		String email = query.getOrDefault(JsonKey.EMAIL, "");
 		String name = query.getOrDefault(JsonKey.NAME, "");
-		if(query.containsKey("update"))
+		if(query.containsKey(JsonKey.UPDATE))
 		{
 			User user;
 			try 
@@ -1474,7 +1475,7 @@ public class ServerWebManager {
 	private void processAdmin(String requestBody, CookieServer cookie) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
-		if(query.containsKey("delete"))
+		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**
 			 * Delete
@@ -1490,14 +1491,14 @@ public class ServerWebManager {
 			}
 			userAccount.save();
 		}
-		if(query.containsKey("deactivate"))
+		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
 			/**
 			 * Deactivate
 			 */
 			this.processAdminDeactivate(query, loggedUsername);
 		}
-		if(query.containsKey("activate"))
+		if(query.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
@@ -1523,14 +1524,14 @@ public class ServerWebManager {
 		{
 			this.processAdminUpdateData(query);
 		}
-		if(query.containsKey("update"))
+		if(query.containsKey(JsonKey.UPDATE))
 		{
 			this.processAdminUpdate(query);
 		}
 	}
 	private void processAPIUser(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("delete"))
+		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**
 			 * Delete
@@ -1543,14 +1544,14 @@ public class ServerWebManager {
 			userAPIAccount.save();
 			APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 		}
-		if(query.containsKey("deactivate"))
+		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
 			/**
 			 * Deactivate
 			 */
 			this.processAPIUserDeactivate(query);
 		}
-		if(query.containsKey("activate"))
+		if(query.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
@@ -1572,7 +1573,7 @@ public class ServerWebManager {
 			 */
 			this.processAPIUserUnblock(query);
 		}
-		if(query.containsKey("update"))
+		if(query.containsKey(JsonKey.UPDATE))
 		{
 			this.processAPIUserUpdate(query);
 		}
@@ -1884,7 +1885,7 @@ public class ServerWebManager {
 	private void processDDNS(String requestBody, CookieServer cookie) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
-		if(query.containsKey("delete"))
+		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**
 			 * Delete
@@ -1900,47 +1901,48 @@ public class ServerWebManager {
 			}
 			ConfigDDNS.save();
 		}
-		if(query.containsKey("deactivate"))
+		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
 			/**
 			 * Deactivate
 			 */
 			this.processDDNSDeactivate(query);
 		}
-		if(query.containsKey("activate"))
+		if(query.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
 			 */
 			this.processDDNSActivate(query);
 		}
-		if(query.containsKey("proxied"))
+		if(query.containsKey(JsonKey.PROXIED))
 		{
 			/**
 			 * Proxied
 			 */
 			this.processDDNSProxied(query);
 		}
-		if(query.containsKey("unproxied"))
+		if(query.containsKey(JsonKey.UNPROXIED))
 		{
 			/**
 			 * Unproxied
 			 */
 			this.processDDNSUnproxied(query);
 		}
-		if(query.containsKey("update"))
+		if(query.containsKey(JsonKey.UPDATE))
 		{
 			this.processDDNSUpdate(query);
 		}
 	}
 
 	private void processDDNSUpdate(Map<String, String> query) {
-		String id = query.getOrDefault("id", "").trim();
-		String zone = query.getOrDefault("zone", "").trim();
-		String recordName = query.getOrDefault("record_name", "").trim();
-		String ttls = query.getOrDefault("ttl", "").trim();
-		boolean proxied = query.getOrDefault("proxied", "").equals("1");
-		boolean forceCreateZone = query.getOrDefault("force_create_zone", "").equals("1");
+		String id = query.getOrDefault(JsonKey.ID, "").trim();
+		String provider = query.getOrDefault(JsonKey.PROVIDER, "").trim();
+		String zone = query.getOrDefault(JsonKey.ZONE, "").trim();
+		String recordName = query.getOrDefault(JsonKey.RECORD_NAME, "").trim();
+		String ttls = query.getOrDefault(JsonKey.TTL, "").trim();
+		boolean proxied = query.getOrDefault(JsonKey.PROXIED, "").equals("1");
+		boolean forceCreateZone = query.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").equals("1");
 		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").equals("1");
 		int ttl = Utility.atoi(ttls);
 		
@@ -1959,6 +1961,7 @@ public class ServerWebManager {
 			{
 				record.setRecordName(recordName);
 			}
+			record.setProvider(provider);
 			record.setProxied(proxied);
 			record.setForceCreateZone(forceCreateZone);
 			record.setTtl(ttl);

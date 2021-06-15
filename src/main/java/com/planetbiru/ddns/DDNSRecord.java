@@ -8,13 +8,14 @@ public class DDNSRecord {
 	private String zone = "";
 	private String recordName = "";
 	private int ttl = 1;
+	private String provider = "";
 	private boolean proxied = false;
 	private String type = "A";
 	private String cronExpression = "0 * * * * ?";
 	private boolean forceCreateZone = false;
 	private boolean active = false;
 
-	public DDNSRecord(String id, String zone, String recordName, String type, boolean proxied, int ttl, boolean forceCreateZone, boolean active, String cronExpression) {
+	public DDNSRecord(String id, String zone, String recordName, String type, boolean proxied, int ttl, boolean forceCreateZone, String provider, boolean active, String cronExpression) {
 		this.setId(id);
 		this.setZone(zone);
 		this.setRecordName(recordName);
@@ -24,9 +25,10 @@ public class DDNSRecord {
 		this.setForceCreateZone(forceCreateZone);
 		this.setCronExpression(cronExpression);
 		this.setActive(active);
+		this.setProvider(provider);
 	}
 
-	public DDNSRecord(String id, String zone, String recordName, String type, boolean proxied, int ttl, boolean forceCreateZone, boolean active) {
+	public DDNSRecord(String id, String zone, String recordName, String type, boolean proxied, int ttl, boolean forceCreateZone, String provider, boolean active) {
 		this.setId(id);
 		this.setZone(zone);
 		this.setRecordName(recordName);
@@ -35,6 +37,7 @@ public class DDNSRecord {
 		this.setTtl(ttl);
 		this.setForceCreateZone(forceCreateZone);
 		this.setActive(active);
+		this.setProvider(provider);
 	}
 
 	public DDNSRecord() {
@@ -50,6 +53,7 @@ public class DDNSRecord {
 		jo.put("ttl", this.getTtl());
 		jo.put("forceCreateZone", this.isForceCreateZone());
 		jo.put("cronExpression", this.getCronExpression());
+		jo.put("provider", this.getProvider());
 		jo.put("active", this.isActive());
 		return jo;
 	}
@@ -125,5 +129,14 @@ public class DDNSRecord {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+
+	public String getProvider() {
+		return provider;
+	}
+
+	public void setProvider(String provider) {
+		this.provider = provider;
+	}
+	
 
 }
