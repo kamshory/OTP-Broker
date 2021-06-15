@@ -1941,6 +1941,7 @@ public class ServerWebManager {
 		String zone = query.getOrDefault(JsonKey.ZONE, "").trim();
 		String recordName = query.getOrDefault(JsonKey.RECORD_NAME, "").trim();
 		String ttls = query.getOrDefault(JsonKey.TTL, "").trim();
+		String cronExpression = query.getOrDefault(JsonKey.CRON_EXPRESSION, "").trim();
 		boolean proxied = query.getOrDefault(JsonKey.PROXIED, "").equals("1");
 		boolean forceCreateZone = query.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").equals("1");
 		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").equals("1");
@@ -1964,6 +1965,7 @@ public class ServerWebManager {
 			record.setProvider(provider);
 			record.setProxied(proxied);
 			record.setForceCreateZone(forceCreateZone);
+			record.setCronExpression(cronExpression);
 			record.setTtl(ttl);
 			record.setActive(active);			
 			ConfigDDNS.updateRecord(record);
@@ -2226,6 +2228,5 @@ public class ServerWebManager {
 	{
 		return documentRoot+request;
 	}
-	
 	
 }
