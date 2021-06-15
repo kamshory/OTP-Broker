@@ -54,13 +54,13 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li class=""><a href="admin.html">Administrator Setting</a></li>
+                                <li class="active "><a href="admin.html">Administrator Setting</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                                 <li class=""><a href="sms-setting.html">SMS Setting</a></li>
                                 <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="dropdown-header">Other Configs</li>
-                                <li class="active"><a href="api-user.html">API User</a></li>
+                                <li class=""><a href="api-user.html">API User</a></li>
                                 <li class=""><a href="ddns-record.html">DDNS Record</a></li>
                             </ul>
                         </li>
@@ -75,31 +75,59 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>API User</h3>
-            <form action="api-user/add" method="post">
+            <h3>DNS Record</h3>
+            <form action="ddns-record/add" method="post">
                 <table class="two-cols-responsive">
                     <tbody>
                         <tr>
-                            <td>Name</td>
-                            <td><input type="text" class="form-control" name="name"></td>
+                        <td>Zone</td>
+                        <td><input type="text" class="form-control" name="zone" value=""></td>
                         </tr>
                         <tr>
-                            <td>Username</td>
-                            <td><input type="text" class="form-control" name="username"></td>
+                        <td>Record Name</td>
+                        <td><input type="text" class="form-control" name="record_name" value=""></td>
                         </tr>
                         <tr>
-                            <td>Email</td>
-                            <td><input type="email" class="form-control" name="email"></td>
+                        <tr>
+                        <td>TTL</td>
+                        <td><input type="number" class="form-control" name="ttl" value=""></td>
                         </tr>
                         <tr>
-                            <td>Phone Number</td>
-                            <td><input type="tel" class="form-control" name="phone"></td>
+                        <td>Proxied</td>
+                        <td><label><input type="checkbox" name="proxied" value="1"> Yes</label></td>
                         </tr>
                         <tr>
-                            <td>Password</td>
-                            <td><input type="password" class="form-control" name="password"></td>
+                        <td>Update DNS</td>
+                        <td><select name="cron_expression" class="form-control">
+                            <option value="0 * * * * ?">Every minute</option>
+                            <option value="0 */2 * * * * ?">Every 2 minutes</option>
+                            <option value="0 */3 * * * * ?">Every 3 minutes</option>
+                            <option value="0 */4 * * * * ?">Every 4 minutes</option>
+                            <option value="0 */5 * * * * ?">Every 5 minutes</option>
+                            <option value="0 */6 * * * * ?">Every 6 minutes</option>
+                            <option value="0 */10 * * * * ?">Every 10 minutes</option>
+                            <option value="0 */12 * * * * ?">Every 12 minutes</option>
+                            <option value="0 */15 * * * * ?">Every 15 minutes</option>
+                            <option value="0 */20 * * * * ?">Every 20 minutes</option>
+                            <option value="0 */30 * * * * ?">Every 30 minutes</option>
+                            <option value="0 0 * * * * ?">Every hour</option>
+                            <option value="0 0 */2 * * * ?">Every 2 hours</option>
+                            <option value="0 0 */3 * * * ?">Every 3 hours</option>
+                            <option value="0 0 */4 * * * ?">Every 4 hours</option>
+                            <option value="0 0 */6 * * * ?">Every 6 hours</option>
+                            <option value="0 0 */12 * * * ?">Every 12 hours</option>
+                            <option value="0 0 0 * * * ?">Everyday at 00:00:00</option>
+                            </select></td>
                         </tr>
-                    </tbody>
+                        <tr>
+                        <td>Force Create Zone</td>
+                        <td><label><input type="checkbox" name="force_create_zone" value="1"> Yes</label></td>
+                        </tr>
+                        <tr>
+                        <td>Active</td>
+                        <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
+                        </tr>
+                        </tbody>
                 </table>
                 <table class="two-cols-responsive">
                     <tbody>
@@ -109,7 +137,7 @@
                                 <input type="submit" class="btn btn-success" name="add" value="Save"
                                     onclick="return confirm('Are you sure you want to save this record')">
                                 <input type="button" class="btn btn-primary" value="Cancel"
-                                    onclick="window.location='admin.html'">
+                                    onclick="window.location='ddns-record.html'">
                             </td>
                         </tr>
                     </tbody>

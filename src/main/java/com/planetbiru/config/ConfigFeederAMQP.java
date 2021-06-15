@@ -23,6 +23,7 @@ public class ConfigFeederAMQP {
 	private static String feederAmqpChannel = "";
 	private static int feederAmqpTimeout = 0;
 	private static int feederAmqpRefresh = 0;
+	private static boolean loaded = false;
 	
 	private ConfigFeederAMQP()
 	{
@@ -65,12 +66,11 @@ public class ConfigFeederAMQP {
 		try 
 		{
 			data = FileConfigUtil.read(fileName);
+			ConfigFeederAMQP.loaded = true;
 		} 
 		catch (FileNotFoundException e1) 
 		{
-			/**
-			 * Do nothing
-			 */
+			ConfigFeederAMQP.loaded = false;
 		}
 		if(data != null)
 		{
@@ -200,6 +200,14 @@ public class ConfigFeederAMQP {
 
 	public static void setFeederAmqpRefresh(int feederAmqpRefresh) {
 		ConfigFeederAMQP.feederAmqpRefresh = feederAmqpRefresh;
+	}
+
+	public static boolean isLoaded() {
+		return loaded;
+	}
+
+	public static void setLoaded(boolean loaded) {
+		ConfigFeederAMQP.loaded = loaded;
 	}
 
 	

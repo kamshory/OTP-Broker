@@ -67,6 +67,7 @@ legend{
 		width:200px;
 	}
 }
+.config-table tr td select,
 .config-table tr td input[type="text"],
 .config-table tr td input[type="email"],
 .config-table tr td input[type="tel"],

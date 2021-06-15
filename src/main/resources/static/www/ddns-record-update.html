@@ -72,47 +72,68 @@
         </div>
         <!--/.container-fluid -->
       </nav>
-      <div class="phone-page"><h3>Administrator Setting</h3>
-        <form action="admin-update.html" method="post">
+      <div class="phone-page"><h3>DDNS Record</h3>
+        <form action="ddns-record-update.html" method="post">
         <table class="two-cols-responsive">
             <tbody>
                 <tr>
-                <td>Username</td>
-                <td><input type="text" class="form-control" name="username" value=""></td>
+                <td>Zone</td>
+                <td><input type="text" class="form-control" name="zone" value=""></td>
                 </tr>
                 <tr>
-                <td>Name</td>
-                <td><input type="text" class="form-control" name="name" value=""></td>
+                <td>Record Name</td>
+                <td><input type="text" class="form-control" name="record_name" value=""></td>
                 </tr>
                 <tr>
-                <td>Email</td>
-                <td><input type="email" class="form-control" name="email" value=""></td>
+                <tr>
+                <td>TTL</td>
+                <td><input type="number" class="form-control" name="ttl" value=""></td>
                 </tr>
                 <tr>
-                <td>Phone Number</td>
-                <td><input type="tel" class="form-control" name="phone" value=""></td>
+                <td>Proxied</td>
+                <td><label><input type="checkbox" name="proxied" value="1"> Yes</label></td>
                 </tr>
                 <tr>
-                <td>Password</td>
-                <td><input type="password" class="form-control" name="password"></td>
+                <td>Update DNS</td>
+                <td><select name="cron_expression" class="form-control">
+                    <option value="0 * * * * ?">Every minute</option>
+                    <option value="0 */2 * * * * ?">Every 2 minutes</option>
+                    <option value="0 */3 * * * * ?">Every 3 minutes</option>
+                    <option value="0 */4 * * * * ?">Every 4 minutes</option>
+                    <option value="0 */5 * * * * ?">Every 5 minutes</option>
+                    <option value="0 */6 * * * * ?">Every 6 minutes</option>
+                    <option value="0 */10 * * * * ?">Every 10 minutes</option>
+                    <option value="0 */12 * * * * ?">Every 12 minutes</option>
+                    <option value="0 */15 * * * * ?">Every 15 minutes</option>
+                    <option value="0 */20 * * * * ?">Every 20 minutes</option>
+                    <option value="0 */30 * * * * ?">Every 30 minutes</option>
+                    <option value="0 0 * * * * ?">Every hour</option>
+                    <option value="0 0 */2 * * * ?">Every 2 hours</option>
+                    <option value="0 0 */3 * * * ?">Every 3 hours</option>
+                    <option value="0 0 */4 * * * ?">Every 4 hours</option>
+                    <option value="0 0 */6 * * * ?">Every 6 hours</option>
+                    <option value="0 0 */12 * * * ?">Every 12 hours</option>
+                    <option value="0 0 0 * * * ?">Everyday at 00:00:00</option>
+                    </select></td>
                 </tr>
                 <tr>
-                <td>Blocked</td>
-                <td><label><input type="checkbox" name="blocked" value="1"> Yes</label></td>
+                <td>Force Create Zone</td>
+                <td><label><input type="checkbox" name="force_create_zone" value="1"> Yes</label></td>
                 </tr>
                 <tr>
                 <td>Active</td>
                 <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
                 </tr>
-            </tbody>
+                </tbody>
         </table>
         <table class="two-cols-responsive">
             <tbody>
             <tr>
                     <td></td>
                     <td>
+                        <input type="hidden" name="id" id="id" value="">
                         <input type="submit" class="btn btn-success" value="Save Changes" onclick="return confirm('Are you sure you want to save changes')" name="update">
-                        <input type="button" class="btn btn-primary" value="Cancel" onclick="window.location='admin.html'">
+                        <input type="button" class="btn btn-primary" value="Cancel" onclick="window.location='ddns-record.html'">
                     </td>
                 </tr>
             </tbody>
@@ -121,26 +142,28 @@
         <script type="text/javascript">
             $(document).ready(function(e){
                 var urlParams = new URLSearchParams(window.location.search);
-                var username = urlParams.get('username') || '';
-                if(username.length > 0)
+                var id = urlParams.get('id') || '';
+                if(id.length > 0)
                 {
+                  $('#id').val(id);
                   $.ajax({
                       type:"GET",
-                      url:"/user/detail/"+username,
+                      url:"/ddns-record/detail/"+id,
                       dataType:"json",
                       success:function(data){
-                          $('input[name="name"]').val(data.name);
-                          $('input[name="username"]').val(data.username);
-                          $('input[name="phone"]').val(data.phone);
-                          $('input[name="email"]').val(data.email);
-                          $('input[name="blocked"]').prop('checked', data.blocked);
+                          $('input[name="zone"]').val(data.zone);
+                          $('input[name="record_name"]').val(data.recordName);
+                          $('input[name="ttl"]').val(data.ttl);
+                          $('input[name="cron_expression"]').val(data.cronExpression);
+                          $('input[name="proxied"]').prop('checked', data.proxied);
+                          $('input[name="force_create_zone"]').prop('checked', data.forceCreateZone);
                           $('input[name="active"]').prop('checked', data.active);
                       }
                   });
                 }
                 else
                 {
-                  window.location = "admin.html";
+                  window.location = "ddns-record.html";
                 }
             });
         </script>

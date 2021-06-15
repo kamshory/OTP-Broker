@@ -1,5 +1,7 @@
 package com.planetbiru.task;
 
+import com.planetbiru.ddns.DDNSUpdater;
+
 public class ThreadExecutor extends Thread {
 
 	private String jobID;
@@ -8,10 +10,13 @@ public class ThreadExecutor extends Thread {
 	private String prevFireTimeStr;
 	private String nextValidTimeAfterStr;
 	private String resolution;
-	public ThreadExecutor(String jobID, String cronExpression, String currentTimeStr, String prevFireTimeStr,
+	private String zone;
+	private String recordName;
+	public ThreadExecutor(String jobID, String zone, String recordName, String currentTimeStr, String prevFireTimeStr,
 			String nextValidTimeAfterStr, String resolution) {
 		this.jobID = jobID;
-		this.cronExpression = cronExpression;
+		this.zone = zone;
+		this.recordName = recordName;
 		this.currentTimeStr = currentTimeStr;
 		this.prevFireTimeStr = prevFireTimeStr;
 		this.nextValidTimeAfterStr = nextValidTimeAfterStr;
@@ -20,11 +25,7 @@ public class ThreadExecutor extends Thread {
 	@Override
 	public void run()
 	{
-		TaskManager task = new TaskManager(this.jobID);
-		if(!task.isStarted(this.prevFireTimeStr, this.resolution))
-		{
-			task.execute(this.jobID, this.cronExpression, this.currentTimeStr, this.prevFireTimeStr, this.nextValidTimeAfterStr);
-		}
+		//DDNSUpdater ddns = new DDNSUpdater();
 	}
 
 }

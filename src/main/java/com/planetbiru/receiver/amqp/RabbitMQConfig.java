@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.planetbiru.config.ConfigFeederAMQP;
+
 
 @Configuration
 public class RabbitMQConfig {
@@ -27,42 +29,81 @@ public class RabbitMQConfig {
 	private int rabbitMQPort;
 
 	@Value("${otpbroker.rabbitmq.queue}")
-	private String normalQueueName;
+	private String queueName;
+
+	@Value("${otpbroker.path.setting.feeder.amqp}")
+	private String feederAMQPSettingPath;
+
+	@Value("${otpbroker.rabbitmq.enable}")
+	private boolean enable;
 
 	@Bean
-	Queue normalQueue() {
-		return new Queue(normalQueueName, false);
+	MessageListenerContainer messageListenerContainer() {
+		
+		boolean lEnable = this.enable;
+		if(ConfigFeederAMQP.isLoaded())
+		{
+			lEnable = ConfigFeederAMQP.isFeederAmqpEnable();
+		}
+		if(lEnable)
+		{
+			SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
+			simpleMessageListenerContainer.setConnectionFactory(connectionFactory());
+			simpleMessageListenerContainer.setQueues(queue());		
+			simpleMessageListenerContainer.setMessageListener(createHandler());
+			return simpleMessageListenerContainer;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	@Bean
+	RabbitMQReceiver createHandler() {
+		return new RabbitMQReceiver();
+	}
+	
+	@Bean
+	Queue queue() {
+		String lQueue = this.queueName;
+		if(ConfigFeederAMQP.isLoaded())
+		{
+			lQueue = ConfigFeederAMQP.getFeederAmqpChannel();
+		}
+		return new Queue(lQueue, false);
 	}
 
 	@PostConstruct
     private void init()
     {
-		
+		ConfigFeederAMQP.load(feederAMQPSettingPath);
     }
 	
 
 	@Bean
-	ConnectionFactory normalConnectionFactory() {
+	ConnectionFactory connectionFactory() {
 		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();
-		cachingConnectionFactory.setAddresses(this.rabbitMQHost);
-		cachingConnectionFactory.setPort(this.rabbitMQPort);
-		cachingConnectionFactory.setUsername(this.username);
-		cachingConnectionFactory.setPassword(this.password);
+		
+		
+		String lRabbitMQHost = this.rabbitMQHost;
+		int lRabbitMQPort = this.rabbitMQPort;
+		String lUsername = this.username;
+		String lPassword = this.password;
+		
+		if(ConfigFeederAMQP.isLoaded())
+		{
+			lRabbitMQHost = ConfigFeederAMQP.getFeederAmqpAddress();
+			lRabbitMQPort = ConfigFeederAMQP.getFeederAmqpPort();
+			lUsername = ConfigFeederAMQP.getFeederAmqpUsername();
+			lPassword = ConfigFeederAMQP.getFeederAmqpPassword();
+		}
+		
+		cachingConnectionFactory.setAddresses(lRabbitMQHost);
+		cachingConnectionFactory.setPort(lRabbitMQPort);
+		cachingConnectionFactory.setUsername(lUsername);
+		cachingConnectionFactory.setPassword(lPassword);
 		return cachingConnectionFactory;
-	}
-	
-	@Bean
-	MessageListenerContainer normalMessageListenerContainer() {
-		SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
-		simpleMessageListenerContainer.setConnectionFactory(normalConnectionFactory());
-		simpleMessageListenerContainer.setQueues(normalQueue());		
-		simpleMessageListenerContainer.setMessageListener(normalCreateHandler());
-		return simpleMessageListenerContainer;
-	}
-	
-	@Bean
-	RabbitMQReceiver normalCreateHandler() {
-		return new RabbitMQReceiver();
 	}
 	
 }

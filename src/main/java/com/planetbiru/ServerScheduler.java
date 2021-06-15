@@ -2,22 +2,25 @@ package com.planetbiru;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.CronExpression;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.expression.ExpressionException;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.constant.ConstantString;
-import com.planetbiru.constant.JsonKey;
-import com.planetbiru.task.ThreadExecutor;
+import com.planetbiru.ddns.DDNSUpdater;
+import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.util.Utility;
 
 
@@ -29,22 +32,33 @@ public class ServerScheduler {
 	
 	@Value("${otpbroker.cron.time.resolution:minute}")
 	private String timeResolution;
+	
+	@Value("${otpbroker.ddns.provider}")
+	private String ddnsProvider;
+	
+	@Value("${otpbroker.path.setting.ddns}")
+	private String ddnsSettingPath;
+	
+	@PostConstruct
+	public void init()
+	{
+		ConfigDDNS.load(ddnsSettingPath);
+	}
 		
 	@Scheduled(cron = "${otpbroker.cron.expression}")
 	public void task() 
 	{	
 		logger.info("Run...");
-		String cronExpression = "";
-		String jobID = "";
+
 		CronExpression exp;
 		Date currentTime = new Date();
 		
-		JSONArray list = getTaskList();
-		for(int i = 0; i<list.length(); i++)
+		
+		Map<String, DDNSRecord> list = ConfigDDNS.getRecords();
+		for(Entry<String, DDNSRecord> set : list.entrySet())
 		{
-			JSONObject jo = list.getJSONObject(i);
-			cronExpression = jo.optString(JsonKey.CRON_EXPRESSION, "");
-			jobID = jo.optString(JsonKey.JOB_ID, "");
+			DDNSRecord ddnsRecord = set.getValue();
+			String cronExpression = ddnsRecord.getRecordName();		
 			try
 			{
 				exp = new CronExpression(cronExpression);
@@ -55,22 +69,19 @@ public class ServerScheduler {
 				String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
 				String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
 				
-				ThreadExecutor exec = new ThreadExecutor(jobID, cronExpression, currentTimeStr, prevFireTimeStr, nextValidTimeAfterStr, this.timeResolution);
-				exec.start();
+				DDNSUpdater ddns = new DDNSUpdater(ddnsProvider, ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
+				ddns.start();
+				
 			}
 			catch(ExpressionException | ParseException | JSONException e)
 			{
 				logger.error(e.getMessage());
 			}
+			
 		}
+
+		
 	}
-	
-	public JSONArray getTaskList() 
-	{
-		JSONArray list = new JSONArray();
-		return list;
-	}
-	
-	
+
     
 }

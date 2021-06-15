@@ -20,6 +20,10 @@ public class Config {
 	private static String portName = "usbtty";
 	private static String defaultFile = "/index.html";
 	
+	private static boolean proxyEnable = false;
+	private static String proxyHost = "127.0.0.1";
+	private static int proxyPort = 8080;
+	
 	private Config()
 	{
 		
@@ -115,6 +119,36 @@ public class Config {
 
 	public static void setWsClientPassword(String wsClientPassword) {
 		Config.wsClientPassword = wsClientPassword;
+	}
+
+
+	public static boolean isProxyEnable() {
+		return proxyEnable;
+	}
+
+
+	public static void setProxyEnable(boolean proxyEnable) {
+		Config.proxyEnable = proxyEnable;
+	}
+
+
+	public static String getProxyHost() {
+		return proxyHost;
+	}
+
+
+	public static void setProxyHost(String proxyHost) {
+		Config.proxyHost = proxyHost;
+	}
+
+
+	public static int getProxyPort() {
+		return proxyPort;
+	}
+
+
+	public static void setProxyPort(int proxyPort) {
+		Config.proxyPort = proxyPort;
 	}
 
 	
