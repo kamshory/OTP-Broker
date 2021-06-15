@@ -25,7 +25,7 @@ public class ConfigDDNS {
 	
 	public static void load(String path) {
 		ConfigDDNS.path = path;
-		String dir = getBaseDir();
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
@@ -97,7 +97,7 @@ public class ConfigDDNS {
 
 	public static void save(String path, JSONObject config) {
 		
-		String dir = getBaseDir();
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
@@ -134,11 +134,6 @@ public class ConfigDDNS {
 		}		
 	}
 	
-	private static String getBaseDir()
-	{
-		return ConfigEmail.class.getResource("/").getFile();
-	}
-
 	public static JSONObject getJSONObject(String zone, String recordname) {
 		String id = Utility.md5(zone+":"+recordname);
 		if(ConfigDDNS.getRecords().containsKey(id))

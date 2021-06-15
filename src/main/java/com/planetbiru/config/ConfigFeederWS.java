@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
+import com.planetbiru.util.Utility;
 
 public class ConfigFeederWS {
 	private static boolean feederWsEnable = false;
@@ -45,7 +45,12 @@ public class ConfigFeederWS {
 	}
 	
 	public static void save(String path) {
-		String fileName = ConfigFeederWS.getBaseDir() + path;
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
 		ConfigFeederWS.prepareDir(fileName);	
 		try 
 		{
@@ -58,7 +63,12 @@ public class ConfigFeederWS {
 	}
 	public static void load(String path)
 	{
-		String fileName = ConfigFeederWS.getBaseDir() + path;
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
 		ConfigFeederWS.prepareDir(fileName);
 		byte[] data = null;
 		try 
@@ -115,10 +125,6 @@ public class ConfigFeederWS {
 		{
 			d1.mkdir();
 		}		
-	}
-	private static String getBaseDir()
-	{
-		return WebUserAccount.class.getResource("/").getFile();
 	}
 
 	public static boolean isFeederWsEnable() {

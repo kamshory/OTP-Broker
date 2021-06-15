@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.planetbiru.util.FileNotFoundException;
+import com.planetbiru.util.Utility;
 
 public class ConfigCloudflare {
 	private ConfigCloudflare()
@@ -20,7 +21,7 @@ public class ConfigCloudflare {
 	private static String authToken = "";
 	
 	public static void load(String path) {
-		String dir = getBaseDir();
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
@@ -64,7 +65,7 @@ public class ConfigCloudflare {
 
 	public static void save(String path, JSONObject config) {
 		
-		String dir = getBaseDir();
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
@@ -101,10 +102,7 @@ public class ConfigCloudflare {
 		}		
 	}
 	
-	private static String getBaseDir()
-	{
-		return ConfigCloudflare.class.getResource("/").getFile();
-	}
+
 	
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();

@@ -20,6 +20,7 @@ public class Config {
 	private static boolean proxyEnable = false;
 	private static String proxyHost = "127.0.0.1";
 	private static int proxyPort = 8080;
+	private static String baseDir = "";
 	
 	private Config()
 	{
@@ -146,6 +147,16 @@ public class Config {
 
 	public static void setProxyPort(int proxyPort) {
 		Config.proxyPort = proxyPort;
+	}
+
+
+	public static String getBaseDir() {
+		return baseDir;
+	}
+
+
+	public static void setBaseDir(String baseDir) {
+		Config.baseDir = baseDir;
 	}
 
 	

@@ -7,8 +7,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
+import com.planetbiru.util.Utility;
 
 public class ConfigSMS {
 	
@@ -39,7 +39,12 @@ public class ConfigSMS {
 	}
 	
 	public static void save(String path) {
-		String fileName = ConfigSMS.getBaseDir() + path;
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
 		ConfigSMS.prepareDir(fileName);	
 		try 
 		{
@@ -53,7 +58,12 @@ public class ConfigSMS {
 	
 	public static void load(String path)
 	{
-		String fileName = ConfigSMS.getBaseDir() + path;
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
 		ConfigSMS.prepareDir(fileName);
 		byte[] data = null;
 		try 
@@ -108,11 +118,6 @@ public class ConfigSMS {
 		}		
 	}
 	
-	private static String getBaseDir()
-	{
-		return WebUserAccount.class.getResource("/").getFile();
-	}
-
 	public static String getConnectionType() {
 		return connectionType;
 	}

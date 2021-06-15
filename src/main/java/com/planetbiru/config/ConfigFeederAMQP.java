@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
+import com.planetbiru.util.Utility;
 
 public class ConfigFeederAMQP {
 
@@ -60,6 +61,7 @@ public class ConfigFeederAMQP {
 	}
 	public static void load(String path)
 	{
+		String dir = Utility.getBaseDir();
 		String fileName = ConfigFeederAMQP.getBaseDir() + path;
 		ConfigFeederAMQP.prepareDir(fileName);
 		byte[] data = null;
@@ -117,11 +119,6 @@ public class ConfigFeederAMQP {
 			d1.mkdir();
 		}		
 	}
-	private static String getBaseDir()
-	{
-		return WebUserAccount.class.getResource("/").getFile();
-	}
-
 	public static boolean isFeederAmqpEnable() {
 		return feederAmqpEnable;
 	}
