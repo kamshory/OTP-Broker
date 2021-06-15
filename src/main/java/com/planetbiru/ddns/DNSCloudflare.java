@@ -49,6 +49,7 @@ public class DNSCloudflare extends DNS{
 		this.authToken = authToken;
 	}
 	
+	
 	@Override
 	public JSONObject createZoneIfNotExists(DDNSRecord ddnsRecord) {
 		if(this.getZone(ddnsRecord.getZone()) == null)
@@ -105,6 +106,7 @@ public class DNSCloudflare extends DNS{
 		}
 		return resp;
 	}
+	
 	/**
 	 * List Zones <br>
 	 * URL https://api.cloudflare.com/#zone-list-zones
@@ -122,10 +124,16 @@ public class DNSCloudflare extends DNS{
 		String url = this.endpoint + "/zones";
 		HttpHeaders requestHeaders = this.createRequestHeader();
 		ResponseEntityCustom response = httpExchange(HttpMethod.GET, url, requestHeaders, null, 10000);
-		JSONObject resp = new JSONObject(response.getBody());
-		return resp.optJSONArray(DDNSKey.RESULT);
+		if(response.getBody().length() > 20)
+		{
+			JSONObject resp = new JSONObject(response.getBody());
+			return resp.optJSONArray(DDNSKey.RESULT);
+		}
+		else
+		{
+			return null;
+		}
 	}
-
 
 	private JSONObject getZone(String name)
 	{
@@ -382,7 +390,6 @@ public class DNSCloudflare extends DNS{
 		}
 		catch(RestClientResponseException e)
 		{
-			e.printStackTrace();
 			result = new ResponseEntityCustom(e.getResponseBodyAsString(), e.getRawStatusCode(), e.getResponseHeaders());
 			logger.error(e.getMessage());
 		}
@@ -516,6 +523,7 @@ public class DNSCloudflare extends DNS{
 		requestHeaders.add(DDNSKey.HEADER_X_AUTH_EMAIL, this.authEmail);
 		requestHeaders.add(DDNSKey.HEADER_X_AUTH_KEY, this.authApiKey);
 		requestHeaders.add(DDNSKey.HEADER_USER_AGENT, "cloudflare-php");
+		requestHeaders.add(DDNSKey.HEADER_CONNECTION, "close");
 		return requestHeaders;
 	}
 

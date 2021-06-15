@@ -1116,7 +1116,7 @@ public class ServerWebManager {
 			 * Do nothing
 			 */
 		}
-		responseHeaders.add(ConstantString.LOCATION, ConstantString.API_USER_FILE_LEVEL_3);
+		responseHeaders.add(ConstantString.LOCATION, ConstantString.DDNS_FILE_LEVEL_3);
 		cookie.saveSessionData();
 		cookie.putToHeaders(responseHeaders);
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
