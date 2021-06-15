@@ -32,8 +32,8 @@ public class DDNSUpdater extends Thread{
 			String accountId = ConfigCloudflare.getAccountId();
 			String authEmail = ConfigCloudflare.getAuthEmail();
 			String authApiKey = ConfigCloudflare.getAuthApiKey();
-			
-			ddns.setConfig(endpoint, accountId, authEmail, authApiKey);
+			String authToken = ConfigCloudflare.getAuthToken();
+			ddns.setConfig(endpoint, accountId, authEmail, authApiKey, authToken);
 			
 			if(this.ddnsRecord.isForceCreateZone())
 			{

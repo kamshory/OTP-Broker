@@ -38,13 +38,15 @@ public class DNSCloudflare extends DNS{
 	private String accountId = "";
 	private String endpoint = "";
 	private String authApiKey = "";
+	private String authToken = "";
 	
-	public void setConfig(String endpoint, String accountId, String authEmail, String authApiKey)
+	public void setConfig(String endpoint, String accountId, String authEmail, String authApiKey, String authToken)
 	{
 		this.endpoint = endpoint;
 		this.accountId = accountId;
 		this.authEmail = authEmail;
 		this.authApiKey = authApiKey;
+		this.authToken = authToken;
 	}
 	
 	@Override
