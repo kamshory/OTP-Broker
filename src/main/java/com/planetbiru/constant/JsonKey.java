@@ -68,6 +68,17 @@ public class JsonKey {
 	public static final String SUBJECT                       = "subject";
 	public static final String PAYLOAD                       = "payload";
 	public static final String NEXT_URL                      = "nextURL";
+	public static final Object PROVIDER                      = "provider";
+	public static final Object ZONE                          = "zone";
+	public static final Object RECORD_NAME                   = "record_name";
+	public static final Object TTL                           = "ttl";
+	public static final Object PROXIED                       = "proxied";
+	public static final Object FORCE_CREATE_ZONE             = "force_create_zone";
+	public static final Object ACTIVATE                      = "activate";
+	public static final Object UNPROXIED                     = "unproxied";
+	public static final Object UPDATE                        = "update";
+	public static final Object DEACTIVATE                    = "deactivate";
+	public static final Object DELETE                        = "delete";
 	
 	private JsonKey()
 	{

@@ -25,14 +25,17 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigSaved;
+import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
+import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.receiver.ws.WebSocketContent;
@@ -117,7 +120,12 @@ public class ServerWebManager {
 	@Value("${otpbroker.device.connection.type}")
 	private String portName;
 	
+	@Value("${otpbroker.path.setting.ddns}")
+	private String ddnsSettingPath;
 	
+	@Value("${otpbroker.path.setting.cloudflare}")
+	private String cloudflareSettingPath;
+
 	private ServerWebManager()
     {
     }
@@ -125,6 +133,9 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		ConfigDDNS.load(ddnsSettingPath);
+		ConfigCloudflare.load(cloudflareSettingPath);
+
 		logger.info("Init...");	
 		Config.setPortName(portName);		
 		userAccount = new WebUserAccount(userSettingPath);		
@@ -286,7 +297,7 @@ public class ServerWebManager {
 		JSONArray data = new JSONArray();
 		JSONObject itemData = new JSONObject();
 		String uuid = UUID.randomUUID().toString();
-		itemData.put("id", uuid);
+		itemData.put(JsonKey.ID, uuid);
 		itemData.put(JsonKey.MESSAGE, message);
 		data.put(itemData);
 		messageJSON.put("data", data);		
@@ -539,6 +550,40 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	@GetMapping(path="/cloudflare/get")
+	public ResponseEntity<byte[]> handleCloudflareSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigCloudflare.load(emailSettingPath);
+				
+				responseBody = ConfigCloudflare.getJSONObject().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
 	@GetMapping(path="/user/list")
 	public ResponseEntity<byte[]> handleUserList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -605,6 +650,39 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 
+	@GetMapping(path="/ddns-record/detail/{id}")
+	public ResponseEntity<byte[]> handleDDNSRecordGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				String data = ConfigDDNS.getJSONObject(id).toString();
+				responseBody = data.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+
 	
 	@GetMapping(path="/api-user/list")
 	public ResponseEntity<byte[]> handleUserAPIList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -638,7 +716,8 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
+
+
 	@GetMapping(path="/api-user/detail/{username}")
 	public ResponseEntity<byte[]> handleUserAPIGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.USERNAME) String username, HttpServletRequest request)
 	{
@@ -779,6 +858,41 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+	
+	@GetMapping(path="/ddns-record/list")
+	public ResponseEntity<byte[]> handleDDNSRecordList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigDDNS.load(ddnsSettingPath);
+				String list = ConfigDDNS.getJSONObject().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
 	
 	@PostMapping(path="/api-user/add**")
 	public ResponseEntity<byte[]> userAPIAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -964,6 +1078,51 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	@PostMapping(path="/ddns-record/add**")
+	public ResponseEntity<byte[]> ddnsAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{		
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
+			    String provider = queryPairs.getOrDefault(JsonKey.PROVIDER, "").translateEscapes();
+			    String zone = queryPairs.getOrDefault(JsonKey.ZONE, "").translateEscapes();
+			    String recordName = queryPairs.getOrDefault(JsonKey.RECORD_NAME, "").trim();
+			    String cronExpression = queryPairs.getOrDefault("cron_expression", "").trim();
+			    boolean proxied = queryPairs.getOrDefault(JsonKey.PROXIED, "").trim().equals("1");
+			    boolean forceCreateZone = queryPairs.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").trim().equals("1");
+			    boolean active = queryPairs.getOrDefault("active", "").trim().equals("1");
+			    
+				String ttls = queryPairs.getOrDefault(JsonKey.TTL, "0");
+			    int ttl = Utility.atoi(ttls);
+			    String type = "A";
+			    String id = Utility.md5(zone+":"+recordName);
+				DDNSRecord record = new DDNSRecord(id, zone, recordName, type, proxied, ttl, forceCreateZone, provider, active, cronExpression);
+				if(!zone.isEmpty() && !recordName.isEmpty())
+				{
+					ConfigDDNS.getRecords().put(id, record);	
+					ConfigDDNS.save();
+				}		    
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		responseHeaders.add(ConstantString.LOCATION, ConstantString.API_USER_FILE_LEVEL_3);
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
 	
 	@GetMapping(path="/**")
 	public ResponseEntity<byte[]> handleDocumentRootGet(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -1039,20 +1198,7 @@ public class ServerWebManager {
 			String[] arr = fileName.split("\\.");
 			String ext = arr[arr.length - 1];
 			String lt = configSaved.getString("CACHE", ext, "0");
-			lt = lt.replaceAll("[^\\d]", "");
-			if(!lt.isEmpty())
-			{
-				try
-				{
-					lifetime = Integer.parseInt(lt);
-				}
-				catch(NumberFormatException e)
-				{
-					/**
-					 * Do nothing
-					 */
-				}
-			}
+			lifetime = Utility.atoi(lt);
 		}
 		return lifetime;
 	}
@@ -1076,6 +1222,14 @@ public class ServerWebManager {
 				if(path.equals("/account-update.html"))
 				{
 					this.processAccount(requestBody, cookie);
+				}
+				if(path.equals("/ddns-record.html"))
+				{
+					this.processDDNS(requestBody, cookie);
+				}
+				if(path.equals("/ddns-record-update.html"))
+				{
+					this.processDDNS(requestBody, cookie);
 				}
 				if(path.equals("/api-user.html"))
 				{
@@ -1101,6 +1255,10 @@ public class ServerWebManager {
 				{
 					this.processSMS(requestBody);
 				}
+				if(path.equals("/cloudflare.html"))
+				{
+					this.processCloudflareSetting(requestBody);
+				}
 			}
 		} 
 		catch (NoUserRegisteredException e) 
@@ -1111,6 +1269,26 @@ public class ServerWebManager {
 		}
 	}
 	
+	private void processCloudflareSetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		String endpoint = query.getOrDefault("endpoint", "").trim();
+		String accountId = query.getOrDefault("account_id", "").trim();
+		String authEmail = query.getOrDefault("auth_email", "").trim();
+		String authApiKey = query.getOrDefault("auth_api_key", "").trim();
+		String authToken = query.getOrDefault("auth_token", "").trim();
+		
+		if(!endpoint.isEmpty())
+		{
+			ConfigCloudflare.load(cloudflareSettingPath);
+			ConfigCloudflare.setEndpoint(endpoint);
+			ConfigCloudflare.setAccountId(accountId);
+			ConfigCloudflare.setAuthEmail(authEmail);
+			ConfigCloudflare.setAuthApiKey(authApiKey);
+			ConfigCloudflare.setAuthToken(authToken);
+			ConfigCloudflare.save(cloudflareSettingPath);
+		}
+	}
+	
 	private void processEmailSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_email_setting"))
@@ -1118,19 +1296,8 @@ public class ServerWebManager {
 			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
 			String lMailHost = query.getOrDefault("smtp_host", "").trim();
 	
-			int lMailPort = 0;
 			String v1 = query.getOrDefault("smtp_port", "0").trim();
-			try
-			{
-				lMailPort = Integer.parseInt(v1);
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}			
-			
+			int lMailPort = Utility.atoi(v1);
 			String lMailSenderAddress = query.getOrDefault("sender_address", "").trim();
 			String lMailSenderPassword = query.getOrDefault("sender_password", "").trim();
 			if(lMailSenderPassword.isEmpty())
@@ -1166,59 +1333,12 @@ public class ServerWebManager {
 		{
 			String connectionType = query.getOrDefault("connection_type", "");			
 			String smsCenter = query.getOrDefault("sms_center", "");		
-			int incommingInterval = 0;
-			try
-			{
-				String incommingInt = query.getOrDefault("incomming_interval", "0");
-				incommingInt = incommingInt.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(incommingInt.isEmpty())
-				{
-					incommingInt = "0";
-				}
-				incommingInterval = Integer.parseInt(incommingInt);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
-			
-			int timeRange = 0;	
-			try
-			{
-				String tmRange = query.getOrDefault("time_range", "0");
-				tmRange = tmRange.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(tmRange.isEmpty())
-				{
-					tmRange = "0";
-				}
-				timeRange = Integer.parseInt(tmRange);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
-			
-			int maxPerTimeRange = 0;
-			try
-			{
-				String maxInRange = query.getOrDefault("max_per_time_range", "0");
-				maxInRange = maxInRange.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(maxInRange.isEmpty())
-				{
-					maxInRange = "0";
-				}
-				maxPerTimeRange = Integer.parseInt(maxInRange);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
+			String incommingInt = query.getOrDefault("incomming_interval", "0");
+			int incommingInterval = Utility.atoi(incommingInt);
+			String tmRange = query.getOrDefault("time_range", "0");
+			int timeRange = Utility.atoi(tmRange);	
+			String maxInRange = query.getOrDefault("max_per_time_range", "0");
+			int maxPerTimeRange = Utility.atoi(maxInRange);
 			String imei = query.getOrDefault("imei", "");		
 			String simCardPIN = query.getOrDefault("sim_card_pin", "");		
 			
@@ -1242,81 +1362,19 @@ public class ServerWebManager {
 			boolean feederWsEnable = query.getOrDefault("feeder_ws_enable", "").equals("1");		
 			boolean feederWsSSL = query.getOrDefault("feeder_ws_ssl", "").equals("1");		
 			String feederWsAddress = query.getOrDefault("feeder_ws_address", "");		
-			int feederWsPort = 0;
-			try
-			{
-				String port = query.getOrDefault("feeder_ws_port", "0");
-				port = port.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(port.isEmpty())
-				{
-					port = "0";
-				}
-				feederWsPort = Integer.parseInt(port);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
+			String port = query.getOrDefault("feeder_ws_port", "0");
+			int feederWsPort = Utility.atoi(port);
 			String feederWsPath = query.getOrDefault("feeder_ws_path", "");		
 			String feederWsUsername = query.getOrDefault("feeder_ws_username", "");		
 			String feederWsPassword = query.getOrDefault("feeder_ws_password", "");		
 			String feederWsChannel = query.getOrDefault("feeder_ws_channel", "");
 			
-			int feederWsTimeout = 0;	
-			try
-			{
-				String timeout = query.getOrDefault("feeder_ws_timeout", "0");
-				timeout = timeout.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(timeout.isEmpty())
-				{
-					timeout = "0";
-				}
-				feederWsTimeout = Integer.parseInt(timeout);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
-			
-			int feederWsReconnectDelay = 0;
-			try
-			{
-				String reconnect = query.getOrDefault("feeder_ws_reconnect_delay", "0");
-				reconnect = reconnect.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(reconnect.isEmpty())
-				{
-					reconnect = "0";
-				}
-				feederWsReconnectDelay = Integer.parseInt(reconnect);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
-			
-			int feederWsRefresh = 0;
-			try
-			{
-				String refresh = query.getOrDefault("feeder_ws_refresh", "0");
-				refresh = refresh.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(refresh.isEmpty())
-				{
-					refresh = "0";
-				}
-				feederWsRefresh = Integer.parseInt(refresh);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}		
+			String timeout = query.getOrDefault("feeder_ws_timeout", "0");
+			int feederWsTimeout = Utility.atoi(timeout);	
+			String reconnect = query.getOrDefault("feeder_ws_reconnect_delay", "0");
+			int feederWsReconnectDelay = Utility.atoi(reconnect);
+			String refresh = query.getOrDefault("feeder_ws_refresh", "0");
+			int feederWsRefresh = Utility.atoi(refresh);
 			
 			ConfigFeederWS.setFeederWsEnable(feederWsEnable);
 			ConfigFeederWS.setFeederWsSSL(feederWsSSL);
@@ -1337,63 +1395,17 @@ public class ServerWebManager {
 			boolean feederAmqpEnable = query.getOrDefault("feeder_amqp_enable", "").equals("1");		
 			boolean feederAmqpSSL = query.getOrDefault("feeder_amqp_ssl", "").equals("1");		
 			String feederAmqpAddress = query.getOrDefault("feeder_amqp_address", "");		
-			int feederAmqpPort = 0;
-			try
-			{
-				String port = query.getOrDefault("feeder_amqp_port", "0");
-				port = port.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(port.isEmpty())
-				{
-					port = "0";
-				}
-				feederAmqpPort = Integer.parseInt(port);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
+			String port = query.getOrDefault("feeder_amqp_port", "0");
+			int feederAmqpPort = Utility.atoi(port);
 			String feederAmqpPath = query.getOrDefault("feeder_amqp_path", "");		
 			String feederAmqpUsername = query.getOrDefault("feeder_amqp_username", "");		
 			String feederAmqpPassword = query.getOrDefault("feeder_amqp_password", "");		
 			String feederAmqpChannel = query.getOrDefault("feeder_amqp_channel", "");
 			
-			int feederAmqpTimeout = 0;	
-			try
-			{
-				String timeout = query.getOrDefault("feeder_amqp_timeout", "0");
-				timeout = timeout.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(timeout.isEmpty())
-				{
-					timeout = "0";
-				}
-				feederAmqpTimeout = Integer.parseInt(timeout);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
-			
-			int feederAmqpRefresh = 0;
-			try
-			{
-				String refresh = query.getOrDefault("feeder_amqp_refresh", "0");
-				refresh = refresh.replaceAll(ConstantString.FILTER_INTEGER, "");
-				if(refresh.isEmpty())
-				{
-					refresh = "0";
-				}
-				feederAmqpRefresh = Integer.parseInt(refresh);		
-			}
-			catch(NumberFormatException e)
-			{
-				/**
-				 * Do nothing
-				 */
-			}
+			String timeout = query.getOrDefault("feeder_amqp_timeout", "0");
+			int feederAmqpTimeout = Utility.atoi(timeout);	
+			String refresh = query.getOrDefault("feeder_amqp_refresh", "0");
+			int feederAmqpRefresh = Utility.atoi(refresh);
 			
 			ConfigFeederAMQP.setFeederAmqpEnable(feederAmqpEnable);
 			ConfigFeederAMQP.setFeederAmqpSSL(feederAmqpSSL);
@@ -1435,7 +1447,7 @@ public class ServerWebManager {
 		String password = query.getOrDefault(JsonKey.PASSWORD, "");
 		String email = query.getOrDefault(JsonKey.EMAIL, "");
 		String name = query.getOrDefault(JsonKey.NAME, "");
-		if(query.containsKey("update"))
+		if(query.containsKey(JsonKey.UPDATE))
 		{
 			User user;
 			try 
@@ -1463,7 +1475,7 @@ public class ServerWebManager {
 	private void processAdmin(String requestBody, CookieServer cookie) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
-		if(query.containsKey("delete"))
+		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**
 			 * Delete
@@ -1479,14 +1491,14 @@ public class ServerWebManager {
 			}
 			userAccount.save();
 		}
-		if(query.containsKey("deactivate"))
+		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
 			/**
 			 * Deactivate
 			 */
 			this.processAdminDeactivate(query, loggedUsername);
 		}
-		if(query.containsKey("activate"))
+		if(query.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
@@ -1512,14 +1524,14 @@ public class ServerWebManager {
 		{
 			this.processAdminUpdateData(query);
 		}
-		if(query.containsKey("update"))
+		if(query.containsKey(JsonKey.UPDATE))
 		{
 			this.processAdminUpdate(query);
 		}
 	}
 	private void processAPIUser(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("delete"))
+		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**
 			 * Delete
@@ -1532,14 +1544,14 @@ public class ServerWebManager {
 			userAPIAccount.save();
 			APIUserAccount.update(userAPIAccount.toJSONObject().toString());
 		}
-		if(query.containsKey("deactivate"))
+		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
 			/**
 			 * Deactivate
 			 */
 			this.processAPIUserDeactivate(query);
 		}
-		if(query.containsKey("activate"))
+		if(query.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
@@ -1561,7 +1573,7 @@ public class ServerWebManager {
 			 */
 			this.processAPIUserUnblock(query);
 		}
-		if(query.containsKey("update"))
+		if(query.containsKey(JsonKey.UPDATE))
 		{
 			this.processAPIUserUpdate(query);
 		}
@@ -1864,6 +1876,155 @@ public class ServerWebManager {
 				 */
 			}
 		}
+	}
+	
+	
+	
+	
+	
+	private void processDDNS(String requestBody, CookieServer cookie) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
+		if(query.containsKey(JsonKey.DELETE))
+		{
+			/**
+			 * Delete
+			 */
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id[") && !value.equals(loggedUsername))
+				{
+					ConfigDDNS.deleteRecord(value);
+				}
+			}
+			ConfigDDNS.save();
+		}
+		if(query.containsKey(JsonKey.DEACTIVATE))
+		{
+			/**
+			 * Deactivate
+			 */
+			this.processDDNSDeactivate(query);
+		}
+		if(query.containsKey(JsonKey.ACTIVATE))
+		{
+			/**
+			 * Activate
+			 */
+			this.processDDNSActivate(query);
+		}
+		if(query.containsKey(JsonKey.PROXIED))
+		{
+			/**
+			 * Proxied
+			 */
+			this.processDDNSProxied(query);
+		}
+		if(query.containsKey(JsonKey.UNPROXIED))
+		{
+			/**
+			 * Unproxied
+			 */
+			this.processDDNSUnproxied(query);
+		}
+		if(query.containsKey(JsonKey.UPDATE))
+		{
+			this.processDDNSUpdate(query);
+		}
+	}
+
+	private void processDDNSUpdate(Map<String, String> query) {
+		String id = query.getOrDefault(JsonKey.ID, "").trim();
+		String provider = query.getOrDefault(JsonKey.PROVIDER, "").trim();
+		String zone = query.getOrDefault(JsonKey.ZONE, "").trim();
+		String recordName = query.getOrDefault(JsonKey.RECORD_NAME, "").trim();
+		String ttls = query.getOrDefault(JsonKey.TTL, "").trim();
+		boolean proxied = query.getOrDefault(JsonKey.PROXIED, "").equals("1");
+		boolean forceCreateZone = query.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").equals("1");
+		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+		int ttl = Utility.atoi(ttls);
+		
+		if(!id.isEmpty())
+		{
+			DDNSRecord record = ConfigDDNS.getRecords().getOrDefault(id, new DDNSRecord());
+			if(!id.isEmpty())
+			{
+				record.setId(id);
+			}
+			if(!zone.isEmpty())
+			{
+				record.setZone(zone);
+			}
+			if(!recordName.isEmpty())
+			{
+				record.setRecordName(recordName);
+			}
+			record.setProvider(provider);
+			record.setProxied(proxied);
+			record.setForceCreateZone(forceCreateZone);
+			record.setTtl(ttl);
+			record.setActive(active);			
+			ConfigDDNS.updateRecord(record);
+			ConfigDDNS.save();
+		}
+	}
+
+	private void processDDNSDeactivate(Map<String, String> query)
+	{
+		for (Map.Entry<String, String> entry : query.entrySet()) 
+		{
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if(key.startsWith("id["))
+			{
+				ConfigDDNS.deactivate(value);
+			}
+		}
+		ConfigDDNS.save();
+	}
+	
+	private void processDDNSActivate(Map<String, String> query)
+	{
+		for (Map.Entry<String, String> entry : query.entrySet()) 
+		{
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if(key.startsWith("id["))
+			{
+				ConfigDDNS.activate(value);
+			}
+		}
+		ConfigDDNS.save();
+	}
+	
+	private void processDDNSProxied(Map<String, String> query)
+	{
+		for (Map.Entry<String, String> entry : query.entrySet()) 
+		{
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if(key.startsWith("id["))
+			{
+				ConfigDDNS.proxied(value);
+			}
+		}
+		ConfigDDNS.save();
+	}
+		
+	private void processDDNSUnproxied(Map<String, String> query)
+	{
+		for (Map.Entry<String, String> entry : query.entrySet()) 
+		{
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if(key.startsWith("id["))
+			{
+				ConfigDDNS.unproxied(value);
+			}
+		}
+		ConfigDDNS.save();
 	}
 	
 	private String getMIMEType(String fileName) 

@@ -1591,4 +1591,23 @@ public class Utility {
 	{
 		return "Basic " + Utility.base64Encode(username+":"+password);
 	}
+	public static int atoi(String alpha) {
+		int value = 0;
+		try
+		{
+			alpha = alpha.replaceAll(ConstantString.FILTER_INTEGER, "");
+			if(alpha.isEmpty())
+			{
+				alpha = "0";
+			}
+			value = Integer.parseInt(alpha);		
+		}
+		catch(NumberFormatException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		return value;
+	}
 }
