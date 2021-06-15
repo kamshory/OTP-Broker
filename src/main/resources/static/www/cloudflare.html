@@ -56,8 +56,8 @@
                             <ul class="dropdown-menu">
                                 <li class=""><a href="admin.html">Administrator Setting</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
-                                <li class=""><a href="sms-setting.html">SMS Setting</a></li>
-                                <li class="active "><a href="email-setting.html">Email Setting</a></li>
+                                <li class="active "><a href="sms-setting.html">SMS Setting</a></li>
+                                <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li class=""><a href="api-user.html">API User</a></li>
                                 <li class=""><a href="ddns-record.html">DDNS Record</a></li>
                                 <li role="separator" class="divider"></li>
@@ -76,54 +76,40 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>Email Setting</h3>
-            <form action="email-setting.html" method="post">
+            <h3>Cloudflare</h3>
+            <form action="cloudflare.html" method="post">
                 <table class="config-table config-table-connection">
                     <tbody>
                         <tr>
-                            <td>SMTP Host</td>
-                            <td><input type="text" name="smtp_host" id="smtp_host" value="">
+                            <td>Cloudflare Endpoint</td>
+                            <td><input type="url" name="endpoint" id="endpoint" value="usb/tty">
                             </td>
                         </tr>
                         <tr>
-                            <td>SMTP Port</td>
-                            <td><input type="number" name="smtp_port" id="smtp_port" value="">
+                            <td>Account ID</td>
+                            <td><input type="text" name="account_id" id="account_id" value="">
                             </td>
                         </tr>
                         <tr>
-                            <td>SSL</td>
-                            <td><label><input type="checkbox" name="ssl" id="ssl" value="1"> Using SSL</label>
+                            <td>Email</td>
+                            <td><input type="email" name="auth_email" id="auth_email" value="">
                             </td>
                         </tr>
                         <tr>
-                            <td>TLS</td>
-                            <td><label><input type="checkbox" name="start_tls" id="start_tls" value="1"> Start TLS Before Send</label>
+                            <td>API Key</td>
+                            <td><input type="text" name="auth_api_key" id="auth_api_key" value="">
                             </td>
                         </tr>
                         <tr>
-                            <td>Authentication</td>
-                            <td><label><input type="checkbox" name="mail_auth" id="mail_auth" value="1"> Use Authentication</label>
+                            <td>Token</td>
+                            <td><input type="text" name="auth_token" id="auth_token" value="">
                             </td>
                         </tr>
-                        <tr>
-                            <td>Sender Account</td>
-                            <td><input type="email" name="sender_address" id="sender_address" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Sender Password</td>
-                            <td><input type="password" name="sender_password" id="sender_password" value="">
-                            </td>
-                        </tr>
-                        
-                        
                         <tr>
                             <td></td>
                             <td>
-                                <input type="submit" class="btn btn-success" name="save_email_setting"
-                                    id="save_email_setting" value="Save">
-                                <input type="button" class="btn btn-primary" name="test_send_email" id="test_send_email"
-                                    value="Test Send EMail">
+                                <input type="submit" class="btn btn-success" name="save_sms_setting"
+                                    id="save_sms_setting" value="Save">
                                 <input type="reset" class="btn btn-default" value="Reset">
                             </td>
                         </tr>
@@ -135,15 +121,14 @@
                 $(document).ready(function (e) {
                     $.ajax({
                         type: "GET",
-                        url: "email-setting/get",
+                        url: "cloudflare/get",
                         dataType: "json",
                         success: function (data) {
-                            $('input[name="smtp_host"]').val(data.mailHost);
-                            $('input[name="smtp_port"]').val(data.mailPort);
-                            $('input[name="sender_address"]').val(data.mailSenderAddress);
-                            $('input[name="mail_auth"]').prop("checked", data.mailAuth);
-                            $('input[name="ssl"]').prop("checked", data.mailSSL);
-                            $('input[name="start_tls"]').prop("checked", data.mailStartTLS);
+                            $('input[name="endpoint"]').val(data.endpoint);
+                            $('input[name="account_id"]').val(data.accountId);
+                            $('input[name="auth_email"]').val(data.authEmail);
+                            $('input[name="auth_api_key"]').val(data.authApiKey);
+                            $('input[name="auth_token"]').val(data.authToken + "");
                         }
                     });
                 });

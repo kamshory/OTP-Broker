@@ -69,6 +69,7 @@ legend{
 }
 .config-table tr td select,
 .config-table tr td input[type="text"],
+.config-table tr td input[type="url"],
 .config-table tr td input[type="email"],
 .config-table tr td input[type="tel"],
 .config-table tr td input[type="number"],
@@ -83,11 +84,13 @@ legend{
 }
 .config-table tr td input[type="text"]:focus,
 .config-table tr td input[type="email"]:focus,
+.config-table tr td input[type="url"]:focus,
 .config-table tr td input[type="tel"]:focus,
 .config-table tr td input[type="number"]:focus,
 .config-table tr td input[type="password"]:focus,
 .config-table tr td select:focus,
 .config-table tr td input[type="text"]:active,
+.config-table tr td input[type="url"]:active,
 .config-table tr td input[type="email"]:active,
 .config-table tr td input[type="tel"]:active,
 .config-table tr td input[type="number"]:active,
@@ -97,6 +100,7 @@ legend{
   outline: none;
 }
 .config-table tr td input[type="text"],
+.config-table tr td input[type="url"],
 .config-table tr td input[type="email"],
 .config-table tr td input[type="tel"],
 .config-table tr td input[type="number"],

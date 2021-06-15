@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.config.ConfigDDNS;
@@ -122,6 +123,9 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.ddns}")
 	private String ddnsSettingPath;
 	
+	@Value("${otpbroker.path.setting.cloudflare}")
+	private String cloudflareSettingPath;
+
 	private ServerWebManager()
     {
     }
@@ -129,6 +133,9 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		ConfigDDNS.load(ddnsSettingPath);
+		ConfigCloudflare.load(cloudflareSettingPath);
+
 		logger.info("Init...");	
 		Config.setPortName(portName);		
 		userAccount = new WebUserAccount(userSettingPath);		
@@ -523,6 +530,40 @@ public class ServerWebManager {
 				ConfigEmail.load(emailSettingPath);
 				
 				responseBody = ConfigEmail.getJSONObject().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/cloudflare/get")
+	public ResponseEntity<byte[]> handleCloudflareSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigCloudflare.load(emailSettingPath);
+				
+				responseBody = ConfigCloudflare.getJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -1213,6 +1254,10 @@ public class ServerWebManager {
 				{
 					this.processSMS(requestBody);
 				}
+				if(path.equals("/cloudflare.html"))
+				{
+					this.processCloudflareSetting(requestBody);
+				}
 			}
 		} 
 		catch (NoUserRegisteredException e) 
@@ -1220,6 +1265,26 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+		}
+	}
+	
+	private void processCloudflareSetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		String endpoint = query.getOrDefault("endpoint", "").trim();
+		String accountId = query.getOrDefault("account_id", "").trim();
+		String authEmail = query.getOrDefault("auth_email", "").trim();
+		String authApiKey = query.getOrDefault("auth_api_key", "").trim();
+		String authToken = query.getOrDefault("auth_token", "").trim();
+		
+		if(!endpoint.isEmpty())
+		{
+			ConfigCloudflare.load(cloudflareSettingPath);
+			ConfigCloudflare.setEndpoint(endpoint);
+			ConfigCloudflare.setAccountId(accountId);
+			ConfigCloudflare.setAuthEmail(authEmail);
+			ConfigCloudflare.setAuthApiKey(authApiKey);
+			ConfigCloudflare.setAuthToken(authToken);
+			ConfigCloudflare.save(cloudflareSettingPath);
 		}
 	}
 	

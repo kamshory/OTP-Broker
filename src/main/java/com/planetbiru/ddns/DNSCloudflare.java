@@ -36,8 +36,16 @@ public class DNSCloudflare extends DNS{
 
 	private String authEmail = "";
 	private String accountId = "";
-	private String endpint = "";
+	private String endpoint = "";
 	private String authApiKey = "";
+	
+	public void setConfig(String endpoint, String accountId, String authEmail, String authApiKey)
+	{
+		this.endpoint = endpoint;
+		this.accountId = accountId;
+		this.authEmail = authEmail;
+		this.authApiKey = authApiKey;
+	}
 	
 	@Override
 	public JSONObject createZoneIfNotExists(DDNSRecord ddnsRecord) {
@@ -76,7 +84,7 @@ public class DNSCloudflare extends DNS{
 		json.put("jump_start", true);
 		json.put("type", "full");		
 	
-		String url = endpint + "/zones";
+		String url = endpoint + "/zones";
 		String body = json.toString();
 		int timeout = 1000;
 		HttpHeaders requestHeaders = this.createRequestHeader();
@@ -109,7 +117,7 @@ public class DNSCloudflare extends DNS{
 	 */
 	private JSONArray listZones(Map<String, String> params)
 	{
-		String url = this.endpint + "/zones";
+		String url = this.endpoint + "/zones";
 		HttpHeaders requestHeaders = this.createRequestHeader();
 		ResponseEntityCustom response = httpExchange(HttpMethod.GET, url, requestHeaders, null, 10000);
 		JSONObject resp = new JSONObject(response.getBody());
@@ -146,7 +154,7 @@ public class DNSCloudflare extends DNS{
 		}
 		String zoneId = zone.optString("id", "");
 		
-		String url = this.endpint + "/zones/"+zoneId;
+		String url = this.endpoint + "/zones/"+zoneId;
 		HttpHeaders requestHeaders = this.createRequestHeader();
 		
 		ResponseEntityCustom response = httpExchange(HttpMethod.DELETE, url, requestHeaders, null, 10000);
@@ -173,7 +181,7 @@ public class DNSCloudflare extends DNS{
 	 */
 	private JSONObject deleteZone(String zoneId)
 	{
-		String url = this.endpint + "/zones/"+zoneId;
+		String url = this.endpoint + "/zones/"+zoneId;
 		HttpHeaders requestHeaders = this.createRequestHeader();
 		
 		ResponseEntityCustom response = httpExchange(HttpMethod.DELETE, url, requestHeaders, null, 10000);
@@ -223,7 +231,7 @@ public class DNSCloudflare extends DNS{
 		json.put("ttl", ttl);
 		json.put("proxied", proxied);
 	
-		String url = endpint + "/zones/" + zoneId + "/dns_records";
+		String url = endpoint + "/zones/" + zoneId + "/dns_records";
 		HttpHeaders requestHeaders = this.createRequestHeader("application/json");
 		String body = json.toString();
 		int timeout = 1000;
@@ -461,32 +469,32 @@ public class DNSCloudflare extends DNS{
 
 	private ResponseEntityCustom get(String endpoint, Map<String, String> params, String contentType)
 	{
-		String url = endpint + endpoint;
+		String url = endpoint + endpoint;
 		return this.request(HttpMethod.GET, url, params, contentType);
 	}
 	private ResponseEntityCustom post(String endpoint, Map<String, String> params, String contentType)
 	{
-		String url = endpint + endpoint;
+		String url = endpoint + endpoint;
 		return this.request(HttpMethod.POST, url, params, contentType);
 	}
 	private ResponseEntityCustom put(String endpoint, Map<String, String> params, String contentType)
 	{
-		String url = endpint + endpoint;
+		String url = endpoint + endpoint;
 		return this.request(HttpMethod.PUT, url, params, contentType);
 	}
 	private ResponseEntityCustom patch(String endpoint, Map<String, String> params, String contentType)
 	{
-		String url = endpint + endpoint;
+		String url = endpoint + endpoint;
 		return this.request(HttpMethod.PATCH, url, params, contentType);
 	}
 	private ResponseEntityCustom delete(String endpoint, Map<String, String> params, String contentType)
 	{
-		String url = endpint + endpoint;
+		String url = endpoint + endpoint;
 		return this.request(HttpMethod.DELETE, url, params, contentType);
 	}
 	private ResponseEntityCustom delete(String endpoint, String contentType)
 	{
-		String url = endpint + endpoint;
+		String url = endpoint + endpoint;
 		Map<String, String> params = new HashMap<>();
 		return this.request(HttpMethod.DELETE, url, params, contentType);
 	}
@@ -590,7 +598,7 @@ public class DNSCloudflare extends DNS{
 		json.put("ttl", ttl);
 		json.put("proxied", proxied);
 	
-		String url = endpint + "/zones/" + zoneId + "/dns_records/" + recordId;
+		String url = endpoint + "/zones/" + zoneId + "/dns_records/" + recordId;
 		HttpHeaders requestHeaders = this.createRequestHeader("application/json");
 		String body = json.toString();
 		int timeout = 1000;

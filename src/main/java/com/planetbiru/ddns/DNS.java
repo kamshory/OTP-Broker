@@ -4,6 +4,9 @@ import org.json.JSONObject;
 
 public class DNS {
 
+	public void setConfig(String endpoint, String accountId, String authEmail, String authApiKey)
+	{
+	}
 	public JSONObject createZone(DDNSRecord ddnsRecord) {
 		return null;
 	}

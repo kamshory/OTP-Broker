@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.ddns.DDNSUpdater;
@@ -39,10 +40,14 @@ public class ServerScheduler {
 	@Value("${otpbroker.path.setting.ddns}")
 	private String ddnsSettingPath;
 	
+	@Value("${otpbroker.path.setting.cloudflare}")
+	private String cloudflareSettingPath;
+	
 	@PostConstruct
 	public void init()
 	{
 		ConfigDDNS.load(ddnsSettingPath);
+		ConfigCloudflare.load(cloudflareSettingPath);
 	}
 		
 	@Scheduled(cron = "${otpbroker.cron.expression}")

@@ -8,9 +8,6 @@ public class Config {
 	private static String apiUsername = "planet";
 	private static String apiPassword = "planetpass";
 	
-	
-	
-	
 	private static boolean otpViaWebSocket = true;
 	private static boolean otpViaRabbitMQ = true;
 	private static long reconnectDelay = 5000;
