@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
@@ -48,7 +47,12 @@ public class ConfigFeederAMQP {
 	}
 	
 	public static void save(String path) {
-		String fileName = ConfigFeederAMQP.getBaseDir() + path;
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
 		ConfigFeederAMQP.prepareDir(fileName);	
 		try 
 		{
@@ -62,7 +66,11 @@ public class ConfigFeederAMQP {
 	public static void load(String path)
 	{
 		String dir = Utility.getBaseDir();
-		String fileName = ConfigFeederAMQP.getBaseDir() + path;
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
 		ConfigFeederAMQP.prepareDir(fileName);
 		byte[] data = null;
 		try 
