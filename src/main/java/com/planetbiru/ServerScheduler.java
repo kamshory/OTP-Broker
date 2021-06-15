@@ -50,38 +50,43 @@ public class ServerScheduler {
 	@Scheduled(cron = "${otpbroker.cron.expression}")
 	public void task() 
 	{	
-		logger.info("Run...");
-
-		CronExpression exp;
-		Date currentTime = new Date();
-		
-		
+		CronExpression exp;		
+		int countUpdate = 0;	
 		Map<String, DDNSRecord> list = ConfigDDNS.getRecords();
 		for(Entry<String, DDNSRecord> set : list.entrySet())
 		{
+			String ddnsId = set.getKey();
 			DDNSRecord ddnsRecord = set.getValue();
-			String cronExpression = ddnsRecord.getRecordName();		
+			String cronExpression = ddnsRecord.getCronExpression();		
 			try
 			{
 				exp = new CronExpression(cronExpression);
+				Date currentTime = new Date();
 				Date prevFireTime = exp.getPrevFireTime(currentTime);
 				Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
-				
+
 				String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
 				String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
 				String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
 				
-				DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
-				ddns.start();
-				
+				if(currentTime.getTime() > ddnsRecord.getNextValid().getTime())
+				{
+					DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
+					ddns.start();
+					
+					ConfigDDNS.getRecords().get(ddnsId).setNextValid(nextValidTimeAfter);					
+					countUpdate++;
+				}
 			}
 			catch(ExpressionException | ParseException | JSONException e)
 			{
 				logger.error(e.getMessage());
-			}
-			
+			}		
 		}
-
+		if(countUpdate > 0)
+		{
+			ConfigDDNS.save(ddnsSettingPath);
+		}
 		
 	}
 

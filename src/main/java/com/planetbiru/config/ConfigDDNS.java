@@ -2,6 +2,7 @@ package com.planetbiru.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,7 +16,6 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigDDNS {
-	
 	private static Map<String, DDNSRecord> records = new HashMap<>();
 	private static String path = "";
 	private ConfigDDNS()
@@ -25,7 +25,7 @@ public class ConfigDDNS {
 	
 	public static void load(String path) {
 		ConfigDDNS.path = path;
-		String dir = getBaseDir();
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
@@ -45,9 +45,11 @@ public class ConfigDDNS {
 					ConfigDDNS.setRecords(new HashMap<>());
 					
 					JSONArray keys = list.names ();
-					for (int i = 0; i < keys.length (); ++i) {
+					for (int i = 0; i < keys.length (); ++i) 
+					{
 						String key = keys.getString (i); 
-					    if ( list.get(key) instanceof JSONObject ) {
+					    if ( list.get(key) instanceof JSONObject ) 
+					    {
 
 					    	JSONObject json = list.getJSONObject(key);
 							
@@ -60,8 +62,9 @@ public class ConfigDDNS {
 							boolean lActive = json.optBoolean("active", false);
 							boolean lForceCreateZone = json.optBoolean("forceCreateZone", false);
 							String lcronExpression = json.optString("cronExpression", "").trim();
+							Date lastUpdate = DDNSRecord.longToDate(json.optLong("lastUpdate", 0));
 							String type = "A";
-							DDNSRecord rec = new DDNSRecord(lID, lZone, lRecordName, type, lProxied, lTTL, lForceCreateZone, lProvider, lActive, lcronExpression);
+							DDNSRecord rec = new DDNSRecord(lID, lZone, lRecordName, type, lProxied, lTTL, lForceCreateZone, lProvider, lActive, lcronExpression, lastUpdate);
 							ConfigDDNS.getRecords().put(lID, rec);
 					    }
 					}
@@ -97,7 +100,7 @@ public class ConfigDDNS {
 
 	public static void save(String path, JSONObject config) {
 		
-		String dir = getBaseDir();
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
@@ -134,11 +137,6 @@ public class ConfigDDNS {
 		}		
 	}
 	
-	private static String getBaseDir()
-	{
-		return ConfigEmail.class.getResource("/").getFile();
-	}
-
 	public static JSONObject getJSONObject(String zone, String recordname) {
 		String id = Utility.md5(zone+":"+recordname);
 		if(ConfigDDNS.getRecords().containsKey(id))

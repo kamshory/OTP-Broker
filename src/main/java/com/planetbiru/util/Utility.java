@@ -40,6 +40,8 @@ import org.json.XML;
 import org.springframework.core.codec.EncodingException;
 import org.springframework.http.HttpHeaders;
 
+import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.constant.ConstantString;
 
 public class Utility {
@@ -1609,5 +1611,20 @@ public class Utility {
 			 */
 		}
 		return value;
+	}
+	public static String getResourceDir()
+	{
+		return Utility.class.getResource("/").getFile();
+	}
+	public static String getBaseDir()
+	{
+		if(Config.getBaseDir().isEmpty())
+		{
+			return Config.getBaseDir();
+		}
+		else
+		{
+			return Utility.getResourceDir();
+		}
 	}
 }
