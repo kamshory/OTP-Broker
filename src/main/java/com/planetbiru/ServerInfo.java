@@ -14,18 +14,18 @@ public class ServerInfo {
 
 	public static String getInfo() {
 		JSONObject info = new JSONObject();
-		info.put("cpu", cpu());
-		info.put("storage", storage());
-		info.put("memory", memory());
+		info.put("cpu", cpuInfo());
+		info.put("storage", storageInfo());
+		info.put("memory", memoryInfo());
 		return info.toString(4);
 	}
 	
-	public static JSONObject memory()
+	public static JSONObject memoryInfo()
 	{
 		
-		String result = "              total        used        free      shared  buff/cache   available\r\n"
-				+ "Mem:        1877280      674068      211560       98540      991652      926216\r\n"
-				+ "Swap:       4194300      166400     4027900";
+		String result =   "              total        used        free      shared  buff/cache   available\r\n"
+						+ "Mem:        1877280      674068      211560       98540      991652      926216\r\n"
+						+ "Swap:       4194300      166400     4027900";
 		
 		result = fixingRawData(result);
 
@@ -42,16 +42,15 @@ public class ServerInfo {
 				{
 					String total = arr2[1];
 					String used = arr2[2];
-					String free = arr2[3];
-					
+					String free = arr2[3];					
 					JSONObject ram = new JSONObject();
 					ram.put("total", Utility.atoi(total));
 					ram.put("used", Utility.atoi(used));
-					ram.put("free", Utility.atoi(free));
-					
+					ram.put("free", Utility.atoi(free));				
 					info.put("ram", ram);
 				}
 			}
+			
 			if(lines[i].contains("Swap:"))
 			{
 				String[] arr2 = lines[i].split(" ");
@@ -63,31 +62,27 @@ public class ServerInfo {
 					JSONObject swap = new JSONObject();
 					swap.put("total", Utility.atoi(total));
 					swap.put("used", Utility.atoi(used));
-					swap.put("free", Utility.atoi(free));
-					
+					swap.put("free", Utility.atoi(free));					
 					info.put("swap", swap);
 				}
 			}
 		}
 		return info;
 	}
-	public static JSONObject storage()
+	
+	public static JSONObject storageInfo()
 	{
-		String result = "Filesystem     1K-blocks     Used Available Use% Mounted on\r\n"
-				+ "devtmpfs          914364        0    914364   0% /dev\r\n"
-				+ "tmpfs             938640        0    938640   0% /dev/shm\r\n"
-				+ "tmpfs             938640   107104    831536  12% /run\r\n"
-				+ "tmpfs             938640        0    938640   0% /sys/fs/cgroup\r\n"
-				+ "/dev/vda1       41931756 24046252  17885504  -58.5% /\r\n"
-				+ "tmpfs             187728        0    187728   0% /run/user/0";
+		String result =   "Filesystem     1K-blocks     Used Available Use% Mounted on\r\n"
+						+ "devtmpfs          914364        0    914364   0% /dev\r\n"
+						+ "tmpfs             938640        0    938640   0% /dev/shm\r\n"
+						+ "tmpfs             938640   107104    831536  12% /run\r\n"
+						+ "tmpfs             938640        0    938640   0% /sys/fs/cgroup\r\n"
+						+ "/dev/vda1       41931756 24046252  17885504  58% /\r\n"
+						+ "tmpfs             187728        0    187728   0% /run/user/0";
 
-		result = fixingRawData(result);
-		
-		
-		String[] lines = result.split("\r\n");
-		
-		JSONObject info = new JSONObject();
-		
+		result = fixingRawData(result);	
+		String[] lines = result.split("\r\n");	
+		JSONObject info = new JSONObject();	
 		if(lines.length > 1)
 		{
 			for(int i = 1; i<lines.length;i++)
@@ -106,11 +101,8 @@ public class ServerInfo {
 					info.put("percentUsed", Utility.atof(percent));
 				}
 			}
-		}
-		
+		}	
 		return info;
-		
-		
 	}
 	
 	public static String fixingRawData(String result)
@@ -121,13 +113,14 @@ public class ServerInfo {
 		result = result.replace("\r\n\n", "\r\n");
 		return result;
 	}
-	public static JSONObject cpu()
+	
+	public static JSONObject cpuInfo()
 	{
-		String result = "Adapter: ISA adapter\r\n"
-				+ "Core 0:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
-				+ "Core 1:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
-				+ "Core 2:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
-				+ "Core 3:       +47.0°C  (high = +98.0°C, crit = +98.0°C)";
+		String result =   "Adapter: ISA adapter\r\n"
+						+ "Core 0:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
+						+ "Core 1:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
+						+ "Core 2:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
+						+ "Core 3:       +47.0°C  (high = +98.0°C, crit = +98.0°C)";
 		
 		result = fixingRawData(result);
 		
@@ -144,10 +137,11 @@ public class ServerInfo {
 	
 	public static JSONObject cpuUsage()
 	{
-		String result = "Linux 3.10.0-1160.11.1.el7.x86_64 (server.planetbiru.com)       06/16/2021      _x86_64_        (2 CPU)\r\n"
-				+ "\r\n"
-				+ "07:08:48 PM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle\r\n"
-				+ "07:08:48 PM  all   44.34    0.00    1.09    0.03    0.00    0.08    0.07    0.00    0.00   54.39";
+		String result =   "Linux 3.10.0-1160.11.1.el7.x86_64 (server.planetbiru.com)       06/16/2021      _x86_64_        (2 CPU)\r\n"
+						+ "\r\n"
+						+ "07:08:48 PM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle\r\n"
+						+ "07:08:48 PM  all   44.34    0.00    1.09    0.03    0.00    0.08    0.07    0.00    0.00   54.39";
+		
 		result = fixingRawData(result);
 		result = result.replace("\r\n\r\n", "\r\n");
 		
@@ -176,6 +170,7 @@ public class ServerInfo {
 			String value = values[j].trim();
 			rawData.put(key, value);
 		}
+		
 		double idle = Utility.atof(rawData.optString("idle", "0"));
 		double used = 100 - idle;
 		info.put("idle", idle);
@@ -223,8 +218,6 @@ public class ServerInfo {
 		return cores;
 	}
 
-
-
 	private static JSONObject getCPUTemperature(String[] arr2) {
 		String cpuLabel = arr2[0].trim();
 		String cpuInfo = arr2[1].trim();
@@ -260,9 +253,10 @@ public class ServerInfo {
 			core = new JSONObject();
 			JSONObject raw = new JSONObject();
 			JSONObject value = new JSONObject();
-			raw.put("currentTemperature", currentTemperatureentTemp);
-			raw.put("hightTemperature", high);
-			raw.put("criticalTemperature", crit);
+			
+			raw.put("currentTemperature", currentTemperatureentTemp.replace("+", ""));
+			raw.put("hightTemperature", high.replace("+", ""));
+			raw.put("criticalTemperature", crit.replace("+", ""));
 			
 			value.put("currentTemperature", Utility.atof(currentTemperatureentTemp));
 			value.put("hightTemperature", Utility.atof(high));
