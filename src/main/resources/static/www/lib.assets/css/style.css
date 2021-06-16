@@ -479,3 +479,29 @@ border: 1px solid #DDDDDD;
 .notification-message{
   padding-left: 4px;
 }
+
+.server-into-item{
+  position: relative;
+  margin-bottom: 10px;
+}
+.info-label{
+  padding: 4px 0;
+}
+.info-value{
+  position: absolute;
+  right: 0;
+  text-align: right;
+  top: 4px;
+}
+.info-progress{
+  width: 100%;
+  border: 1px solid #DDDDDD;
+  background-color: #FEFEFE;
+  border-radius:5px;
+}
+.info-progress-inner{
+  height: 10px;
+  background-color: #2984f9;
+  box-sizing: border-box;
+  position: relative;
+}
