@@ -132,6 +132,9 @@
                                         '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
                                         '</tr>\r\n'
                                     );
+                                    
+                                    var lastUpdate = new Date(item.lastUpdate);
+                                    $('.row-table tbody').find('tr:last-child').attr('title', 'Last update : '+lastUpdate.toUTCString());
                                 }
                             }
                         }

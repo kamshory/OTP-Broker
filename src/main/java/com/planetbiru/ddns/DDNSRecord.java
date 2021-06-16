@@ -17,6 +17,7 @@ public class DDNSRecord {
 	private boolean forceCreateZone = false;
 	private boolean active = false;
 	private Date nextValid = DDNSRecord.longToDate(0);
+	private Date lastUpdate = DDNSRecord.longToDate(0);
 	
 	public static Date longToDate(long time)
 	{
@@ -50,10 +51,7 @@ public class DDNSRecord {
 		this.setProvider(provider);
 	}
 
-	public DDNSRecord() {
-	}
-
-	public DDNSRecord(String id, String zone, String recordName, String type, boolean proxied, int ttl, boolean forceCreateZone, String provider, boolean active, String cronExpression, Date nextValid) {
+	public DDNSRecord(String id, String zone, String recordName, String type, boolean proxied, int ttl, boolean forceCreateZone, String provider, boolean active, String cronExpression, Date nextValid, Date lastUpdate) {
 		this.setId(id);
 		this.setZone(zone);
 		this.setRecordName(recordName);
@@ -65,6 +63,10 @@ public class DDNSRecord {
 		this.setActive(active);
 		this.setProvider(provider);
 		this.setNextValid(nextValid);
+		this.setLastUpdate(lastUpdate);
+	}
+
+	public DDNSRecord() {
 	}
 
 	public JSONObject toJSONObject() {
@@ -79,10 +81,12 @@ public class DDNSRecord {
 		jo.put("cronExpression", this.getCronExpression());
 		jo.put("provider", this.getProvider());
 		jo.put("active", this.isActive());
-		jo.put("lastUpdate", this.getNextValid().getTime());
+		jo.put("lastUpdate", this.getLastUpdate().getTime());
+		jo.put("nextValid", this.getNextValid().getTime());
 		return jo;
 	}
 
+	
 	public String getId() {
 		return id;
 	}
@@ -169,6 +173,14 @@ public class DDNSRecord {
 
 	public void setNextValid(Date nextValid) {
 		this.nextValid = nextValid;
+	}
+
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Date lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 	
 

@@ -1240,8 +1240,8 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
-			    String provider = queryPairs.getOrDefault(JsonKey.PROVIDER, "").translateEscapes();
-			    String zone = queryPairs.getOrDefault(JsonKey.ZONE, "").translateEscapes();
+			    String provider = queryPairs.getOrDefault(JsonKey.PROVIDER, "").trim();
+			    String zone = queryPairs.getOrDefault(JsonKey.ZONE, "").trim();
 			    String recordName = queryPairs.getOrDefault(JsonKey.RECORD_NAME, "").trim();
 			    String cronExpression = queryPairs.getOrDefault("cron_expression", "").trim();
 			    boolean proxied = queryPairs.getOrDefault(JsonKey.PROXIED, "").trim().equals("1");

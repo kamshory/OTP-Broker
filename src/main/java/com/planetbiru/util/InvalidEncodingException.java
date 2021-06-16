@@ -1,6 +1,6 @@
 package com.planetbiru.util;
 
-public class FileNotFoundException extends Exception {
+public class InvalidEncodingException extends Exception {
 
 	/**
 	 * 
@@ -9,7 +9,7 @@ public class FileNotFoundException extends Exception {
 	/**
 	 * Default constructor
 	 */
-	public FileNotFoundException() 
+	public InvalidEncodingException() 
 	{ 
 		super(); 
 	}
@@ -17,7 +17,7 @@ public class FileNotFoundException extends Exception {
 	 * Constructor with the message
 	 * @param message Message
 	 */
-	public FileNotFoundException(String message) 
+	public InvalidEncodingException(String message) 
 	{ 
 		super(message); 
 	}
@@ -26,7 +26,7 @@ public class FileNotFoundException extends Exception {
 	 * @param message Message
 	 * @param cause Cause
 	 */
-	public FileNotFoundException(String message, Throwable cause) 
+	public InvalidEncodingException(String message, Throwable cause) 
 	{ 
 		super(message, cause); 
 	}
@@ -34,7 +34,7 @@ public class FileNotFoundException extends Exception {
 	 * Constructor with cause
 	 * @param cause Cause
 	 */
-	public FileNotFoundException(Throwable cause) 
+	public InvalidEncodingException(Throwable cause) 
 	{ 
 		super(cause); 
 	}

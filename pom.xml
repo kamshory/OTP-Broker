@@ -9,12 +9,13 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.planetbiru</groupId>
-	<artifactId>ksps</artifactId>
+	<artifactId>otp-broker</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ksps</name>
-	<description>Koperasi Simpan Pinjam Syariah Planetbiru</description>
+	<name>otp-broker</name>
+	<description>OTP Broker</description>
 	<properties>
 		<java.version>1.8</java.version>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -197,6 +198,7 @@
 		    <version>2.6</version>
 		</dependency>
 				
+		
 				
         
 	</dependencies>

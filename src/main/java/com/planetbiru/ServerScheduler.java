@@ -57,31 +57,35 @@ public class ServerScheduler {
 		{
 			String ddnsId = set.getKey();
 			DDNSRecord ddnsRecord = set.getValue();
-			String cronExpression = ddnsRecord.getCronExpression();		
-			try
+			if(ddnsRecord.isActive())
 			{
-				exp = new CronExpression(cronExpression);
-				Date currentTime = new Date();
-				Date prevFireTime = exp.getPrevFireTime(currentTime);
-				Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
-
-				String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
-				String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
-				String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
-				
-				if(currentTime.getTime() > ddnsRecord.getNextValid().getTime())
+				String cronExpression = ddnsRecord.getCronExpression();		
+				try
 				{
-					DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
-					ddns.start();
+					exp = new CronExpression(cronExpression);
+					Date currentTime = new Date();
+					Date prevFireTime = exp.getPrevFireTime(currentTime);
+					Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
+	
+					String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
+					String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
+					String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
 					
-					ConfigDDNS.getRecords().get(ddnsId).setNextValid(nextValidTimeAfter);					
-					countUpdate++;
+					if(currentTime.getTime() > ddnsRecord.getNextValid().getTime())
+					{
+						DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
+						ddns.start();
+						
+						ConfigDDNS.getRecords().get(ddnsId).setNextValid(nextValidTimeAfter);		
+						ConfigDDNS.getRecords().get(ddnsId).setLastUpdate(currentTime);
+						countUpdate++;
+					}
 				}
+				catch(ExpressionException | ParseException | JSONException e)
+				{
+					logger.error(e.getMessage());
+				}	
 			}
-			catch(ExpressionException | ParseException | JSONException e)
-			{
-				logger.error(e.getMessage());
-			}		
 		}
 		if(countUpdate > 0)
 		{
@@ -89,6 +93,5 @@ public class ServerScheduler {
 		}
 		
 	}
-
     
 }

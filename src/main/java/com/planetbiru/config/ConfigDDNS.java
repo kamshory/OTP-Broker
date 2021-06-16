@@ -33,6 +33,7 @@ public class ConfigDDNS {
 		String fileName = dir + path;
 		prepareDir(fileName);	
 		
+		
 		try 
 		{
 			byte[] data = FileConfigUtil.read(fileName);		
@@ -63,8 +64,9 @@ public class ConfigDDNS {
 							boolean lForceCreateZone = json.optBoolean("forceCreateZone", false);
 							String lcronExpression = json.optString("cronExpression", "").trim();
 							Date lastUpdate = DDNSRecord.longToDate(json.optLong("lastUpdate", 0));
+							Date nextValid = DDNSRecord.longToDate(json.optLong("nextValid", 0));
 							String type = "A";
-							DDNSRecord rec = new DDNSRecord(lID, lZone, lRecordName, type, lProxied, lTTL, lForceCreateZone, lProvider, lActive, lcronExpression, lastUpdate);
+							DDNSRecord rec = new DDNSRecord(lID, lZone, lRecordName, type, lProxied, lTTL, lForceCreateZone, lProvider, lActive, lcronExpression, nextValid, lastUpdate);
 							ConfigDDNS.getRecords().put(lID, rec);
 					    }
 					}
