@@ -328,7 +328,6 @@ public class ConfigNetDHCP {
 	public static void setConfigPath(String configPath) {
 		ConfigNetDHCP.configPath = configPath;
 	}
-
 	
 	
 	

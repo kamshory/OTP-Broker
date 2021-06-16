@@ -1,8 +1,6 @@
 package com.planetbiru.util;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -18,31 +16,20 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
-import java.util.Map.Entry;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.XML;
-import org.springframework.core.codec.EncodingException;
-import org.springframework.http.HttpHeaders;
-
 import com.planetbiru.config.Config;
-import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.constant.ConstantString;
 
 public class Utility {
@@ -770,37 +757,7 @@ public class Utility {
 	{
 		return Base64.getDecoder().decode(input.getBytes());
 	}
-	/**
-	 * Rotate 13 of string
-	 * @param input Input string
-	 * @return Rotated 13
-	 */
-	public static String rot13(String input)
-	{
-		StringBuilder bld = new StringBuilder();
-        for (int i = 0; i < input.length(); i++) 
-        {
-            char c = input.charAt(i);
-            if (c >= 'a' && c <= 'm')
-            {
-            	c += 13;
-            }
-            else if(c >= 'A' && c <= 'M') 
-            {
-            	c += 13;
-            }
-            else if  (c >= 'n' && c <= 'z') 
-            {
-            	c -= 13;
-            }
-            else if  (c >= 'N' && c <= 'Z') 
-            {
-            	c -= 13;
-            }
-            bld.append(String.format("%c", c));
-        }
-        return bld.toString();
-	}
+	
 	/**
 	 * Escape XML
 	 * @param input Input string 
@@ -819,119 +776,7 @@ public class Utility {
 	{
 		return input.replace("<", "&lt;").replace(">", "&gt").replace("\"", "&quot;");
 	}
-	/**
-	 * Convert double to big decimal value as string
-	 * @param input Double value
-	 * @return Big decimal value as string
-	 */
-	public static String doubleToBigDecimal(double input) 
-	{		
-		return BigDecimal.valueOf(input)+"";
-	}
-	/**
-	 * Convert long to big decimal value as string
-	 * @param input Double value
-	 * @return Big decimal value as string
-	 */
-	public static String longToBigDecimal(long input) 
-	{		
-		return input+"";
-	}
-	/**
-	 * Get object from JSON with case insensitive key
-	 * @param jobj JSONObject
-	 * @param key Case insensitive key
-	 * @return Object
-	 */
-	public static Object getIgnoreCase(JSONObject jobj, String key) 
-	{
-	    Iterator<String> iter = jobj.keySet().iterator();
-	    while(iter.hasNext()) 
-	    {
-	        String key1 = iter.next();
-	        if(key1.equalsIgnoreCase(key)) 
-	        {
-	            return jobj.get(key1);
-	        }
-	    }
-	    return null;
-	}
-
-	/**
-	 * Convert header to string
-	 * @param header Header
-	 * @return String from header
-	 */
-	public static String headerToString(HttpHeaders header) 
-	{
-		StringBuilder result = new StringBuilder();
-        int size = 0;
-        int i = 0;
-        int j = 0;
-        String value = "";
-        String key = "";
-        for (Map.Entry<String, List<String>> hdr : header.entrySet()) 
-        {
-        	size = hdr.getValue().size();
-        	for(i = 0; i < size; i++, j++)
-        	{
-        		if(j > 0)
-        		{
-        			result.append("\r\n");
-        		}
-           		key = hdr.getKey();
-           		value = hdr.getValue().get(i);
-        		if(key.length() > 0)
-        		{
-        			key = key.substring(0, 1).toUpperCase() + key.substring(1);
-        		}
-        		result.append(key+": "+value);
-        	}
-        }
-        return result.toString();
-    }
-	public static String capitalFirst(String input)
-	{
-		String output = "";
-		output = input;
-		return output;
-	}
-	/**
-	 * Convert Headers to Map
-	 * @param headers Headers
-	 * @return Map
-	 */
-	public static Map<String, String> headersToMap(HttpHeaders headers)
-	{
-		Map<String, String> mapHeader = new HashMap<>();
-		int size = 0;
-        int i = 0;
-        for (Map.Entry<String, List<String>> hdr : headers.entrySet()) 
-        {
-        	size = hdr.getValue().size();
-        	for(i = 0; i < size; i++)
-        	{
-        		mapHeader.put(hdr.getKey(), hdr.getValue().get(i));
-        	}
-        }
-        return mapHeader;
-	}
-	/**
-	 * Convert Map to Headers
-	 * @param map Map
-	 * @return Header
-	 */
-	public static HttpHeaders mapToHeaders(Map<String, String> map)
-	{
-		HttpHeaders headers = new HttpHeaders();
-	    Iterator<Entry<String, String>> it = map.entrySet().iterator();
-	    while (it.hasNext()) 
-	    {
-	        Entry<String, String> pair = it.next();            
-	        headers.add(pair.getKey(), pair.getValue());
-	    }
-	    return headers;
-	}
+	
 	public static String changeTimeZone(String timeString, String dateFormat, String fromTimeZone, String toTimeZone) 
 	{
 		String result = "";
@@ -966,158 +811,7 @@ public class Utility {
         }
         return dateTime;
 	}
-	public static String splitChunk(String text, int size) {
-        List<String> parts = new ArrayList<>();
 
-        int length = text.length();
-        for (int i = 0; i < length; i += size) {
-            parts.add(text.substring(i, Math.min(length, i + size)));
-        }
-        return String.join("\r\n", parts.toArray(new String[0]));
-    }
-	/**
-	 * Capitalize
-	 * @param input String input
-	 * @return Capitalized words
-	 */
-	public static String capitalize(String input)
-	{
-		Objects.requireNonNull(input, "The input parameter may not be null.");
-		input = input.replace("_", " ").replace("   ", " ").replace("  ", " ").toLowerCase();
-	    final StringBuilder output = new StringBuilder(input.length());
-	    boolean lastCharacterWasWhitespace = true;
-
-	    for (final char currentCharacter : input.toCharArray()) 
-	    {
-	        if (lastCharacterWasWhitespace) 
-	        {
-	            output.append(Character.toTitleCase(currentCharacter));
-	        } 
-	        else 
-	        {
-	            output.append(currentCharacter);
-	        }
-	        lastCharacterWasWhitespace = Character.isWhitespace(currentCharacter);
-	    }
-	    return output.toString();
-	}
-	public static String jsonArrayLines(JSONArray jsonArray)
-	{
-		List<String> list = new ArrayList<>();
-		for(int i = 0; i < jsonArray.length(); i++)
-		{
-		    list.add(jsonArray.getString(i));
-		}
-		return String.join("\r\n", list);
-	}
- 	public static String jsonToXml(JSONObject jsonObject)
-	{
-		String xml = "";
-		try 
-		{
-			xml = XML.toString(jsonObject);
-		} 
-		catch (JSONException e) 
-		{
-			logger.error(e.getMessage());
-		}
-		return xml;
-	}
-	public static JSONObject xmlToJSON(String xml)
-	{
-		JSONObject jsonObject = new JSONObject();
-		try 
-		{
-			jsonObject = XML.toJSONObject(xml);
-		} 
-		catch(JSONException e) 
-		{
-			logger.error(e.getMessage());
-		}
-		return jsonObject;
-	}
-	public static String number36Encode(long input)
-	{
-		String key = ConstantString.BASE_36;
-		String chr = "";
-		int val = 0;
-		long inp = input;
-		String ret = "";
-		StringBuilder bld = new StringBuilder();
-		while(inp > 0)
-		{
-			val = (int) (inp) % 36;
-			chr = key.substring(val, val+1);
-			inp = inp/36;
-			bld.append(chr+ret);
-		}
-		ret = bld.toString();
-		if(ret.substring(0, 1).equals("0"))
-		{
-			ret = ret.substring(1);
-		}
-		return ret;
-	}
-	public static String number36Encode(BigInteger input)
-	{
-		String key = ConstantString.BASE_36;
-		String chr = "";
-		int val;
-		BigInteger inp = input;
-		String ret = "";
-		BigInteger div = BigInteger.valueOf(36);
-		StringBuilder bld = new StringBuilder();
-		while(inp.longValue() > 0)
-		{
-			val = inp.mod(div).intValue();
-			chr = key.substring(val, val+1);
-			inp = inp.divide(div);
-			bld.append(chr+ret);
-		}
-		ret = bld.toString();
-		if(ret.substring(0, 1).equals("0"))
-		{
-			ret = ret.substring(1);
-		}
-		return ret;
-	}
-	public static long number36Decode(String input)
-	{
-		String key = ConstantString.BASE_36;
-		String inp = input;
-		String chr = "";
-		long val = 0;
-		long ret = 0;
-		int exponent = 0;
-		while(inp.length() > 0)
-		{
-			chr = inp.substring(inp.length() - 1);
-			val = key.indexOf(chr);
-			ret += val * Math.pow(36, exponent);
-			exponent++;
-			inp = inp.substring(0, inp.length() - 1);
-		}
-		return ret;
-	}	
-	public static BigInteger number36DecodeBigint(String input)
-	{
-		String key = ConstantString.BASE_36;
-		String inp = input;
-		String chr = "";
-		BigInteger val;
-		BigInteger ret = BigInteger.valueOf(0);
-		BigInteger div = BigInteger.valueOf(36);
-		int exponent = 0;
-		while(inp.length() > 0)
-		{
-			chr = inp.substring(inp.length() - 1);
-			val = BigInteger.valueOf(key.indexOf(chr));
-			ret = ret.add(val.multiply(div.pow(exponent)));
-			exponent++;
-			inp = inp.substring(0, inp.length() - 1);
-		}
-		return ret;
-	}
 	public static String convertDateTime(String dateTimeFrom, String formatFrom, String timeZoneFrom, String formatTo, String timeZoneTo) throws ParseException
 	{
 		SimpleDateFormat format = new SimpleDateFormat(formatFrom);
@@ -1161,72 +855,6 @@ public class Utility {
 	}
 	
 	/**
-	 * Convert Date10 to MySQL date format (MMddHHmmss to yyyy-MM-dd HH:mm:ss) 
-	 * @param datetime Date10
-	 * @return MySQL date format
-	 */
-	public static String date10ToMySQLDate(String datetime)
-	{
-		return date10ToFullDate(datetime, ConstantString.MYSQL_DATE_TIME_FORMAT);
-	}
-	/**
-	 * Convert Date10 to PgSQL date format (MMddHHmmss to yyyy-MM-dd HH:mm:ss.SSS) 
-	 * @param datetime Date10
-	 * @return PgSQL date format
-	 */
-	public static String date10ToPgSQLDate(String datetime)
-	{
-		return date10ToFullDate(datetime, "yyyy-MM-dd HH:mm:ss.SSS");
-	}
-	/**
-	 * Convert Date10 to full date time
-	 * @param datetime Date10
-	 * @param format Expected format
-	 * @return Full date time format
-	 */
-	public static String date10ToFullDate(String datetime, String format)
-	{
-		StringBuilder bld = new StringBuilder();
-		int len = datetime.length();
-		while(len < 10)
-		{
-			bld.append("0");
-			len++;
-		}
-		bld.append(datetime);
-		datetime = bld.toString();
-		String yyyy = now("yyyy");
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-		String result = "";
-	    try 
-	    {
-	    	// debug year transition
-	    	if(datetime.length() > 4)
-	    	{
-	    		String month1 = datetime.substring(0, 4);
-	    		if(month1.equals("1231"))
-	    		{
-		    		String month2 = now("MMdd");
-		    		if(!month2.equals("0101"))
-		    		{
-		    			int yyyyInt = Integer.parseInt(yyyy) - 1;
-		    			yyyy = yyyyInt+"";
-		    		}
-	    		}
-	    	}
-			Date dateObject = dateFormat.parse(yyyy+datetime);
-			dateFormat = new SimpleDateFormat(format);
-			result = dateFormat.format(dateObject);
-		} 
-	    catch (ParseException e) 
-	    {
-			result = mySQLDate();
-		}
-	    return result;
-	}
-	
-	
-	/**
 	 * Generate SHA-256 hash code from a string
 	 * @param input Input string
 	 * @return SHA-256 hash code
@@ -1255,9 +883,9 @@ public class Utility {
 	 * @param input Input string
 	 * @param encode Encoding used
 	 * @return SHA-256 hash code
-	 * @throws EncodingException if encoding is invalid
+	 * @throws InvalidEncodingException if encoding is invalid
 	 */
-	public static String sha256(String input, String encode) throws EncodingException
+	public static String sha256(String input, String encode) throws InvalidEncodingException
 	{
 		String output = "";
 		if(input == null)
@@ -1278,7 +906,7 @@ public class Utility {
 			}
 			else
 			{
-				throw new EncodingException(ConstantString.INVALID_ENCODING);
+				throw new InvalidEncodingException(ConstantString.INVALID_ENCODING);
 			}
 			return output;
 		}
@@ -1316,9 +944,9 @@ public class Utility {
 	 * @param input Input string
 	 * @param encode Encoding used
 	 * @return SHA-1 hash code
-	 * @throws EncodingException if encoding is invalid
+	 * @throws InvalidEncodingException if encoding is invalid
 	 */
-	public static String sha1(String input, String encode) throws EncodingException
+	public static String sha1(String input, String encode) throws InvalidEncodingException
 	{
 		String output = "";
 		if(input == null)
@@ -1339,7 +967,7 @@ public class Utility {
 			}
 			else
 			{
-				throw new EncodingException(ConstantString.INVALID_ENCODING);
+				throw new InvalidEncodingException(ConstantString.INVALID_ENCODING);
 			}
 			return output;
 		}
@@ -1353,9 +981,9 @@ public class Utility {
 	 * @param input Input string
 	 * @param encode Encoding used
 	 * @return SHA-1 with RSA hash code
-	 * @throws EncodingException if encoding is invalid
+	 * @throws InvalidEncodingException if encoding is invalid
 	 */
-	public static String sha1WithRSA(String input, String encode) throws EncodingException
+	public static String sha1WithRSA(String input, String encode) throws InvalidEncodingException
 	{
 		String output = "";
 		if(input == null)
@@ -1380,7 +1008,7 @@ public class Utility {
 			}
 			else
 			{
-				throw new EncodingException(ConstantString.INVALID_ENCODING);
+				throw new InvalidEncodingException(ConstantString.INVALID_ENCODING);
 			}
 			return output;
 		}
@@ -1418,9 +1046,9 @@ public class Utility {
 	 * @param input Input string
 	 * @param encode Encoding used
 	 * @return MD5 hash code
-	 * @throws EncodingException if encoding is invalid
+	 * @throws InvalidEncodingException if encoding is invalid
 	 */
-	public static String md5(String input, String encode) throws EncodingException
+	public static String md5(String input, String encode) throws InvalidEncodingException
 	{
 		String output = "";
 		if(input == null)
@@ -1441,7 +1069,7 @@ public class Utility {
 			}
 			else
 			{
-				throw new EncodingException(ConstantString.INVALID_ENCODING);
+				throw new InvalidEncodingException(ConstantString.INVALID_ENCODING);
 			}
 			return output;
 		}
@@ -1505,56 +1133,6 @@ public class Utility {
 			logger.error(e.getMessage());
 		}
 		return newDateString;
-	}
-	
-	public static String formatAmount(double amount, String format, int decimal) {
-		if(decimal > 0)
-		{
-			String fmt = "%."+decimal+"f";
-			String dec = String.format(fmt, amount);
-			String[] arr = dec.split("\\.");
-		   	String str = String.format("%,d", (long) amount);
-	    	return String.format(format, str.replace(",", "."))+","+arr[1];
-		}
-		else
-		{
-		   	String str = String.format("%,d", (long) amount);
-	    	return String.format(format, str.replace(",", "."));			
-		}
-	}
-	public static Date getDate(int i) 
-	{
-		final Calendar cal = Calendar.getInstance();
-	    cal.add(Calendar.DATE, i);
-	    return cal.getTime();
-	}
-	public static String getSameDate(String tanggalMinimum, String dateFormat, int nMonth)
-	{
-		/**
-		 * Tanggal yang sama pada bulan sebelumnya
-		 */
-		
-		String result = tanggalMinimum;
-        DateFormat sourceTime = new SimpleDateFormat(dateFormat);
-        DateFormat destinationTime = new SimpleDateFormat(dateFormat);
-        Date dateTime;
-        try 
-        {
-        	dateTime = sourceTime.parse(tanggalMinimum);
-    		Calendar c = Calendar.getInstance(); 
-    		c.setTime(dateTime); 
-    		c.add(Calendar.MONTH, nMonth);
-    		Date dateTime2 = c.getTime();
-        	result = destinationTime.format(dateTime2);
-        } 
-        catch (ParseException e) 
-        {
-        	logger.error(e.getMessage());
-        }
-        return result;
-	}
-	public static String prevMonth(String tanggalMinimum, String dateFormat) {
-		return Utility.getSameDate(tanggalMinimum, dateFormat, -1);
 	}
 	
 	public static Map<String, String> parseURLEncoded(String data)
