@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1603,6 +1604,25 @@ public class Utility {
 				alpha = "0";
 			}
 			value = Integer.parseInt(alpha);		
+		}
+		catch(NumberFormatException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		return value;
+	}
+	public static double atof(String alpha) {
+		double value = 0;
+		try
+		{
+			alpha = alpha.replaceAll(ConstantString.FILTER_REAL, "");
+			if(alpha.isEmpty())
+			{
+				alpha = "0";
+			}
+			value = Double.parseDouble(alpha);		
 		}
 		catch(NumberFormatException e)
 		{

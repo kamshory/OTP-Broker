@@ -36,7 +36,7 @@ public class DNSCloudflare extends DNS{
 
 	private String authEmail = "";
 	private String accountId = "";
-	private String endpoint = "";
+	private String endpoint = "https://api.cloudflare.com/client/v4";
 	private String authApiKey = "";
 	private String authToken = "";
 	
