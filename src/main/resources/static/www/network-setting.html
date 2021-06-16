@@ -76,7 +76,7 @@
             </div>
             <!--/.container-fluid -->
         </nav>
-        <script src="lib.assets/js/inputmask.js"></script>
+        <script src="lib.assets/js/inputmask.min.js"></script>
         <div class="phone-page">
             <h3>Network Setting</h3>
 
@@ -256,7 +256,6 @@
                         </tr>
                     </tbody>
                 </table>
-
             </form>
 
             <script type="text/javascript">
@@ -290,7 +289,6 @@
                                     obj1.push(rangesObj[i].begin+"-"+rangesObj[i].end)
                                 }
                             }
-                            console.log(obj1);
                             $('.dhcp input[name="ranges"]').val(obj1.join(", "));
                         }
                     });
