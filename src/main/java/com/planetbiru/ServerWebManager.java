@@ -31,6 +31,9 @@ import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.ConfigNetDHCP;
+import com.planetbiru.config.ConfigNetEthernet;
+import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
@@ -126,9 +129,20 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.cloudflare}")
 	private String cloudflareSettingPath;
 
+	@Value("${otpbroker.path.setting.dhcp}")
+	private String dhcpSettingPath;
+
+	@Value("${otpbroker.path.setting.wlan}")
+	private String wlanSettingPath;
+
+	@Value("${otpbroker.path.setting.ethernet}")
+	private String ethernetSettingPath;
+
+	
 	private ServerWebManager()
     {
     }
+	
 	
 	@PostConstruct
 	public void init()
@@ -360,9 +374,7 @@ public class ServerWebManager {
 		    res.put("code", 0);
 		    res.put(JsonKey.PAYLOAD, payload);
 			responseBody = res.toString().getBytes();				
-		}
-		
-		
+		}	
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
@@ -516,6 +528,8 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	
+	
 	@GetMapping(path="/email-setting/get")
 	public ResponseEntity<byte[]> handleEmailSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -527,8 +541,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigEmail.load(emailSettingPath);
-				
+				ConfigEmail.load(emailSettingPath);				
 				responseBody = ConfigEmail.getJSONObject().toString().getBytes();
 			}
 			else
@@ -549,6 +562,108 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+	
+	@GetMapping(path="/network-dhcp-setting/get")
+	public ResponseEntity<byte[]> handleDHCPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigNetDHCP.load(dhcpSettingPath);		
+				responseBody = ConfigNetDHCP.getJSONObject().toString().getBytes();
+				
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}	
+	
+	@GetMapping(path="/network-wlan-setting/get")
+	public ResponseEntity<byte[]> handleWLANSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigNetWLAN.load(wlanSettingPath);;		
+				responseBody = ConfigNetWLAN.getJSONObject().toString().getBytes();
+				
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/network-ethernet-setting/get")
+	public ResponseEntity<byte[]> handleEthernetSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigNetEthernet.load(ethernetSettingPath);;		
+				responseBody = ConfigNetEthernet.getJSONObject().toString().getBytes();				
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
 	
 	@GetMapping(path="/cloudflare/get")
 	public ResponseEntity<byte[]> handleCloudflareSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -1059,8 +1174,7 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{			
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);			
-			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
-	
+			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");	
 			    userAccount.deleteUser(username);		
 				userAccount.save();
 			}
@@ -1259,6 +1373,10 @@ public class ServerWebManager {
 				{
 					this.processCloudflareSetting(requestBody);
 				}
+				if(path.equals("/network-setting.html"))
+				{
+					this.processNetworkSetting(requestBody);
+				}
 			}
 		} 
 		catch (NoUserRegisteredException e) 
@@ -1269,6 +1387,94 @@ public class ServerWebManager {
 		}
 	}
 	
+	private void processNetworkSetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		if(query.containsKey("save_dhcp"))
+		{
+			String domainName = query.getOrDefault("domainName", "").trim();
+			String domainNameServersStr = query.getOrDefault("domainNameServers", "").trim();
+			String ipRouter = query.getOrDefault("ipRouter", "").trim();
+			String netmask = query.getOrDefault("netmask", "").trim();
+			String subnetMask = query.getOrDefault("subnetMask", "").trim();
+			String domainNameServersAddress = query.getOrDefault("domainNameServersAddress", "").trim();
+			String defaultLeaseTime = query.getOrDefault("defaultLeaseTime", "").trim();
+			String maxLeaseTime = query.getOrDefault("maxLeaseTime", "").trim();
+			String ranges = query.getOrDefault("ranges", "").trim();
+			
+			JSONArray nsList = new JSONArray();
+			
+			String[] arr1 = domainNameServersStr.split("\\,");
+			for(int i = 0; i<arr1.length; i++)
+			{
+				String str1 = arr1[i].trim();
+				if(!str1.isEmpty())
+				{
+					nsList.put(str1);
+				}
+			}
+			JSONArray rangeList = new JSONArray();
+			String[] arr2 = ranges.split("\\,");
+			for(int i = 0; i<arr2.length; i++)
+			{
+				String str2 = arr2[i].trim();
+				if(!str2.isEmpty())
+				{
+					String[] arr3 = str2.split("\\-");
+					String str3 = arr3[0].trim();
+					String str4 = arr3[1].trim();
+					if(!str3.isEmpty() && !str4.isEmpty())
+					{
+						JSONObject obj1 = new JSONObject();
+						obj1.put("begin", str3);
+						obj1.put("end", str4);
+						rangeList.put(obj1);
+					}
+				}
+			}
+			
+			ConfigNetDHCP.load(dhcpSettingPath);
+			ConfigNetDHCP.setDomainName(domainName);
+			ConfigNetDHCP.setIpRouter(ipRouter);
+			ConfigNetDHCP.setNetmask(netmask);
+			ConfigNetDHCP.setSubnetMask(subnetMask);
+			ConfigNetDHCP.setDomainNameServersAddress(domainNameServersAddress);
+			ConfigNetDHCP.setDefaultLeaseTime(defaultLeaseTime);
+			ConfigNetDHCP.setMaxLeaseTime(maxLeaseTime);
+			ConfigNetDHCP.setRanges(rangeList);
+			ConfigNetDHCP.setDomainNameServers(nsList);
+			ConfigNetDHCP.save(dhcpSettingPath);	
+			ConfigNetDHCP.apply();
+		}
+		
+		if(query.containsKey("save_wlan"))
+		{
+			ConfigNetWLAN.load(wlanSettingPath);
+			ConfigNetWLAN.setEssid(query.getOrDefault("essid", "").trim());
+			ConfigNetWLAN.setKey(query.getOrDefault("key", "").trim());
+			ConfigNetWLAN.setKeyMgmt(query.getOrDefault("keyMgmt", "").trim());
+			ConfigNetWLAN.setIpAddress(query.getOrDefault("ipAddress", "").trim());
+			ConfigNetWLAN.setPrefix(query.getOrDefault("prefix", "").trim());
+			ConfigNetWLAN.setNetmask(query.getOrDefault("netmask", "").trim());
+			ConfigNetWLAN.setGateway(query.getOrDefault("gateway", "").trim());
+			ConfigNetWLAN.setDns1(query.getOrDefault("dns1", "").trim());
+			ConfigNetWLAN.save(wlanSettingPath);
+			ConfigNetWLAN.apply();
+		}
+
+		if(query.containsKey("save_ethernet"))
+		{
+			ConfigNetEthernet.load(ethernetSettingPath);
+			ConfigNetEthernet.setIpAddress(query.getOrDefault("ipAddress", "").trim());
+			ConfigNetEthernet.setPrefix(query.getOrDefault("prefix", "").trim());
+			ConfigNetEthernet.setNetmask(query.getOrDefault("netmask", "").trim());
+			ConfigNetEthernet.setGateway(query.getOrDefault("gateway", "").trim());
+			ConfigNetEthernet.setDns1(query.getOrDefault("dns1", "").trim());
+			ConfigNetEthernet.setDns2(query.getOrDefault("dns2", "").trim());
+			ConfigNetEthernet.save(ethernetSettingPath);
+			ConfigNetEthernet.apply();
+		}
+	}
+
 	private void processCloudflareSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		String endpoint = query.getOrDefault("endpoint", "").trim();

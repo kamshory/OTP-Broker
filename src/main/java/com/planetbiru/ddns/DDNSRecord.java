@@ -53,7 +53,7 @@ public class DDNSRecord {
 	public DDNSRecord() {
 	}
 
-	public DDNSRecord(String id, String zone, String recordName, String type, boolean proxied, int ttl, boolean forceCreateZone, String provider, boolean active, String cronExpression, Date lastUpdate) {
+	public DDNSRecord(String id, String zone, String recordName, String type, boolean proxied, int ttl, boolean forceCreateZone, String provider, boolean active, String cronExpression, Date nextValid) {
 		this.setId(id);
 		this.setZone(zone);
 		this.setRecordName(recordName);
@@ -64,7 +64,7 @@ public class DDNSRecord {
 		this.setCronExpression(cronExpression);
 		this.setActive(active);
 		this.setProvider(provider);
-		this.setNextValid(lastUpdate);
+		this.setNextValid(nextValid);
 	}
 
 	public JSONObject toJSONObject() {
@@ -80,7 +80,6 @@ public class DDNSRecord {
 		jo.put("provider", this.getProvider());
 		jo.put("active", this.isActive());
 		jo.put("lastUpdate", this.getNextValid().getTime());
-		System.out.println(jo.toString(5));
 		return jo;
 	}
 
