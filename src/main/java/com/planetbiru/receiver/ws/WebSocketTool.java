@@ -12,12 +12,6 @@ public class WebSocketTool extends Thread{
 		this.client = new WebSocketClient(this);
 	}
 	
-	public WebSocketTool() {
-		/**
-		 * Do nothing
-		 */
-	}
-
 	@Override
 	public void run()
 	{

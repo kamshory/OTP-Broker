@@ -16,7 +16,7 @@ public class WebSocketReceiver {
 	@Value("${otpbroker.path.setting.feeder.ws}")
 	private String feederWSSettingPath;
 
-	private WebSocketTool tool = new WebSocketTool();
+	private WebSocketTool tool;
 	
 	@PostConstruct
 	public void init()
