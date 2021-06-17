@@ -20,4 +20,13 @@ public class SMSUtil {
 	public static String executeUSSD(String ussd) throws GSMNullException {
 		return smsInstance.executeUSSD(ussd);
 	}
+	public static boolean isClosed()
+	{
+		return smsInstance.isClosed();
+	}
+	
 }
+
+
+
+

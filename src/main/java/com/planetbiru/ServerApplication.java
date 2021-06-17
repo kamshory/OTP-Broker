@@ -20,6 +20,7 @@ public class ServerApplication {
 		resetConfig();
 		context = SpringApplication.run(ServerApplication.class);
 	}
+	
 	private static void resetConfig() 
 	{
 		boolean fileExists = usbPluged();

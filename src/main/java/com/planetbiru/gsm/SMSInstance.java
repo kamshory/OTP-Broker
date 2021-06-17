@@ -48,4 +48,8 @@ public class SMSInstance {
 		return this.gsm.executeUSSD(ussd);
 		
 	}
+	public boolean isClosed()
+	{
+		return this.gsm.isClosed();
+	}
 }

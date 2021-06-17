@@ -17,7 +17,9 @@ public class GSM {
 	private static final Logger logger = LogManager.getLogger(GSM.class);
 
     private SerialPort serialPort;
-    private String portName = "";    
+    private String portName = "";
+
+	private boolean closed = true;    
     
     private static String[] smsStorage = new String[]{
     		"MT", 
@@ -297,7 +299,7 @@ public class GSM {
     	}
     	if(this.serialPort.openPort()) 
         {
-  
+    		
     		this.serialPort.addDataListener(new SerialPortDataListener() 
             {
                 @Override
@@ -351,6 +353,7 @@ public class GSM {
 //                return false;
             // turn off periodic status messages (RSSI status, etc.)
 //            executeAT("AT^CURC=0", 1);
+    		this.closed = false;
             return true;
         } 
         else 
@@ -389,7 +392,9 @@ public class GSM {
     {
         if(getSerialPort() != null)
         {
-        	return getSerialPort().closePort();
+        	boolean cls = getSerialPort().closePort();
+        	this.closed = cls;
+        	return cls;
         }
         else
         {
@@ -403,6 +408,14 @@ public class GSM {
 
 	public void setSerialPort(SerialPort serialPort) {
 		this.serialPort = serialPort;
+	}
+
+	public boolean isClosed() {
+		return closed;
+	}
+
+	public void setClosed(boolean closed) {
+		this.closed = closed;
 	}
 
 	

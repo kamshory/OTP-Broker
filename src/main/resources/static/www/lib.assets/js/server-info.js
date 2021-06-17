@@ -67,7 +67,7 @@ $(document).ready(function(e){
       var label = core.label;
       var percent = 100 * core.value.currentTemperature / 150;
       var cls = label.split(' ').join('-').toLowerCase();
-      $('.cpu-temperature-container').find('.'+cls).find('.info-value').text(core.raw.currentTemperature);
+      $('.cpu-temperature-container').find('.'+cls).find('.info-value').html(core.raw.currentTemperature);
       $('.cpu-temperature-container').find('.'+cls).find('.info-progress-inner').css({'width':percent+'%'});
     }
   }

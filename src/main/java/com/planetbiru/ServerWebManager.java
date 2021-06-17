@@ -315,7 +315,7 @@ public class ServerWebManager {
 		itemData.put(JsonKey.MESSAGE, message);
 		data.put(itemData);
 		messageJSON.put("data", data);		
-		ServerWebSocket.broadcast(messageJSON.toString(4));	
+		ServerWebSocketManager.broadcast(messageJSON.toString(4));	
 	}
 	
 	@PostMapping(path="/login.html")

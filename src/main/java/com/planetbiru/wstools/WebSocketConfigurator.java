@@ -4,13 +4,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
-import com.planetbiru.ServerWebSocket;
+import com.planetbiru.ServerWebSocketManager;
 
 @Configuration
 public class WebSocketConfigurator {
 	@Bean
-    public ServerWebSocket serverEndpoint() {
-        return new ServerWebSocket();
+    public ServerWebSocketManager serverEndpoint() {
+        return new ServerWebSocketManager();
     }
 
 	@Bean

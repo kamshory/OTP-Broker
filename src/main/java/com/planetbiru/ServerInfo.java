@@ -7,6 +7,12 @@ import com.planetbiru.util.Utility;
 
 public class ServerInfo {
 	
+	private static final String TOTAL = "total";
+	private static final String USED = "used";
+	private static final String FREE = "free";
+	private static final String RAM = "ram";
+	private static final String SWAP = "swap";
+
 	private ServerInfo()
 	{
 		
@@ -44,10 +50,10 @@ public class ServerInfo {
 					String used = arr2[2];
 					String free = arr2[3];					
 					JSONObject ram = new JSONObject();
-					ram.put("total", Utility.atoi(total));
-					ram.put("used", Utility.atoi(used));
-					ram.put("free", Utility.atoi(free));				
-					info.put("ram", ram);
+					ram.put(ServerInfo.TOTAL, Utility.atoi(total));
+					ram.put(ServerInfo.USED, Utility.atoi(used));
+					ram.put(ServerInfo.FREE, Utility.atoi(free));				
+					info.put(ServerInfo.RAM, ram);
 				}
 			}
 			
@@ -60,10 +66,10 @@ public class ServerInfo {
 					String used = arr2[2];
 					String free = arr2[3];
 					JSONObject swap = new JSONObject();
-					swap.put("total", Utility.atoi(total));
-					swap.put("used", Utility.atoi(used));
-					swap.put("free", Utility.atoi(free));					
-					info.put("swap", swap);
+					swap.put(ServerInfo.TOTAL, Utility.atoi(total));
+					swap.put(ServerInfo.USED, Utility.atoi(used));
+					swap.put(ServerInfo.FREE, Utility.atoi(free));					
+					info.put(ServerInfo.SWAP, swap);
 				}
 			}
 		}
@@ -95,8 +101,8 @@ public class ServerInfo {
 					String used = arr2[2];
 					String avail = arr2[3];
 					String percent = arr2[4];
-					info.put("total", Utility.atoi(total));
-					info.put("used", Utility.atoi(used));
+					info.put(ServerInfo.TOTAL, Utility.atoi(total));
+					info.put(ServerInfo.USED, Utility.atoi(used));
 					info.put("available", Utility.atoi(avail));
 					info.put("percentUsed", Utility.atof(percent));
 				}
@@ -122,6 +128,7 @@ public class ServerInfo {
 						+ "Core 2:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
 						+ "Core 3:       +47.0°C  (high = +98.0°C, crit = +98.0°C)";
 		
+		result = result.replace("°", "&deg;");
 		result = fixingRawData(result);
 		
 		String adapter = getCPUSensorAdapter(result);
@@ -174,7 +181,7 @@ public class ServerInfo {
 		double idle = Utility.atof(rawData.optString("idle", "0"));
 		double used = 100 - idle;
 		info.put("idle", idle);
-		info.put("used", used);
+		info.put(ServerInfo.USED, used);
 		return info;	
 	}
 
@@ -270,3 +277,10 @@ public class ServerInfo {
 	}
 
 }
+
+
+
+
+
+
+

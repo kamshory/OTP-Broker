@@ -34,6 +34,7 @@ public class WebSocketEndpoint extends Endpoint {
 		try 
 		{
 			this.login();
+			webSocketClient.sendServerStatus(true);
 		}
 		catch (IOException e) 
 		{

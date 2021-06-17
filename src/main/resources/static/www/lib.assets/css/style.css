@@ -505,3 +505,6 @@ border: 1px solid #DDDDDD;
   box-sizing: border-box;
   position: relative;
 }
+.usb-device-symbol{
+display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
+}
