@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.config.ConfigDDNS;
+import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.ddns.DDNSUpdater;
@@ -90,6 +91,7 @@ public class ServerScheduler {
 	@Scheduled(cron = "${otpbroker.cron.expression.ddns}")
 	public void updateDNS() 
 	{
+		ConfigFeederAMQP.echoTest();
 		if(ddnsUpdate)
 		{
 			CronExpression exp;		

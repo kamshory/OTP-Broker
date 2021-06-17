@@ -113,7 +113,7 @@ public class ServerWebSocketManager {
 		
 		JSONObject amqp = new JSONObject();
 		amqp.put("name", "amqp_connected");
-		amqp.put("connected", ConfigFeederAMQP.isConnected());
+		amqp.put("connected", ConfigFeederAMQP.echoTest());
 		data.put(amqp);
 		
 		info.put("command", "server-info");

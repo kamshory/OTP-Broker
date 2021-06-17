@@ -200,9 +200,9 @@ function updateDashboard()
     var isAMQPConnected = getAMQPStatus();
     var isModemConnected = getModemStatus();
     console.log(isWSConnected, isAMQPConnected, isModemConnected)
-    $('.service-modem').css({'background-color':isModemConnected?'#FFFFFF':'#FF0000'});
-    $('.service-amqp').css({'background-color':isAMQPConnected?'#FFFFFF':'#FF0000'});
-    $('.service-ws').css({'background-color':isWSConnected?'#FFFFFF':'#FF0000'});
+    $('.service-modem').css({'background-color':(isModemConnected?'#FFFFFF':'#FF0000')});
+    $('.service-amqp').css({'background-color':(isAMQPConnected?'#FFFFFF':'#FF0000')});
+    $('.service-ws').css({'background-color':(isWSConnected?'#FFFFFF':'#FF0000')});
 }
 
 function setFeeder(feeder)

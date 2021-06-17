@@ -35,6 +35,7 @@ public class WebSocketClient extends Thread
 		this.webSocketTool = webSocketTool;
 	}
 
+	
 	@Override
 	public void run()
 	{
@@ -59,6 +60,9 @@ public class WebSocketClient extends Thread
 				try 
 				{
 					this.initWSClient();
+					connected = true;
+					ConfigFeederWS.setConnected(true);
+					sendWSStatus(true);
 				} 
 				catch (WebSocketConnectionException e1) 
 				{

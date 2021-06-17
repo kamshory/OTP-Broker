@@ -31,20 +31,32 @@ public class ConfigFeederAMQP {
 	private static int feederAmqpRefresh = 0;
 	private static boolean loaded = false;
 	private static boolean connected = false;
-	public static ConnectionFactory factory;
+	private static ConnectionFactory factory;
 	
 	private ConfigFeederAMQP()
 	{
 	}
 	
-	public static boolean test()
+	public static boolean echoTest()
 	{
-		AmqpAdmin admin = new RabbitAdmin(ConfigFeederAMQP.factory);
-		admin.declareQueue(new Queue("myqueue"));
-		AmqpTemplate template = new RabbitTemplate(ConfigFeederAMQP.factory);
-		template.convertAndSend("myqueue", "foo");
-		String foo = (String) template.receiveAndConvert("myqueue");
-		return true;
+		if(ConfigFeederAMQP.getFactory() != null)
+		{
+			AmqpAdmin admin = new RabbitAdmin(ConfigFeederAMQP.getFactory());
+			String queueName = "__echo_test__";
+			String messageSent = Utility.md5(System.nanoTime()+"");
+			admin.declareQueue(new Queue(queueName));
+			AmqpTemplate template = new RabbitTemplate(ConfigFeederAMQP.getFactory());
+			template.convertAndSend(queueName, messageSent);
+			String messageReceived = (String) template.receiveAndConvert(queueName);
+			System.out.println("messageSent     : "+messageSent);
+			System.out.println("messageReceived : "+messageReceived);
+			return (messageReceived != null && messageReceived.equals(messageSent));
+		}
+		else
+		{
+			System.out.println("ConfigFeederAMQP.factory is null");
+		}
+		return false;
 	}
 	
 	public static JSONObject toJSONObject()
@@ -238,6 +250,14 @@ public class ConfigFeederAMQP {
 
 	public static void setConnected(boolean connected) {
 		ConfigFeederAMQP.connected = connected;
+	}
+
+	public static ConnectionFactory getFactory() {
+		return factory;
+	}
+
+	public static void setFactory(ConnectionFactory factory) {
+		ConfigFeederAMQP.factory = factory;
 	}
 
 

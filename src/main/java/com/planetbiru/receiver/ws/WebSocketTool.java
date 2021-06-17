@@ -21,9 +21,9 @@ public class WebSocketTool extends Thread{
 	@Override
 	public void run()
 	{
-		this.client = new WebSocketClient(this);
 		if(ConfigFeederWS.isFeederWsEnable())
 		{
+			this.client = new WebSocketClient(this);
 			this.client.start();
 		}
 	}

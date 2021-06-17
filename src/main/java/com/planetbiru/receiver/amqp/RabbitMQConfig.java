@@ -1,6 +1,7 @@
 package com.planetbiru.receiver.amqp;
 
 import javax.annotation.PostConstruct;
+
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -15,6 +16,7 @@ import com.planetbiru.config.ConfigFeederAMQP;
 
 @Configuration
 public class RabbitMQConfig {
+	//private Logger logger = LogManager.getLogger(RabbitMQConfig.class);	
 
 	@Value("${otpbroker.rabbitmq.username}")
 	String username;
@@ -37,6 +39,7 @@ public class RabbitMQConfig {
 	@Value("${otpbroker.rabbitmq.enable}")
 	private boolean enable;
 
+	
 	@Bean
 	MessageListenerContainer messageListenerContainer() {
 		
@@ -52,8 +55,7 @@ public class RabbitMQConfig {
 			simpleMessageListenerContainer.setConnectionFactory(connectionFactory());
 			simpleMessageListenerContainer.setQueues(queue());		
 			simpleMessageListenerContainer.setMessageListener(createHandler());
-			//ConfigFeederAMQP.factory = simpleMessageListenerContainer.getConnectionFactory();
-
+			ConfigFeederAMQP.setFactory(simpleMessageListenerContainer.getConnectionFactory());
 			return simpleMessageListenerContainer;
 		}
 		else
