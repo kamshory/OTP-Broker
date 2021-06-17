@@ -136,58 +136,73 @@ function setUSBColor(color)
 
 function setModemStatus(value)
 {
-    var key = 'otp_modem_status';
+    var key = 'otp_modem_connected';
     window.localStorage.setItem(key, (value)?'1':'0');
 }
-function setModemStatus()
+function getModemStatus()
 {
-    var key = 'otp_modem_status';
+    var key = 'otp_modem_connected';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
 function setWSStatus(value)
 {
-    var key = 'otp_ws_status';
+    var key = 'otp_ws_connected';
     window.localStorage.setItem(key, (value)?'1':'0');
+    console.log('otp_ws_connected', value)
 }
 function getWSStatus()
 {
-    var key = 'otp_ws_status';
+    var key = 'otp_ws_connected';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
 function setAMQPStatus(value)
 {
-    var key = 'otp_amqp_status';
+    var key = 'otp_amqp_connected';
     window.localStorage.setItem(key, (value)?'1':'0');
 }
 function getAMQPStatus()
 {
-    var key = 'otp_amqp_status';
+    var key = 'otp_amqp_connected';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
-function updateServerInfo(data)
+function updateServerInfo(receivedJSON)
 {
+    var data = receivedJSON.data;
     for(var i in data)
     {
-        if(data.name == 'modem')
+        var item = data[i];
+        console.log(item)
+        if(item.name == 'modem_connected')
         {
-            setModemStatus(data.connected);
+            setModemStatus(item.connected);
         }
-        if(data.name == 'websocket')
+        if(item.name == 'ws_connected')
         {
-            setWSStatus(data.connected);
+            setWSStatus(item.connected);
         }
-        if(data.name == 'rabbitmq')
+        if(item.name == 'amqp_connected')
         {
-            setAMQPStatus(data.connected);
+            setAMQPStatus(item.connected);
         }
-        if(data.name == 'feeder')
+        if(item.name == 'feeder')
         {
-            setFeeder(data.feeder);
+            setFeeder(item.feeder);
         }
     }
+    updateDashboard();
+}
+function updateDashboard()
+{
+    var isWSConnected = getWSStatus();
+    var isAMQPConnected = getAMQPStatus();
+    var isModemConnected = getModemStatus();
+    console.log(isWSConnected, isAMQPConnected, isModemConnected)
+    $('.service-modem').css({'background-color':(isModemConnected?'#FFFFFF':'#FF0000')});
+    $('.service-amqp').css({'background-color':(isAMQPConnected?'#FFFFFF':'#FF0000')});
+    $('.service-ws').css({'background-color':(isWSConnected?'#FFFFFF':'#FF0000')});
 }
 
 function setFeeder(feeder)
@@ -237,6 +252,6 @@ $(document).ready(function(e){
     $(document).on('click', '.notification-close a', function(e2){
         $(this).closest('.notification-item').remove();
     });
-    initWebSocket("#555555");
+    initWebSocket();
 
 });

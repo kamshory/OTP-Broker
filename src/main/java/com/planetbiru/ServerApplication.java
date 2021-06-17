@@ -23,9 +23,7 @@ public class ServerApplication {
 	
 	private static void resetConfig() 
 	{
-		boolean fileExists = usbPluged();
-		
-		if(fileExists)
+		if(usbPluged())
 		{
 			String defaultConfigDHCP = "/static/default-config/dhcp.json";
 			String defaultConfigWLAN = "/static/default-config/wlan.json";

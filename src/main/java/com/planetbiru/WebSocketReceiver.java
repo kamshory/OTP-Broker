@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.planetbiru.config.ConfigFeederWS;
-import com.planetbiru.receiver.ws.WebSocketClient;
+import com.planetbiru.receiver.ws.WebSocketTool;
 
 @Service
 public class WebSocketReceiver {
@@ -16,15 +16,14 @@ public class WebSocketReceiver {
 	@Value("${otpbroker.path.setting.feeder.ws}")
 	private String feederWSSettingPath;
 
-	private WebSocketClient client = new WebSocketClient();
+	private WebSocketTool tool = new WebSocketTool();
+	
 	@PostConstruct
 	public void init()
 	{
 		ConfigFeederWS.load(feederWSSettingPath);
-		if(ConfigFeederWS.isFeederWsEnable())
-		{
-			this.client.start();
-		}
+		this.tool = new WebSocketTool(reconnectDelay);
+		this.tool.start();
 	}
 	
 }

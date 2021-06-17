@@ -5,6 +5,12 @@ import java.io.IOException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
@@ -24,10 +30,33 @@ public class ConfigFeederAMQP {
 	private static int feederAmqpTimeout = 0;
 	private static int feederAmqpRefresh = 0;
 	private static boolean loaded = false;
+	private static boolean connected = false;
+	private static ConnectionFactory factory;
 	
 	private ConfigFeederAMQP()
 	{
-		
+	}
+	
+	public static boolean echoTest()
+	{
+		if(ConfigFeederAMQP.getFactory() != null)
+		{
+			AmqpAdmin admin = new RabbitAdmin(ConfigFeederAMQP.getFactory());
+			String queueName = "__echo_test__";
+			String messageSent = Utility.md5(System.nanoTime()+"");
+			admin.declareQueue(new Queue(queueName));
+			AmqpTemplate template = new RabbitTemplate(ConfigFeederAMQP.getFactory());
+			template.convertAndSend(queueName, messageSent);
+			String messageReceived = (String) template.receiveAndConvert(queueName);
+			System.out.println("messageSent     : "+messageSent);
+			System.out.println("messageReceived : "+messageReceived);
+			return (messageReceived != null && messageReceived.equals(messageSent));
+		}
+		else
+		{
+			System.out.println("ConfigFeederAMQP.factory is null");
+		}
+		return false;
 	}
 	
 	public static JSONObject toJSONObject()
@@ -214,6 +243,23 @@ public class ConfigFeederAMQP {
 	public static void setLoaded(boolean loaded) {
 		ConfigFeederAMQP.loaded = loaded;
 	}
+
+	public static boolean isConnected() {
+		return connected;
+	}
+
+	public static void setConnected(boolean connected) {
+		ConfigFeederAMQP.connected = connected;
+	}
+
+	public static ConnectionFactory getFactory() {
+		return factory;
+	}
+
+	public static void setFactory(ConnectionFactory factory) {
+		ConfigFeederAMQP.factory = factory;
+	}
+
 
 	
 	

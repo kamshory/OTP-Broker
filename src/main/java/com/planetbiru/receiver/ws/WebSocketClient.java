@@ -15,13 +15,11 @@ import javax.websocket.WebSocketContainer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigFeederWS;
-import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.Utility;
 
 public class WebSocketClient extends Thread
@@ -30,40 +28,48 @@ public class WebSocketClient extends Thread
 	private static Object waitLock = new Object();
 	private Session session = null;
 	private WebSocketContainer container;
-	private static boolean stoped = false;
+	private WebSocketTool webSocketTool;
+	private boolean stoped = false;
 	
-	public WebSocketClient() {
-		logger.info("Default constructor");
+	public WebSocketClient(WebSocketTool webSocketTool) {
+		this.webSocketTool = webSocketTool;
 	}
 
+	
 	@Override
 	public void run()
 	{
+		this.container = null;
+		this.session = null;
+		stoped = false;
+		
+		
 		boolean connected = false;
 		do
 		{
-			logger.info("Connecting...");
 			try 
 			{
 				this.initWSClient();
 				connected = true;
 				ConfigFeederWS.setConnected(true);
-				sendServerStatus(true);
-				System.out.println("Connected...");
+				sendWSStatus(true);
 			} 
 			catch (WebSocketConnectionException e) 
 			{
 				connected = false;
-				sleep(Config.getReconnectDelay());			
 				try 
 				{
 					this.initWSClient();
+					connected = true;
+					ConfigFeederWS.setConnected(true);
+					sendWSStatus(true);
 				} 
 				catch (WebSocketConnectionException e1) 
 				{
 					e1.printStackTrace();
 				}
 			}
+			sleep(Config.getReconnectDelay());			
 		}
 		while(!connected && !isStoped());
 	}
@@ -81,8 +87,8 @@ public class WebSocketClient extends Thread
 	
 	public void initWSClient() throws WebSocketConnectionException
 	{
-		setSession(null);
-		setContainer(null);
+		this.session = null;
+		this.container = null;
 		try
 		{
 			String url = Config.getSsClientEndpoint();
@@ -98,10 +104,9 @@ public class WebSocketClient extends Thread
 			});
 			ClientEndpointConfig clientConfig = configBuilder.build();
 			
-			setSession(getContainer().connectToServer(new WebSocketEndpoint(this), clientConfig, URI.create(url))); 
+			this.session = getContainer().connectToServer(new WebSocketEndpoint(this), clientConfig, URI.create(url)); 
 			ConfigFeederWS.setConnected(true);
-			sendServerStatus(true);
-			System.out.println("Connected...");
+			sendWSStatus(true);
 			wait4TerminateSignal();
 			
 		} 
@@ -128,9 +133,9 @@ public class WebSocketClient extends Thread
 	public void close() {
 		try 
 		{
-			getSession().close();
 			ConfigFeederWS.setConnected(false);
-			sendServerStatus(false);
+			sendWSStatus(false);
+			getSession().close();
 		} 
 		catch (IOException e) 
 		{
@@ -138,22 +143,30 @@ public class WebSocketClient extends Thread
 		}		
 	}
 	
-	 void sendServerStatus(boolean connected) 
-	    {
-			JSONArray data = new JSONArray();
-			JSONObject info = new JSONObject();
-			
-			JSONObject ws = new JSONObject();
-			ws.put("name", "otp_ws_status");
-			ws.put("connected", connected);
-			data.put(ws);
-			
-			info.put("command", "server-info");
-			info.put("data", data);
+	void sendWSStatus(boolean connected, String message) 
+    {
+		JSONArray data = new JSONArray();
+		JSONObject info = new JSONObject();
 		
-			ServerWebSocketManager.broadcast(info.toString(4));
+		JSONObject ws = new JSONObject();
+		ws.put("name", "ws_connected");
+		ws.put("connected", connected);
+		ws.put("message", message);
+		data.put(ws);
+		
+		info.put("command", "server-info");
+		info.put("data", data);
+	
+		ServerWebSocketManager.broadcast(info.toString(4));
+		
+		
+	}
+	
+	
+	public void sendWSStatus(boolean connected) {
+		this.sendWSStatus(connected, "");
 			
-		}
+	}
 	private static void wait4TerminateSignal()
 	{
 		synchronized(waitLock)
@@ -168,22 +181,6 @@ public class WebSocketClient extends Thread
 			}
 		}
 	}
-
-	public void reconnect() 
-	{
-		logger.info("Reconnect...");
-		try 
-		{
-			initWSClient();
-		} 
-		catch (WebSocketConnectionException e) 
-		{
-			sleep(Config.getReconnectDelay());
-			reconnect();
-		}
-	}
-
-	
 
 	public Session getSession() {
 		return session;
@@ -201,13 +198,23 @@ public class WebSocketClient extends Thread
 		this.container = container;
 	}
 
-	public static boolean isStoped() {
+	public boolean isStoped() {
 		return stoped;
 	}
 
-	public static void setStoped(boolean stoped) {
-		WebSocketClient.stoped = stoped;
+	public void setStoped(boolean stoped) {
+		this.stoped = stoped;
 	}
+
+	public WebSocketTool getWebSocketTool() {
+		return webSocketTool;
+	}
+
+	public void setWebSocketTool(WebSocketTool webSocketTool) {
+		this.webSocketTool = webSocketTool;
+	}
+
+	
 
 	
 	

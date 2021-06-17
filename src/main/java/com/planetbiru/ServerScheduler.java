@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.config.ConfigDDNS;
+import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.ddns.DDNSUpdater;
@@ -36,6 +37,12 @@ public class ServerScheduler {
 
 	private Logger logger = LogManager.getLogger(ServerScheduler.class);
 	
+	@Value("${otpbroker.cron.enable.ddns}")
+	private boolean ddnsUpdate;
+
+	@Value("${otpbroker.cron.enable.device}")
+	private boolean deviceUpdate;
+
 	@Value("${otpbroker.cron.time.resolution:minute}")
 	private String timeResolution;
 	
@@ -56,6 +63,8 @@ public class ServerScheduler {
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
 	public void inspectDevice()
 	{
+		if(deviceUpdate)
+		{
 		String message = "Inspect Device at "+Utility.now("yyyy-MM-dd HH:mm:ss.SSS");
 		System.out.println(message);
 		
@@ -74,53 +83,59 @@ public class ServerScheduler {
 			messageJSON.put("data", data);		
 			ServerWebSocketManager.broadcast(messageJSON.toString());
 		}
+		}
 		
 	}
+	
 		
 	@Scheduled(cron = "${otpbroker.cron.expression.ddns}")
 	public void updateDNS() 
-	{	
-		CronExpression exp;		
-		int countUpdate = 0;	
-		Map<String, DDNSRecord> list = ConfigDDNS.getRecords();
-		for(Entry<String, DDNSRecord> set : list.entrySet())
+	{
+		ConfigFeederAMQP.echoTest();
+		if(ddnsUpdate)
 		{
-			String ddnsId = set.getKey();
-			DDNSRecord ddnsRecord = set.getValue();
-			if(ddnsRecord.isActive())
+			CronExpression exp;		
+			int countUpdate = 0;	
+			Map<String, DDNSRecord> list = ConfigDDNS.getRecords();
+			for(Entry<String, DDNSRecord> set : list.entrySet())
 			{
-				String cronExpression = ddnsRecord.getCronExpression();		
-				try
+				String ddnsId = set.getKey();
+				DDNSRecord ddnsRecord = set.getValue();
+				if(ddnsRecord.isActive())
 				{
-					exp = new CronExpression(cronExpression);
-					Date currentTime = new Date();
-					Date prevFireTime = exp.getPrevFireTime(currentTime);
-					Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
-	
-					String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
-					String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
-					String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
-					
-					if(currentTime.getTime() > ddnsRecord.getNextValid().getTime())
+					String cronExpression = ddnsRecord.getCronExpression();		
+					try
 					{
-						DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
-						ddns.start();
+						exp = new CronExpression(cronExpression);
+						Date currentTime = new Date();
+						Date prevFireTime = exp.getPrevFireTime(currentTime);
+						Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
+		
+						String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
+						String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
+						String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
 						
-						ConfigDDNS.getRecords().get(ddnsId).setNextValid(nextValidTimeAfter);		
-						ConfigDDNS.getRecords().get(ddnsId).setLastUpdate(currentTime);
-						countUpdate++;
+						if(currentTime.getTime() > ddnsRecord.getNextValid().getTime())
+						{
+							DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
+							ddns.start();
+							
+							ConfigDDNS.getRecords().get(ddnsId).setNextValid(nextValidTimeAfter);		
+							ConfigDDNS.getRecords().get(ddnsId).setLastUpdate(currentTime);
+							countUpdate++;
+						}
 					}
+					catch(ExpressionException | ParseException | JSONException e)
+					{
+						logger.error(e.getMessage());
+					}	
 				}
-				catch(ExpressionException | ParseException | JSONException e)
-				{
-					logger.error(e.getMessage());
-				}	
 			}
+			if(countUpdate > 0)
+			{
+				ConfigDDNS.save(ddnsSettingPath);
+			}	
 		}
-		if(countUpdate > 0)
-		{
-			ConfigDDNS.save(ddnsSettingPath);
-		}	
 	}
     
 }

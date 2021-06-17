@@ -12,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.planetbiru.config.Config;
 import com.planetbiru.gsm.GSMNullException;
 import com.planetbiru.gsm.SMSUtil;
 
@@ -34,7 +33,7 @@ public class WebSocketEndpoint extends Endpoint {
 		try 
 		{
 			this.login();
-			webSocketClient.sendServerStatus(true);
+			webSocketClient.sendWSStatus(true);
 		}
 		catch (IOException e) 
 		{
@@ -104,19 +103,17 @@ public class WebSocketEndpoint extends Endpoint {
 	{
 		this.session.getBasicRemote().sendText(text);		
 	}
+	@Override
+	public void onError(Session session, Throwable throwable)
+	{
+		this.webSocketClient.sendWSStatus(false, throwable.getMessage());
+		this.webSocketClient.getWebSocketTool().restartThread();
+	}
 	
 	@Override
 	public void onClose(Session ses, CloseReason closeReason) {
-		System.out.println("Session on close : "+closeReason.getReasonPhrase());
-		try 
-		{
-			Thread.sleep(Config.getReconnectDelay());
-		} 
-		catch (InterruptedException e) 
-		{
-			Thread.currentThread().interrupt();
-		}
-		this.webSocketClient.reconnect();
+		this.webSocketClient.sendWSStatus(false, closeReason.getReasonPhrase());
+		this.webSocketClient.getWebSocketTool().restartThread();
     }
 
 }
