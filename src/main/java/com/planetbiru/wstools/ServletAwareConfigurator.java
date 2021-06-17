@@ -10,12 +10,8 @@ import javax.websocket.HandshakeResponse;
 import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class ServletAwareConfigurator extends ServerEndpointConfig.Configurator{
 
-	private static Logger logger = LogManager.getLogger(ServletAwareConfigurator.class);
 	@Override
     public void modifyHandshake(ServerEndpointConfig serverEndpointConfig, HandshakeRequest request, HandshakeResponse response) {
         HttpServletRequest httpservletRequest = getField(request, HttpServletRequest.class);
@@ -33,20 +29,27 @@ public class ServletAwareConfigurator extends ServerEndpointConfig.Configurator{
         serverEndpointConfig.getUserProperties().put("response_header", responseHeader);
     }
 
-    //hacking reflector to expose fields...
     @SuppressWarnings("unchecked")
 	private static < I, F > F getField(I instance, Class < F > fieldType) {
-        try {
-            for (Class < ? > type = instance.getClass(); type != Object.class; type = type.getSuperclass()) {
-                for (Field field: type.getDeclaredFields()) {
-                    if (fieldType.isAssignableFrom(field.getType())) {
+        try 
+        {
+            for (Class < ? > type = instance.getClass(); type != Object.class; type = type.getSuperclass()) 
+            {
+                for (Field field: type.getDeclaredFields()) 
+                {
+                    if (fieldType.isAssignableFrom(field.getType())) 
+                    {
                         field.setAccessible(true);
                         return (F) field.get(instance);
                     }
                 }
             }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        } 
+        catch (SecurityException | IllegalArgumentException | IllegalAccessException e) 
+        {
+            /**
+             * Do nothing
+             */
         }
         return null;
     }

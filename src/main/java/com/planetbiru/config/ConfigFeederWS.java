@@ -22,6 +22,8 @@ public class ConfigFeederWS {
 	private static int feederWsReconnectDelay = 0;
 	private static int feederWsRefresh = 0;
 	
+	private static boolean connected = false;
+	
 	private ConfigFeederWS()
 	{
 		
@@ -213,6 +215,14 @@ public class ConfigFeederWS {
 
 	public static void setFeederWsRefresh(int feederWsRefresh) {
 		ConfigFeederWS.feederWsRefresh = feederWsRefresh;
+	}
+
+	public static boolean isConnected() {
+		return connected;
+	}
+
+	public static void setConnected(boolean connected) {
+		ConfigFeederWS.connected = connected;
 	}
 
 	

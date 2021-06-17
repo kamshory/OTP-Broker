@@ -14,7 +14,14 @@ import javax.websocket.WebSocketContainer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.Utility;
 
 public class WebSocketClient extends Thread
@@ -40,6 +47,9 @@ public class WebSocketClient extends Thread
 			{
 				this.initWSClient();
 				connected = true;
+				ConfigFeederWS.setConnected(true);
+				sendServerStatus(true);
+				System.out.println("Connected...");
 			} 
 			catch (WebSocketConnectionException e) 
 			{
@@ -89,6 +99,9 @@ public class WebSocketClient extends Thread
 			ClientEndpointConfig clientConfig = configBuilder.build();
 			
 			setSession(getContainer().connectToServer(new WebSocketEndpoint(this), clientConfig, URI.create(url))); 
+			ConfigFeederWS.setConnected(true);
+			sendServerStatus(true);
+			System.out.println("Connected...");
 			wait4TerminateSignal();
 			
 		} 
@@ -116,6 +129,8 @@ public class WebSocketClient extends Thread
 		try 
 		{
 			getSession().close();
+			ConfigFeederWS.setConnected(false);
+			sendServerStatus(false);
 		} 
 		catch (IOException e) 
 		{
@@ -123,6 +138,22 @@ public class WebSocketClient extends Thread
 		}		
 	}
 	
+	 void sendServerStatus(boolean connected) 
+	    {
+			JSONArray data = new JSONArray();
+			JSONObject info = new JSONObject();
+			
+			JSONObject ws = new JSONObject();
+			ws.put("name", "otp_ws_status");
+			ws.put("connected", connected);
+			data.put(ws);
+			
+			info.put("command", "server-info");
+			info.put("data", data);
+		
+			ServerWebSocketManager.broadcast(info.toString(4));
+			
+		}
 	private static void wait4TerminateSignal()
 	{
 		synchronized(waitLock)

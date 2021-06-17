@@ -17,14 +17,15 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.constant.JsonKey;
+import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.user.WebSocketUserAccount;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.util.Utility;
@@ -32,13 +33,12 @@ import com.planetbiru.wstools.MessageDecoder;
 import com.planetbiru.wstools.MessageEncoder;
 import com.planetbiru.wstools.ServletAwareConfigurator;
 
-
 @Component
-@ServerEndpoint(value = "/websocket", 
+@ServerEndpoint(value = "/websocket/manager", 
 	configurator = ServletAwareConfigurator.class,
 	decoders = MessageDecoder.class, 
 	encoders = MessageEncoder.class)
-public class ServerWebSocket {
+public class ServerWebSocketManager {
 	
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
@@ -52,12 +52,9 @@ public class ServerWebSocket {
     private String username = "";
     private String channel = "";	
 	
-	private static Set<ServerWebSocket> listeners = new CopyOnWriteArraySet<>();
+	private static Set<ServerWebSocketManager> listeners = new CopyOnWriteArraySet<>();
     
-    private static Logger logger = LogManager.getLogger(ServerWebSocket.class);   
-    
-    Random rand = new Random();
-    
+    Random rand = new Random();  
     
     @PostConstruct
     public void init()
@@ -84,24 +81,50 @@ public class ServerWebSocket {
         {
         	WebSocketUserAccount.getUserAccount().load();
         	auth = WebSocketUserAccount.getUserAccount().checkUserAuth(requestHdr);
+            if(auth)
+            {
+                listeners.add(this);
+                this.sendServerStatus();
+            }
 		} 
         catch (NoUserRegisteredException e) 
         {
-			/**
-			 * Do nothing
-			 */
-        	logger.error(e.getMessage());
-		}     
-        
-        if(auth)
-        {
-            listeners.add(this);
-            this.sendWelcomeMessage();
-        }
+        	/**
+        	 * Do nothing
+        	 */
+		}
 	}
     
-    private void sendWelcomeMessage() {
-		String welcomeMessage = this.createWelcomeMessage();	
+    private void sendServerStatus() 
+    {
+		JSONArray data = new JSONArray();
+		JSONObject info = new JSONObject();
+		
+		JSONObject modem = new JSONObject();
+		modem.put("name", "otp_modem_status");
+		modem.put("connected", !SMSUtil.isClosed());
+		data.put(modem);
+		
+		JSONObject ws = new JSONObject();
+		ws.put("name", "otp_ws_status");
+		ws.put("connected", ConfigFeederWS.isConnected());
+		data.put(ws);
+		
+		info.put("command", "server-info");
+		info.put("data", data);
+	
+		
+		try {
+			this.sendMessage(info.toString(4));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void sendWelcomeMessage() {
+		String welcomeMessage = this.createWelcomeMessage().toString(4);	
 		try 
 		{
 			this.sendMessage(welcomeMessage);
@@ -114,7 +137,7 @@ public class ServerWebSocket {
 		}
 	}
 
-	private String createWelcomeMessage() 
+	private JSONObject createWelcomeMessage() 
 	{
 		JSONObject msg = new JSONObject();
 		JSONArray data = new JSONArray();
@@ -126,12 +149,11 @@ public class ServerWebSocket {
 		msg.put(JsonKey.COMMAND, "welcome");
 		msg.put(JsonKey.DATA, data);
 		msg.put(JsonKey.SESSION_ID, this.sessionID);
-		return msg.toString(4);
+		return msg;
 	}
 
     @OnMessage 
-    public void onMessage(String messageReceived) {
-    	
+    public void onMessage(String messageReceived) {	
     	broadcast(messageReceived, this.sessionID);
     }
 
@@ -146,6 +168,7 @@ public class ServerWebSocket {
     {
     	listeners.remove(this);
     }
+    
     public static void broadcast(String message) 
     {
     	broadcast(message, "");	
@@ -153,7 +176,8 @@ public class ServerWebSocket {
 
     public static void broadcast(String message, String senderID) 
     {
-        for (ServerWebSocket listener : listeners) 
+    	System.out.println("Broadcast");
+        for (ServerWebSocketManager listener : listeners) 
         {
             try 
             {

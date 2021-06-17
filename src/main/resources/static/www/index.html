@@ -35,6 +35,8 @@
       <nav class="navbar navbar-default">
         <div class="container-fluid">
           <div class="navbar-header">
+			    <span class="usb-device-symbol"></span>
+            <script src="lib.assets/js/ubb.js"></script>
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
               <span class="sr-only">Toggle navigation</span>
               <span class="icon-bar"></span>
@@ -44,7 +46,7 @@
             <a class="navbar-brand" href="./">OTP Broker</a>
           </div>
           
-                  <div id="navbar" class="navbar-collapse collapse">
+          <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
               <li class="active "><a href="./">Home</a></li>
               <li class=""><a href="ussd.html">USSD</a></li>
@@ -76,25 +78,56 @@
       </nav>
  
       <div class="phone-page">
-        <div>
-          <div class="server-into-item cpu-usage">
-            <div class="info-label">CPU Usage</div>
-            <div class="info-value">0%</div>
-            <div class="info-progress">
-              <div class="info-progress-inner" style="width:0%"></div>
-            </div>
+
+        <style>
+          .service-wrapper {  
+            display: flex;
+            flex-flow: row wrap;
+          }
+
+          .service-wrapper .service-item {
+            border: 1px solid #DDDDDD;
+            background: white;
+            margin: 10px;
+            height: 80px;
+            width: calc( (100% / 2) - 20px );
+            padding: 10px;
+          }
+
+          .service-wrapper .feature {
+            width: calc( ( ( 100% / 3 ) * 2) - 20px );
+          }
+
+          
+
+          @media (max-width: 480px) {
+            .service-wrapper .service-item {
+              width: 100%;
+              margin: 10px 0;
+            }
+          }
+          
+        </style>
+        <script>
+          
+        </script>
+
+
+        <div class="status-connection">
+          <div class="service-wrapper">
+  
+            <div class="service-item">Modem</div>
+            <div class="service-item">Feeder WebSocket</div>
+            <div class="service-item">Feeder MessageBroker</div>
+            <div class="service-item">REST API</div>
+            
+           
+            
           </div>
-          <div class="cpu-temperature">
-            <div class="info-label">CPU Temperature</div>
-            <div class="cpu-temperature-container">
-            <div class="server-into-item">
-              <div class="info-label">Core</div>
-              <div class="info-value">C</div>
-              <div class="info-progress">
-                <div class="info-progress-inner" style="width:0%"></div>
-              </div>
-            </div>
-          </div>
+
+        </div>
+        <div class="status-resource">
+          
           </div>
           <div class="server-into-item ram">
             <div class="info-label">RAM</div>
@@ -115,6 +148,24 @@
             <div class="info-value"></div>
             <div class="info-progress">
               <div class="info-progress-inner" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="server-into-item cpu-usage">
+            <div class="info-label">CPU Usage</div>
+            <div class="info-value">0%</div>
+            <div class="info-progress">
+              <div class="info-progress-inner" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="cpu-temperature">
+            <div class="info-label">CPU Temperature</div>
+            <div class="cpu-temperature-container">
+            <div class="server-into-item">
+              <div class="info-label">Core</div>
+              <div class="info-value">C</div>
+              <div class="info-progress">
+                <div class="info-progress-inner" style="width:0%"></div>
+              </div>
             </div>
           </div>
         </div>
