@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Queue;
@@ -47,10 +48,27 @@ public class ConfigFeederAMQP {
 			admin.declareQueue(new Queue(queueName));
 			AmqpTemplate template = new RabbitTemplate(ConfigFeederAMQP.getFactory());
 			template.convertAndSend(queueName, messageSent);
-			String messageReceived = (String) template.receiveAndConvert(queueName);
+			String messageReceived = "";
+			try
+			{
+				messageReceived = (String) template.receiveAndConvert(queueName);
+				if(messageReceived != null && !messageReceived.equals(messageSent))
+				{
+					messageReceived = (String) template.receiveAndConvert(queueName);
+				}
+			}
+			catch(AmqpException e)
+			{
+				/**
+				 * Do nothing
+				 */
+			}
 			System.out.println("messageSent     : "+messageSent);
 			System.out.println("messageReceived : "+messageReceived);
-			return (messageReceived != null && messageReceived.equals(messageSent));
+			/**
+			 * messageSent may different with messageReceived 
+			 */
+			return (messageReceived != null && messageReceived.trim().length() == 32);
 		}
 		else
 		{
