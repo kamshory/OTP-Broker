@@ -5,6 +5,12 @@ import java.io.IOException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
@@ -24,10 +30,21 @@ public class ConfigFeederAMQP {
 	private static int feederAmqpTimeout = 0;
 	private static int feederAmqpRefresh = 0;
 	private static boolean loaded = false;
+	private static boolean connected = false;
+	public static ConnectionFactory factory;
 	
 	private ConfigFeederAMQP()
 	{
-		
+	}
+	
+	public static boolean test()
+	{
+		AmqpAdmin admin = new RabbitAdmin(ConfigFeederAMQP.factory);
+		admin.declareQueue(new Queue("myqueue"));
+		AmqpTemplate template = new RabbitTemplate(ConfigFeederAMQP.factory);
+		template.convertAndSend("myqueue", "foo");
+		String foo = (String) template.receiveAndConvert("myqueue");
+		return true;
 	}
 	
 	public static JSONObject toJSONObject()
@@ -214,6 +231,15 @@ public class ConfigFeederAMQP {
 	public static void setLoaded(boolean loaded) {
 		ConfigFeederAMQP.loaded = loaded;
 	}
+
+	public static boolean isConnected() {
+		return connected;
+	}
+
+	public static void setConnected(boolean connected) {
+		ConfigFeederAMQP.connected = connected;
+	}
+
 
 	
 	

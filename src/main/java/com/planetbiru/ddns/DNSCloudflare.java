@@ -40,6 +40,7 @@ public class DNSCloudflare extends DNS{
 	private String authApiKey = "";
 	private String authToken = "";
 	
+	@Override
 	public void setConfig(String endpoint, String accountId, String authEmail, String authApiKey, String authToken)
 	{
 		this.endpoint = endpoint;
@@ -77,7 +78,7 @@ public class DNSCloudflare extends DNS{
 	 * @param params 
 	 * @return
 	 */
-	private JSONObject createZone(String name, String accountId)
+	public JSONObject createZone(String name, String accountId)
 	{
 		JSONObject json = new JSONObject();
 		JSONObject account = new JSONObject();
@@ -119,7 +120,7 @@ public class DNSCloudflare extends DNS{
 	 * per_page (number)
 	 * @return
 	 */
-	private JSONArray listZones(Map<String, String> params)
+	public JSONArray listZones(Map<String, String> params)
 	{
 		String url = this.endpoint + "/zones";
 		HttpHeaders requestHeaders = this.createRequestHeader();
@@ -135,7 +136,7 @@ public class DNSCloudflare extends DNS{
 		}
 	}
 
-	private JSONObject getZone(String name)
+	public JSONObject getZone(String name)
 	{
 		Map<String, String> params = new HashMap<>();
 		params.put(DDNSKey.NAME, name);
@@ -155,7 +156,7 @@ public class DNSCloudflare extends DNS{
 		return zone;
 	}
 
-	private JSONObject deleteZoneByName(String name) throws DDNSException
+	public JSONObject deleteZoneByName(String name) throws DDNSException
 	{
 		JSONObject zone = this.getZone(name);
 		if(zone == null || zone.isEmpty())
@@ -189,7 +190,7 @@ public class DNSCloudflare extends DNS{
 	 * @param zoneId Zone ID
 	 * @return
 	 */
-	private JSONObject deleteZone(String zoneId)
+	public JSONObject deleteZone(String zoneId)
 	{
 		String url = this.endpoint + "/zones/"+zoneId;
 		HttpHeaders requestHeaders = this.createRequestHeader();
@@ -213,7 +214,7 @@ public class DNSCloudflare extends DNS{
 	}
 
 
-	private JSONObject getZoneDnsRecords(String zoneId, Map<String, String> params)
+	public JSONObject getZoneDnsRecords(String zoneId, Map<String, String> params)
 	{
 		ResponseEntityCustom response = this.get("/zones/" + zoneId + "/dns_records", params, "application/x-www-form-urlencoded");
 		JSONObject resp = new JSONObject();
@@ -290,7 +291,7 @@ public class DNSCloudflare extends DNS{
 	}
 	
 	
-	private String getRecordId(JSONObject records, String recordName) {
+	public String getRecordId(JSONObject records, String recordName) {
 		if(records != null && records.has(DDNSKey.RESULT))
 		{
 			JSONArray recs = records.optJSONArray(DDNSKey.RESULT);
@@ -310,7 +311,7 @@ public class DNSCloudflare extends DNS{
 	}
 
 
-	private boolean isRecordExists(JSONObject records, String recordName) {
+	public boolean isRecordExists(JSONObject records, String recordName) {
 		if(records != null && records.has(DDNSKey.RESULT))
 		{
 			JSONArray recs = records.optJSONArray(DDNSKey.RESULT);
@@ -330,7 +331,7 @@ public class DNSCloudflare extends DNS{
 	}
 
 
-	private String getIP() 
+	public String getIP() 
 	{
 		String ip = "";
 		try 
@@ -344,7 +345,7 @@ public class DNSCloudflare extends DNS{
 		return ip;
 	}
 
-	private String getIP(String protocol) throws DDNSException
+	public String getIP(String protocol) throws DDNSException
 	{
 		List<String> allowedTypes = new ArrayList<>();
 		allowedTypes.add("ipv4");
@@ -374,7 +375,7 @@ public class DNSCloudflare extends DNS{
 	* @param body Request body
 	* @return ResponseEntityCustom Custom response entity
 	*/
-	private ResponseEntityCustom httpExchange(HttpMethod method, String url, HttpHeaders requestHeaders, String body, int timeout)
+	public ResponseEntityCustom httpExchange(HttpMethod method, String url, HttpHeaders requestHeaders, String body, int timeout)
 	{
 		logger.info("Send message to  : {}", url);
 		logger.info("Request Headers  : {}", requestHeaders);
@@ -417,7 +418,7 @@ public class DNSCloudflare extends DNS{
 	* @param timeout Request timeout
 	* @return RestTemplate
 	*/
-	private RestTemplate customRestTemplate(int timeout)
+	public RestTemplate customRestTemplate(int timeout)
 	{
 		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
 		httpRequestFactory.setConnectionRequestTimeout(timeout);
@@ -446,79 +447,69 @@ public class DNSCloudflare extends DNS{
 	*
 	* @return mixed
 	*/
-	private ResponseEntityCustom request(HttpMethod method, String endpoint, Map<String, String> params, String contentType)
+	public ResponseEntityCustom request(HttpMethod method, String endpoint, Map<String, String> params, String contentType)
 	{
 		int timeout = 10000;
 		HttpHeaders headers = this.createRequestHeader(contentType);
 		headers.add(DDNSKey.HEADER_CONTENT_TYPE, contentType);
 		String body = "";
-		if(contentType.contains("urlencode"))
+		if(contentType.contains("urlencode") && (method.equals(HttpMethod.POST) || method.equals(HttpMethod.PUT) || method.equals(HttpMethod.PATCH)  || method.equals(HttpMethod.DELETE)))
 		{
-			if(method.equals(HttpMethod.POST) || method.equals(HttpMethod.PUT) || method.equals(HttpMethod.PATCH)  || method.equals(HttpMethod.DELETE))
-			{
-				body = this.buildQuery(params);
-			}
+			body = this.buildQuery(params);
 		}
-		else if(contentType.contains("json"))
+		else if(contentType.contains("json") && (method.equals(HttpMethod.POST) || method.equals(HttpMethod.PUT) || method.equals(HttpMethod.PATCH)  || method.equals(HttpMethod.DELETE)))
 		{
-			if(method.equals(HttpMethod.POST) || method.equals(HttpMethod.PUT) || method.equals(HttpMethod.PATCH)  || method.equals(HttpMethod.DELETE))
-			{
-				JSONObject obj = new JSONObject(params);
-				body = obj.toString();
-			}			
+			JSONObject obj = new JSONObject(params);
+			body = obj.toString();
 		}
 		
 		return this.httpExchange(method, endpoint, headers, body, timeout);
 	}
 
-	private String buildQuery(Map<String, String> params) {
-
-	return Utility.buildQuery(params);
+	public String buildQuery(Map<String, String> params) 
+	{
+		return Utility.buildQuery(params);
 	}
 
-	private ResponseEntityCustom get(String endpoint, Map<String, String> params, String contentType)
+	public ResponseEntityCustom get(String endpoint, Map<String, String> params, String contentType)
 	{
 		String url = endpoint + endpoint;
 		return this.request(HttpMethod.GET, url, params, contentType);
 	}
-	private ResponseEntityCustom post(String endpoint, Map<String, String> params, String contentType)
+	public ResponseEntityCustom post(String endpoint, Map<String, String> params, String contentType)
 	{
 		String url = endpoint + endpoint;
 		return this.request(HttpMethod.POST, url, params, contentType);
 	}
-	private ResponseEntityCustom put(String endpoint, Map<String, String> params, String contentType)
+	public ResponseEntityCustom put(String endpoint, Map<String, String> params, String contentType)
 	{
 		String url = endpoint + endpoint;
 		return this.request(HttpMethod.PUT, url, params, contentType);
 	}
-	private ResponseEntityCustom patch(String endpoint, Map<String, String> params, String contentType)
+	public ResponseEntityCustom patch(String endpoint, Map<String, String> params, String contentType)
 	{
 		String url = endpoint + endpoint;
 		return this.request(HttpMethod.PATCH, url, params, contentType);
 	}
-	private ResponseEntityCustom delete(String endpoint, Map<String, String> params, String contentType)
+	public ResponseEntityCustom delete(String endpoint, Map<String, String> params, String contentType)
 	{
 		String url = endpoint + endpoint;
 		return this.request(HttpMethod.DELETE, url, params, contentType);
 	}
-	private ResponseEntityCustom delete(String endpoint, String contentType)
+	public ResponseEntityCustom delete(String endpoint, String contentType)
 	{
 		String url = endpoint + endpoint;
 		Map<String, String> params = new HashMap<>();
 		return this.request(HttpMethod.DELETE, url, params, contentType);
 	}
-
-
 	
-	
-	
-	private HttpHeaders createRequestHeader(String contentType)
+	public HttpHeaders createRequestHeader(String contentType)
 	{
 		HttpHeaders requestHeaders = this.createRequestHeader();
 		requestHeaders.add(DDNSKey.HEADER_CONTENT_TYPE, contentType);
 		return requestHeaders;
 	}
-	private HttpHeaders createRequestHeader() {
+	public HttpHeaders createRequestHeader() {
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.add(DDNSKey.HEADER_X_AUTH_EMAIL, this.authEmail);
 		requestHeaders.add(DDNSKey.HEADER_X_AUTH_KEY, this.authApiKey);
@@ -532,7 +523,7 @@ public class DNSCloudflare extends DNS{
 	*
 	* Returns information about the zone
 	*/
-	private JSONObject registerDnsZone(String name, String accountId)
+	public JSONObject registerDnsZone(String name, String accountId)
 	{
 		JSONObject zone = this.getZone(name);
 		if(zone != null)
@@ -546,7 +537,7 @@ public class DNSCloudflare extends DNS{
 		return zone;
 	}
 
-	private JSONObject setDnsZoneSsl(String zoneId, String type) throws DDNSException
+	public JSONObject setDnsZoneSsl(String zoneId, String type) throws DDNSException
 	{
 		List<String> allowedTypes = new ArrayList<>();
 		allowedTypes.add("off");
@@ -565,7 +556,7 @@ public class DNSCloudflare extends DNS{
 		return resp.optJSONObject(DDNSKey.RESULT);
 	}
 
-	private JSONObject setDnsZoneCache(String zoneId, String type) throws DDNSException
+	public JSONObject setDnsZoneCache(String zoneId, String type) throws DDNSException
 	{
 		List<String> allowedTypes = new ArrayList<>();
 		allowedTypes.add("aggressive");
@@ -584,21 +575,21 @@ public class DNSCloudflare extends DNS{
 		return resp.optJSONObject(DDNSKey.RESULT);
 	}
 
-	private ResponseEntityCustom clearZoneCache(String zoneId)
+	public ResponseEntityCustom clearZoneCache(String zoneId)
 	{
 		Map<String, String> params = new HashMap<>();
 		params.put("purge_everything", Boolean.toString(true));
 		return this.delete("/zones/" + zoneId + "/purge_cache", params, "application/x-www-form-urlencoded");
 	}
 
-	private ResponseEntityCustom setDnsZoneMinify(String zoneId, String settings)
+	public ResponseEntityCustom setDnsZoneMinify(String zoneId, String settings)
 	{
 		Map<String, String> params = new HashMap<>();
 		params.put(DDNSKey.VALUE, settings);
 		return this.patch("/zones/" + zoneId + "/settings/minify", params, "application/x-www-form-urlencoded");
 	}
 
-	private JSONObject updateDnsRecord(String zoneId, String type, String name, String content, int ttl, boolean proxied, String recordId)
+	public JSONObject updateDnsRecord(String zoneId, String type, String name, String content, int ttl, boolean proxied, String recordId)
 	{
 		JSONObject json = new JSONObject();
 		
@@ -621,7 +612,7 @@ public class DNSCloudflare extends DNS{
 
 	}
 
-	private ResponseEntityCustom deleteDnsRecord(String zoneId, String recordId)
+	public ResponseEntityCustom deleteDnsRecord(String zoneId, String recordId)
 	{
 		return this.delete("/zones/" + zoneId + "/dns_records/" + recordId, "application/x-www-form-urlencoded");
 	}

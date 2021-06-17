@@ -1,9 +1,7 @@
-package com.planetbiru;
+package com.planetbiru.util;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.planetbiru.util.Utility;
 
 public class ServerInfo {
 	

@@ -145,8 +145,6 @@
 		
 		
 		
-		
-		
 		<dependency>
 		     <groupId>org.glassfish.tyrus.bundles</groupId>
 		     <artifactId>tyrus-standalone-client</artifactId>

@@ -48,9 +48,12 @@ public class RabbitMQConfig {
 		if(lEnable)
 		{
 			SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
+			
 			simpleMessageListenerContainer.setConnectionFactory(connectionFactory());
 			simpleMessageListenerContainer.setQueues(queue());		
 			simpleMessageListenerContainer.setMessageListener(createHandler());
+			//ConfigFeederAMQP.factory = simpleMessageListenerContainer.getConnectionFactory();
+
 			return simpleMessageListenerContainer;
 		}
 		else
@@ -97,6 +100,7 @@ public class RabbitMQConfig {
 			lRabbitMQPort = ConfigFeederAMQP.getFeederAmqpPort();
 			lUsername = ConfigFeederAMQP.getFeederAmqpUsername();
 			lPassword = ConfigFeederAMQP.getFeederAmqpPassword();
+			ConfigFeederAMQP.setConnected(true);
 		}
 		
 		cachingConnectionFactory.setAddresses(lRabbitMQHost);

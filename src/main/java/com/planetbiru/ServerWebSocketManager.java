@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.gsm.SMSUtil;
@@ -101,14 +102,19 @@ public class ServerWebSocketManager {
 		JSONObject info = new JSONObject();
 		
 		JSONObject modem = new JSONObject();
-		modem.put("name", "otp_modem_status");
+		modem.put("name", "modem_connected");
 		modem.put("connected", !SMSUtil.isClosed());
 		data.put(modem);
 		
 		JSONObject ws = new JSONObject();
-		ws.put("name", "otp_ws_status");
+		ws.put("name", "ws_connected");
 		ws.put("connected", ConfigFeederWS.isConnected());
 		data.put(ws);
+		
+		JSONObject amqp = new JSONObject();
+		amqp.put("name", "amqp_connected");
+		amqp.put("connected", ConfigFeederAMQP.isConnected());
+		data.put(amqp);
 		
 		info.put("command", "server-info");
 		info.put("data", data);
@@ -116,28 +122,14 @@ public class ServerWebSocketManager {
 		
 		try {
 			this.sendMessage(info.toString(4));
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void sendWelcomeMessage() {
-		String welcomeMessage = this.createWelcomeMessage().toString(4);	
-		try 
-		{
-			this.sendMessage(welcomeMessage);
-		} 
-		catch (IOException e) 
-		{
+		} catch (JSONException | IOException e) {
 			/**
 			 * Do nothing
 			 */
 		}
 	}
 
-	private JSONObject createWelcomeMessage() 
+	public JSONObject createWelcomeMessage() 
 	{
 		JSONObject msg = new JSONObject();
 		JSONArray data = new JSONArray();
@@ -176,7 +168,6 @@ public class ServerWebSocketManager {
 
     public static void broadcast(String message, String senderID) 
     {
-    	System.out.println("Broadcast");
         for (ServerWebSocketManager listener : listeners) 
         {
             try 
