@@ -83,76 +83,10 @@
       <div class="phone-page">
 
         <style>
-          .service-wrapper {  
-            display: flex;
-            flex-flow: row wrap;
-            gap: 20px;
-          }
-
-          .service-wrapper .service-item {
-            box-sizing: border-box;
-            border: 1px solid #DDDDDD;
-            background: white;
-            height: 60px;
-            width: calc( (100% / 2) - 10px );
-            padding: 10px;
-          }
-
-          .service-wrapper .feature {
-            width: calc( ( ( 100% / 3 ) * 2) - 20px );
-          }
-
-          
-
-          @media (max-width: 480px) {
-            .service-wrapper .service-item {
-              width: 100%;
-              margin:0px;
-            }
-          }
-          .status-connection{
-            margin-bottom: 10px;
-          }
-          
+         
         </style>
         <script>
-        function updateDashboard()
-          {
-          var isModemConnected = getModemConnected();
-          var isWSEmable = getWSEnable();
-          var isWSConnected = getWSConnected();
-          var isAMQPEnable = getAMQPEnable();
-          var isAMQPConnected = getAMQPConnected();
-          var isHTTPEmable = getHTTPEnable();
-
-          $('.service-modem').removeClass('connected');
-          $('.service-modem').removeClass('disconnected');
-          $('.service-modem').addClass('enable');
-          $('.service-modem').addClass(isModemConnected?'connected':'disconnected');
-
-          $('.service-http').removeClass('connected');
-          $('.service-http').removeClass('disconnected');
-          $('.service-http').removeClass('enable');
-          $('.service-http').removeClass('disable');
-          $('.service-http').addClass(isHTTPEmable?'enable':'disable');
-          $('.service-http').addClass(isHTTPEmable?'connected':'disconnected');
-
-          $('.service-ws').removeClass('enable');
-          $('.service-ws').removeClass('disable');
-          $('.service-ws').removeClass('connected');
-          $('.service-ws').removeClass('disconnected');
-          $('.service-ws').addClass(isWSEmable?'enable':'disable');
-          $('.service-ws').addClass(isWSConnected?'connected':'disconnected');
-
-          $('.service-amqp').removeClass('enable');
-          $('.service-amqp').removeClass('disable');
-          $('.service-amqp').removeClass('connected');
-          $('.service-amqp').removeClass('disconnected');
-          $('.service-amqp').addClass(isAMQPEnable?'enable':'disable');
-          $('.service-amqp').addClass(isAMQPConnected?'connected':'disconnected');
-
         
-        }
 
         </script>
 
