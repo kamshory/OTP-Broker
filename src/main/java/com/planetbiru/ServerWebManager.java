@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.config.ConfigEmail;
@@ -119,7 +120,10 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
-	@Value("${otpbroker.path.setting.api}")
+	@Value("${otpbroker.path.setting.api.service}")
+	private String apiSettingPath;
+
+	@Value("${otpbroker.path.setting.api.user}")
 	private String userAPISettingPath;
 
 	@Value("${otpbroker.path.setting.email}")
@@ -1417,6 +1421,10 @@ public class ServerWebManager {
 				{
 					this.processSMS(requestBody);
 				}
+				if(path.equals("/api-setting.html"))
+				{
+					this.processAPISetting(requestBody);
+				}
 				if(path.equals("/cloudflare.html"))
 				{
 					this.processCloudflareSetting(requestBody);
@@ -1435,6 +1443,39 @@ public class ServerWebManager {
 		}
 	}
 	
+	private void processAPISetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		if(query.containsKey("save_api_setting"))
+		{
+			String v1 = query.getOrDefault("http_port", "0").trim();
+			int lHttpPort = Utility.atoi(v1);
+			
+			String v2 = query.getOrDefault("https_port", "0").trim();
+			int lHttpsPort = Utility.atoi(v2);
+
+			boolean lHttpEnable = query.getOrDefault("http_enable", "").trim().equals("1");
+			boolean lHttpsEnable = query.getOrDefault("https_enable", "").trim().equals("1");
+	
+			
+			String lMessagePath = query.getOrDefault("message_path", "").trim();
+			String lBlockingPath = query.getOrDefault("blocking_path", "").trim();
+			String lUnblockingPath = query.getOrDefault("unblockingPath", "").trim();
+			
+			JSONObject config = new JSONObject();			
+			config.put("httpPort", lHttpPort);
+			config.put("httpsPort", lHttpsPort);
+
+			config.put("httpEnable", lHttpEnable);
+			config.put("httpsEnable", lHttpsEnable);
+
+			config.put("messagePath", lMessagePath);
+			config.put("blockingPath", lBlockingPath);
+			config.put("unblockingPath", lUnblockingPath);
+			
+			ConfigEmail.save(emailSettingPath, config);
+		}
+	}
+
 	private void processNetworkSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_dhcp"))
@@ -1547,6 +1588,7 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_email_setting"))
 		{
+			ConfigAPI.load(apiSettingPath);
 			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
 			String lMailHost = query.getOrDefault("smtp_host", "").trim();
 	
@@ -1571,15 +1613,11 @@ public class ServerWebManager {
 			config.put("mailSSL", lMailSSL);
 			config.put("mailStartTLS", lMailStartTLS);
 			
-			saveConfigEmail(config);
+			ConfigAPI.save(apiSettingPath, config);
 		}
 		
 	}
 
-	private void saveConfigEmail(JSONObject config)
-	{
-		ConfigEmail.save(emailSettingPath, config);
-	}
 	
 	private void processModemSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
