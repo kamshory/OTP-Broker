@@ -41,7 +41,7 @@ public class ServerScheduler {
 	private boolean ddnsUpdate;
 
 	@Value("${otpbroker.cron.enable.device}")
-	private boolean deviceUpdate;
+	private boolean cronDeviceEnable;
 
 	@Value("${otpbroker.cron.time.resolution:minute}")
 	private String timeResolution;
@@ -63,15 +63,22 @@ public class ServerScheduler {
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
 	public void inspectDevice()
 	{
-		if(deviceUpdate)
-		{
-		String message = "Inspect Device at "+Utility.now("yyyy-MM-dd HH:mm:ss.SSS");
-		System.out.println(message);
-		
-		
-		if(SMSUtil.isClosed())
+		if(cronDeviceEnable)
+		{					
+			modemCheck();
+			
+			if(ConfigFeederAMQP.isFeederAmqpEnable())
+			{
+				amqpCheck();
+			}
+		}
+	}
+	
+	private void modemCheck()
+	{
+		if(SMSUtil.isConnected())
 		{	
-			String alert = "Modem tidak terpasang";
+			String alert = ConstantString.MODEM_NOT_CONNECTED;
 			JSONObject messageJSON = new JSONObject();
 			messageJSON.put(JsonKey.COMMAND, "broadcast-message");
 			JSONArray data = new JSONArray();
@@ -79,22 +86,26 @@ public class ServerScheduler {
 			String uuid = UUID.randomUUID().toString();
 			itemData.put(JsonKey.ID, uuid);
 			itemData.put(JsonKey.MESSAGE, alert);
+			itemData.put(JsonKey.DATE_TIME, Utility.now(ConstantString.ISO_DATE_TIME_FORMAT, ConstantString.UTC));
 			data.put(itemData);
-			messageJSON.put("data", data);		
+			messageJSON.put(JsonKey.DATA, data);		
 			ServerWebSocketManager.broadcast(messageJSON.toString());
 		}
-		}
-		
+	}
+	
+	private void amqpCheck()
+	{
+		boolean connected = ConfigFeederAMQP.echoTest();
+		ConfigFeederAMQP.setConnected(connected);
 	}
 	
 		
 	@Scheduled(cron = "${otpbroker.cron.expression.ddns}")
 	public void updateDNS() 
 	{
-		ConfigFeederAMQP.echoTest();
+		
 		if(ddnsUpdate)
 		{
-			CronExpression exp;		
 			int countUpdate = 0;	
 			Map<String, DDNSRecord> list = ConfigDDNS.getRecords();
 			for(Entry<String, DDNSRecord> set : list.entrySet())
@@ -103,32 +114,11 @@ public class ServerScheduler {
 				DDNSRecord ddnsRecord = set.getValue();
 				if(ddnsRecord.isActive())
 				{
-					String cronExpression = ddnsRecord.getCronExpression();		
-					try
+					boolean update = updateDNS(ddnsRecord, ddnsId);
+					if(update)
 					{
-						exp = new CronExpression(cronExpression);
-						Date currentTime = new Date();
-						Date prevFireTime = exp.getPrevFireTime(currentTime);
-						Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
-		
-						String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
-						String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
-						String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
-						
-						if(currentTime.getTime() > ddnsRecord.getNextValid().getTime())
-						{
-							DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
-							ddns.start();
-							
-							ConfigDDNS.getRecords().get(ddnsId).setNextValid(nextValidTimeAfter);		
-							ConfigDDNS.getRecords().get(ddnsId).setLastUpdate(currentTime);
-							countUpdate++;
-						}
+						countUpdate++;
 					}
-					catch(ExpressionException | ParseException | JSONException e)
-					{
-						logger.error(e.getMessage());
-					}	
 				}
 			}
 			if(countUpdate > 0)
@@ -136,6 +126,38 @@ public class ServerScheduler {
 				ConfigDDNS.save(ddnsSettingPath);
 			}	
 		}
+	}
+	private boolean updateDNS(DDNSRecord ddnsRecord, String ddnsId) 
+	{
+		boolean update = false;
+		String cronExpression = ddnsRecord.getCronExpression();		
+		CronExpression exp;		
+		try
+		{
+			exp = new CronExpression(cronExpression);
+			Date currentTime = new Date();
+			Date prevFireTime = exp.getPrevFireTime(currentTime);
+			Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
+
+			String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
+			String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
+			String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
+			
+			if(currentTime.getTime() > ddnsRecord.getNextValid().getTime())
+			{
+				DDNSUpdater ddns = new DDNSUpdater(ddnsRecord, prevFireTimeStr, currentTimeStr, nextValidTimeAfterStr);
+				ddns.start();
+				
+				ConfigDDNS.getRecords().get(ddnsId).setNextValid(nextValidTimeAfter);		
+				ConfigDDNS.getRecords().get(ddnsId).setLastUpdate(currentTime);
+				update = true;
+			}
+		}
+		catch(ExpressionException | ParseException | JSONException e)
+		{
+			logger.error(e.getMessage());
+		}
+		return update;	
 	}
     
 }

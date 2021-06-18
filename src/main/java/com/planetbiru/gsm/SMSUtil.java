@@ -7,11 +7,13 @@ public class SMSUtil {
 		 * Do nothing
 		 */
 	}
+	private static boolean initialized = false;
 	private static SMSInstance smsInstance = null;
 	public static void init(String port)
 	{
 		smsInstance = new SMSInstance();
 		smsInstance.init(port);
+		SMSUtil.initialized = true;
 	}
 	public static void sendSMS(String receiver, String message) throws GSMNullException {
 		smsInstance.sendSMS(receiver, message);
@@ -24,6 +26,10 @@ public class SMSUtil {
 	{
 		return smsInstance.isClosed();
 	}
+	public static boolean isConnected() {
+		return SMSUtil.initialized && !SMSUtil.isClosed();
+	}
+
 	
 }
 

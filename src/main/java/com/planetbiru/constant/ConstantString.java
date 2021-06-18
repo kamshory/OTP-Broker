@@ -29,6 +29,7 @@ public class ConstantString {
 	public static final String REKENING_WRITE_TABUNGAN_WRITE = "rekening write, tabungan write";
 	public static final String MYSQL_DATE                    = "yyyy-MM-dd";
 	public static final String SERIAL_PORT_NULL              = "Serial port is null";
+	public static final String MODEM_NOT_CONNECTED           = "Modem is not connected";
 	
 	private ConstantString()
 	{
