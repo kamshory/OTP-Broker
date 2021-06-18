@@ -14,6 +14,7 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
+import com.planetbiru.util.Utility;
 
 public class APIUserAccount {
 
@@ -25,7 +26,7 @@ public class APIUserAccount {
 	}
 	public static void load(String path)
 	{
-		String dir = APIUserAccount.getBaseDir();
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
@@ -74,12 +75,7 @@ public class APIUserAccount {
 			d1.mkdir();
 		}		
 	}
-	
-	private static String getBaseDir()
-	{
-		return APIUserAccount.class.getResource("/").getFile();
-	}
-	
+		
 	public static void update(String text) {
 		if(text != null)
 		{

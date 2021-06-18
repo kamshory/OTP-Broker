@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.planetbiru.api.HandlerAPIMessage;
 import com.planetbiru.config.ConfigAPI;
+import com.planetbiru.gsm.SMSUtil;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsServer;
@@ -35,12 +36,14 @@ public class ServerAPI {
 	@PostConstruct
 	public void init()
 	{
+		SMSUtil.init();
+		
 		this.initHttp();
 		this.initHttps();
 		
 	}
 	private void initHttps() {
-		if(ConfigAPI.isEenable())
+		if(ConfigAPI.isHttpEnable())
 		{
 			try (FileInputStream fileInputStream = new FileInputStream(keystoreFile))
 			{
@@ -72,7 +75,7 @@ public class ServerAPI {
 		
 	}
 	private void initHttp() {
-		if(ConfigAPI.isEenable())
+		if(ConfigAPI.isHttpsEnable())
 		{
 			try 
 			{

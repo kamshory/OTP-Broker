@@ -191,12 +191,27 @@ function getAMQPEnable()
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
+function setHTTPEnable(value)
+{
+    var key = 'otp_http_enable';
+    window.localStorage.setItem(key, (value)?'1':'0');
+}
+function getHTTPEnable()
+{
+    var key = 'otp_http_enable';
+    var value = window.localStorage.getItem(key) || '';
+    return value == '1';
+}
 function updateServerInfo(receivedJSON)
 {
     var data = receivedJSON.data;
     for(var i in data)
     {
         var item = data[i];
+        if(item.name == 'http_enable')
+        {
+            setHTTPEnable(item.value);
+        }
         if(item.name == 'modem_connected')
         {
             setModemConnected(item.value);
@@ -222,7 +237,7 @@ function updateServerInfo(receivedJSON)
             setFeeder(item.feeder);
         }
     }
-    updateDashboard();
+    
 }
 
 function setFeeder(feeder)

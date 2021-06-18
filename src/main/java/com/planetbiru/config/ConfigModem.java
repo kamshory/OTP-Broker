@@ -15,21 +15,26 @@ import com.planetbiru.util.Utility;
 
 public class ConfigModem {
     private static Map<String, ModemData> modemData = new HashMap<>();
-	
-	private static String configPath = "/etc/gsm/devices.conf.json";
+	private static String configPath;
 	
 	private ConfigModem()
 	{
 		
 	}
+	public static Map<String, ModemData> getModemData()
+	{
+		return ConfigModem.modemData;
+	}
 	public static void load(String path)
 	{
-		String dir = ConfigModem.getBaseDir();
+		ConfigModem.configPath = path;
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = dir + path;
+		System.out.println(fileName);
 		ConfigModem.prepareDir(fileName);
 		try 
 		{
@@ -42,6 +47,7 @@ public class ConfigModem {
 				while(keys.hasNext()) {
 				    String id = keys.next();
 				    JSONObject modem = jsonObject.optJSONObject(id);
+				    System.out.println(modem);
 				    ConfigModem.addModemData(id, modem);
 				}
 			}
@@ -72,11 +78,6 @@ public class ConfigModem {
 		{
 			d1.mkdir();
 		}		
-	}
-	
-	private static String getBaseDir()
-	{
-		return ConfigModem.class.getResource("/").getFile();
 	}
 	
 	public static void update(String text) {
@@ -120,14 +121,17 @@ public class ConfigModem {
 		save(path, config);
 	}
 
-	public static void save(String path, JSONObject config) {
-		
+	
+	
+	public static void save(String path, JSONObject config) {	
+		ConfigModem.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = dir + path;
+		System.out.println(fileName);
 		prepareDir(fileName);
 		
 		try 
@@ -144,15 +148,15 @@ public class ConfigModem {
 		save(ConfigModem.configPath, toJSONObject());
 		
 	}
-
+	
 	public static JSONObject toJSONObject()
 	{
 		JSONObject json = new JSONObject();
 		for (Map.Entry<String, ModemData> entry : modemData.entrySet())
 		{
-			String username = entry.getKey();
-			JSONObject user = ((ModemData) entry.getValue()).toJSONObject();
-			json.put(username, user);
+			String id = entry.getKey();
+			JSONObject modem = ((ModemData) entry.getValue()).toJSONObject();
+			json.put(id, modem);
 		}
 		return json;
 	}

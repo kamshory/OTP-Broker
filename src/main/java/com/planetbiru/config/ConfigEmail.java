@@ -108,6 +108,11 @@ public class ConfigEmail {
 		}
 		
 	}	
+	
+	public static JSONObject toJSONObject()
+	{
+		return getJSONObject();
+	}
 
 	public static void save(String path) {
 		JSONObject config = getJSONObject();

@@ -264,6 +264,10 @@ public class ConfigNetWLAN {
 		ConfigNetWLAN.configPathWPAPSK = configPathWPAPSK;
 	}
 
+	public static JSONObject toJSONObject()
+	{
+		return getJSONObject();
+	}
 	
 	
 }

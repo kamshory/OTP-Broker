@@ -57,9 +57,10 @@
                             <ul class="dropdown-menu">
                                 <li class=""><a href="admin.html">Administrator Setting</a></li>
                                 <li class=""><a href="api-setting.html">API Setting</a></li>
-                                <li class="active"><a href="api-user.html">API User</a></li>
+                                <li class=""><a href="api-user.html">API User</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                                 <li class=""><a href="sms-setting.html">SMS Setting</a></li>
+                                <li class="active"><a href="modem.html">Modem</a></li>
                                 <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li class=""><a href="ddns-record.html">DDNS Record</a></li>
                                 <li role="separator" class="divider"></li>
@@ -70,7 +71,7 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li class=""><a href="account.html">Account</a></li>
+                        <li><a href="account.html">Account</a></li>
                         <li><a href="logout.html">Logout</a></li>
                     </ul>
                 </div>
@@ -80,28 +81,32 @@
         </nav>
         <div class="phone-page">
             <h3>Modem</h3>
-            <form action="api-user/add" method="post">
+            <form action="modem.html" method="post">
                 <table class="two-cols-responsive">
                     <tbody>
                         <tr>
                             <td>Name</td>
-                            <td><input type="text" class="form-control" name="name"></td>
+                            <td><input type="text" class="form-control" name="name" value=""></td>
                         </tr>
                         <tr>
-                            <td>Username</td>
-                            <td><input type="text" class="form-control" name="username"></td>
+                            <td>Connection Type</td>
+                            <td><input type="text" class="form-control" name="connection_type" value=""></td>
                         </tr>
                         <tr>
-                            <td>Email</td>
-                            <td><input type="email" class="form-control" name="email"></td>
+                            <td>SMS Center</td>
+                            <td><input type="text" class="form-control" name="sms_center" value=""></td>
                         </tr>
                         <tr>
-                            <td>Phone Number</td>
-                            <td><input type="tel" class="form-control" name="phone"></td>
+                            <td>IMEI</td>
+                            <td><input type="tel" class="form-control" name="imei" value=""></td>
                         </tr>
                         <tr>
-                            <td>Password</td>
-                            <td><input type="password" class="form-control" name="password"></td>
+                            <td>SIM Card PIN</td>
+                            <td><input type="password" class="form-control" name="sim_card_pin"></td>
+                        </tr>
+                        <tr>
+                            <td>Active</td>
+                            <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
                         </tr>
                     </tbody>
                 </table>
@@ -110,10 +115,10 @@
                         <tr>
                             <td></td>
                             <td>
-                                <input type="submit" class="btn btn-success" name="add" value="Save"
-                                    onclick="return confirm('Are you sure you want to save this record')">
+                                <input type="submit" class="btn btn-success" value="Save Changes"
+                                    onclick="return confirm('Are you sure you want to save it?')" name="update">
                                 <input type="button" class="btn btn-primary" value="Cancel"
-                                    onclick="window.location='admin.html'">
+                                    onclick="window.location='modem.html'">
                             </td>
                         </tr>
                     </tbody>

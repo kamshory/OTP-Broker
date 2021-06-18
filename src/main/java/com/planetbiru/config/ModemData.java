@@ -24,6 +24,7 @@ public class ModemData {
 		this.maxPerTimeRange = jsonObject.optInt("maxPerTimeRange", 0);
 		this.imei = jsonObject.optString("imei", "");
 		this.simCardPIN = jsonObject.optString("simCardPIN", "");
+		this.active = jsonObject.optBoolean("active", false);
 	}
 	public ModemData() {
 	}
@@ -39,6 +40,9 @@ public class ModemData {
 		jsonObject.put("maxPerTimeRange", this.maxPerTimeRange);
 		jsonObject.put("imei", this.imei);
 		jsonObject.put("simCardPIN", this.simCardPIN);
+		jsonObject.put("active", this.active);
 		return jsonObject;
 	}
 }
+
+

@@ -17,6 +17,7 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
+import com.planetbiru.util.Utility;
 
 public class WebUserAccount {
 	private static final String USER_FILE = "/static/data/user/urses.json";
@@ -169,14 +170,10 @@ public class WebUserAccount {
 		}		
 	}
 	
-	private String getBaseDir()
-	{
-		return WebUserAccount.class.getResource("/").getFile();
-	}
 	
 	public void load()
 	{
-		String dir = this.getBaseDir();
+		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
@@ -208,7 +205,12 @@ public class WebUserAccount {
 	
 	public void save()
 	{
-		String fileName = this.getBaseDir() + path;
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = dir + path;
 		String userData = this.toString();
 		try 
 		{

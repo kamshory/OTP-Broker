@@ -115,7 +115,10 @@ public class ConfigNetDHCP {
 		}		
 	}
 	
-
+	public static JSONObject toJSONObject() {
+		return getJSONObject();
+	}
+	
 	
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
@@ -328,6 +331,7 @@ public class ConfigNetDHCP {
 	public static void setConfigPath(String configPath) {
 		ConfigNetDHCP.configPath = configPath;
 	}
+
 	
 	
 	

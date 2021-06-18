@@ -16,58 +16,13 @@ public class ConfigAPI {
 		
 	}
 
-	private static int port = 587;
-	private static String path = "";
-	private static boolean enable = true;	
-
-	private static String mailSenderPassword;
-	private static boolean mailStartTLS = true;
-	private static boolean mailSSL = false;
-	private static String mailHost = "";
-	
-	public static String getpath() {
-		return path;
-	}
-	public static void setpath(String path) {
-		ConfigAPI.path = path;
-	}
-	public static String getMailSenderPassword() {
-		return mailSenderPassword;
-	}
-	public static void setMailSenderPassword(String mailSenderPassword) {
-		ConfigAPI.mailSenderPassword = mailSenderPassword;
-	}
-	public static boolean isEenable() {
-		return enable;
-	}
-	public static void setEnable(boolean enable) {
-		ConfigAPI.enable = enable;
-	}
-	public static boolean isMailStartTLS() {
-		return mailStartTLS;
-	}
-	public static void setMailStartTLS(boolean mailStartTLS) {
-		ConfigAPI.mailStartTLS = mailStartTLS;
-	}
-	public static boolean isMailSSL() {
-		return mailSSL;
-	}
-	public static void setMailSSL(boolean mailSSL) {
-		ConfigAPI.mailSSL = mailSSL;
-	}
-	public static String getMailHost() {
-		return mailHost;
-	}
-	public static void setMailHost(String mailHost) {
-		ConfigAPI.mailHost = mailHost;
-	}
-	public static int getport() {
-		return port;
-	}
-	public static void setport(int port) {
-		ConfigAPI.port = port;
-	}
-	
+	private static int httpPort = 587;
+	private static int httpsPort = 587;
+	private static boolean httpEnable = true;	
+	private static boolean httpsEnable = true;	
+	private static String messagePath = "/";
+	private static String blockinPath = "/";
+	private static String unblockinPath = "/";
 	
 	public static void load(String path) {
 		String dir = Utility.getBaseDir();
@@ -86,22 +41,24 @@ public class ConfigAPI {
 				if(text.length() > 7)
 				{
 					JSONObject json = new JSONObject(text);
-					String lpath = json.optString("path", "");
-					String lMailSenderPassword = json.optString("mailSenderPassword", "");
-					boolean lenable = json.optBoolean("enable", false);
-					boolean lMailStartTLS  = json.optBoolean("mailStartTLS", false);
-					boolean lMailSSL = json.optBoolean("mailSSL", false);
-					String lMailHost = json.optString("mailHost", "");
-					int lport = json.optInt("port", 0);
-					
-					ConfigAPI.port = lport;
-					ConfigAPI.path = lpath;
-					ConfigAPI.enable = lenable;
 
-					ConfigAPI.mailSenderPassword = lMailSenderPassword;
-					ConfigAPI.mailStartTLS = lMailStartTLS;
-					ConfigAPI.mailSSL = lMailSSL;
-					ConfigAPI.mailHost = lMailHost;
+					int lHttpPort = json.optInt("httpPort", 0);
+					int lHttpsPort = json.optInt("httpsPort", 0);
+					boolean lHttpEnable = json.optBoolean("httpEnable", false);	
+					boolean lHttpsEnable = json.optBoolean("httpsEnable", false);	
+					String lMessagePath = json.optString("messagePath", "");
+					String lBlockinPath = json.optString("blockinPath", "");
+					String lUnblockinPath = json.optString("unblockinPath", "");
+
+					
+					ConfigAPI.httpPort = lHttpPort;
+					ConfigAPI.httpsPort = lHttpsPort;
+					ConfigAPI.httpEnable = lHttpEnable;
+					ConfigAPI.httpsEnable = lHttpsEnable;
+					
+					ConfigAPI.messagePath = lMessagePath;
+					ConfigAPI.blockinPath = lBlockinPath;
+					ConfigAPI.unblockinPath = lUnblockinPath;
 				}
 			}
 		} 
@@ -128,6 +85,7 @@ public class ConfigAPI {
 		
 		try 
 		{
+			System.out.println(config.toString());
 			FileConfigUtil.write(fileName, config.toString().getBytes());
 		}
 		catch (IOException e) 
@@ -158,16 +116,78 @@ public class ConfigAPI {
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
 
-		config.put("port", ConfigAPI.port);
-		config.put("path", ConfigAPI.path);
-		config.put("enable", ConfigAPI.enable);
+		config.put("httpPort", ConfigAPI.httpPort);
+		config.put("httpsPort", ConfigAPI.httpsPort);
+		config.put("httpEnable", ConfigAPI.httpEnable);
+		config.put("httpsEnable", ConfigAPI.httpsEnable);
 
-		config.put("mailHost", ConfigAPI.mailHost);
-		config.put("mailSenderPassword", ConfigAPI.mailSenderPassword);
-		config.put("mailSSL", ConfigAPI.mailSSL);
-		config.put("mailStartTLS", ConfigAPI.mailStartTLS);
+		config.put("messagePath", ConfigAPI.messagePath);
+		config.put("blockinPath", ConfigAPI.blockinPath);
+		config.put("unblockinPath", ConfigAPI.unblockinPath);
 		return config;
 	}
+
+	public static int getHttpPort() {
+		return httpPort;
+	}
+
+	public static void setHttpPort(int httpPort) {
+		ConfigAPI.httpPort = httpPort;
+	}
+
+	public static int getHttpsPort() {
+		return httpsPort;
+	}
+
+	public static void setHttpsPort(int httpsPort) {
+		ConfigAPI.httpsPort = httpsPort;
+	}
+
+	public static boolean isHttpEnable() {
+		return httpEnable;
+	}
+
+	public static void setHttpEnable(boolean httpEnable) {
+		ConfigAPI.httpEnable = httpEnable;
+	}
+
+	public static boolean isHttpsEnable() {
+		return httpsEnable;
+	}
+
+	public static void setHttpsEnable(boolean httpsEnable) {
+		ConfigAPI.httpsEnable = httpsEnable;
+	}
+
+	public static String getMessagePath() {
+		return messagePath;
+	}
+
+	public static void setMessagePath(String messagePath) {
+		ConfigAPI.messagePath = messagePath;
+	}
+
+	public static String getBlockinPath() {
+		return blockinPath;
+	}
+
+	public static void setBlockinPath(String blockinPath) {
+		ConfigAPI.blockinPath = blockinPath;
+	}
+
+	public static String getUnblockinPath() {
+		return unblockinPath;
+	}
+
+	public static void setUnblockinPath(String unblockinPath) {
+		ConfigAPI.unblockinPath = unblockinPath;
+	}
+
+	public static JSONObject toJSONObject() {
+		return getJSONObject();
+	}
+	
+	
 	
 	
 }

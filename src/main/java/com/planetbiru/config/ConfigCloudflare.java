@@ -154,5 +154,10 @@ public class ConfigCloudflare {
 	public static void setAuthToken(String authToken) {
 		ConfigCloudflare.authToken = authToken;
 	}
+
+	public static JSONObject toJSONObject()
+	{
+		return getJSONObject();
+	}
 	
 }

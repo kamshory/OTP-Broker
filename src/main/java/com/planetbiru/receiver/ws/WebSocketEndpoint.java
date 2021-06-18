@@ -89,8 +89,7 @@ public class WebSocketEndpoint extends Endpoint {
 		
 	}
 	private void login() throws IOException {
-		String text = "";
-		
+		String text = "";	
 		JSONObject requestJSON = new JSONObject();
 		requestJSON.put("command", "receive-message");
 		requestJSON.put("channel", "sms");

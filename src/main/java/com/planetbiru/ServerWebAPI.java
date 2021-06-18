@@ -27,7 +27,7 @@ import com.planetbiru.util.Utility;
 @RestController
 public class ServerWebAPI {
 	
-	@Value("${otpbroker.path.setting.api}")
+	@Value("${otpbroker.path.setting.api.user}")
 	private String userAPISettingPath;
 	
 	@PostConstruct

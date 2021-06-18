@@ -41,38 +41,28 @@ public class ConfigFeederAMQP {
 	public static boolean echoTest()
 	{
 		if(ConfigFeederAMQP.getFactory() != null)
-		{
-			AmqpAdmin admin = new RabbitAdmin(ConfigFeederAMQP.getFactory());
-			String queueName = "__echo_test__";
-			String messageSent = Utility.md5(System.nanoTime()+"");
-			admin.declareQueue(new Queue(queueName));
-			AmqpTemplate template = new RabbitTemplate(ConfigFeederAMQP.getFactory());
-			template.convertAndSend(queueName, messageSent);
+		{			
 			String messageReceived = "";
+			String messageSent = "";
 			try
 			{
+				AmqpAdmin admin = new RabbitAdmin(ConfigFeederAMQP.getFactory());
+				String queueName = "__echo_test__";
+				messageSent = Utility.md5(System.nanoTime()+"");
+				admin.declareQueue(new Queue(queueName));
+				AmqpTemplate template = new RabbitTemplate(ConfigFeederAMQP.getFactory());
+				template.convertAndSend(queueName, messageSent);
 				messageReceived = (String) template.receiveAndConvert(queueName);
 				if(messageReceived != null && !messageReceived.equals(messageSent))
 				{
 					messageReceived = (String) template.receiveAndConvert(queueName);
-				}
+				}				
 			}
 			catch(AmqpException e)
 			{
-				/**
-				 * Do nothing
-				 */
+				return false;
 			}
-			System.out.println("messageSent     : "+messageSent);
-			System.out.println("messageReceived : "+messageReceived);
-			/**
-			 * messageSent may different with messageReceived 
-			 */
 			return (messageReceived != null && messageReceived.trim().length() == 32);
-		}
-		else
-		{
-			System.out.println("ConfigFeederAMQP.factory is null");
 		}
 		return false;
 	}
