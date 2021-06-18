@@ -31,7 +31,7 @@ public class ConfigNetDHCP {
 	private static String maxLeaseTime = "";	
 	private static JSONArray ranges = new JSONArray();
 	
-	private static String configPath = "/etc/dhcp/dhcpd.conf";
+	private static String configPath = "/etc/modem/modemd.conf";
 	
 	public static void load(String path) {
 		String dir = Utility.getBaseDir();

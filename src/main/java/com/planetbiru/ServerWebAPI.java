@@ -3,7 +3,6 @@ package com.planetbiru;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONObject;

@@ -30,11 +30,13 @@ import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.ConfigSaved;
+import com.planetbiru.config.ModemData;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
@@ -140,6 +142,9 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.path.setting.ethernet}")
 	private String ethernetSettingPath;
+
+	@Value("${otpbroker.path.setting.modem}")
+	private String modemSettingPath;
 
 	
 	private ServerWebManager()
@@ -1398,7 +1403,11 @@ public class ServerWebManager {
 				}
 				if(path.equals("/sms-setting.html"))
 				{
-					this.processSMSSetting(requestBody);
+					//this.processSMSSetting(requestBody);
+				}
+				if(path.equals("/modem.html") || path.equals("/modem-add.html") || path.equals("/modem-update.html"))
+				{
+					this.processModemSetting(requestBody);
 				}
 				if(path.equals("/email-setting.html"))
 				{
@@ -1572,36 +1581,102 @@ public class ServerWebManager {
 		ConfigEmail.save(emailSettingPath, config);
 	}
 	
-	private void processSMSSetting(String requestBody) {
+	private void processModemSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("save_sms_setting"))
+		if(query.containsKey(JsonKey.DELETE))
 		{
-			String connectionType = query.getOrDefault("connection_type", "").trim();			
-			String smsCenter = query.getOrDefault("sms_center", "").trim();		
-			String incommingInt = query.getOrDefault("incomming_interval", "0").trim();
-			int incommingInterval = Utility.atoi(incommingInt);
-			String tmRange = query.getOrDefault("time_range", "0").trim();
-			int timeRange = Utility.atoi(tmRange);	
-			String maxInRange = query.getOrDefault("max_per_time_range", "0").trim();
-			int maxPerTimeRange = Utility.atoi(maxInRange);
-			String imei = query.getOrDefault("imei", "").trim();		
-			String simCardPIN = query.getOrDefault("sim_card_pin", "").trim();		
-			boolean sendIncommingSMS = query.getOrDefault("send_incomming_sms", "").trim().equals("1");
-			
-			
-			ConfigSMS.setConnectionType(connectionType);
-			ConfigSMS.setImei(imei);
-			ConfigSMS.setSimCardPIN(simCardPIN);
-			ConfigSMS.setSmsCenter(smsCenter);
-			ConfigSMS.setIncommingInterval(incommingInterval);
-			ConfigSMS.setTimeRange(timeRange);
-			ConfigSMS.setMaxPerTimeRange(maxPerTimeRange);			
-			ConfigSMS.setSendIncommingSMS(sendIncommingSMS);		
-			
-			ConfigSMS.save(smsSettingPath);			
-		}		
+			/**
+			 * Delete
+			 */
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigModem.deleteRecord(value);
+				}
+			}
+			ConfigDDNS.save();
+		}
+		if(query.containsKey(JsonKey.DEACTIVATE))
+		{
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigModem.deactivate(value);
+				}
+			}
+			ConfigModem.save();
+		}
+		if(query.containsKey(JsonKey.ACTIVATE))
+		{
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigModem.activate(value);
+				}
+			}
+			ConfigModem.save();
+		}
+		
+		if(query.containsKey(JsonKey.ADD))
+		{
+			this.processModemUpdate(query, JsonKey.ADD);
+		}	
+		if(query.containsKey(JsonKey.UPDATE))
+		{
+			this.processModemUpdate(query, JsonKey.UPDATE);
+		}	
 	}
 	
+	
+	private void processModemUpdate(Map<String, String> query, String action) {		
+		
+		String id = query.getOrDefault("id", "");		
+		String connectionType = query.getOrDefault("connection_type", "");
+		boolean active = query.getOrDefault("active", "").equals("1");		
+
+		String smsCenter = query.getOrDefault("sms_center", "");		
+		String incommingIntervalS = query.getOrDefault("incomming_interval", "0");		
+		int incommingInterval = Utility.atoi(incommingIntervalS);	
+		
+		String timeRangeS = query.getOrDefault("time_range", "");		
+		int timeRange = Utility.atoi(timeRangeS);
+
+		String maxPerTimeRangeS = query.getOrDefault("maxPer_time_range", "0");
+		int maxPerTimeRange = Utility.atoi(maxPerTimeRangeS);
+
+		String imei = query.getOrDefault("imei", "");
+		String name = query.getOrDefault("name", "");
+		String simCardPIN = query.getOrDefault("sim_card_pin", "");
+			
+		ModemData modem = ConfigModem.geModemData(id);
+		if(action.equals(JsonKey.ADD))
+		{
+			modem.id = Utility.md5(String.format("%d", System.nanoTime()));
+		}
+		modem.name = name;
+		modem.connectionType = connectionType;
+		modem.smsCenter = smsCenter;
+		modem.incommingInterval = incommingInterval;
+		modem.timeRange = timeRange;
+		modem.maxPerTimeRange = maxPerTimeRange;
+		modem.imei = imei;
+		modem.simCardPIN = simCardPIN;
+		modem.active = active;
+
+		ConfigModem.update(id, modem);
+		ConfigModem.save(modemSettingPath);	
+	}
+
+
 	private void processFeederSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_feeder_ws_setting"))
@@ -2132,7 +2207,6 @@ public class ServerWebManager {
 	
 	private void processDDNS(String requestBody, CookieServer cookie) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
 		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**
@@ -2142,7 +2216,7 @@ public class ServerWebManager {
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
-				if(key.startsWith("id[") && !value.equals(loggedUsername))
+				if(key.startsWith("id["))
 				{
 					ConfigDDNS.deleteRecord(value);
 				}

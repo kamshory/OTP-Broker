@@ -1173,6 +1173,10 @@ public class Utility {
 		return "Basic " + Utility.base64Encode(username+":"+password);
 	}
 	public static int atoi(String alpha) {
+		if(alpha == null)
+		{
+			return 0;
+		}
 		int value = 0;
 		try
 		{
@@ -1191,7 +1195,13 @@ public class Utility {
 		}
 		return value;
 	}
+	
+	
 	public static double atof(String alpha) {
+		if(alpha == null)
+		{
+			return 0;
+		}
 		double value = 0;
 		try
 		{
