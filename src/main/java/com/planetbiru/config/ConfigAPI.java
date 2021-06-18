@@ -85,6 +85,7 @@ public class ConfigAPI {
 		
 		try 
 		{
+			System.out.println(fileName.toString());
 			System.out.println(config.toString());
 			FileConfigUtil.write(fileName, config.toString().getBytes());
 		}
@@ -186,8 +187,5 @@ public class ConfigAPI {
 	public static JSONObject toJSONObject() {
 		return getJSONObject();
 	}
-	
-	
-	
 	
 }
