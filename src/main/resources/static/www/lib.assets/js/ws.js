@@ -281,6 +281,42 @@ function showNotif(message)
     }, 6000);
 }
 
+function updateDashboard()
+    {
+    var isModemConnected = getModemConnected();
+    var isWSEmable = getWSEnable();
+    var isWSConnected = getWSConnected();
+    var isAMQPEnable = getAMQPEnable();
+    var isAMQPConnected = getAMQPConnected();
+    var isHTTPEmable = getHTTPEnable();
+
+    $('.service-modem').removeClass('connected');
+    $('.service-modem').removeClass('disconnected');
+    $('.service-modem').addClass('enable');
+    $('.service-modem').addClass(isModemConnected?'connected':'disconnected');
+
+    $('.service-http').removeClass('connected');
+    $('.service-http').removeClass('disconnected');
+    $('.service-http').removeClass('enable');
+    $('.service-http').removeClass('disable');
+    $('.service-http').addClass(isHTTPEmable?'enable':'disable');
+    $('.service-http').addClass(isHTTPEmable?'connected':'disconnected');
+
+    $('.service-ws').removeClass('enable');
+    $('.service-ws').removeClass('disable');
+    $('.service-ws').removeClass('connected');
+    $('.service-ws').removeClass('disconnected');
+    $('.service-ws').addClass(isWSEmable?'enable':'disable');
+    $('.service-ws').addClass(isWSConnected?'connected':'disconnected');
+
+    $('.service-amqp').removeClass('enable');
+    $('.service-amqp').removeClass('disable');
+    $('.service-amqp').removeClass('connected');
+    $('.service-amqp').removeClass('disconnected');
+    $('.service-amqp').addClass(isAMQPEnable?'enable':'disable');
+    $('.service-amqp').addClass(isAMQPConnected?'connected':'disconnected');
+}
+
 $(document).ready(function(e){
     createUSBSymbol();
     $('body').append('<div class="notification-container"></div>');

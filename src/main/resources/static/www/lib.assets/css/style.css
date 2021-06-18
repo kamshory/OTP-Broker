@@ -519,3 +519,31 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
 .service-item.disable.connected, .service-item.disable.disconnected{
   background-color: #F9F3F3;
 }
+
+.service-wrapper {  
+  display: flex;
+  flex-flow: row wrap;
+  gap: 20px;
+}
+
+.service-wrapper .service-item {
+  box-sizing: border-box;
+  border: 1px solid #DDDDDD;
+  background: white;
+  height: 60px;
+  width: calc( (100% / 2) - 10px );
+  padding: 10px;
+}
+
+.service-wrapper .feature {
+  width: calc( ( ( 100% / 3 ) * 2) - 20px );
+}
+@media (max-width: 480px) {
+  .service-wrapper .service-item {
+    width: 100%;
+    margin:0px;
+  }
+}
+.status-connection{
+  margin-bottom: 10px;
+}
