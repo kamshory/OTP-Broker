@@ -102,23 +102,33 @@ public class ServerWebSocketManager {
 		JSONObject info = new JSONObject();
 		
 		JSONObject modem = new JSONObject();
-		modem.put("name", "modem_connected");
-		modem.put("connected", !SMSUtil.isClosed());
+		modem.put(JsonKey.NAME, "modem_connected");
+		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
 		data.put(modem);
 		
-		JSONObject ws = new JSONObject();
-		ws.put("name", "ws_connected");
-		ws.put("connected", ConfigFeederWS.isConnected());
-		data.put(ws);
+		JSONObject wsEnable = new JSONObject();
+		wsEnable.put(JsonKey.NAME, "ws_enable");
+		wsEnable.put(JsonKey.VALUE, ConfigFeederWS.isFeederWsEnable());
+		data.put(wsEnable);
 		
-		JSONObject amqp = new JSONObject();
-		amqp.put("name", "amqp_connected");
-		amqp.put("connected", ConfigFeederAMQP.echoTest());
-		data.put(amqp);
+		JSONObject wsConnected = new JSONObject();
+		wsConnected.put(JsonKey.NAME, "ws_connected");
+		wsConnected.put(JsonKey.VALUE, ConfigFeederWS.isConnected());
+		data.put(wsConnected);
+		
+		JSONObject amqpEnable = new JSONObject();
+		amqpEnable.put(JsonKey.NAME, "amqp_enable");
+		amqpEnable.put(JsonKey.VALUE, ConfigFeederAMQP.isFeederAmqpEnable());
+		data.put(amqpEnable);
+		
+		JSONObject amqpConnected = new JSONObject();
+		amqpConnected.put(JsonKey.NAME, "amqp_connected");
+		amqpConnected.put(JsonKey.VALUE, ConfigFeederAMQP.isConnected());
+		data.put(amqpConnected);
 		
 		info.put("command", "server-info");
 		info.put("data", data);
-	
+		
 		
 		try {
 			this.sendMessage(info.toString(4));
@@ -127,6 +137,8 @@ public class ServerWebSocketManager {
 			 * Do nothing
 			 */
 		}
+		
+		
 	}
 
 	public JSONObject createWelcomeMessage() 

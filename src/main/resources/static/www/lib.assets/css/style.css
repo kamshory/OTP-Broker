@@ -501,10 +501,21 @@ border: 1px solid #DDDDDD;
 }
 .info-progress-inner{
   height: 10px;
-  background-color: #2984f9;
+  background-color: #3B82F2;
   box-sizing: border-box;
   position: relative;
 }
 .usb-device-symbol{
 display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
+}
+
+.service-item.enable.disconnected{
+  background-color: #D83A56;
+  color: #FFFFFF;
+}
+.service-item.enable.connected{
+  background-color: #66DE93;
+}
+.service-item.disable.connected, .service-item.disable.disconnected{
+  background-color: #F9F3F3;
 }

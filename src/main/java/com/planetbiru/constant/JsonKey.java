@@ -79,6 +79,8 @@ public class JsonKey {
 	public static final Object UPDATE                        = "update";
 	public static final Object DEACTIVATE                    = "deactivate";
 	public static final Object DELETE                        = "delete";
+	public static final String VALUE                         = "value";
+	public static final String SEND_INCOMMING_SMS            = "sendIncommingSMS";
 	
 	private JsonKey()
 	{

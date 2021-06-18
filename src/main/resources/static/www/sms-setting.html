@@ -100,6 +100,11 @@
                 </td>
               </tr>
               <tr>
+                <td>Send Incomming SMS</td>
+                <td><label><input type="checkbox" name="send_incomming_sms" id="send_incomming_sms" value="1">	Yes</label>
+                </td>
+              </tr>
+              <tr>
                 <td>Minimum Interval (Second)</td>
                 <td><input type="number" name="incomming_interval" id="incomming_interval" value="">	
                 </td>
@@ -136,10 +141,12 @@
                       $('input[name="connection_type"]').val(data.connectionType);
                       $('input[name="imei"]').val(data.imei);
                       $('input[name="sim_card_pin"]').val(data.simCardPIN);
-                        $('input[name="sms_center"]').val(data.smsCenter);
-                        $('input[name="incomming_interval"]').val(data.incommingInterval+"");
-                        $('input[name="time_range"]').val(data.timeRange+"");
-                        $('input[name="max_per_time_range"]').val(data.maxPerTimeRange+"");
+                      $('input[name="sms_center"]').val(data.smsCenter);
+                      $('input[name="incomming_interval"]').val(data.incommingInterval+"");
+                      $('input[name="time_range"]').val(data.timeRange+"");
+                      $('input[name="max_per_time_range"]').val(data.maxPerTimeRange+"");
+                      $('input[name="send_incomming_sms"]').prop("checked", data.sendIncommingSMS);
+                      
                     }
                 });
             });

@@ -19,6 +19,7 @@ public class ConfigSMS {
 	private static int maxPerTimeRange = 0;
 	private static String imei = "";
 	private static String simCardPIN = "";
+	private static boolean sendIncommingSMS = false;
 	
 	private ConfigSMS()
 	{
@@ -33,10 +34,12 @@ public class ConfigSMS {
 		smsSetting.put(JsonKey.INCOMMING_INTERVAL, ConfigSMS.incommingInterval);
 		smsSetting.put(JsonKey.TIME_RANGE, ConfigSMS.timeRange);
 		smsSetting.put(JsonKey.MAX_PER_TIME_RANGE, ConfigSMS.maxPerTimeRange);
-		smsSetting.put(JsonKey.IMEI, ConfigSMS.getImei());
-		smsSetting.put(JsonKey.SIM_CARD_PIN, ConfigSMS.getSimCardPIN());
+		smsSetting.put(JsonKey.IMEI, ConfigSMS.imei);
+		smsSetting.put(JsonKey.SIM_CARD_PIN, ConfigSMS.simCardPIN);
+		smsSetting.put(JsonKey.SEND_INCOMMING_SMS, ConfigSMS.sendIncommingSMS);
 		return smsSetting;
 	}
+	
 	
 	public static void save(String path) {
 		String dir = Utility.getBaseDir();
@@ -84,11 +87,12 @@ public class ConfigSMS {
 				JSONObject smsSetting = new JSONObject(text);
 				ConfigSMS.connectionType = smsSetting.optString(JsonKey.CONNECTION_TYPE, "");
 				ConfigSMS.smsCenter = smsSetting.optString(JsonKey.SMS_CENTER, "");
-				ConfigSMS.setImei(smsSetting.optString(JsonKey.IMEI, ""));
-				ConfigSMS.setSimCardPIN(smsSetting.optString(JsonKey.SIM_CARD_PIN, ""));
+				ConfigSMS.imei = smsSetting.optString(JsonKey.IMEI, "");
+				ConfigSMS.simCardPIN = smsSetting.optString(JsonKey.SIM_CARD_PIN, "");
 				ConfigSMS.incommingInterval = smsSetting.optInt(JsonKey.INCOMMING_INTERVAL, 0);
 				ConfigSMS.timeRange = smsSetting.optInt(JsonKey.TIME_RANGE, 0);
 				ConfigSMS.maxPerTimeRange = smsSetting.optInt(JsonKey.MAX_PER_TIME_RANGE, 0);
+				ConfigSMS.sendIncommingSMS = smsSetting.optBoolean(JsonKey.SEND_INCOMMING_SMS, false);
 			}
 			catch(JSONException e)
 			{
@@ -172,6 +176,14 @@ public class ConfigSMS {
 
 	public static void setSimCardPIN(String simCardPIN) {
 		ConfigSMS.simCardPIN = simCardPIN;
+	}
+
+	public static boolean isSendIncommingSMS() {
+		return sendIncommingSMS;
+	}
+
+	public static void setSendIncommingSMS(boolean sendIncommingSMS) {
+		ConfigSMS.sendIncommingSMS = sendIncommingSMS;
 	}
 
 	

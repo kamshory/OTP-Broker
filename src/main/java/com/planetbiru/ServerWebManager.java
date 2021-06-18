@@ -1576,16 +1576,18 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_sms_setting"))
 		{
-			String connectionType = query.getOrDefault("connection_type", "");			
-			String smsCenter = query.getOrDefault("sms_center", "");		
-			String incommingInt = query.getOrDefault("incomming_interval", "0");
+			String connectionType = query.getOrDefault("connection_type", "").trim();			
+			String smsCenter = query.getOrDefault("sms_center", "").trim();		
+			String incommingInt = query.getOrDefault("incomming_interval", "0").trim();
 			int incommingInterval = Utility.atoi(incommingInt);
-			String tmRange = query.getOrDefault("time_range", "0");
+			String tmRange = query.getOrDefault("time_range", "0").trim();
 			int timeRange = Utility.atoi(tmRange);	
-			String maxInRange = query.getOrDefault("max_per_time_range", "0");
+			String maxInRange = query.getOrDefault("max_per_time_range", "0").trim();
 			int maxPerTimeRange = Utility.atoi(maxInRange);
-			String imei = query.getOrDefault("imei", "");		
-			String simCardPIN = query.getOrDefault("sim_card_pin", "");		
+			String imei = query.getOrDefault("imei", "").trim();		
+			String simCardPIN = query.getOrDefault("sim_card_pin", "").trim();		
+			boolean sendIncommingSMS = query.getOrDefault("send_incomming_sms", "").trim().equals("1");
+			
 			
 			ConfigSMS.setConnectionType(connectionType);
 			ConfigSMS.setImei(imei);
@@ -1594,6 +1596,7 @@ public class ServerWebManager {
 			ConfigSMS.setIncommingInterval(incommingInterval);
 			ConfigSMS.setTimeRange(timeRange);
 			ConfigSMS.setMaxPerTimeRange(maxPerTimeRange);			
+			ConfigSMS.setSendIncommingSMS(sendIncommingSMS);		
 			
 			ConfigSMS.save(smsSettingPath);			
 		}		
