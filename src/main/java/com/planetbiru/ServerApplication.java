@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
+
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
@@ -20,7 +21,6 @@ public class ServerApplication {
 		resetConfig();
 		context = SpringApplication.run(ServerApplication.class);
 	}
-	
 	private static void resetConfig() 
 	{
 		if(usbPluged())

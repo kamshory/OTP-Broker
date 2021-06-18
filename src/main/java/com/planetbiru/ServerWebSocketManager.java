@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.constant.JsonKey;
@@ -95,30 +96,45 @@ public class ServerWebSocketManager {
         	 */
 		}
 	}
-    
+
+	
+	
     private void sendServerStatus() 
     {
 		JSONArray data = new JSONArray();
 		JSONObject info = new JSONObject();
 		
 		JSONObject modem = new JSONObject();
-		modem.put("name", "modem_connected");
-		modem.put("connected", !SMSUtil.isClosed());
+		modem.put(JsonKey.NAME, "modem_connected");
+		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
 		data.put(modem);
+		JSONObject wsEnable = new JSONObject();
+		wsEnable.put(JsonKey.NAME, "ws_enable");
+		wsEnable.put(JsonKey.VALUE, ConfigFeederWS.isFeederWsEnable());
+		data.put(wsEnable);
 		
-		JSONObject ws = new JSONObject();
-		ws.put("name", "ws_connected");
-		ws.put("connected", ConfigFeederWS.isConnected());
-		data.put(ws);
+		JSONObject wsConnected = new JSONObject();
+		wsConnected.put(JsonKey.NAME, "ws_connected");
+		wsConnected.put(JsonKey.VALUE, ConfigFeederWS.isConnected());
+		data.put(wsConnected);
 		
-		JSONObject amqp = new JSONObject();
-		amqp.put("name", "amqp_connected");
-		amqp.put("connected", ConfigFeederAMQP.echoTest());
-		data.put(amqp);
+		JSONObject amqpEnable = new JSONObject();
+		amqpEnable.put(JsonKey.NAME, "amqp_enable");
+		amqpEnable.put(JsonKey.VALUE, ConfigFeederAMQP.isFeederAmqpEnable());
+		data.put(amqpEnable);
+		
+		JSONObject amqpConnected = new JSONObject();
+		amqpConnected.put(JsonKey.NAME, "amqp_connected");
+		amqpConnected.put(JsonKey.VALUE, ConfigFeederAMQP.isConnected());
+		data.put(amqpConnected);
+		
+		JSONObject httpEnable = new JSONObject();
+		httpEnable.put(JsonKey.NAME, "http_enable");
+		httpEnable.put(JsonKey.VALUE, ConfigAPI.isHttpEnable() || ConfigAPI.isHttpsEnable());
+		data.put(httpEnable);
 		
 		info.put("command", "server-info");
 		info.put("data", data);
-	
 		
 		try {
 			this.sendMessage(info.toString(4));
@@ -127,6 +143,7 @@ public class ServerWebSocketManager {
 			 * Do nothing
 			 */
 		}
+		
 	}
 
 	public JSONObject createWelcomeMessage() 
@@ -244,5 +261,6 @@ public class ServerWebSocketManager {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+	
     
 }

@@ -22,6 +22,7 @@ public class ConstantString {
 	public static final String ADMIN_INIT                    = "admin-init.html";
 	public static final String SEND_MESSAGE                  = "send-message";
 	public static final String SEND_MAIL                     = "send-mail";
+	public static final String SEND_EMAIL                    = "send-email";
 	public static final String BASE_36                       = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	public static final String MYSQL_DATE_TIME_FORMAT        = "yyyy-MM-dd HH:mm:ss";
 	public static final String MYSQL_DATE_TIME_FORMAT_MS     = "yyyy-MM-dd HH:mm:ss.SSS";
@@ -29,6 +30,7 @@ public class ConstantString {
 	public static final String REKENING_WRITE_TABUNGAN_WRITE = "rekening write, tabungan write";
 	public static final String MYSQL_DATE                    = "yyyy-MM-dd";
 	public static final String SERIAL_PORT_NULL              = "Serial port is null";
+	public static final String MODEM_NOT_CONNECTED           = "Modem is not connected";
 	
 	private ConstantString()
 	{

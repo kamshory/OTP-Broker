@@ -23,7 +23,8 @@
     <script>
       function handleIncommingMessage(message)
       {
-        console.log("handleIncommingMessage", message);     
+        console.log("handleIncommingMessage", message);  
+        updateDashboard();   
       }      
     </script>
   </head>
@@ -48,17 +49,19 @@
           
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-              <li class="active "><a href="./">Home</a></li>
+              <li class="active"><a href="./">Home</a></li>
               <li class=""><a href="ussd.html">USSD</a></li>
               <li class=""><a href="sms.html">SMS</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                   <li class=""><a href="admin.html">Administrator Setting</a></li>
+                  <li class=""><a href="api-setting.html">API Setting</a></li>
+                  <li class=""><a href="api-user.html">API User</a></li>
                   <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                   <li class=""><a href="sms-setting.html">SMS Setting</a></li>
+                  <li class=""><a href="modem.html">Modem</a></li>
                   <li class=""><a href="email-setting.html">Email Setting</a></li>
-                  <li class=""><a href="api-user.html">API User</a></li>
                   <li class=""><a href="ddns-record.html">DDNS Record</a></li>
                   <li role="separator" class="divider"></li>
                   <li class="dropdown-header">Other Configs</li>
@@ -83,14 +86,15 @@
           .service-wrapper {  
             display: flex;
             flex-flow: row wrap;
+            gap: 20px;
           }
 
           .service-wrapper .service-item {
+            box-sizing: border-box;
             border: 1px solid #DDDDDD;
             background: white;
-            margin: 10px;
-            height: 80px;
-            width: calc( (100% / 2) - 20px );
+            height: 60px;
+            width: calc( (100% / 2) - 10px );
             padding: 10px;
           }
 
@@ -103,13 +107,53 @@
           @media (max-width: 480px) {
             .service-wrapper .service-item {
               width: 100%;
-              margin: 10px 0;
+              margin:0px;
             }
+          }
+          .status-connection{
+            margin-bottom: 10px;
           }
           
         </style>
         <script>
-          
+        function updateDashboard()
+          {
+          var isModemConnected = getModemConnected();
+          var isWSEmable = getWSEnable();
+          var isWSConnected = getWSConnected();
+          var isAMQPEnable = getAMQPEnable();
+          var isAMQPConnected = getAMQPConnected();
+          var isHTTPEmable = getHTTPEnable();
+
+          $('.service-modem').removeClass('connected');
+          $('.service-modem').removeClass('disconnected');
+          $('.service-modem').addClass('enable');
+          $('.service-modem').addClass(isModemConnected?'connected':'disconnected');
+
+          $('.service-http').removeClass('connected');
+          $('.service-http').removeClass('disconnected');
+          $('.service-http').removeClass('enable');
+          $('.service-http').removeClass('disable');
+          $('.service-http').addClass(isHTTPEmable?'enable':'disable');
+          $('.service-http').addClass(isHTTPEmable?'connected':'disconnected');
+
+          $('.service-ws').removeClass('enable');
+          $('.service-ws').removeClass('disable');
+          $('.service-ws').removeClass('connected');
+          $('.service-ws').removeClass('disconnected');
+          $('.service-ws').addClass(isWSEmable?'enable':'disable');
+          $('.service-ws').addClass(isWSConnected?'connected':'disconnected');
+
+          $('.service-amqp').removeClass('enable');
+          $('.service-amqp').removeClass('disable');
+          $('.service-amqp').removeClass('connected');
+          $('.service-amqp').removeClass('disconnected');
+          $('.service-amqp').addClass(isAMQPEnable?'enable':'disable');
+          $('.service-amqp').addClass(isAMQPConnected?'connected':'disconnected');
+
+        
+        }
+
         </script>
 
 
@@ -119,7 +163,7 @@
             <div class="service-item service-modem">Modem</div>
             <div class="service-item service-ws">Feeder WebSocket</div>
             <div class="service-item service-amqp">Feeder MessageBroker</div>
-            <div class="service-item">REST API</div>
+            <div class="service-item service-http">REST API</div>
             
            
             

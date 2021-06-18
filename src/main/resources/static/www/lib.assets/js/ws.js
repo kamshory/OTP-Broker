@@ -134,37 +134,71 @@ function setUSBColor(color)
     $('.usb-device-symbol svg path').attr('stroke', color);
 }
 
-function setModemStatus(value)
+function setModemConnected(value)
 {
     var key = 'otp_modem_connected';
     window.localStorage.setItem(key, (value)?'1':'0');
 }
-function getModemStatus()
+function getModemConnected()
 {
     var key = 'otp_modem_connected';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
-function setWSStatus(value)
+function setWSConnected(value)
 {
     var key = 'otp_ws_connected';
     window.localStorage.setItem(key, (value)?'1':'0');
     console.log('otp_ws_connected', value)
 }
-function getWSStatus()
+function getWSConnected()
 {
     var key = 'otp_ws_connected';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
-function setAMQPStatus(value)
+function setAMQPConnected(value)
 {
     var key = 'otp_amqp_connected';
     window.localStorage.setItem(key, (value)?'1':'0');
 }
-function getAMQPStatus()
+function getAMQPConnected()
 {
     var key = 'otp_amqp_connected';
+    var value = window.localStorage.getItem(key) || '';
+    return value == '1';
+}
+function setWSEnable(value)
+{
+    var key = 'otp_ws_enable';
+    window.localStorage.setItem(key, (value)?'1':'0');
+    console.log('otp_ws_enable', value)
+}
+function getWSEnable()
+{
+    var key = 'otp_ws_enable';
+    var value = window.localStorage.getItem(key) || '';
+    return value == '1';
+}
+function setAMQPEnable(value)
+{
+    var key = 'otp_amqp_enable';
+    window.localStorage.setItem(key, (value)?'1':'0');
+}
+function getAMQPEnable()
+{
+    var key = 'otp_amqp_enable';
+    var value = window.localStorage.getItem(key) || '';
+    return value == '1';
+}
+function setHTTPEnable(value)
+{
+    var key = 'otp_http_enable';
+    window.localStorage.setItem(key, (value)?'1':'0');
+}
+function getHTTPEnable()
+{
+    var key = 'otp_http_enable';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
@@ -174,35 +208,36 @@ function updateServerInfo(receivedJSON)
     for(var i in data)
     {
         var item = data[i];
-        console.log(item)
+        if(item.name == 'http_enable')
+        {
+            setHTTPEnable(item.value);
+        }
         if(item.name == 'modem_connected')
         {
-            setModemStatus(item.connected);
+            setModemConnected(item.value);
+        }
+        if(item.name == 'ws_enable')
+        {
+            setWSEnable(item.value);
         }
         if(item.name == 'ws_connected')
         {
-            setWSStatus(item.connected);
+            setWSConnected(item.value);
+        }
+        if(item.name == 'amqp_enable')
+        {
+            setAMQPEnable(item.value);
         }
         if(item.name == 'amqp_connected')
         {
-            setAMQPStatus(item.connected);
+            setAMQPConnected(item.value);
         }
         if(item.name == 'feeder')
         {
             setFeeder(item.feeder);
         }
     }
-    updateDashboard();
-}
-function updateDashboard()
-{
-    var isWSConnected = getWSStatus();
-    var isAMQPConnected = getAMQPStatus();
-    var isModemConnected = getModemStatus();
-    console.log(isWSConnected, isAMQPConnected, isModemConnected)
-    $('.service-modem').css({'background-color':(isModemConnected?'#FFFFFF':'#FF0000')});
-    $('.service-amqp').css({'background-color':(isAMQPConnected?'#FFFFFF':'#FF0000')});
-    $('.service-ws').css({'background-color':(isWSConnected?'#FFFFFF':'#FF0000')});
+    
 }
 
 function setFeeder(feeder)

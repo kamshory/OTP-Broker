@@ -35,7 +35,7 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-			<span class="usb-device-symbol"></span>
+                    <span class="usb-device-symbol"></span>
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                         aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
@@ -55,12 +55,12 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li class="active"><a href="admin.html">Administrator Setting</a></li>
+                                <li class=""><a href="admin.html">Administrator Setting</a></li>
                                 <li class=""><a href="api-setting.html">API Setting</a></li>
                                 <li class=""><a href="api-user.html">API User</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                                 <li class=""><a href="sms-setting.html">SMS Setting</a></li>
-                                <li class=""><a href="modem.html">Modem</a></li>
+                                <li class="active"><a href="modem.html">Modem</a></li>
                                 <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li class=""><a href="ddns-record.html">DDNS Record</a></li>
                                 <li role="separator" class="divider"></li>
@@ -71,7 +71,7 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li class=""><a href="account.html">Account</a></li>
+                        <li><a href="account.html">Account</a></li>
                         <li><a href="logout.html">Logout</a></li>
                     </ul>
                 </div>
@@ -80,75 +80,45 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>DNS Record</h3>
-            <form action="ddns-record/add" method="post">
+            <h3>Modem</h3>
+            <form action="modem.html" method="post">
                 <table class="two-cols-responsive">
                     <tbody>
                         <tr>
-                        <td>Provider</td>
-                        <td><select name="provider" id="provider" class="form-control">
-                            <option value="cloudflare">Cloudflare</option>
-                        </select></td>
+                            <td>Name</td>
+                            <td><input type="text" class="form-control" name="name" value=""></td>
                         </tr>
                         <tr>
-                        <td>Zone</td>
-                        <td><input type="text" class="form-control" name="zone" value=""></td>
+                            <td>Connection Type</td>
+                            <td><input type="text" class="form-control" name="connection_type" value=""></td>
                         </tr>
                         <tr>
-                        <td>Record Name</td>
-                        <td><input type="text" class="form-control" name="record_name" value=""></td>
+                            <td>SMS Center</td>
+                            <td><input type="text" class="form-control" name="sms_center" value=""></td>
                         </tr>
                         <tr>
-                        <tr>
-                        <td>TTL</td>
-                        <td><input type="number" class="form-control" name="ttl" value=""></td>
+                            <td>IMEI</td>
+                            <td><input type="tel" class="form-control" name="imei" value=""></td>
                         </tr>
                         <tr>
-                        <td>Proxied</td>
-                        <td><label><input type="checkbox" name="proxied" value="1"> Yes</label></td>
+                            <td>SIM Card PIN</td>
+                            <td><input type="password" class="form-control" name="sim_card_pin"></td>
                         </tr>
                         <tr>
-                        <td>Update DNS</td>
-                        <td><select name="cron_expression" class="form-control">
-                            <option value="0 * * * * ?">Every minute</option>
-                            <option value="0 */2 * * * * ?">Every 2 minutes</option>
-                            <option value="0 */3 * * * * ?">Every 3 minutes</option>
-                            <option value="0 */4 * * * * ?">Every 4 minutes</option>
-                            <option value="0 */5 * * * * ?">Every 5 minutes</option>
-                            <option value="0 */6 * * * * ?">Every 6 minutes</option>
-                            <option value="0 */10 * * * * ?" selected>Every 10 minutes</option>
-                            <option value="0 */12 * * * * ?">Every 12 minutes</option>
-                            <option value="0 */15 * * * * ?">Every 15 minutes</option>
-                            <option value="0 */20 * * * * ?">Every 20 minutes</option>
-                            <option value="0 */30 * * * * ?">Every 30 minutes</option>
-                            <option value="0 0 * * * * ?">Every hour</option>
-                            <option value="0 0 */2 * * * ?">Every 2 hours</option>
-                            <option value="0 0 */3 * * * ?">Every 3 hours</option>
-                            <option value="0 0 */4 * * * ?">Every 4 hours</option>
-                            <option value="0 0 */6 * * * ?">Every 6 hours</option>
-                            <option value="0 0 */12 * * * ?">Every 12 hours</option>
-                            <option value="0 0 0 * * * ?">Everyday at 00:00:00</option>
-                            </select></td>
+                            <td>Active</td>
+                            <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
                         </tr>
-                        <tr>
-                        <td>Force Create Zone</td>
-                        <td><label><input type="checkbox" name="force_create_zone" value="1"> Yes</label></td>
-                        </tr>
-                        <tr>
-                        <td>Active</td>
-                        <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
-                        </tr>
-                        </tbody>
+                    </tbody>
                 </table>
                 <table class="two-cols-responsive">
                     <tbody>
                         <tr>
                             <td></td>
                             <td>
-                                <input type="submit" class="btn btn-success" name="add" value="Save"
-                                    onclick="return confirm('Are you sure you want to save this record')">
+                                <input type="submit" class="btn btn-success" value="Save Changes"
+                                    onclick="return confirm('Are you sure you want to save it?')" name="update">
                                 <input type="button" class="btn btn-primary" value="Cancel"
-                                    onclick="window.location='ddns-record.html'">
+                                    onclick="window.location='modem.html'">
                             </td>
                         </tr>
                     </tbody>

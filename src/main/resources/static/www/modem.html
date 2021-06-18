@@ -35,7 +35,7 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-			<span class="usb-device-symbol"></span>
+                    <span class="usb-device-symbol"></span>
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                         aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
@@ -55,12 +55,12 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li class="active"><a href="admin.html">Administrator Setting</a></li>
+                                <li class=""><a href="admin.html">Administrator Setting</a></li>
                                 <li class=""><a href="api-setting.html">API Setting</a></li>
                                 <li class=""><a href="api-user.html">API User</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                                 <li class=""><a href="sms-setting.html">SMS Setting</a></li>
-                                <li class=""><a href="modem.html">Modem</a></li>
+                                <li class="active"><a href="modem.html">Modem</a></li>
                                 <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li class=""><a href="ddns-record.html">DDNS Record</a></li>
                                 <li role="separator" class="divider"></li>
@@ -71,7 +71,7 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="account.html">Account</a></li>
+                        <li class=""><a href="account.html">Account</a></li>
                         <li><a href="logout.html">Logout</a></li>
                     </ul>
                 </div>
@@ -80,77 +80,64 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>API User</h3>
-            <form action="api-user-update.html" method="post">
-                <table class="two-cols-responsive">
-                    <tbody>
+            <h3>Modem</h3>
+            <form action="" method="post">
+                <table class="row-table" border="1" data-file="admin.html">
+                    <thead>
                         <tr>
-                            <td>Username</td>
-                            <td><input type="text" class="form-control" name="username" value=""></td>
-                        </tr>
-                        <tr>
+                            <td width="16"><input type="checkbox" class="check-all"></td>
                             <td>Name</td>
-                            <td><input type="text" class="form-control" name="name" value=""></td>
+                            <td>Connection</td>
+                            <td width="60" align="center">Active</td>
                         </tr>
-                        <tr>
-                            <td>Email</td>
-                            <td><input type="email" class="form-control" name="email" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>Phone Number</td>
-                            <td><input type="tel" class="form-control" name="phone" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>Password</td>
-                            <td><input type="password" class="form-control" name="password"></td>
-                        </tr>
-                        <tr>
-                            <td>Blocked</td>
-                            <td><label><input type="checkbox" name="blocked" value="1"> Yes</label></td>
-                        </tr>
-                        <tr>
-                            <td>Active</td>
-                            <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="two-cols-responsive">
+                    </thead>
+
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td>
-                                <input type="submit" class="btn btn-success" value="Save Changes"
-                                    onclick="return confirm('Are you sure you want to save changes')" name="update">
-                                <input type="button" class="btn btn-primary" value="Cancel"
-                                    onclick="window.location='api-user.html'">
-                            </td>
-                        </tr>
+
                     </tbody>
                 </table>
+                <div class="button-area">
+                    <input type="button" class="btn btn-success" value="Add"
+                        onclick="window.location='modem-add.html'">
+                    <input type="submit" class="btn btn-primary" name="activate" value="Activate">
+                    <input type="submit" class="btn btn-warning" name="deactivate" value="Deactivate">
+                    <input type="submit" class="btn btn-danger" name="delete" value="Delete"
+                        onclick="return confirm('Are you sure you want to delete this record?')">
+                </div>
             </form>
             <script type="text/javascript">
-                $(document).ready(function (e) {
-                    var urlParams = new URLSearchParams(window.location.search);
-                    var username = urlParams.get('username') || '';
-                    if (username.length > 0) {
-                        $.ajax({
-                            type: "GET",
-                            url: "/api-user/detail/" + username,
-                            dataType: "json",
-                            success: function (data) {
-                                $('input[name="name"]').val(data.name);
-                                $('input[name="username"]').val(data.username);
-                                $('input[name="phone"]').val(data.phone);
-                                $('input[name="email"]').val(data.email);
-                                $('input[name="blocked"]').prop('checked', data.blocked);
-                                $('input[name="active"]').prop('checked', data.active);
+                $(document).ready(function (e1) {
+                    $.ajax({
+                        type: "GET",
+                        url: "modem/list",
+                        dataType: "json",
+                        success: function (data) {
+                            console.log(data)
+                            for (const key in data) {
+                                if (data.hasOwnProperty(key)) {
+                                    var item = data[key];
+                                    var active = !item.active ? 'icon-cross' : 'icon-check';
+                                    $('.row-table tbody').append(
+                                        '<tr data-pk-id="' + item.id + '">\r\n' +
+                                        '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +
+                                        '	<td><a href="modem-update.html?id=' + encodeURIComponent(item.id) + '">' + item.name + '</a></td>\r\n' +
+                                        '	<td><a href="modem-update.html?id=' + encodeURIComponent(item.id) + '">' + item.connectionType + '</a></td>\r\n' +
+                                        '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
+                                        '</tr>\r\n'
+                                    );
+                                }
                             }
+                        }
+                    });
+
+                    $(document).on('change', 'thead input[type="checkbox"].check-all', function (e) {
+                        var checked = $(this).prop('checked');
+                        $(this).closest("table").find('tbody input[type="checkbox"].check-all').each(function (e2) {
+                            $(this).prop('checked', checked);
                         });
-                    }
-                    else {
-                        window.location = "api-user.html";
-                    }
+                    });
                 });
+
             </script>
         </div>
         <!-- /container -->

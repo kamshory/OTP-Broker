@@ -25,16 +25,19 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigCloudflare;
-import com.planetbiru.config.ConfigEmail;
-import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.config.ConfigDDNS;
+import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigSMS;
+import com.planetbiru.config.ConfigSaved;
+import com.planetbiru.config.ModemData;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
@@ -51,6 +54,8 @@ import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.Utility;
+
+
 
 @RestController
 public class ServerWebManager {
@@ -115,7 +120,10 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
-	@Value("${otpbroker.path.setting.api}")
+	@Value("${otpbroker.path.setting.api.service}")
+	private String apiSettingPath;
+
+	@Value("${otpbroker.path.setting.api.user}")
 	private String userAPISettingPath;
 
 	@Value("${otpbroker.path.setting.email}")
@@ -139,24 +147,30 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.ethernet}")
 	private String ethernetSettingPath;
 
+	@Value("${otpbroker.path.setting.modem}")
+	private String modemSettingPath;
+	
+	@Value("${otpbroker.path.base.setting}")
+	private String baseDirConfig;
+
 	
 	private ServerWebManager()
     {
     }
 	
-	
 	@PostConstruct
 	public void init()
 	{
+		Config.setBaseDirConfig(baseDirConfig);
 		ConfigDDNS.load(ddnsSettingPath);
 		ConfigCloudflare.load(cloudflareSettingPath);
+		ConfigAPI.load(apiSettingPath);
 
 		logger.info("Init...");	
 		Config.setPortName(portName);		
 		userAccount = new WebUserAccount(userSettingPath);		
 		userAPIAccount = new WebUserAccount(userAPISettingPath);		
 		this.loadConfigEmail();		
-		this.initSerial();		
 		
 		try 
 		{
@@ -167,6 +181,7 @@ public class ServerWebManager {
 			e.printStackTrace();			
 		}
 	}
+	
 	
 	private void loadConfigEmail()
 	{
@@ -181,14 +196,6 @@ public class ServerWebManager {
 		 * Override email setting if exists
 		 */
 		ConfigEmail.load(emailSettingPath);
-	}
-	
-	
-	
-	private void initSerial() 
-	{
-		String port = Config.getPortName();
-		SMSUtil.init(port);
 	}	
 	
 	@PostMapping(path="/send-token")
@@ -528,6 +535,38 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+	@GetMapping(path="/api-setting/get")
+	public ResponseEntity<byte[]> handleAPISetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigAPI.load(apiSettingPath);
+				String list = ConfigAPI.toJSONObject().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
 	
 	
 	
@@ -543,7 +582,7 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{
 				ConfigEmail.load(emailSettingPath);				
-				responseBody = ConfigEmail.getJSONObject().toString().getBytes();
+				responseBody = ConfigEmail.toJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -576,7 +615,7 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{
 				ConfigNetDHCP.load(dhcpSettingPath);		
-				responseBody = ConfigNetDHCP.getJSONObject().toString().getBytes();
+				responseBody = ConfigNetDHCP.toJSONObject().toString().getBytes();
 				
 			}
 			else
@@ -610,7 +649,7 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{
 				ConfigNetWLAN.load(wlanSettingPath);;		
-				responseBody = ConfigNetWLAN.getJSONObject().toString().getBytes();
+				responseBody = ConfigNetWLAN.toJSONObject().toString().getBytes();
 				
 			}
 			else
@@ -644,7 +683,7 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{
 				ConfigNetEthernet.load(ethernetSettingPath);;		
-				responseBody = ConfigNetEthernet.getJSONObject().toString().getBytes();				
+				responseBody = ConfigNetEthernet.toJSONObject().toString().getBytes();				
 			}
 			else
 			{
@@ -715,7 +754,7 @@ public class ServerWebManager {
 			{
 				ConfigCloudflare.load(emailSettingPath);
 				
-				responseBody = ConfigCloudflare.getJSONObject().toString().getBytes();
+				responseBody = ConfigCloudflare.toJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -1023,7 +1062,74 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{
 				ConfigDDNS.load(ddnsSettingPath);
-				String list = ConfigDDNS.getJSONObject().toString();
+				String list = ConfigDDNS.toJSONObject().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	@GetMapping(path="/modem/detail/{id}")
+	public ResponseEntity<byte[]> handleModemGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigModem.load(modemSettingPath);
+				String list = ConfigModem.geModemData(id).toJSONObject().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/modem/list")
+	public ResponseEntity<byte[]> handleModemSRecordList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers);
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigModem.load(modemSettingPath);
+				String list = ConfigModem.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -1396,7 +1502,11 @@ public class ServerWebManager {
 				}
 				if(path.equals("/sms-setting.html"))
 				{
-					this.processSMSSetting(requestBody);
+					//this.processSMSSetting(requestBody);
+				}
+				if(path.equals("/modem.html") || path.equals("/modem-add.html") || path.equals("/modem-update.html"))
+				{
+					this.processModemSetting(requestBody);
 				}
 				if(path.equals("/email-setting.html"))
 				{
@@ -1405,6 +1515,10 @@ public class ServerWebManager {
 				if(path.equals("/sms.html"))
 				{
 					this.processSMS(requestBody);
+				}
+				if(path.equals("/api-setting.html"))
+				{
+					this.processAPISetting(requestBody);
 				}
 				if(path.equals("/cloudflare.html"))
 				{
@@ -1424,6 +1538,40 @@ public class ServerWebManager {
 		}
 	}
 	
+	private void processAPISetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		if(query.containsKey("save_api_setting"))
+		{
+			ConfigAPI.load(apiSettingPath);
+			String v1 = query.getOrDefault("http_port", "0").trim();
+			int lHttpPort = Utility.atoi(v1);
+			
+			String v2 = query.getOrDefault("https_port", "0").trim();
+			int lHttpsPort = Utility.atoi(v2);
+
+			boolean lHttpEnable = query.getOrDefault("http_enable", "").trim().equals("1");
+			boolean lHttpsEnable = query.getOrDefault("https_enable", "").trim().equals("1");
+	
+			
+			String lMessagePath = query.getOrDefault("message_path", "").trim();
+			String lBlockingPath = query.getOrDefault("blocking_path", "").trim();
+			String lUnblockingPath = query.getOrDefault("unblocking_path", "").trim();
+			
+			JSONObject config = new JSONObject();			
+			config.put("httpPort", lHttpPort);
+			config.put("httpsPort", lHttpsPort);
+
+			config.put("httpEnable", lHttpEnable);
+			config.put("httpsEnable", lHttpsEnable);
+
+			config.put("messagePath", lMessagePath);
+			config.put("blockingPath", lBlockingPath);
+			config.put("unblockingPath", lUnblockingPath);
+			
+			ConfigAPI.save(apiSettingPath, config);
+		}
+	}
+
 	private void processNetworkSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_dhcp"))
@@ -1536,6 +1684,7 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_email_setting"))
 		{
+			ConfigAPI.load(apiSettingPath);
 			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
 			String lMailHost = query.getOrDefault("smtp_host", "").trim();
 	
@@ -1560,43 +1709,114 @@ public class ServerWebManager {
 			config.put("mailSSL", lMailSSL);
 			config.put("mailStartTLS", lMailStartTLS);
 			
-			saveConfigEmail(config);
+			ConfigAPI.save(apiSettingPath, config);
 		}
 		
 	}
 
-	private void saveConfigEmail(JSONObject config)
-	{
-		ConfigEmail.save(emailSettingPath, config);
-	}
 	
-	private void processSMSSetting(String requestBody) {
+	private void processModemSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("save_sms_setting"))
+		ConfigModem.load(modemSettingPath);
+		if(query.containsKey(JsonKey.DELETE))
 		{
-			String connectionType = query.getOrDefault("connection_type", "");			
-			String smsCenter = query.getOrDefault("sms_center", "");		
-			String incommingInt = query.getOrDefault("incomming_interval", "0");
-			int incommingInterval = Utility.atoi(incommingInt);
-			String tmRange = query.getOrDefault("time_range", "0");
-			int timeRange = Utility.atoi(tmRange);	
-			String maxInRange = query.getOrDefault("max_per_time_range", "0");
-			int maxPerTimeRange = Utility.atoi(maxInRange);
-			String imei = query.getOrDefault("imei", "");		
-			String simCardPIN = query.getOrDefault("sim_card_pin", "");		
-			
-			ConfigSMS.setConnectionType(connectionType);
-			ConfigSMS.setImei(imei);
-			ConfigSMS.setSimCardPIN(simCardPIN);
-			ConfigSMS.setSmsCenter(smsCenter);
-			ConfigSMS.setIncommingInterval(incommingInterval);
-			ConfigSMS.setTimeRange(timeRange);
-			ConfigSMS.setMaxPerTimeRange(maxPerTimeRange);			
-			
-			ConfigSMS.save(smsSettingPath);			
-		}		
+			/**
+			 * Delete
+			 */
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigModem.deleteRecord(value);
+				}
+			}
+			ConfigModem.save(modemSettingPath);
+		}
+		if(query.containsKey(JsonKey.DEACTIVATE))
+		{
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigModem.deactivate(value);
+				}
+			}
+			ConfigModem.save(modemSettingPath);
+		}
+		if(query.containsKey(JsonKey.ACTIVATE))
+		{
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigModem.activate(value);
+				}
+			}
+			ConfigModem.save(modemSettingPath);
+		}
+		
+		if(query.containsKey(JsonKey.ADD))
+		{
+			this.processModemUpdate(query, JsonKey.ADD);
+		}	
+		if(query.containsKey(JsonKey.UPDATE))
+		{
+			this.processModemUpdate(query, JsonKey.UPDATE);
+		}	
 	}
 	
+	
+	private void processModemUpdate(Map<String, String> query, String action) {		
+		
+		String id = query.getOrDefault("id", "").trim();		
+		String connectionType = query.getOrDefault("connection_type", "").trim();
+		boolean active = query.getOrDefault("active", "").trim().equals("1");		
+
+		String smsCenter = query.getOrDefault("sms_center", "").trim();		
+		
+		String incommingIntervalS = query.getOrDefault("incomming_interval", "0").trim();		
+		int incommingInterval = Utility.atoi(incommingIntervalS);	
+		
+		String timeRangeS = query.getOrDefault("time_range", "").trim();		
+		int timeRange = Utility.atoi(timeRangeS);
+
+		String maxPerTimeRangeS = query.getOrDefault("maxPer_time_range", "0").trim();
+		int maxPerTimeRange = Utility.atoi(maxPerTimeRangeS);
+
+		String imei = query.getOrDefault("imei", "").trim();
+		String name = query.getOrDefault("name", "").trim();
+		String simCardPIN = query.getOrDefault("sim_card_pin", "").trim();
+			
+		ModemData modem = ConfigModem.geModemData(id);
+		if(action.equals(JsonKey.ADD) || id.isEmpty())
+		{
+			id = Utility.md5(String.format("%d", System.nanoTime()));
+			modem.id = id;
+		}
+		modem.name = name;
+		modem.connectionType = connectionType;
+		modem.smsCenter = smsCenter;
+		modem.incommingInterval = incommingInterval;
+		modem.timeRange = timeRange;
+		modem.maxPerTimeRange = maxPerTimeRange;
+		modem.imei = imei;
+		if(!simCardPIN.isBlank())
+		{
+			modem.simCardPIN = simCardPIN;
+		}
+		modem.active = active;
+
+		
+		ConfigModem.update(id, modem);
+		ConfigModem.save(modemSettingPath);	
+	}
+
 	private void processFeederSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_feeder_ws_setting"))
@@ -1669,16 +1889,20 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("send"))
 		{
-			String receiver = query.getOrDefault(JsonKey.RECEIVER, "");			
-			String message = query.getOrDefault(JsonKey.MESSAGE, "");	
-			try 
+			String receiver = query.getOrDefault(JsonKey.RECEIVER, "").trim();			
+			String message = query.getOrDefault(JsonKey.MESSAGE, "").trim();	
+			if(!receiver.isEmpty() && !message.isEmpty())
 			{
-				this.broardcastWebSocket("Sending a message to "+receiver);
-				SMSUtil.sendSMS(receiver, message);
-			} 
-			catch (GSMNullException e) 
-			{
-				e.printStackTrace();
+				try 
+				{
+					this.broardcastWebSocket("Sending a message to "+receiver);
+					SMSUtil.sendSMS(receiver, message);
+				} 
+				catch (GSMNullException e) 
+				{
+					this.broardcastWebSocket(e.getMessage());
+					e.printStackTrace();
+				}
 			}
 		}		
 	}
@@ -2127,7 +2351,6 @@ public class ServerWebManager {
 	
 	private void processDDNS(String requestBody, CookieServer cookie) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
 		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**
@@ -2137,7 +2360,7 @@ public class ServerWebManager {
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
-				if(key.startsWith("id[") && !value.equals(loggedUsername))
+				if(key.startsWith("id["))
 				{
 					ConfigDDNS.deleteRecord(value);
 				}

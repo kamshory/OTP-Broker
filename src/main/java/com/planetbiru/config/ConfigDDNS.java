@@ -197,6 +197,11 @@ public class ConfigDDNS {
 		((DDNSRecord) ConfigDDNS.records.getOrDefault(value, new DDNSRecord())).setProxied(false);
 		
 	}
+
+	public static JSONObject toJSONObject()
+	{
+		return getJSONObject();
+	}
 	
 	
 

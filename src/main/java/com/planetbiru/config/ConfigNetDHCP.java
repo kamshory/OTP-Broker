@@ -31,7 +31,7 @@ public class ConfigNetDHCP {
 	private static String maxLeaseTime = "";	
 	private static JSONArray ranges = new JSONArray();
 	
-	private static String configPath = "/etc/dhcp/dhcpd.conf";
+	private static String configPath = "/etc/modem/modemd.conf";
 	
 	public static void load(String path) {
 		String dir = Utility.getBaseDir();
@@ -115,7 +115,10 @@ public class ConfigNetDHCP {
 		}		
 	}
 	
-
+	public static JSONObject toJSONObject() {
+		return getJSONObject();
+	}
+	
 	
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
@@ -328,6 +331,7 @@ public class ConfigNetDHCP {
 	public static void setConfigPath(String configPath) {
 		ConfigNetDHCP.configPath = configPath;
 	}
+
 	
 	
 	

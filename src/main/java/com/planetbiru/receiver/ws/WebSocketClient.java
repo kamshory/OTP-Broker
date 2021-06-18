@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.constant.JsonKey;
 import com.planetbiru.util.Utility;
 
 public class WebSocketClient extends Thread
@@ -149,13 +150,13 @@ public class WebSocketClient extends Thread
 		JSONObject info = new JSONObject();
 		
 		JSONObject ws = new JSONObject();
-		ws.put("name", "ws_connected");
-		ws.put("connected", connected);
-		ws.put("message", message);
+		ws.put(JsonKey.NAME, "ws_connected");
+		ws.put(JsonKey.VALUE, connected);
+		ws.put(JsonKey.MESSAGE, message);
 		data.put(ws);
 		
-		info.put("command", "server-info");
-		info.put("data", data);
+		info.put(JsonKey.COMMAND, "server-info");
+		info.put(JsonKey.DATA, data);
 	
 		ServerWebSocketManager.broadcast(info.toString(4));
 		
@@ -213,9 +214,6 @@ public class WebSocketClient extends Thread
 	public void setWebSocketTool(WebSocketTool webSocketTool) {
 		this.webSocketTool = webSocketTool;
 	}
-
-	
-
 	
 	
 	

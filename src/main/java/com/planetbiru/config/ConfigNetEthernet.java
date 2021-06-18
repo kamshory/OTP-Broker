@@ -222,6 +222,11 @@ public class ConfigNetEthernet {
 		ConfigNetEthernet.configPath = configPath;
 	}
 
+	public static JSONObject toJSONObject()
+	{
+		return getJSONObject();
+	}
+
 	
 	
 }

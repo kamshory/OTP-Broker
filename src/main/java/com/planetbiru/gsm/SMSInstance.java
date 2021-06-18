@@ -6,6 +6,7 @@ import com.planetbiru.constant.ConstantString;
 
 public class SMSInstance {
 	private GSM gsm;
+	private boolean connected = false;
 	public SMSInstance()
 	{
 		/**
@@ -51,5 +52,11 @@ public class SMSInstance {
 	public boolean isClosed()
 	{
 		return this.gsm.isClosed();
+	}
+	public boolean isConnected() {
+		return connected;
+	}
+	public void setConnected(boolean connected) {
+		this.connected = connected;
 	}
 }
