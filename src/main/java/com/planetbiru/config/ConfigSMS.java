@@ -40,7 +40,6 @@ public class ConfigSMS {
 		return smsSetting;
 	}
 	
-	
 	public static void save(String path) {
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
@@ -186,7 +185,5 @@ public class ConfigSMS {
 		ConfigSMS.sendIncommingSMS = sendIncommingSMS;
 	}
 
-	
-	
 	
 }

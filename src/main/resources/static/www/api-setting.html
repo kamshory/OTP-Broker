@@ -45,7 +45,7 @@
             <a class="navbar-brand" href="./">OTP Broker</a>
           </div>
           
-                  <div id="navbar" class="navbar-collapse collapse">
+          <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
               <li class=""><a href="./">Home</a></li>
               <li class=""><a href="ussd.html">USSD</a></li>
@@ -53,8 +53,8 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                  <li class="active"><a href="admin.html">Administrator Setting</a></li>
-                  <li class=""><a href="api-setting.html">API Setting</a></li>
+                  <li class=""><a href="admin.html">Administrator Setting</a></li>
+                  <li class="active"><a href="api-setting.html">API Setting</a></li>
                   <li class=""><a href="api-user.html">API User</a></li>
                   <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                   <li class=""><a href="sms-setting.html">SMS Setting</a></li>
@@ -76,44 +76,53 @@
         </div>
         <!--/.container-fluid -->
       </nav>
-      <div class="phone-page"><h3>Administrator Setting</h3>
-    <form action="user/add" method="post">
-        <table class="two-cols-responsive">
+      <div class="phone-page">        
+          <h3>API Setting</h3>
+        <form action="api-setting.html" method="post">
+          <table class="config-table config-table-connection">
             <tbody>
-                <tr>
-                <td>Name</td>
-                <td><input type="text" class="form-control" name="name"></td>
-                </tr>
-                <tr>
-                <td>Username</td>
-                <td><input type="text" class="form-control" name="username"></td>
-                </tr>
-                <tr>
-                <td>Email</td>
-                <td><input type="email" class="form-control" name="email"></td>
-                </tr>
-                <tr>
-                <td>Phone Number</td>
-                <td><input type="tel" class="form-control" name="phone"></td>
-                </tr>
-                <tr>
-                <td>Password</td>
-                <td><input type="password" class="form-control" name="password"></td>
-                </tr>
+              <tr>
+                <td>HTTP Port</td>
+                <td><input type="number" name="port" id="port" value="80">	
+                </td>
+              </tr>
+              <tr>
+                <td>Context Path</td>
+                <td><input type="text" name="path" id="path" value="/">	
+                </td>
+              </tr>
+              <tr>
+                <td>Enable REST API</td>
+                <td><label><input type="checkbox" name="enable" id="enable" value="1">	Enable</label>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>
+                <input type="submit" class="btn btn-success" name="save_api_setting" id="save_api_setting" value="Save">	
+                <input type="reset" class="btn btn-default" value="Reset">	
+                </td>
+              </tr>
             </tbody>
-        </table>
-        <table class="two-cols-responsive">
-            <tbody>
-            <tr>
-                    <td></td>
-                    <td>
-                        <input type="submit" class="btn btn-success" name="add" value="Save" onclick="return confirm('Are you sure you want to save this record')">
-                        <input type="button" class="btn btn-primary" value="Cancel" onclick="window.location='admin.html'">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+          </table>
+       
         </form>
+        <script type="text/javascript">
+            $(document).ready(function(e){
+                $.ajax({
+                    type:"GET",
+                    url:"sms-setting/get",
+                    dataType:"json",
+                    success:function(data){
+                      $('input[name="port"]').val(data.port);
+                      $('input[name="path"]').val(data.path);
+                      $('input[name="enable"]').prop("checked", data.enable);                    
+                    }
+                });
+            });
+        </script>
+
+    
     </div>
     <!-- /container -->
   </div>

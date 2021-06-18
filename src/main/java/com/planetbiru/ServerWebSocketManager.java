@@ -256,5 +256,6 @@ public class ServerWebSocketManager {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+	
     
 }
