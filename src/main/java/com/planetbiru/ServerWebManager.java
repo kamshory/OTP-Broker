@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.planetbiru.api.RESTAPI;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigCloudflare;
@@ -40,6 +41,7 @@ import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.config.ModemData;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
+import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMNullException;
@@ -197,6 +199,113 @@ public class ServerWebManager {
 		 */
 		ConfigEmail.load(emailSettingPath);
 	}	
+	
+	@PostMapping(path="/api/email**")
+	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{		
+		HttpHeaders responseHeaders = new HttpHeaders();
+		HttpStatus statusCode;
+		JSONObject responseJSON = new JSONObject();
+		statusCode = HttpStatus.OK;
+		try {
+			if(userAccount.checkUserAuth(headers))
+			{
+				responseJSON = new JSONObject();
+				responseJSON = RESTAPI.processEmailRequest(requestBody);
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;
+				responseJSON = RESTAPI.unauthorized(requestBody);					
+			}
+		} catch (NoUserRegisteredException e) {
+			statusCode = HttpStatus.UNAUTHORIZED;
+			responseJSON = RESTAPI.unauthorized(requestBody);					
+		}
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		String responseBody = responseJSON.toString(4);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@PostMapping(path="/api/sms**")
+	public ResponseEntity<String> sendSMS(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{		
+		HttpHeaders responseHeaders = new HttpHeaders();
+		
+		HttpStatus statusCode;
+		JSONObject responseJSON = new JSONObject();
+		statusCode = HttpStatus.OK;
+		try {
+			if(userAccount.checkUserAuth(headers))
+			{
+				responseJSON = RESTAPI.processMessageRequest(requestBody);
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;
+				responseJSON = RESTAPI.unauthorized(requestBody);			
+			}
+		} catch (NoUserRegisteredException e) {
+			statusCode = HttpStatus.OK;
+			responseJSON = RESTAPI.unauthorized(requestBody);			
+		}
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		String responseBody = responseJSON.toString(4);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+
+	@PostMapping(path="/api/ussd**")
+	public ResponseEntity<String> sendUSSD(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		HttpStatus statusCode;
+		statusCode = HttpStatus.OK;
+		JSONObject responseJSON = new JSONObject();
+		try {
+			if(userAccount.checkUserAuth(headers))
+			{
+				responseJSON = new JSONObject();
+				Map<String, String> query = Utility.parseURLEncoded(requestBody);
+				String ussd = query.getOrDefault("ussd", "");
+				String message = "";
+				String responseCode = ResponseCode.SUCCESS;
+				String responseText = "";
+				if(ussd != null && !ussd.isEmpty())
+				{
+					try 
+					{
+						message = SMSUtil.executeUSSD(ussd);
+					} 
+					catch (GSMNullException e) 
+					{
+						message = e.getMessage();
+					}		
+				}
+				JSONObject data = new JSONObject();
+				data.put(JsonKey.MESSAGE, message);
+				responseJSON.put(JsonKey.RESPONSE_CODE, responseCode);
+				responseJSON.put(JsonKey.RESPONSE_TEXT, responseText);
+				responseJSON.put(JsonKey.DATA, data);		
+				responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+				responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;
+				responseJSON = RESTAPI.unauthorized(requestBody);
+			}
+		} catch (JSONException | NoUserRegisteredException e) {
+			statusCode = HttpStatus.UNAUTHORIZED;
+			responseJSON = RESTAPI.unauthorized(requestBody);
+		}
+		String responseBody = responseJSON.toString(4);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	
+	
 	
 	@PostMapping(path="/send-token")
 	public ResponseEntity<byte[]> sendTokenResetPassword1(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -1797,22 +1906,21 @@ public class ServerWebManager {
 		if(action.equals(JsonKey.ADD) || id.isEmpty())
 		{
 			id = Utility.md5(String.format("%d", System.nanoTime()));
-			modem.id = id;
+			modem.setId(id);
 		}
-		modem.name = name;
-		modem.connectionType = connectionType;
-		modem.smsCenter = smsCenter;
-		modem.incommingInterval = incommingInterval;
-		modem.timeRange = timeRange;
-		modem.maxPerTimeRange = maxPerTimeRange;
-		modem.imei = imei;
+		modem.setName(name);
+		modem.setConnectionType(connectionType);
+		modem.setSmsCenter(smsCenter);
+		modem.setIncommingInterval(incommingInterval);
+		modem.setTimeRange(timeRange);
+		modem.setMaxPerTimeRange(maxPerTimeRange);
+		modem.setImei(imei);
 		if(!simCardPIN.isBlank())
 		{
-			modem.simCardPIN = simCardPIN;
+			modem.setSimCardPIN(simCardPIN);
 		}
-		modem.active = active;
+		modem.setActive(active);
 
-		
 		ConfigModem.update(id, modem);
 		ConfigModem.save(modemSettingPath);	
 	}

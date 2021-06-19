@@ -7,6 +7,7 @@ import com.planetbiru.constant.ConstantString;
 public class SMSInstance {
 	private GSM gsm;
 	private boolean connected = false;
+	private String id = "";
 	public SMSInstance()
 	{
 		/**
@@ -14,9 +15,9 @@ public class SMSInstance {
 		 */
 		this.gsm = new GSM();
 	}
-	public boolean init(String port)
+	public boolean connect(String port)
 	{
-		return this.gsm.initialize(port);
+		return this.gsm.connect(port);
 	}
 	public void close() throws GSMNullException {
 		if(this.gsm.getSerialPort() == null)
@@ -59,4 +60,12 @@ public class SMSInstance {
 	public void setConnected(boolean connected) {
 		this.connected = connected;
 	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	
 }
