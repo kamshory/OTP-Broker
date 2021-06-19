@@ -8,6 +8,7 @@ import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ModemData;
 
 public class SMSUtil {
+	
 	private static final String NO_DEVICE_CONNECTED = "No device connected";
 	private static boolean initialized = false;
 	private static List<SMSInstance> smsInstance = new ArrayList<>();
@@ -20,6 +21,7 @@ public class SMSUtil {
 		 * Do nothing
 		 */
 	}
+
 	
 	public static void init()
 	{
@@ -31,19 +33,24 @@ public class SMSUtil {
 			ModemData modem = entry.getValue();
 			String port = modem.getConnectionType();			
 			SMSInstance instance = new SMSInstance();
-			instance.connect(port);
-			if(!instance.isClosed())
-			{
-				instance.setConnected(true);
-				modem.setConnected(true);
+			try {
+				instance.connect(port);
+				if(!instance.isClosed())
+				{
+					instance.setConnected(true);
+					modem.setConnected(true);
+				}
+			} catch (GSMException e) {
+				e.printStackTrace();
 			}
+			
 			SMSUtil.smsInstance.add(instance);
 		}
 		SMSUtil.initialized = true;
 		SMSUtil.updateConnectedDevice();
 	}
 
-	public static void connect(String modemID)
+	public static void connect(String modemID) throws GSMException
 	{
 		ModemData modem = ConfigModem.getModemData(modemID);
 		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)
@@ -57,20 +64,34 @@ public class SMSUtil {
 		}
 		SMSUtil.updateConnectedDevice();
 	}
+	public static void disconnect(String modemID) throws GSMException {
+
+		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)
+		{
+			SMSInstance instance =  SMSUtil.smsInstance.get(i);
+			if(instance.getId().endsWith(modemID))
+			{
+				instance.disconnect();
+				ConfigModem.getModemData(modemID).setConnected(instance.isConnected());
+			}
+		}
+		SMSUtil.updateConnectedDevice();
+		
+	}
 	
-	public static void sendSMS(String receiver, String message) throws GSMNullException {
+	public static void sendSMS(String receiver, String message) throws GSMException {
 		if(SMSUtil.smsInstance.isEmpty())
 		{
-			throw new GSMNullException(SMSUtil.NO_DEVICE_CONNECTED);
+			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 		}
 		int index = SMSUtil.getModemIndex();
 		SMSUtil.smsInstance.get(index).sendSMS(receiver, message);
 		
 	}
-	public static String executeUSSD(String ussd) throws GSMNullException {
+	public static String executeUSSD(String ussd) throws GSMException {
 		if(smsInstance.isEmpty())
 		{
-			throw new GSMNullException(SMSUtil.NO_DEVICE_CONNECTED);
+			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 		}
 		int index = SMSUtil.getModemIndex();
 		return SMSUtil.smsInstance.get(index).executeUSSD(ussd);
@@ -134,7 +155,7 @@ public class SMSUtil {
 		}
 		SMSUtil.connectedDevices = connectedDev;
 	}
-	private static int getModemIndex() throws GSMNullException {
+	private static int getModemIndex() throws GSMException {
 		SMSUtil.cnt++;
 		if(SMSUtil.cnt > SMSUtil.countConnected())
 		{
@@ -146,9 +167,12 @@ public class SMSUtil {
 		}
 		else
 		{
-			throw new GSMNullException(SMSUtil.NO_DEVICE_CONNECTED);
+			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 		}
 	}
+
+
+	
 
 }
 

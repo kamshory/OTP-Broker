@@ -13,7 +13,7 @@ import org.springframework.http.HttpHeaders;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
-import com.planetbiru.gsm.GSMNullException;
+import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.user.APIUserAccount;
 import com.planetbiru.util.MailUtil;
@@ -178,7 +178,7 @@ public class RESTAPI {
 			{
 				SMSUtil.sendSMS(receiver, textMessage);
 			} 
-			catch (GSMNullException e) 
+			catch (GSMException e) 
 			{
 				
 				e.printStackTrace();

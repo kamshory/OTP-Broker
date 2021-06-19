@@ -123,11 +123,19 @@
                                 if (data.hasOwnProperty(key)) {
                                     var item = data[key];
                                     var active = !item.active ? 'icon-cross' : 'icon-check';
+                                    var cls = '';
+                                    cls += (item.active?' enable':' disable');
+                                    cls += (item.connected?' connected':' disconnected');
 
-                                    var service = $('<div class="service-item service-modem">'+item.name+'</div>');
-                                    
-                                    service.addClass(item.active?'enable':'disable');
-                                    service.addClass(item.connected?'connected':'disconnected');
+                                    var service = $('<div class="service-item service-modem'+cls+'">\r\n'+
+                                        '<div class="service-label"></div>\r\n'+
+                                        '<div class="service-button">\r\n'+
+                                        '<button class="btn btn-sm btn-success connect">Connect</button>\r\n'+
+                                        '<button class="btn btn-sm btn-danger disconnect">Disonnect</button>\r\n'+
+                                        '</div>\r\n'+
+                                        '</div>');
+                                    service.attr('data-id', item.id);
+                                    service.find('.service-label').text(item.name+ ' via '+item.connectionType);
 
                                     $('.service-wrapper').append(service);
                                     $('.row-table tbody').append(
@@ -141,6 +149,33 @@
                                 }
                             }
                         }
+                    });
+
+                    $(document).on('click', '.service-wrapper .connect', function(e2){
+                        var modemID = $(this).closest('.service-item').attr('data-id');
+                        $.ajax({
+                            url:'api/device/',
+                            type:'POST',
+                            dataType:'jaosn',
+                            data:{action:'connect', id:modemID},
+                            success:function(data)
+                            {
+
+                            }
+                        });
+                    });
+                    $(document).on('click', '.service-wrapper .disconnect', function(e2){
+                        var modemID = $(this).closest('.service-item').attr('data-id');
+                        $.ajax({
+                            url:'api/device/',
+                            type:'POST',
+                            dataType:'jaosn',
+                            data:{action:'disconnect', id:modemID},
+                            success:function(data)
+                            {
+
+                            }
+                        });
                     });
 
                     $(document).on('change', 'thead input[type="checkbox"].check-all', function (e) {

@@ -21,6 +21,8 @@ public class Config {
 	private static String proxyHost = "127.0.0.1";
 	private static int proxyPort = 8080;
 	private static String baseDirConfig = "";
+	private static String sessionName = "SMSSESSID";
+	private static long sessionLifetime = 1440000;
 	
 	private Config()
 	{
@@ -157,6 +159,26 @@ public class Config {
 
 	public static void setBaseDirConfig(String baseDirConfig) {
 		Config.baseDirConfig = baseDirConfig;
+	}
+
+
+	public static String getSessionName() {
+		return sessionName;
+	}
+
+
+	public static void setSessionName(String sessionName) {
+		Config.sessionName = sessionName;
+	}
+
+
+	public static long getSessionLifetime() {
+		return sessionLifetime;
+	}
+
+
+	public static void setSessionLifetime(long sessionLifetime) {
+		Config.sessionLifetime = sessionLifetime;
 	}
 
 

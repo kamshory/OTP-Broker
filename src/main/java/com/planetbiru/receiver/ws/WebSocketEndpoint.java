@@ -12,7 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.planetbiru.gsm.GSMNullException;
+import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
 
 public class WebSocketEndpoint extends Endpoint {
@@ -78,13 +78,13 @@ public class WebSocketEndpoint extends Endpoint {
 			{
 				this.sendSMS(receiver, textMessage);
 			} 
-			catch (GSMNullException e) 
+			catch (GSMException e) 
 			{
 				e.printStackTrace();
 			}
 		}
 	}
-	private void sendSMS(String receiver, String textMessage) throws GSMNullException {
+	private void sendSMS(String receiver, String textMessage) throws GSMException {
 		SMSUtil.sendSMS(receiver, textMessage);
 		
 	}

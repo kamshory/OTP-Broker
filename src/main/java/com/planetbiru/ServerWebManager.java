@@ -44,7 +44,7 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
-import com.planetbiru.gsm.GSMNullException;
+import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.receiver.ws.WebSocketContent;
 import com.planetbiru.user.APIUserAccount;
@@ -102,7 +102,7 @@ public class ServerWebManager {
 	private String sessionName;
 
 	@Value("${otpbroker.web.session.lifetime}")
-	private int cacheLifetime;
+	private long sessionLifetime;
 
 	@Value("${otpbroker.web.document.root}")
 	private String documentRoot;
@@ -163,6 +163,9 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		Config.setSessionName(sessionName);
+		Config.setSessionLifetime(sessionLifetime);
+		
 		Config.setBaseDirConfig(baseDirConfig);
 		ConfigDDNS.load(ddnsSettingPath);
 		ConfigCloudflare.load(cloudflareSettingPath);
@@ -199,6 +202,50 @@ public class ServerWebManager {
 		 */
 		ConfigEmail.load(emailSettingPath);
 	}	
+	
+	@PostMapping(path="/api/device/**")
+	public ResponseEntity<String> modemConnect(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		HttpHeaders responseHeaders = new HttpHeaders();
+		HttpStatus statusCode;
+		JSONObject responseJSON = new JSONObject();
+		statusCode = HttpStatus.OK;
+		try {
+			if(userAccount.checkUserAuth(headers)){
+				String action = query.getOrDefault("action", "");
+				String modemID = query.getOrDefault("id", "");
+				if(!modemID.isEmpty())
+				{
+					try 
+					{
+						if(action.equals("connect"))
+						{
+							SMSUtil.connect(modemID);
+						}
+						else
+						{
+							SMSUtil.disconnect(modemID);
+						} 
+					}
+					catch (GSMException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			} else {
+				statusCode = HttpStatus.UNAUTHORIZED;
+				responseJSON = RESTAPI.unauthorized(requestBody);					
+			}
+		} catch (NoUserRegisteredException e) {
+			statusCode = HttpStatus.UNAUTHORIZED;
+			responseJSON = RESTAPI.unauthorized(requestBody);					
+		}
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		String responseBody = responseJSON.toString(4);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
 	
 	@PostMapping(path="/api/email**")
 	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -278,7 +325,7 @@ public class ServerWebManager {
 					{
 						message = SMSUtil.executeUSSD(ussd);
 					} 
-					catch (GSMNullException e) 
+					catch (GSMException e) 
 					{
 						message = e.getMessage();
 					}		
@@ -375,7 +422,7 @@ public class ServerWebManager {
 					{
 						SMSUtil.sendSMS(phone, message);
 					} 
-					catch (GSMNullException e) 
+					catch (GSMException e) 
 					{
 						/**
 						 * Do nothing
@@ -439,7 +486,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleLogin(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 	    
@@ -499,7 +546,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleLogout(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		
 		byte[] responseBody = "".getBytes();
 		cookie.destroySession();
@@ -515,7 +562,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleSelfAccount(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -550,7 +597,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleFeederWSSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -583,7 +630,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleFeederAMQPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -616,7 +663,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleSMSSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -648,7 +695,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleAPISetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -683,7 +730,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleEmailSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -716,7 +763,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleDHCPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -750,7 +797,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleWLANSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -784,7 +831,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleEthernetSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -821,7 +868,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleServerInfo(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -854,7 +901,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleCloudflareSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -888,7 +935,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleUserList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -921,7 +968,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleUserGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.USERNAME) String username, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -954,7 +1001,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleDDNSRecordGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -988,7 +1035,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleUserAPIList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -1022,7 +1069,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleUserAPIGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.USERNAME) String username, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -1056,7 +1103,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userInit(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		if(userAccount.isEmpty())
@@ -1116,7 +1163,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1163,7 +1210,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleDDNSRecordList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -1196,7 +1243,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleModemGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -1230,7 +1277,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleModemSRecordList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -1265,7 +1312,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userAPIAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1313,7 +1360,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userUpdate(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1365,7 +1412,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userAPIUpdate(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1418,7 +1465,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userRemove(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1448,7 +1495,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> ddnsAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1529,7 +1576,7 @@ public class ServerWebManager {
 				}
 			}
 		}
-		CookieServer cookie = new CookieServer(headers);		
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());		
 		WebSocketContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
 		
 		responseBody = newContent.getResponseBody();
@@ -1575,7 +1622,7 @@ public class ServerWebManager {
 		try {
 			if(userAccount.checkUserAuth(headers))
 			{
-				CookieServer cookie = new CookieServer(headers);
+				CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 				String path = request.getServletPath();
 				if(path.equals("/admin.html"))
 				{
@@ -2006,7 +2053,7 @@ public class ServerWebManager {
 					this.broardcastWebSocket("Sending a message to "+receiver);
 					SMSUtil.sendSMS(receiver, message);
 				} 
-				catch (GSMNullException e) 
+				catch (GSMException e) 
 				{
 					this.broardcastWebSocket(e.getMessage());
 					e.printStackTrace();

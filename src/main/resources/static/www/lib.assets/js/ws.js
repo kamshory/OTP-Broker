@@ -125,7 +125,7 @@ function createUSB(color)
 
 function createUSBSymbol(color)
 {
-    $('.usb-device-symbol').html(createUSB(color));
+    $('.usb-device-symbol').html('<a href="modem.html">'+createUSB(color)+'</a>');
 }
 
 function setUSBColor(color)
