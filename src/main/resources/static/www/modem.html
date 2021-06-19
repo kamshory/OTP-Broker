@@ -124,10 +124,12 @@
                                     var item = data[key];
                                     var active = !item.active ? 'icon-cross' : 'icon-check';
 
-                                    $('.service-wrapper').append('<div class="service-item service-modem">'+item.name+'</div>\r\n');
+                                    var service = $('<div class="service-item service-modem">'+item.name+'</div>');
                                     
+                                    service.addClass(item.active?'enable':'disable');
+                                    service.addClass(item.connected?'connected':'disconnected');
 
-
+                                    $('.service-wrapper').append(service);
                                     $('.row-table tbody').append(
                                         '<tr data-pk-id="' + item.id + '">\r\n' +
                                         '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +

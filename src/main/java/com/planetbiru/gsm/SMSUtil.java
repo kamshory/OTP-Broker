@@ -21,7 +21,6 @@ public class SMSUtil {
 		 */
 	}
 	
-	
 	public static void init()
 	{
 		SMSUtil.smsInstance = new ArrayList<>();
