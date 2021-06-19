@@ -139,15 +139,28 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		Config.setModemSettingPath(modemSettingPath);
+		Config.setDhcpSettingPath(dhcpSettingPath);
+		
+		Config.setFeederWSSettingPath(feederWSSettingPath);
+		Config.setWlanSettingPath(wlanSettingPath);	
 		Config.setFeederWSSettingPath(feederWSSettingPath);
 		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
 		Config.setSessionName(sessionName);
 		Config.setSessionLifetime(sessionLifetime);
 		
+		Config.setDdnsSettingPath(ddnsSettingPath);
+		Config.setCloudflareSettingPath(cloudflareSettingPath);
+		Config.setApiSettingPath(apiSettingPath);
+		
+		Config.setSmsSettingPath(smsSettingPath);
+		Config.setEthernetSettingPath(ethernetSettingPath);
+		
+		
 		Config.setBaseDirConfig(baseDirConfig);
-		ConfigDDNS.load(ddnsSettingPath);
-		ConfigCloudflare.load(cloudflareSettingPath);
-		ConfigAPI.load(apiSettingPath);
+		ConfigDDNS.load(Config.getDdnsSettingPath());
+		ConfigCloudflare.load(Config.getCloudflareSettingPath());
+		ConfigAPI.load(Config.getApiSettingPath());
 
 		Config.setPortName(portName);		
 		userAccount = new WebUserAccount(userSettingPath);		
@@ -564,7 +577,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigFeederWS.load(feederWSSettingPath);
+				ConfigFeederWS.load(Config.getFeederWSSettingPath());
 				String list = ConfigFeederWS.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -630,7 +643,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigSMS.load(smsSettingPath);
+				ConfigSMS.load(Config.getSmsSettingPath());
 				String list = ConfigSMS.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -662,7 +675,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigAPI.load(apiSettingPath);
+				ConfigAPI.load(Config.getApiSettingPath());
 				String list = ConfigAPI.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -730,7 +743,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigNetDHCP.load(dhcpSettingPath);		
+				ConfigNetDHCP.load(Config.getDhcpSettingPath());		
 				responseBody = ConfigNetDHCP.toJSONObject().toString().getBytes();
 				
 			}
@@ -764,7 +777,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigNetWLAN.load(wlanSettingPath);;		
+				ConfigNetWLAN.load(Config.getWlanSettingPath());		
 				responseBody = ConfigNetWLAN.toJSONObject().toString().getBytes();
 				
 			}
@@ -798,7 +811,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigNetEthernet.load(ethernetSettingPath);;		
+				ConfigNetEthernet.load(Config.getEthernetSettingPath());
 				responseBody = ConfigNetEthernet.toJSONObject().toString().getBytes();				
 			}
 			else
@@ -1177,7 +1190,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigDDNS.load(ddnsSettingPath);
+				ConfigDDNS.load(Config.getDdnsSettingPath());
 				String list = ConfigDDNS.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -1210,7 +1223,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigModem.load(modemSettingPath);
+				ConfigModem.load(Config.getModemSettingPath());
 				String list = ConfigModem.geModemData(id).toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -1244,7 +1257,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigModem.load(modemSettingPath);
+				ConfigModem.load(Config.getModemSettingPath());
 				String list = ConfigModem.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -1658,7 +1671,7 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_api_setting"))
 		{
-			ConfigAPI.load(apiSettingPath);
+			ConfigAPI.load(Config.getApiSettingPath());
 			String v1 = query.getOrDefault("http_port", "0").trim();
 			int lHttpPort = Utility.atoi(v1);
 			
@@ -1733,7 +1746,7 @@ public class ServerWebManager {
 				}
 			}
 			
-			ConfigNetDHCP.load(dhcpSettingPath);
+			ConfigNetDHCP.load(Config.getDhcpSettingPath());
 			ConfigNetDHCP.setDomainName(domainName);
 			ConfigNetDHCP.setIpRouter(ipRouter);
 			ConfigNetDHCP.setNetmask(netmask);
@@ -1749,7 +1762,7 @@ public class ServerWebManager {
 		
 		if(query.containsKey("save_wlan"))
 		{
-			ConfigNetWLAN.load(wlanSettingPath);
+			ConfigNetWLAN.load(Config.getWlanSettingPath());
 			ConfigNetWLAN.setEssid(query.getOrDefault("essid", "").trim());
 			ConfigNetWLAN.setKey(query.getOrDefault("key", "").trim());
 			ConfigNetWLAN.setKeyMgmt(query.getOrDefault("keyMgmt", "").trim());
@@ -1758,13 +1771,13 @@ public class ServerWebManager {
 			ConfigNetWLAN.setNetmask(query.getOrDefault("netmask", "").trim());
 			ConfigNetWLAN.setGateway(query.getOrDefault("gateway", "").trim());
 			ConfigNetWLAN.setDns1(query.getOrDefault("dns1", "").trim());
-			ConfigNetWLAN.save(wlanSettingPath);
+			ConfigNetWLAN.save(Config.getWlanSettingPath());
 			ConfigNetWLAN.apply();
 		}
 
 		if(query.containsKey("save_ethernet"))
 		{
-			ConfigNetEthernet.load(ethernetSettingPath);
+			ConfigNetEthernet.load(Config.getEthernetSettingPath());
 			ConfigNetEthernet.setIpAddress(query.getOrDefault("ipAddress", "").trim());
 			ConfigNetEthernet.setPrefix(query.getOrDefault("prefix", "").trim());
 			ConfigNetEthernet.setNetmask(query.getOrDefault("netmask", "").trim());
@@ -1786,7 +1799,7 @@ public class ServerWebManager {
 		
 		if(!endpoint.isEmpty())
 		{
-			ConfigCloudflare.load(cloudflareSettingPath);
+			ConfigCloudflare.load(Config.getCloudflareSettingPath());
 			ConfigCloudflare.setEndpoint(endpoint);
 			ConfigCloudflare.setAccountId(accountId);
 			ConfigCloudflare.setAuthEmail(authEmail);
@@ -1800,7 +1813,7 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_email_setting"))
 		{
-			ConfigAPI.load(apiSettingPath);
+			ConfigAPI.load(Config.getApiSettingPath());
 			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
 			String lMailHost = query.getOrDefault("smtp_host", "").trim();
 	
@@ -1833,7 +1846,7 @@ public class ServerWebManager {
 	
 	private void processModemSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		ConfigModem.load(modemSettingPath);
+		ConfigModem.load(Config.getModemSettingPath());
 		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**

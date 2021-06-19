@@ -10,7 +10,7 @@ import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.receiver.ws.WebSocketTool;
 
 @Service
-public class WebSocketReceiver {
+public class ClientReceiverWS {
 	@Value("${otpbroker.ws.reconnect.delay}")
 	private int reconnectDelay;
 

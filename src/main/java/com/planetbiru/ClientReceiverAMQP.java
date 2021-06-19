@@ -1,4 +1,4 @@
-package com.planetbiru.receiver.amqp;
+package com.planetbiru;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
@@ -15,10 +15,11 @@ import org.springframework.context.annotation.Configuration;
 
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigFeederAMQP;
+import com.planetbiru.receiver.amqp.RabbitMQReceiver;
 
 
 @Configuration
-public class RabbitMQConfig {
+public class ClientReceiverAMQP {
 
 	@Value("${otpbroker.rabbitmq.username}")
 	String username;

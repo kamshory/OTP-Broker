@@ -48,7 +48,7 @@ public class RabbitMQReceiver implements MessageListener{
 			{
 				logger.error(e.getMessage());
 			}
-			latch.countDown();
+			this.latch.countDown();
 		}
 	}
 

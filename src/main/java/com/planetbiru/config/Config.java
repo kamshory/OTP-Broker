@@ -26,6 +26,14 @@ public class Config {
 	private static String emailSettingPath = "";
 	private static String feederAMQPSettingPath = "";
 	private static String feederWSSettingPath = "";
+	private static String wlanSettingPath = "";
+	private static String ddnsSettingPath = "";
+	private static String cloudflareSettingPath = "";
+	private static String apiSettingPath = "";
+	private static String smsSettingPath = "";
+	private static String dhcpSettingPath = "";
+	private static String ethernetSettingPath = "";
+	private static String modemSettingPath = "";
 	
 	private Config()
 	{
@@ -212,6 +220,86 @@ public class Config {
 
 	public static void setFeederWSSettingPath(String feederWSSettingPath) {
 		Config.feederWSSettingPath = feederWSSettingPath;
+	}
+
+
+	public static String getWlanSettingPath() {
+		return wlanSettingPath;
+	}
+
+
+	public static void setWlanSettingPath(String wlanSettingPath) {
+		Config.wlanSettingPath = wlanSettingPath;
+	}
+
+
+	public static String getDdnsSettingPath() {
+		return ddnsSettingPath;
+	}
+
+
+	public static void setDdnsSettingPath(String ddnsSettingPath) {
+		Config.ddnsSettingPath = ddnsSettingPath;
+	}
+
+
+	public static String getCloudflareSettingPath() {
+		return cloudflareSettingPath;
+	}
+
+
+	public static void setCloudflareSettingPath(String cloudflareSettingPath) {
+		Config.cloudflareSettingPath = cloudflareSettingPath;
+	}
+
+
+	public static String getApiSettingPath() {
+		return apiSettingPath;
+	}
+
+
+	public static void setApiSettingPath(String apiSettingPath) {
+		Config.apiSettingPath = apiSettingPath;
+	}
+
+
+	public static String getSmsSettingPath() {
+		return smsSettingPath;
+	}
+
+
+	public static void setSmsSettingPath(String smsSettingPath) {
+		Config.smsSettingPath = smsSettingPath;
+	}
+
+
+	public static String getDhcpSettingPath() {
+		return dhcpSettingPath;
+	}
+
+
+	public static void setDhcpSettingPath(String dhcpSettingPath) {
+		Config.dhcpSettingPath = dhcpSettingPath;
+	}
+
+
+	public static String getEthernetSettingPath() {
+		return ethernetSettingPath;
+	}
+
+
+	public static void setEthernetSettingPath(String ethernetSettingPath) {
+		Config.ethernetSettingPath = ethernetSettingPath;
+	}
+
+
+	public static String getModemSettingPath() {
+		return modemSettingPath;
+	}
+
+
+	public static void setModemSettingPath(String modemSettingPath) {
+		Config.modemSettingPath = modemSettingPath;
 	}
 
 
