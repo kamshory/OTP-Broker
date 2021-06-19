@@ -9,6 +9,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.planetbiru.constant.JsonKey;
+import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
@@ -21,10 +22,12 @@ public class ConfigModem {
 	{
 		
 	}
+	
 	public static Map<String, ModemData> getModemData()
 	{
 		return ConfigModem.modemData;
 	}
+	
 	public static void load(String path)
 	{
 		ConfigModem.configPath = path;
@@ -34,7 +37,6 @@ public class ConfigModem {
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = dir + path;
-		System.out.println(fileName);
 		ConfigModem.prepareDir(fileName);
 		try 
 		{
@@ -47,8 +49,8 @@ public class ConfigModem {
 				while(keys.hasNext()) {
 				    String id = keys.next();
 				    JSONObject modem = jsonObject.optJSONObject(id);
-				    System.out.println(modem);
-				    ConfigModem.addModemData(id, modem);
+				    ModemData modemData = new ModemData(modem);
+				    ConfigModem.addModemData(id, modemData);
 				}
 			}
 		} 
@@ -80,28 +82,20 @@ public class ConfigModem {
 		}		
 	}
 	
-	public static void update(String text) {
-		if(text != null)
-		{
-			ConfigModem.modemData = new HashMap<>();
-			JSONObject jsonObject = new JSONObject(text);
-			Iterator<String> keys = jsonObject.keys();
-			while(keys.hasNext()) {
-			    String id = keys.next();
-			    JSONObject modem = jsonObject.optJSONObject(id);
-			    ConfigModem.addModemData(id, modem);
-			}
-		}	
-	}
-	public static void addUser(ModemData modem)
+	public static void addModemData(ModemData modem)
 	{
-		ConfigModem.modemData.put(modem.id, modem);
+		ConfigModem.modemData.put(modem.getId(), modem);
 	}
 	
-	public static void addModemData(String username, JSONObject jsonObject) 
+	public static void addModemData(String id, ModemData modem)
 	{
-		ModemData user = new ModemData(jsonObject);
-		ConfigModem.modemData.put(username, user);
+		ConfigModem.modemData.put(id, modem);
+	}
+	
+	public static void addModemData(String id, JSONObject jsonObject) 
+	{
+		ModemData modem = new ModemData(jsonObject);
+		ConfigModem.modemData.put(id, modem);
 	}
 	
 	public static void addModemData(JSONObject jsonObject) 
@@ -120,8 +114,6 @@ public class ConfigModem {
 		JSONObject config = toJSONObject();
 		save(path, config);
 	}
-
-	
 	
 	public static void save(String path, JSONObject config) {	
 		ConfigModem.configPath = path;
@@ -131,9 +123,7 @@ public class ConfigModem {
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = dir + path;
-		System.out.println(fileName);
-		prepareDir(fileName);
-		
+		prepareDir(fileName);		
 		try 
 		{
 			FileConfigUtil.write(fileName, config.toString().getBytes());
@@ -145,8 +135,7 @@ public class ConfigModem {
 	}
 	
 	public static void save() {
-		save(ConfigModem.configPath, toJSONObject());
-		
+		save(ConfigModem.configPath, toJSONObject());		
 	}
 	
 	public static JSONObject toJSONObject()
@@ -168,22 +157,26 @@ public class ConfigModem {
 	public static void setConfigPath(String configPath) {
 		ConfigModem.configPath = configPath;
 	}
+	
 	public static void deleteRecord(String id) {
-		ConfigModem.modemData.remove(id);
-		
+		ConfigModem.modemData.remove(id);	
 	}
+	
 	public static void deactivate(String id) {
 		ModemData modem = ConfigModem.modemData.getOrDefault(id, new ModemData());
-		modem.active = false;
-		ConfigModem.modemData.put(id, modem);
-		
+		modem.setActive(false);
+		ConfigModem.modemData.put(id, modem);	
 	}
+	
 	public static void activate(String id) {
 		ModemData modem = ConfigModem.modemData.getOrDefault(id, new ModemData());
-		modem.active = true;
+		modem.setActive(true);
 		ConfigModem.modemData.put(id, modem);		
 	}
+	
 	public static void update(String id, ModemData modem) {
+		boolean connected = SMSUtil.isConnected(id);
+		modem.setConnected(connected);
 		ConfigModem.modemData.put(id, modem);		
 	}
 	

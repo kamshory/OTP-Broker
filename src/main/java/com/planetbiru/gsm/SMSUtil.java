@@ -26,13 +26,13 @@ public class SMSUtil {
 		for (Map.Entry<String, ModemData> entry : modemData.entrySet())
 		{
 			ModemData modem = entry.getValue();
-			String port = modem.connectionType;
-			
+			String port = modem.getConnectionType();			
 			SMSInstance instance = new SMSInstance();
 			instance.init(port);
 			if(!instance.isClosed())
 			{
 				instance.setConnected(true);
+				modem.setConnected(true);
 			}
 			smsInstance.add(instance);
 		}
@@ -55,25 +55,46 @@ public class SMSUtil {
 		int index = getModemIndex();
 		return smsInstance.get(index).executeUSSD(ussd);
 	}
-	public static boolean isClosed()
-	{
-		if(smsInstance.isEmpty())
-		{
-			return true;
-		}
-		int index = getModemIndex();
-		return smsInstance.get(index).isClosed();
-	}
+
+
 	public static boolean isConnected() {
 		if(smsInstance.isEmpty())
 		{
 			return false;
 		}
-		return SMSUtil.initialized && !SMSUtil.isClosed();
+		return SMSUtil.initialized && countConnected() > 0;
+	}
+	
+	public static int countConnected()
+	{
+		int connected = 0;
+		Map<String, ModemData> modemData = ConfigModem.getModemData();	
+		for (Map.Entry<String, ModemData> entry : modemData.entrySet())
+		{
+			ModemData modem = entry.getValue();
+			if(modem.isConnected())
+			{
+				connected++;
+			}
+		}
+		return connected;
+	}
+	
+	public static boolean isConnected(String modemID)
+	{
+		Map<String, ModemData> modemData = ConfigModem.getModemData();	
+		for (Map.Entry<String, ModemData> entry : modemData.entrySet())
+		{
+			ModemData modem = entry.getValue();
+			if(modem.isConnected() && modem.getId().equals(modemID))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static int getModemIndex() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

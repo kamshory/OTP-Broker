@@ -81,6 +81,13 @@
         </nav>
         <div class="phone-page">
             <h3>Modem</h3>
+
+            <div class="status-connection">
+                <div class="service-wrapper">  
+                  
+                </div>
+              </div>
+
             <form action="" method="post">
                 <table class="row-table" border="1" data-file="admin.html">
                     <thead>
@@ -112,11 +119,15 @@
                         url: "modem/list",
                         dataType: "json",
                         success: function (data) {
-                            console.log(data)
                             for (const key in data) {
                                 if (data.hasOwnProperty(key)) {
                                     var item = data[key];
                                     var active = !item.active ? 'icon-cross' : 'icon-check';
+
+                                    $('.service-wrapper').append('<div class="service-item service-modem">'+item.name+'</div>\r\n');
+                                    
+
+
                                     $('.row-table tbody').append(
                                         '<tr data-pk-id="' + item.id + '">\r\n' +
                                         '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +
