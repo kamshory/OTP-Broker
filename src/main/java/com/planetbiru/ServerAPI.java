@@ -91,10 +91,10 @@ public class ServerAPI {
 	@PostConstruct
 	public void init()
 	{
-		SMSUtil.init();
-		
 		this.loadConfigHttp();
 		this.loadConfigEmail();
+
+		SMSUtil.init();	
 		this.initHttp();
 		this.initHttps();
 		
@@ -160,12 +160,10 @@ public class ServerAPI {
 				}
 			} catch (IOException e1) {
 				logger.info(e1.getMessage());
-			}
-			
-			
-		}
-		
+			}	
+		}	
 	}
+	
 	private void initHttp() {
 		if(ConfigAPI.isHttpsEnable())
 		{
@@ -179,9 +177,9 @@ public class ServerAPI {
 			{
 				logger.info(e.getMessage());
 			}
-		}
-		
+		}		
 	}
+	
 	@PreDestroy
 	public void destroy()
 	{
