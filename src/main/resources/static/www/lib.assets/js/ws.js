@@ -68,6 +68,7 @@ function connectWebSocket()
         if(receivedJSON.command == "server-info")
         {
             updateServerInfo(receivedJSON);
+            updateUSBColor(receivedJSON);
         }
         if(typeof handleIncommingMessage != 'undefined')
         {
@@ -201,6 +202,18 @@ function getHTTPEnable()
     var key = 'otp_http_enable';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
+}
+function updateUSBColor(receivedJSON)
+{
+    var data = receivedJSON.data;
+    for(var i in data)
+    {
+        var item = data[i];
+        if(item.name == 'modem_connected')
+        {
+            createUSBSymbol(item.value?'#328C54':'#D83A56');
+        }
+    }
 }
 function updateServerInfo(receivedJSON)
 {

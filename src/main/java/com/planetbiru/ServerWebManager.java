@@ -68,26 +68,6 @@ public class ServerWebManager {
 	private WebUserAccount userAccount;
 	private WebUserAccount userAPIAccount;
 
-	@Value("${otpbroker.mail.sender.address}")
-	private String mailSenderAddress;
-
-	@Value("${otpbroker.mail.sender.password}")
-	private String mailSenderPassword;
-	
-	@Value("${otpbroker.mail.auth}")
-	private boolean mailAuth;
-	
-	@Value("${otpbroker.mail.start.tls}")
-	private boolean mailStartTLS;
-	
-	@Value("${otpbroker.mail.ssl}")
-	private boolean mailSSL;
-	
-	@Value("${otpbroker.mail.host}")
-	private String mailHost;
-	
-	@Value("${otpbroker.mail.port}")
-	private int mailPort;
 
 	@Value("${otpbroker.ws.endpoint}")
 	private String wsClientEndpoint;
@@ -128,9 +108,6 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.api.user}")
 	private String userAPISettingPath;
 
-	@Value("${otpbroker.path.setting.email}")
-	private String emailSettingPath;
-
 	@Value("${otpbroker.device.connection.type}")
 	private String portName;
 	
@@ -154,7 +131,6 @@ public class ServerWebManager {
 	
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
-
 	
 	private ServerWebManager()
     {
@@ -171,11 +147,9 @@ public class ServerWebManager {
 		ConfigCloudflare.load(cloudflareSettingPath);
 		ConfigAPI.load(apiSettingPath);
 
-		logger.info("Init...");	
 		Config.setPortName(portName);		
 		userAccount = new WebUserAccount(userSettingPath);		
 		userAPIAccount = new WebUserAccount(userAPISettingPath);		
-		this.loadConfigEmail();		
 		
 		try 
 		{
@@ -183,25 +157,11 @@ public class ServerWebManager {
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();			
+			/**
+			 * Do nothing	
+			 */
 		}
 	}
-	
-	
-	private void loadConfigEmail()
-	{
-		ConfigEmail.setMailSenderAddress(mailSenderAddress);
-		ConfigEmail.setMailSenderPassword(mailSenderPassword);
-		ConfigEmail.setMailAuth(mailAuth);
-		ConfigEmail.setMailSSL(mailSSL);
-		ConfigEmail.setMailStartTLS(mailStartTLS);
-		ConfigEmail.setMailHost(mailHost);
-		ConfigEmail.setMailPort(mailPort);	
-		/**
-		 * Override email setting if exists
-		 */
-		ConfigEmail.load(emailSettingPath);
-	}	
 	
 	@PostMapping(path="/api/device/**")
 	public ResponseEntity<String> modemConnect(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -222,10 +182,12 @@ public class ServerWebManager {
 						if(action.equals("connect"))
 						{
 							SMSUtil.connect(modemID);
+							ServerInfo.sendModemStatus(SMSUtil.isConnected());
 						}
 						else
 						{
 							SMSUtil.disconnect(modemID);
+							ServerInfo.sendModemStatus(SMSUtil.isConnected());
 						} 
 					}
 					catch (GSMException e) 
@@ -257,7 +219,6 @@ public class ServerWebManager {
 		try {
 			if(userAccount.checkUserAuth(headers))
 			{
-				responseJSON = new JSONObject();
 				responseJSON = RESTAPI.processEmailRequest(requestBody);
 			}
 			else
@@ -350,9 +311,6 @@ public class ServerWebManager {
 		String responseBody = responseJSON.toString(4);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
-	
-	
 	
 	@PostMapping(path="/send-token")
 	public ResponseEntity<byte[]> sendTokenResetPassword1(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -737,7 +695,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigEmail.load(emailSettingPath);				
+				ConfigEmail.load(Config.getEmailSettingPath());				
 				responseBody = ConfigEmail.toJSONObject().toString().getBytes();
 			}
 			else
@@ -908,7 +866,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigCloudflare.load(emailSettingPath);
+				ConfigCloudflare.load(Config.getEmailSettingPath());
 				
 				responseBody = ConfigCloudflare.toJSONObject().toString().getBytes();
 			}
@@ -2499,10 +2457,6 @@ public class ServerWebManager {
 			}
 		}
 	}
-	
-	
-	
-	
 	
 	private void processDDNS(String requestBody, CookieServer cookie) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);

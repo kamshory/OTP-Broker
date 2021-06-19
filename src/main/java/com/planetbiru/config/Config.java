@@ -23,6 +23,7 @@ public class Config {
 	private static String baseDirConfig = "";
 	private static String sessionName = "SMSSESSID";
 	private static long sessionLifetime = 1440000;
+	private static String emailSettingPath = "";
 	
 	private Config()
 	{
@@ -179,6 +180,16 @@ public class Config {
 
 	public static void setSessionLifetime(long sessionLifetime) {
 		Config.sessionLifetime = sessionLifetime;
+	}
+
+
+	public static String getEmailSettingPath() {
+		return emailSettingPath;
+	}
+
+
+	public static void setEmailSettingPath(String emailSettingPath) {
+		Config.emailSettingPath = emailSettingPath;
 	}
 
 

@@ -28,6 +28,7 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.ddns.DDNSUpdater;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.ddns.DDNSRecord;
+import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.Utility;
 
 
@@ -70,7 +71,7 @@ public class ServerScheduler {
 			if(ConfigFeederAMQP.isFeederAmqpEnable())
 			{
 				amqpCheck();
-				this.sendAMQPStatus(ConfigFeederAMQP.isConnected());
+				ServerInfo.sendAMQPStatus(ConfigFeederAMQP.isConnected());
 			}
 		}
 	}
@@ -98,22 +99,6 @@ public class ServerScheduler {
 	{
 		boolean connected = ConfigFeederAMQP.echoTest();
 		ConfigFeederAMQP.setConnected(connected);		
-	}
-	
-	private void sendAMQPStatus(boolean connected)
-	{
-		JSONArray data = new JSONArray();
-		JSONObject info = new JSONObject();
-		
-		JSONObject ws = new JSONObject();
-		ws.put(JsonKey.NAME, "amqp_connected");
-		ws.put(JsonKey.VALUE, connected);
-		data.put(ws);
-		
-		info.put(JsonKey.COMMAND, "server-info");
-		info.put(JsonKey.DATA, data);
-	
-		ServerWebSocketManager.broadcast(info.toString(4));
 	}
 	
 		
