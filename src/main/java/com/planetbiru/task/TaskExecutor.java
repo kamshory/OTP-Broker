@@ -8,8 +8,6 @@ public class TaskExecutor {
 
 	private Logger logger = LogManager.getLogger(TaskExecutor.class);
 
-	
-
 	public JSONObject execute(String jobID, String cronExpression, String currentTimeStr, String prevFireTimeStr,
 			String nextValidTimeAfterStr) {
 		
@@ -18,13 +16,10 @@ public class TaskExecutor {
 
 	protected void markJobStarted(String jobID, String currentTimeStr, String prevFireTimeStr,
 			String nextValidTimeAfterStr) {
-		
-		
 	}
+
 	protected void markJobFinishied(String jobID, String currentTimeStr, String prevFireTimeStr,
 			String nextValidTimeAfterStr) {
-		
-		
 	}
 	
 	public void sleep(long sleep)

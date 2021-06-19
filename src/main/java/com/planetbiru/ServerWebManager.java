@@ -44,7 +44,7 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
-import com.planetbiru.gsm.GSMNullException;
+import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.receiver.ws.WebSocketContent;
 import com.planetbiru.user.APIUserAccount;
@@ -68,41 +68,12 @@ public class ServerWebManager {
 	private WebUserAccount userAccount;
 	private WebUserAccount userAPIAccount;
 
-	@Value("${otpbroker.mail.sender.address}")
-	private String mailSenderAddress;
-
-	@Value("${otpbroker.mail.sender.password}")
-	private String mailSenderPassword;
-	
-	@Value("${otpbroker.mail.auth}")
-	private boolean mailAuth;
-	
-	@Value("${otpbroker.mail.start.tls}")
-	private boolean mailStartTLS;
-	
-	@Value("${otpbroker.mail.ssl}")
-	private boolean mailSSL;
-	
-	@Value("${otpbroker.mail.host}")
-	private String mailHost;
-	
-	@Value("${otpbroker.mail.port}")
-	private int mailPort;
-
-	@Value("${otpbroker.ws.endpoint}")
-	private String wsClientEndpoint;
-
-	@Value("${otpbroker.ws.username}")
-	private String wsClientUsername;
-
-	@Value("${otpbroker.ws.password}")
-	private String wsClientPassword;
 
 	@Value("${otpbroker.web.session.name}")
 	private String sessionName;
 
 	@Value("${otpbroker.web.session.lifetime}")
-	private int cacheLifetime;
+	private long sessionLifetime;
 
 	@Value("${otpbroker.web.document.root}")
 	private String documentRoot;
@@ -128,9 +99,6 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.api.user}")
 	private String userAPISettingPath;
 
-	@Value("${otpbroker.path.setting.email}")
-	private String emailSettingPath;
-
 	@Value("${otpbroker.device.connection.type}")
 	private String portName;
 	
@@ -154,7 +122,6 @@ public class ServerWebManager {
 	
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
-
 	
 	private ServerWebManager()
     {
@@ -163,16 +130,32 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		Config.setModemSettingPath(modemSettingPath);
+		Config.setDhcpSettingPath(dhcpSettingPath);
+		
+		Config.setFeederWSSettingPath(feederWSSettingPath);
+		Config.setWlanSettingPath(wlanSettingPath);	
+		Config.setFeederWSSettingPath(feederWSSettingPath);
+		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
+		Config.setSessionName(sessionName);
+		Config.setSessionLifetime(sessionLifetime);
+		
+		Config.setDdnsSettingPath(ddnsSettingPath);
+		Config.setCloudflareSettingPath(cloudflareSettingPath);
+		Config.setApiSettingPath(apiSettingPath);
+		
+		Config.setSmsSettingPath(smsSettingPath);
+		Config.setEthernetSettingPath(ethernetSettingPath);
+		
+		
 		Config.setBaseDirConfig(baseDirConfig);
-		ConfigDDNS.load(ddnsSettingPath);
-		ConfigCloudflare.load(cloudflareSettingPath);
-		ConfigAPI.load(apiSettingPath);
+		ConfigDDNS.load(Config.getDdnsSettingPath());
+		ConfigCloudflare.load(Config.getCloudflareSettingPath());
+		ConfigAPI.load(Config.getApiSettingPath());
 
-		logger.info("Init...");	
 		Config.setPortName(portName);		
 		userAccount = new WebUserAccount(userSettingPath);		
 		userAPIAccount = new WebUserAccount(userAPISettingPath);		
-		this.loadConfigEmail();		
 		
 		try 
 		{
@@ -180,25 +163,57 @@ public class ServerWebManager {
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();			
+			/**
+			 * Do nothing	
+			 */
 		}
 	}
 	
-	
-	private void loadConfigEmail()
+	@PostMapping(path="/api/device/**")
+	public ResponseEntity<String> modemConnect(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
-		ConfigEmail.setMailSenderAddress(mailSenderAddress);
-		ConfigEmail.setMailSenderPassword(mailSenderPassword);
-		ConfigEmail.setMailAuth(mailAuth);
-		ConfigEmail.setMailSSL(mailSSL);
-		ConfigEmail.setMailStartTLS(mailStartTLS);
-		ConfigEmail.setMailHost(mailHost);
-		ConfigEmail.setMailPort(mailPort);	
-		/**
-		 * Override email setting if exists
-		 */
-		ConfigEmail.load(emailSettingPath);
-	}	
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		HttpHeaders responseHeaders = new HttpHeaders();
+		HttpStatus statusCode;
+		JSONObject responseJSON = new JSONObject();
+		statusCode = HttpStatus.OK;
+		try {
+			if(userAccount.checkUserAuth(headers)){
+				String action = query.getOrDefault("action", "");
+				String modemID = query.getOrDefault("id", "");
+				if(!modemID.isEmpty())
+				{
+					try 
+					{
+						if(action.equals("connect"))
+						{
+							SMSUtil.connect(modemID);
+							ServerInfo.sendModemStatus(SMSUtil.isConnected());
+						}
+						else
+						{
+							SMSUtil.disconnect(modemID);
+							ServerInfo.sendModemStatus(SMSUtil.isConnected());
+						} 
+					}
+					catch (GSMException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			} else {
+				statusCode = HttpStatus.UNAUTHORIZED;
+				responseJSON = RESTAPI.unauthorized(requestBody);					
+			}
+		} catch (NoUserRegisteredException e) {
+			statusCode = HttpStatus.UNAUTHORIZED;
+			responseJSON = RESTAPI.unauthorized(requestBody);					
+		}
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		String responseBody = responseJSON.toString(4);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
 	
 	@PostMapping(path="/api/email**")
 	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -210,7 +225,6 @@ public class ServerWebManager {
 		try {
 			if(userAccount.checkUserAuth(headers))
 			{
-				responseJSON = new JSONObject();
 				responseJSON = RESTAPI.processEmailRequest(requestBody);
 			}
 			else
@@ -278,7 +292,7 @@ public class ServerWebManager {
 					{
 						message = SMSUtil.executeUSSD(ussd);
 					} 
-					catch (GSMNullException e) 
+					catch (GSMException e) 
 					{
 						message = e.getMessage();
 					}		
@@ -303,9 +317,6 @@ public class ServerWebManager {
 		String responseBody = responseJSON.toString(4);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
-	
-	
 	
 	@PostMapping(path="/send-token")
 	public ResponseEntity<byte[]> sendTokenResetPassword1(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -375,7 +386,7 @@ public class ServerWebManager {
 					{
 						SMSUtil.sendSMS(phone, message);
 					} 
-					catch (GSMNullException e) 
+					catch (GSMException e) 
 					{
 						/**
 						 * Do nothing
@@ -439,7 +450,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleLogin(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 	    
@@ -499,7 +510,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleLogout(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		
 		byte[] responseBody = "".getBytes();
 		cookie.destroySession();
@@ -515,7 +526,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleSelfAccount(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -550,14 +561,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleFeederWSSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigFeederWS.load(feederWSSettingPath);
+				ConfigFeederWS.load(Config.getFeederWSSettingPath());
 				String list = ConfigFeederWS.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -583,14 +594,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleFeederAMQPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigFeederAMQP.load(feederAMQPSettingPath);
+				ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
 				String list = ConfigFeederAMQP.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -616,14 +627,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleSMSSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigSMS.load(smsSettingPath);
+				ConfigSMS.load(Config.getSmsSettingPath());
 				String list = ConfigSMS.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -648,14 +659,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleAPISetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigAPI.load(apiSettingPath);
+				ConfigAPI.load(Config.getApiSettingPath());
 				String list = ConfigAPI.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -683,14 +694,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleEmailSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigEmail.load(emailSettingPath);				
+				ConfigEmail.load(Config.getEmailSettingPath());				
 				responseBody = ConfigEmail.toJSONObject().toString().getBytes();
 			}
 			else
@@ -716,14 +727,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleDHCPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigNetDHCP.load(dhcpSettingPath);		
+				ConfigNetDHCP.load(Config.getDhcpSettingPath());		
 				responseBody = ConfigNetDHCP.toJSONObject().toString().getBytes();
 				
 			}
@@ -750,14 +761,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleWLANSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigNetWLAN.load(wlanSettingPath);;		
+				ConfigNetWLAN.load(Config.getWlanSettingPath());		
 				responseBody = ConfigNetWLAN.toJSONObject().toString().getBytes();
 				
 			}
@@ -784,14 +795,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleEthernetSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigNetEthernet.load(ethernetSettingPath);;		
+				ConfigNetEthernet.load(Config.getEthernetSettingPath());
 				responseBody = ConfigNetEthernet.toJSONObject().toString().getBytes();				
 			}
 			else
@@ -821,7 +832,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleServerInfo(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -854,14 +865,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleCloudflareSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigCloudflare.load(emailSettingPath);
+				ConfigCloudflare.load(Config.getEmailSettingPath());
 				
 				responseBody = ConfigCloudflare.toJSONObject().toString().getBytes();
 			}
@@ -888,7 +899,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleUserList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -921,7 +932,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleUserGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.USERNAME) String username, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -954,7 +965,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleDDNSRecordGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -988,7 +999,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleUserAPIList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -1022,7 +1033,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleUserAPIGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.USERNAME) String username, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
@@ -1056,7 +1067,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userInit(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		if(userAccount.isEmpty())
@@ -1116,7 +1127,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1163,14 +1174,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleDDNSRecordList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigDDNS.load(ddnsSettingPath);
+				ConfigDDNS.load(Config.getDdnsSettingPath());
 				String list = ConfigDDNS.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -1196,14 +1207,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleModemGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigModem.load(modemSettingPath);
+				ConfigModem.load(Config.getModemSettingPath());
 				String list = ConfigModem.geModemData(id).toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -1230,14 +1241,14 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> handleModemSRecordList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigModem.load(modemSettingPath);
+				ConfigModem.load(Config.getModemSettingPath());
 				String list = ConfigModem.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -1265,7 +1276,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userAPIAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1313,7 +1324,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userUpdate(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1365,7 +1376,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userAPIUpdate(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1418,7 +1429,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> userRemove(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1448,7 +1459,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> ddnsAdd(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		CookieServer cookie = new CookieServer(headers);
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
@@ -1529,7 +1540,7 @@ public class ServerWebManager {
 				}
 			}
 		}
-		CookieServer cookie = new CookieServer(headers);		
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());		
 		WebSocketContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
 		
 		responseBody = newContent.getResponseBody();
@@ -1575,7 +1586,7 @@ public class ServerWebManager {
 		try {
 			if(userAccount.checkUserAuth(headers))
 			{
-				CookieServer cookie = new CookieServer(headers);
+				CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 				String path = request.getServletPath();
 				if(path.equals("/admin.html"))
 				{
@@ -1651,7 +1662,7 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_api_setting"))
 		{
-			ConfigAPI.load(apiSettingPath);
+			ConfigAPI.load(Config.getApiSettingPath());
 			String v1 = query.getOrDefault("http_port", "0").trim();
 			int lHttpPort = Utility.atoi(v1);
 			
@@ -1726,7 +1737,7 @@ public class ServerWebManager {
 				}
 			}
 			
-			ConfigNetDHCP.load(dhcpSettingPath);
+			ConfigNetDHCP.load(Config.getDhcpSettingPath());
 			ConfigNetDHCP.setDomainName(domainName);
 			ConfigNetDHCP.setIpRouter(ipRouter);
 			ConfigNetDHCP.setNetmask(netmask);
@@ -1742,7 +1753,7 @@ public class ServerWebManager {
 		
 		if(query.containsKey("save_wlan"))
 		{
-			ConfigNetWLAN.load(wlanSettingPath);
+			ConfigNetWLAN.load(Config.getWlanSettingPath());
 			ConfigNetWLAN.setEssid(query.getOrDefault("essid", "").trim());
 			ConfigNetWLAN.setKey(query.getOrDefault("key", "").trim());
 			ConfigNetWLAN.setKeyMgmt(query.getOrDefault("keyMgmt", "").trim());
@@ -1751,13 +1762,13 @@ public class ServerWebManager {
 			ConfigNetWLAN.setNetmask(query.getOrDefault("netmask", "").trim());
 			ConfigNetWLAN.setGateway(query.getOrDefault("gateway", "").trim());
 			ConfigNetWLAN.setDns1(query.getOrDefault("dns1", "").trim());
-			ConfigNetWLAN.save(wlanSettingPath);
+			ConfigNetWLAN.save(Config.getWlanSettingPath());
 			ConfigNetWLAN.apply();
 		}
 
 		if(query.containsKey("save_ethernet"))
 		{
-			ConfigNetEthernet.load(ethernetSettingPath);
+			ConfigNetEthernet.load(Config.getEthernetSettingPath());
 			ConfigNetEthernet.setIpAddress(query.getOrDefault("ipAddress", "").trim());
 			ConfigNetEthernet.setPrefix(query.getOrDefault("prefix", "").trim());
 			ConfigNetEthernet.setNetmask(query.getOrDefault("netmask", "").trim());
@@ -1779,7 +1790,7 @@ public class ServerWebManager {
 		
 		if(!endpoint.isEmpty())
 		{
-			ConfigCloudflare.load(cloudflareSettingPath);
+			ConfigCloudflare.load(Config.getCloudflareSettingPath());
 			ConfigCloudflare.setEndpoint(endpoint);
 			ConfigCloudflare.setAccountId(accountId);
 			ConfigCloudflare.setAuthEmail(authEmail);
@@ -1793,7 +1804,7 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_email_setting"))
 		{
-			ConfigAPI.load(apiSettingPath);
+			ConfigAPI.load(Config.getApiSettingPath());
 			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
 			String lMailHost = query.getOrDefault("smtp_host", "").trim();
 	
@@ -1826,7 +1837,7 @@ public class ServerWebManager {
 	
 	private void processModemSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		ConfigModem.load(modemSettingPath);
+		ConfigModem.load(Config.getModemSettingPath());
 		if(query.containsKey(JsonKey.DELETE))
 		{
 			/**
@@ -1930,6 +1941,7 @@ public class ServerWebManager {
 		if(query.containsKey("save_feeder_ws_setting"))
 		{
 
+			ConfigFeederWS.load(Config.getFeederWSSettingPath());
 			boolean feederWsEnable = query.getOrDefault("feeder_ws_enable", "").equals("1");		
 			boolean feederWsSSL = query.getOrDefault("feeder_ws_ssl", "").equals("1");		
 			String feederWsAddress = query.getOrDefault("feeder_ws_address", "");		
@@ -1959,10 +1971,11 @@ public class ServerWebManager {
 			ConfigFeederWS.setFeederWsReconnectDelay(feederWsReconnectDelay);
 			ConfigFeederWS.setFeederWsRefresh(feederWsRefresh);		
 			
-			ConfigFeederWS.save(feederWSSettingPath);
+			ConfigFeederWS.save(Config.getFeederWSSettingPath());
 		}
 		if(query.containsKey("save_feeder_amqp_setting"))
 		{
+			ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
 			boolean feederAmqpEnable = query.getOrDefault("feeder_amqp_enable", "").equals("1");		
 			boolean feederAmqpSSL = query.getOrDefault("feeder_amqp_ssl", "").equals("1");		
 			String feederAmqpAddress = query.getOrDefault("feeder_amqp_address", "");		
@@ -1989,7 +2002,7 @@ public class ServerWebManager {
 			ConfigFeederAMQP.setFeederAmqpTimeout(feederAmqpTimeout);
 			ConfigFeederAMQP.setFeederAmqpRefresh(feederAmqpRefresh);		
 
-			ConfigFeederAMQP.save(feederAMQPSettingPath);			
+			ConfigFeederAMQP.save(Config.getFeederAMQPSettingPath());			
 		}		
 	}
 	
@@ -2006,7 +2019,7 @@ public class ServerWebManager {
 					this.broardcastWebSocket("Sending a message to "+receiver);
 					SMSUtil.sendSMS(receiver, message);
 				} 
-				catch (GSMNullException e) 
+				catch (GSMException e) 
 				{
 					this.broardcastWebSocket(e.getMessage());
 					e.printStackTrace();
@@ -2452,10 +2465,6 @@ public class ServerWebManager {
 			}
 		}
 	}
-	
-	
-	
-	
 	
 	private void processDDNS(String requestBody, CookieServer cookie) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);

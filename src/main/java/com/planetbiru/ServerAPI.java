@@ -16,11 +16,15 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.planetbiru.api.HandlerAPIMessage;
+import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
+import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.util.ServiceHTTP;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsServer;
@@ -33,15 +37,59 @@ public class ServerAPI {
 	private String jksPassword = "auewfiuwehfiwehfewfewf";
 	private String keystoreFile = "auewfiuwehfiwehfewfewf.jks";
 
+	
+	@Value("${otpbroker.mail.sender.address}")
+	private String mailSenderAddress;
+
+	@Value("${otpbroker.mail.sender.password}")
+	private String mailSenderPassword;
+	
+	@Value("${otpbroker.mail.auth}")
+	private boolean mailAuth;
+	
+	@Value("${otpbroker.mail.start.tls}")
+	private boolean mailStartTLS;
+	
+	@Value("${otpbroker.mail.ssl}")
+	private boolean mailSSL;
+	
+	@Value("${otpbroker.mail.host}")
+	private String mailHost;
+	
+	@Value("${otpbroker.mail.port}")
+	private int mailPort;
+
+	@Value("${otpbroker.path.setting.email}")
+	private String emailSettingPath;
+
+
 	@PostConstruct
 	public void init()
 	{
 		SMSUtil.init();
 		
+		this.loadConfigEmail();
 		this.initHttp();
 		this.initHttps();
 		
 	}
+	
+	private void loadConfigEmail()
+	{
+		Config.setEmailSettingPath(emailSettingPath);
+		ConfigEmail.setMailSenderAddress(mailSenderAddress);
+		ConfigEmail.setMailSenderPassword(mailSenderPassword);
+		ConfigEmail.setMailAuth(mailAuth);
+		ConfigEmail.setMailSSL(mailSSL);
+		ConfigEmail.setMailStartTLS(mailStartTLS);
+		ConfigEmail.setMailHost(mailHost);
+		ConfigEmail.setMailPort(mailPort);	
+		/**
+		 * Override email setting if exists
+		 */
+		ConfigEmail.load(Config.getEmailSettingPath());
+	}	
+	
 	private void initHttps() {
 		if(ConfigAPI.isHttpEnable())
 		{

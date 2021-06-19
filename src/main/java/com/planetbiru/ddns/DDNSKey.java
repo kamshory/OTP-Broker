@@ -10,6 +10,7 @@ public class DDNSKey {
 	public static final String NAME                   = "name";
 	public static final String RESULT                 = "result";
 	public static final String HEADER_CONNECTION      = "Connection";
+	public static final String ZONES                  = "/zones/";
 	
 	private DDNSKey()
 	{

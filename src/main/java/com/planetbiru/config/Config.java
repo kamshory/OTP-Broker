@@ -10,8 +10,8 @@ public class Config {
 	
 	private static boolean otpViaWebSocket = true;
 	private static boolean otpViaRabbitMQ = true;
-	private static long reconnectDelay = 5000;
-	private static String ssClientEndpoint = "ws://localhost:8888/ws";
+	private static long feederWSReconnectDelay = 5000;
+
 	private static String wsClientUsername = "qa";
 	private static String wsClientPassword = "4lt0@1234";
 	private static String portName = "usbtty";
@@ -21,6 +21,20 @@ public class Config {
 	private static String proxyHost = "127.0.0.1";
 	private static int proxyPort = 8080;
 	private static String baseDirConfig = "";
+	private static String sessionName = "SMSSESSID";
+	private static long sessionLifetime = 1440000;
+	private static String emailSettingPath = "";
+	private static String feederAMQPSettingPath = "";
+	private static String feederWSSettingPath = "";
+	private static String wlanSettingPath = "";
+	private static String ddnsSettingPath = "";
+	private static String cloudflareSettingPath = "";
+	private static String apiSettingPath = "";
+	private static String smsSettingPath = "";
+	private static String dhcpSettingPath = "";
+	private static String ethernetSettingPath = "";
+	private static String modemSettingPath = "";
+	private static long feederWSRecoonectDelay;
 	
 	private Config()
 	{
@@ -72,19 +86,11 @@ public class Config {
 	}
 
 	public static long getReconnectDelay() {
-		return reconnectDelay;
+		return getFeederWSReconnectDelay();
 	}
 
 	public static void setReconnectDelay(long reconnectDelay) {
-		Config.reconnectDelay = reconnectDelay;
-	}
-
-	public static String getSsClientEndpoint() {
-		return ssClientEndpoint;
-	}
-
-	public static void setSsClientEndpoint(String ssClientEndpoint) {
-		Config.ssClientEndpoint = ssClientEndpoint;
+		Config.setFeederWSReconnectDelay(reconnectDelay);
 	}
 
 	public static String getPortName() {
@@ -157,6 +163,155 @@ public class Config {
 
 	public static void setBaseDirConfig(String baseDirConfig) {
 		Config.baseDirConfig = baseDirConfig;
+	}
+
+
+	public static String getSessionName() {
+		return sessionName;
+	}
+
+
+	public static void setSessionName(String sessionName) {
+		Config.sessionName = sessionName;
+	}
+
+
+	public static long getSessionLifetime() {
+		return sessionLifetime;
+	}
+
+
+	public static void setSessionLifetime(long sessionLifetime) {
+		Config.sessionLifetime = sessionLifetime;
+	}
+
+
+	public static String getEmailSettingPath() {
+		return emailSettingPath;
+	}
+
+
+	public static void setEmailSettingPath(String emailSettingPath) {
+		Config.emailSettingPath = emailSettingPath;
+	}
+
+
+	public static String getFeederAMQPSettingPath() {
+		return feederAMQPSettingPath;
+	}
+
+
+	public static void setFeederAMQPSettingPath(String feederAMQPSettingPath) {
+		Config.feederAMQPSettingPath = feederAMQPSettingPath;
+	}
+
+
+	public static String getFeederWSSettingPath() {
+		return feederWSSettingPath;
+	}
+
+
+	public static void setFeederWSSettingPath(String feederWSSettingPath) {
+		Config.feederWSSettingPath = feederWSSettingPath;
+	}
+
+
+	public static String getWlanSettingPath() {
+		return wlanSettingPath;
+	}
+
+
+	public static void setWlanSettingPath(String wlanSettingPath) {
+		Config.wlanSettingPath = wlanSettingPath;
+	}
+
+	public static String getDdnsSettingPath() {
+		return ddnsSettingPath;
+	}
+
+
+	public static void setDdnsSettingPath(String ddnsSettingPath) {
+		Config.ddnsSettingPath = ddnsSettingPath;
+	}
+
+
+	public static String getCloudflareSettingPath() {
+		return cloudflareSettingPath;
+	}
+
+
+	public static void setCloudflareSettingPath(String cloudflareSettingPath) {
+		Config.cloudflareSettingPath = cloudflareSettingPath;
+	}
+
+
+	public static String getApiSettingPath() {
+		return apiSettingPath;
+	}
+
+
+	public static void setApiSettingPath(String apiSettingPath) {
+		Config.apiSettingPath = apiSettingPath;
+	}
+
+
+	public static String getSmsSettingPath() {
+		return smsSettingPath;
+	}
+
+
+	public static void setSmsSettingPath(String smsSettingPath) {
+		Config.smsSettingPath = smsSettingPath;
+	}
+
+
+	public static String getDhcpSettingPath() {
+		return dhcpSettingPath;
+	}
+
+
+	public static void setDhcpSettingPath(String dhcpSettingPath) {
+		Config.dhcpSettingPath = dhcpSettingPath;
+	}
+
+
+	public static String getEthernetSettingPath() {
+		return ethernetSettingPath;
+	}
+
+
+	public static void setEthernetSettingPath(String ethernetSettingPath) {
+		Config.ethernetSettingPath = ethernetSettingPath;
+	}
+
+
+	public static String getModemSettingPath() {
+		return modemSettingPath;
+	}
+
+
+	public static void setModemSettingPath(String modemSettingPath) {
+		Config.modemSettingPath = modemSettingPath;
+	}
+
+
+	public static long getFeederWSReconnectDelay() {
+		return feederWSReconnectDelay;
+	}
+
+
+	public static void setFeederWSReconnectDelay(long feederWSReconnectDelay) {
+		Config.feederWSReconnectDelay = feederWSReconnectDelay;
+	}
+
+
+	public static long getFeederWSRecoonectDelay() {
+		return feederWSRecoonectDelay;
+	}
+
+
+	public static void setFeederWSRecoonectDelay(long feederWSRecoonectDelay) {
+		Config.feederWSRecoonectDelay = feederWSRecoonectDelay;
 	}
 
 

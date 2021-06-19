@@ -27,6 +27,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import com.planetbiru.config.Config;
+import com.planetbiru.constant.ConstantString;
 import com.planetbiru.util.ResponseEntityCustom;
 import com.planetbiru.util.Utility;
 
@@ -92,7 +93,7 @@ public class DNSCloudflare extends DNS{
 		String body = json.toString();
 		int timeout = 1000;
 		HttpHeaders requestHeaders = this.createRequestHeader();
-		requestHeaders.add(DDNSKey.HEADER_CONTENT_TYPE, "application/json");
+		requestHeaders.add(DDNSKey.HEADER_CONTENT_TYPE, ConstantString.APPLICATION_JSON);
 		ResponseEntityCustom response = httpExchange(HttpMethod.POST, url, requestHeaders, body, timeout);
 		JSONObject resp = new JSONObject();
 		try
@@ -165,7 +166,7 @@ public class DNSCloudflare extends DNS{
 		}
 		String zoneId = zone.optString("id", "");
 		
-		String url = this.endpoint + "/zones/"+zoneId;
+		String url = this.endpoint + DDNSKey.ZONES+zoneId;
 		HttpHeaders requestHeaders = this.createRequestHeader();
 		
 		ResponseEntityCustom response = httpExchange(HttpMethod.DELETE, url, requestHeaders, null, 10000);
@@ -192,7 +193,7 @@ public class DNSCloudflare extends DNS{
 	 */
 	public JSONObject deleteZone(String zoneId)
 	{
-		String url = this.endpoint + "/zones/"+zoneId;
+		String url = this.endpoint + DDNSKey.ZONES+zoneId;
 		HttpHeaders requestHeaders = this.createRequestHeader();
 		
 		ResponseEntityCustom response = httpExchange(HttpMethod.DELETE, url, requestHeaders, null, 10000);
@@ -216,7 +217,7 @@ public class DNSCloudflare extends DNS{
 
 	public JSONObject getZoneDnsRecords(String zoneId, Map<String, String> params)
 	{
-		ResponseEntityCustom response = this.get("/zones/" + zoneId + "/dns_records", params, "application/x-www-form-urlencoded");
+		ResponseEntityCustom response = this.get(DDNSKey.ZONES + zoneId + "/dns_records", params, ConstantString.URL_ENCODE);
 		JSONObject resp = new JSONObject();
 				
 		try
@@ -242,8 +243,8 @@ public class DNSCloudflare extends DNS{
 		json.put("ttl", ttl);
 		json.put("proxied", proxied);
 	
-		String url = endpoint + "/zones/" + zoneId + "/dns_records";
-		HttpHeaders requestHeaders = this.createRequestHeader("application/json");
+		String url = endpoint + DDNSKey.ZONES + zoneId + "/dns_records";
+		HttpHeaders requestHeaders = this.createRequestHeader(ConstantString.APPLICATION_JSON);
 		String body = json.toString();
 		int timeout = 1000;
 		ResponseEntityCustom response = httpExchange(HttpMethod.POST, url, requestHeaders, body, timeout);
@@ -254,6 +255,7 @@ public class DNSCloudflare extends DNS{
 		return resp.optJSONObject(DDNSKey.RESULT);
 	}
 	
+	@Override
 	public JSONObject update(DDNSRecord ddnsRecord)  
 	{
 		String ip = this.getIP();
@@ -377,9 +379,6 @@ public class DNSCloudflare extends DNS{
 	*/
 	public ResponseEntityCustom httpExchange(HttpMethod method, String url, HttpHeaders requestHeaders, String body, int timeout)
 	{
-		logger.info("Send message to  : {}", url);
-		logger.info("Request Headers  : {}", requestHeaders);
-		logger.info("Request Body     : {}", body);
 		RestTemplate restTemplate = this.customRestTemplate(timeout);
 		HttpEntity<String> entity = new HttpEntity<>(body, requestHeaders);	
 		ResponseEntity<String> responseEntity;
@@ -513,7 +512,7 @@ public class DNSCloudflare extends DNS{
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.add(DDNSKey.HEADER_X_AUTH_EMAIL, this.authEmail);
 		requestHeaders.add(DDNSKey.HEADER_X_AUTH_KEY, this.authApiKey);
-		requestHeaders.add(DDNSKey.HEADER_USER_AGENT, "cloudflare-php");
+		requestHeaders.add(DDNSKey.HEADER_USER_AGENT, "OTP Broker");
 		requestHeaders.add(DDNSKey.HEADER_CONNECTION, "close");
 		return requestHeaders;
 	}
@@ -551,7 +550,7 @@ public class DNSCloudflare extends DNS{
 		Map<String, String> params = new HashMap<>();
 		params.put(DDNSKey.VALUE, type);
 	
-		ResponseEntityCustom response = this.patch("/zones/" + zoneId + "/settings/ssl", params, "application/x-www-form-urlencoded");
+		ResponseEntityCustom response = this.patch(DDNSKey.ZONES + zoneId + "/settings/ssl", params, ConstantString.URL_ENCODE);
 		JSONObject resp = new JSONObject(response.getBody());
 		return resp.optJSONObject(DDNSKey.RESULT);
 	}
@@ -570,7 +569,7 @@ public class DNSCloudflare extends DNS{
 		Map<String, String> params = new HashMap<>();
 		params.put(DDNSKey.VALUE, type);
 	
-		ResponseEntityCustom response = this.patch("/zones/" + zoneId + "/settings/cache_level", params, "application/x-www-form-urlencoded");
+		ResponseEntityCustom response = this.patch(DDNSKey.ZONES + zoneId + "/settings/cache_level", params, ConstantString.URL_ENCODE);
 		JSONObject resp = new JSONObject(response.getBody());
 		return resp.optJSONObject(DDNSKey.RESULT);
 	}
@@ -579,14 +578,14 @@ public class DNSCloudflare extends DNS{
 	{
 		Map<String, String> params = new HashMap<>();
 		params.put("purge_everything", Boolean.toString(true));
-		return this.delete("/zones/" + zoneId + "/purge_cache", params, "application/x-www-form-urlencoded");
+		return this.delete(DDNSKey.ZONES + zoneId + "/purge_cache", params, ConstantString.URL_ENCODE);
 	}
 
 	public ResponseEntityCustom setDnsZoneMinify(String zoneId, String settings)
 	{
 		Map<String, String> params = new HashMap<>();
 		params.put(DDNSKey.VALUE, settings);
-		return this.patch("/zones/" + zoneId + "/settings/minify", params, "application/x-www-form-urlencoded");
+		return this.patch(DDNSKey.ZONES + zoneId + "/settings/minify", params, ConstantString.URL_ENCODE);
 	}
 
 	public JSONObject updateDnsRecord(String zoneId, String type, String name, String content, int ttl, boolean proxied, String recordId)
@@ -599,8 +598,8 @@ public class DNSCloudflare extends DNS{
 		json.put("ttl", ttl);
 		json.put("proxied", proxied);
 	
-		String url = endpoint + "/zones/" + zoneId + "/dns_records/" + recordId;
-		HttpHeaders requestHeaders = this.createRequestHeader("application/json");
+		String url = endpoint + DDNSKey.ZONES + zoneId + "/dns_records/" + recordId;
+		HttpHeaders requestHeaders = this.createRequestHeader(ConstantString.APPLICATION_JSON);
 		String body = json.toString();
 		int timeout = 1000;
 		ResponseEntityCustom response = httpExchange(HttpMethod.PUT, url, requestHeaders, body, timeout);		
@@ -614,7 +613,7 @@ public class DNSCloudflare extends DNS{
 
 	public ResponseEntityCustom deleteDnsRecord(String zoneId, String recordId)
 	{
-		return this.delete("/zones/" + zoneId + "/dns_records/" + recordId, "application/x-www-form-urlencoded");
+		return this.delete(DDNSKey.ZONES + zoneId + "/dns_records/" + recordId, ConstantString.URL_ENCODE);
 	}
 
 

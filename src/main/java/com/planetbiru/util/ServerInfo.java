@@ -3,6 +3,9 @@ package com.planetbiru.util;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.planetbiru.ServerWebSocketManager;
+import com.planetbiru.constant.JsonKey;
+
 public class ServerInfo {
 	
 	private static final String TOTAL = "total";
@@ -14,6 +17,62 @@ public class ServerInfo {
 	private ServerInfo()
 	{
 		
+	}
+	
+	public static void sendWSStatus(boolean connected, String message) 
+    {
+		JSONArray data = new JSONArray();
+		JSONObject info = new JSONObject();
+		
+		JSONObject ws = new JSONObject();
+		ws.put(JsonKey.NAME, "ws_connected");
+		ws.put(JsonKey.VALUE, connected);
+		ws.put(JsonKey.MESSAGE, message);
+		data.put(ws);
+		
+		info.put(JsonKey.COMMAND, "server-info");
+		info.put(JsonKey.DATA, data);
+	
+		ServerWebSocketManager.broadcast(info.toString(4));
+		
+		
+	}
+	
+	
+	public static void sendWSStatus(boolean connected) {
+		ServerInfo.sendWSStatus(connected, "");		
+	}
+	
+	public static void sendAMQPStatus(boolean connected)
+	{
+		JSONArray data = new JSONArray();
+		JSONObject info = new JSONObject();
+		
+		JSONObject ws = new JSONObject();
+		ws.put(JsonKey.NAME, "amqp_connected");
+		ws.put(JsonKey.VALUE, connected);
+		data.put(ws);
+		
+		info.put(JsonKey.COMMAND, "server-info");
+		info.put(JsonKey.DATA, data);
+	
+		ServerWebSocketManager.broadcast(info.toString(4));
+	}
+
+	public static void sendModemStatus(boolean connected)
+	{
+		JSONArray data = new JSONArray();
+		JSONObject info = new JSONObject();
+		
+		JSONObject ws = new JSONObject();
+		ws.put(JsonKey.NAME, "modem_connected");
+		ws.put(JsonKey.VALUE, connected);
+		data.put(ws);
+		
+		info.put(JsonKey.COMMAND, "server-info");
+		info.put(JsonKey.DATA, data);
+	
+		ServerWebSocketManager.broadcast(info.toString(4));
 	}
 
 	public static String getInfo() {

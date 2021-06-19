@@ -12,8 +12,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.planetbiru.gsm.GSMNullException;
+import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.util.ServerInfo;
 
 public class WebSocketEndpoint extends Endpoint {
 	private WebSocketClient webSocketClient;
@@ -33,7 +34,7 @@ public class WebSocketEndpoint extends Endpoint {
 		try 
 		{
 			this.login();
-			webSocketClient.sendWSStatus(true);
+			ServerInfo.sendWSStatus(true);
 		}
 		catch (IOException e) 
 		{
@@ -78,13 +79,13 @@ public class WebSocketEndpoint extends Endpoint {
 			{
 				this.sendSMS(receiver, textMessage);
 			} 
-			catch (GSMNullException e) 
+			catch (GSMException e) 
 			{
 				e.printStackTrace();
 			}
 		}
 	}
-	private void sendSMS(String receiver, String textMessage) throws GSMNullException {
+	private void sendSMS(String receiver, String textMessage) throws GSMException {
 		SMSUtil.sendSMS(receiver, textMessage);
 		
 	}
@@ -105,13 +106,13 @@ public class WebSocketEndpoint extends Endpoint {
 	@Override
 	public void onError(Session session, Throwable throwable)
 	{
-		this.webSocketClient.sendWSStatus(false, throwable.getMessage());
+		ServerInfo.sendWSStatus(false, throwable.getMessage());
 		this.webSocketClient.getWebSocketTool().restartThread();
 	}
 	
 	@Override
 	public void onClose(Session ses, CloseReason closeReason) {
-		this.webSocketClient.sendWSStatus(false, closeReason.getReasonPhrase());
+		ServerInfo.sendWSStatus(false, closeReason.getReasonPhrase());
 		this.webSocketClient.getWebSocketTool().restartThread();
     }
 

@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
+import com.planetbiru.config.Config;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
@@ -29,22 +30,23 @@ public class CookieServer {
 	private Map<String, CookieItem> cookieItem = new HashMap<>();
 	private long sessionLifetime = 1440000;
 	private JSONObject sessionData = new JSONObject();
-	
-	public CookieServer()
-	{
-		
-	}
+
 	public CookieServer(Map<String, List<String>> headers) {
+		this.sessionLifetime = Config.getSessionLifetime();
+		this.sessionName = Config.getSessionName();
 		this.parseCookie(headers);
 		this.updateSessionID();
 	}
-	public CookieServer(HttpHeaders headers)
-	{
+
+	public CookieServer(Map<String, List<String>> headers, String sessionName, long sessionLifetime) {
+		this.sessionLifetime = sessionLifetime;
+		this.sessionName = sessionName;
 		this.parseCookie(headers);
 		this.updateSessionID();
 	}
-	public CookieServer(HttpHeaders headers, String sessionName)
+	public CookieServer(HttpHeaders headers, String sessionName, long sessionLifetime)
 	{
+		this.sessionLifetime = sessionLifetime;
 		this.sessionName = sessionName;
 		this.parseCookie(headers);
 		this.updateSessionID();
@@ -231,7 +233,8 @@ public class CookieServer {
 			String key = entry.getKey();
 			if(key.equals(this.sessionName))
 			{
-				((CookieItem) entry.getValue()).setExpires(new Date(System.currentTimeMillis() + this.sessionLifetime));
+				Date expirationDate = new Date(System.currentTimeMillis() + this.sessionLifetime);
+				((CookieItem) entry.getValue()).setExpires(expirationDate);
 			}
 			responseHeaders.add("Set-Cookie", ((CookieItem) entry.getValue()).toString());
 		}
@@ -326,12 +329,12 @@ public class CookieServer {
 	}
 	
 	private String getSessionFile() {
-		String dir = FileUtil.class.getResource("/").getFile();
+		String dir = Utility.getBaseDir();
 		return dir+"/static/session/"+this.sessionID;
 	}
 	
 	private String getSessionDir() {
-		String dir = FileUtil.class.getResource("/").getFile();
+		String dir = Utility.getBaseDir();
 		return dir+"/static/session";
 	}
 	

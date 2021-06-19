@@ -6,7 +6,7 @@ public class WebSocketTool extends Thread{
 	private WebSocketClient client;
 	private long reconnectDelay = 10000;
 	
-	public WebSocketTool(int reconnectDelay)
+	public WebSocketTool(long reconnectDelay)
 	{
 		this.reconnectDelay = reconnectDelay;
 		this.client = new WebSocketClient(this);

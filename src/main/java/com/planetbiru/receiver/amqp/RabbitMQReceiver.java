@@ -11,7 +11,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.gsm.GSMNullException;
+import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
 
 public class RabbitMQReceiver implements MessageListener{
@@ -37,7 +37,7 @@ public class RabbitMQReceiver implements MessageListener{
 					    {
 							SMSUtil.sendSMS(receiver, message);
 						} 
-					    catch (GSMNullException e) 
+					    catch (GSMException e) 
 					    {
 							logger.error(e.getMessage());
 						}
@@ -48,7 +48,7 @@ public class RabbitMQReceiver implements MessageListener{
 			{
 				logger.error(e.getMessage());
 			}
-			latch.countDown();
+			this.latch.countDown();
 		}
 	}
 
