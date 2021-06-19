@@ -283,7 +283,7 @@ public class GSM {
      * @param portName the port name
      * @return true if port was opened successfully
      */
-    public boolean initialize(String portName) 
+    public boolean connect(String portName) 
     {
     	
     	this.portName = portName;

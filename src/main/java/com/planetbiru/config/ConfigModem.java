@@ -23,6 +23,10 @@ public class ConfigModem {
 		
 	}
 	
+	public static ModemData getModemData(String modemID) {
+		return ConfigModem.modemData.getOrDefault(modemID, new ModemData());
+	}
+	
 	public static Map<String, ModemData> getModemData()
 	{
 		return ConfigModem.modemData;
@@ -179,6 +183,7 @@ public class ConfigModem {
 		modem.setConnected(connected);
 		ConfigModem.modemData.put(id, modem);		
 	}
+
 	
 	
 	
