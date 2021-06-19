@@ -1,6 +1,8 @@
 package com.planetbiru.receiver.amqp;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -11,12 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigFeederAMQP;
 
 
 @Configuration
 public class RabbitMQConfig {
-	//private Logger logger = LogManager.getLogger(RabbitMQConfig.class);	
 
 	@Value("${otpbroker.rabbitmq.username}")
 	String username;
@@ -38,6 +40,9 @@ public class RabbitMQConfig {
 
 	@Value("${otpbroker.rabbitmq.enable}")
 	private boolean enable;
+	
+	@Value("${otpbroker.rabbitmq.ssl}")
+	private boolean rabbitMQSSL;
 
 	
 	@Bean
@@ -82,15 +87,14 @@ public class RabbitMQConfig {
 	@PostConstruct
     private void init()
     {
-		ConfigFeederAMQP.load(feederAMQPSettingPath);
-    }
-	
+		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
+		ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
+    }	
 
 	@Bean
 	ConnectionFactory connectionFactory() {
-		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();
-		
-		
+		com.rabbitmq.client.ConnectionFactory  rabbitmqConnectionfactory = new com.rabbitmq.client.ConnectionFactory();		
+		boolean ssl = this.rabbitMQSSL;
 		String lRabbitMQHost = this.rabbitMQHost;
 		int lRabbitMQPort = this.rabbitMQPort;
 		String lUsername = this.username;
@@ -102,14 +106,31 @@ public class RabbitMQConfig {
 			lRabbitMQPort = ConfigFeederAMQP.getFeederAmqpPort();
 			lUsername = ConfigFeederAMQP.getFeederAmqpUsername();
 			lPassword = ConfigFeederAMQP.getFeederAmqpPassword();
+			ssl = ConfigFeederAMQP.isFeederAmqpSSL();
 			ConfigFeederAMQP.setConnected(true);
 		}
 		
-		cachingConnectionFactory.setAddresses(lRabbitMQHost);
-		cachingConnectionFactory.setPort(lRabbitMQPort);
-		cachingConnectionFactory.setUsername(lUsername);
-		cachingConnectionFactory.setPassword(lPassword);
-		return cachingConnectionFactory;
+		if(ssl)
+		{
+			SSLContext sslContext;		
+    		try {
+    			sslContext = SSLContext.getInstance("TLS");
+    			sslContext.init(null,null,null);
+    			SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();    	  		
+    			rabbitmqConnectionfactory.setSocketFactory(sslSocketFactory); 		
+    		} catch (Exception e) {
+    			/**
+    			 * Do nothing
+    			 */
+    		}
+		}
+		
+		rabbitmqConnectionfactory.setHost(lRabbitMQHost);
+		rabbitmqConnectionfactory.setPort(lRabbitMQPort);
+		rabbitmqConnectionfactory.setUsername(lUsername);
+		rabbitmqConnectionfactory.setPassword(lPassword);
+
+		return new CachingConnectionFactory(rabbitmqConnectionfactory);
 	}
 	
 }
