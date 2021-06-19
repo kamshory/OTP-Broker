@@ -16,6 +16,8 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +33,17 @@ import com.sun.net.httpserver.HttpsServer;
 
 @Service
 public class ServerAPI {
-	private int httpPort = 8088;
-	private int httpsPort = 8089;
-	private String pathSendSMS = "/send-sms";	
-	private String jksPassword = "auewfiuwehfiwehfewfewf";
-	private String keystoreFile = "auewfiuwehfiwehfewfewf.jks";
 
+	private Logger logger = LogManager.getLogger(ServerAPI.class);
+	
+	private String keystorePassword = "4lt0@1234!";
+	private String keystoreFile = "C:/static/keystore.jks";
+	
+	@Value("${otpbroker.path.setting.api.service}")
+	private String apiSettingPath;
+
+	@Value("${otpbroker.path.setting.email}")
+	private String emailSettingPath;
 	
 	@Value("${otpbroker.mail.sender.address}")
 	private String mailSenderAddress;
@@ -58,9 +65,27 @@ public class ServerAPI {
 	
 	@Value("${otpbroker.mail.port}")
 	private int mailPort;
-
-	@Value("${otpbroker.path.setting.email}")
-	private String emailSettingPath;
+	
+	@Value("${otpbroker.api.http.port}")
+	private int httpPort;
+	
+	@Value("${otpbroker.api.https.port}")
+	private int httpsPort;
+	
+	@Value("${otpbroker.api.http.enable}")
+	private boolean httpEnable;
+	
+	@Value("${otpbroker.api.https.enable}")
+	private boolean httpsEnable;
+	
+	@Value("${otpbroker.api.path.message}")
+	private String messagePath;
+	
+	@Value("${otpbroker.api.path.block}")
+	private String blockinPath;
+	
+	@Value("${otpbroker.api.path.unblock}")
+	private String unblockinPath;
 
 
 	@PostConstruct
@@ -68,15 +93,31 @@ public class ServerAPI {
 	{
 		SMSUtil.init();
 		
+		this.loadConfigHttp();
 		this.loadConfigEmail();
 		this.initHttp();
 		this.initHttps();
 		
 	}
 	
+	private void loadConfigHttp() {
+		Config.setApiSettingPath(apiSettingPath);
+		
+		ConfigAPI.setHttpPort(httpPort);
+		ConfigAPI.setHttpsPort(httpsPort);
+		ConfigAPI.setHttpEnable(httpEnable);	
+		ConfigAPI.setHttpsEnable(httpsEnable);	
+		ConfigAPI.setMessagePath(messagePath);
+		ConfigAPI.setBlockinPath(blockinPath);
+		ConfigAPI.setUnblockinPath(unblockinPath);
+		
+		ConfigAPI.load(Config.getApiSettingPath());
+	}
+
 	private void loadConfigEmail()
 	{
 		Config.setEmailSettingPath(emailSettingPath);
+		
 		ConfigEmail.setMailSenderAddress(mailSenderAddress);
 		ConfigEmail.setMailSenderPassword(mailSenderPassword);
 		ConfigEmail.setMailAuth(mailAuth);
@@ -84,6 +125,7 @@ public class ServerAPI {
 		ConfigEmail.setMailStartTLS(mailStartTLS);
 		ConfigEmail.setMailHost(mailHost);
 		ConfigEmail.setMailPort(mailPort);	
+		
 		/**
 		 * Override email setting if exists
 		 */
@@ -91,34 +133,36 @@ public class ServerAPI {
 	}	
 	
 	private void initHttps() {
-		if(ConfigAPI.isHttpEnable())
+		if(ConfigAPI.isHttpsEnable())
 		{
-			try (FileInputStream fileInputStream = new FileInputStream(keystoreFile))
-			{
-				char[] password = jksPassword.toCharArray();
-			    KeyStore keyStore;
-
-				keyStore = KeyStore.getInstance("JKS");
-				
-
-				SSLContext sslContext = SSLContext.getInstance("TLS");
-				keyStore.load(fileInputStream, password);
-			    KeyManagerFactory keyManagementFactory = KeyManagerFactory.getInstance("SunX509");
-			    keyManagementFactory.init (keyStore, password);
-			    TrustManagerFactory trustFactory = TrustManagerFactory.getInstance("SunX509");
-			    trustFactory.init (keyStore);
-			    sslContext.init(keyManagementFactory.getKeyManagers(), trustFactory.getTrustManagers(), null);							    
-				HttpsConfigurator httpsConfigurator = new HttpsConfigurator(sslContext);
-				ServiceHTTP.getHttpsServer().setHttpsConfigurator(httpsConfigurator);		
-				
-				ServiceHTTP.setHttpsServer(HttpsServer.create(new InetSocketAddress(this.httpsPort), 0));
-		        ServiceHTTP.getHttpsServer().createContext(this.pathSendSMS, new HandlerAPIMessage());
-		        ServiceHTTP.getHttpsServer().start();
-			} 
-			catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException | UnrecoverableKeyException e) 
-			{
-				e.printStackTrace();
+			try {
+				ServiceHTTP.setHttpsServer(HttpsServer.create(new InetSocketAddress(ConfigAPI.getHttpsPort()), 0));
+				try (FileInputStream fileInputStream = new FileInputStream(keystoreFile))
+				{
+					char[] password = keystorePassword.toCharArray();
+				    KeyStore keyStore;
+					keyStore = KeyStore.getInstance("JKS");	
+					SSLContext sslContext = SSLContext.getInstance("TLS");
+					keyStore.load(fileInputStream, password);
+				    KeyManagerFactory keyManagementFactory = KeyManagerFactory.getInstance("SunX509");
+				    keyManagementFactory.init (keyStore, password);
+				    TrustManagerFactory trustFactory = TrustManagerFactory.getInstance("SunX509");
+				    trustFactory.init(keyStore);
+				    sslContext.init(keyManagementFactory.getKeyManagers(), trustFactory.getTrustManagers(), null);		
+					HttpsConfigurator httpsConfigurator = new HttpsConfigurator(sslContext);
+					ServiceHTTP.getHttpsServer().setHttpsConfigurator(httpsConfigurator);		
+			        ServiceHTTP.getHttpsServer().createContext(ConfigAPI.getMessagePath(), new HandlerAPIMessage());
+			        ServiceHTTP.getHttpsServer().start();
+				} 
+				catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException | UnrecoverableKeyException e) 
+				{
+					logger.info(e.getMessage());
+				}
+			} catch (IOException e1) {
+				logger.info(e1.getMessage());
 			}
+			
+			
 		}
 		
 	}
@@ -127,13 +171,13 @@ public class ServerAPI {
 		{
 			try 
 			{
-				ServiceHTTP.setHttpServer(HttpServer.create(new InetSocketAddress(this.httpPort), 0));
-		        ServiceHTTP.getHttpServer().createContext(this.pathSendSMS, new HandlerAPIMessage());
+				ServiceHTTP.setHttpServer(HttpServer.create(new InetSocketAddress(ConfigAPI.getHttpPort()), 0));
+		        ServiceHTTP.getHttpServer().createContext(ConfigAPI.getMessagePath(), new HandlerAPIMessage());
 		        ServiceHTTP.getHttpServer().start();
 			} 
 			catch (IOException e) 
 			{
-				e.printStackTrace();
+				logger.info(e.getMessage());
 			}
 		}
 		
@@ -141,6 +185,13 @@ public class ServerAPI {
 	@PreDestroy
 	public void destroy()
 	{
-		ServiceHTTP.getHttpServer().start();
+		if(ConfigAPI.isHttpsEnable() && ServiceHTTP.getHttpServer() != null)
+		{
+			ServiceHTTP.getHttpServer().stop(0);
+		}
+		if(ConfigAPI.isHttpsEnable() && ServiceHTTP.getHttpsServer() != null)
+		{
+			ServiceHTTP.getHttpsServer().stop(0);
+		}
 	}
 }
