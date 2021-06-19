@@ -10,8 +10,8 @@ public class Config {
 	
 	private static boolean otpViaWebSocket = true;
 	private static boolean otpViaRabbitMQ = true;
-	private static long reconnectDelay = 5000;
-	private static String ssClientEndpoint = "ws://localhost:8888/ws";
+	private static long feederWSReconnectDelay = 5000;
+
 	private static String wsClientUsername = "qa";
 	private static String wsClientPassword = "4lt0@1234";
 	private static String portName = "usbtty";
@@ -34,6 +34,7 @@ public class Config {
 	private static String dhcpSettingPath = "";
 	private static String ethernetSettingPath = "";
 	private static String modemSettingPath = "";
+	private static long feederWSRecoonectDelay;
 	
 	private Config()
 	{
@@ -85,19 +86,11 @@ public class Config {
 	}
 
 	public static long getReconnectDelay() {
-		return reconnectDelay;
+		return getFeederWSReconnectDelay();
 	}
 
 	public static void setReconnectDelay(long reconnectDelay) {
-		Config.reconnectDelay = reconnectDelay;
-	}
-
-	public static String getSsClientEndpoint() {
-		return ssClientEndpoint;
-	}
-
-	public static void setSsClientEndpoint(String ssClientEndpoint) {
-		Config.ssClientEndpoint = ssClientEndpoint;
+		Config.setFeederWSReconnectDelay(reconnectDelay);
 	}
 
 	public static String getPortName() {
@@ -300,6 +293,26 @@ public class Config {
 
 	public static void setModemSettingPath(String modemSettingPath) {
 		Config.modemSettingPath = modemSettingPath;
+	}
+
+
+	public static long getFeederWSReconnectDelay() {
+		return feederWSReconnectDelay;
+	}
+
+
+	public static void setFeederWSReconnectDelay(long feederWSReconnectDelay) {
+		Config.feederWSReconnectDelay = feederWSReconnectDelay;
+	}
+
+
+	public static long getFeederWSRecoonectDelay() {
+		return feederWSRecoonectDelay;
+	}
+
+
+	public static void setFeederWSRecoonectDelay(long feederWSRecoonectDelay) {
+		Config.feederWSRecoonectDelay = feederWSRecoonectDelay;
 	}
 
 

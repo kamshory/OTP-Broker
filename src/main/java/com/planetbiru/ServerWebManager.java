@@ -69,15 +69,6 @@ public class ServerWebManager {
 	private WebUserAccount userAPIAccount;
 
 
-	@Value("${otpbroker.ws.endpoint}")
-	private String wsClientEndpoint;
-
-	@Value("${otpbroker.ws.username}")
-	private String wsClientUsername;
-
-	@Value("${otpbroker.ws.password}")
-	private String wsClientPassword;
-
 	@Value("${otpbroker.web.session.name}")
 	private String sessionName;
 

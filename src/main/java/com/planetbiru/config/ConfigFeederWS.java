@@ -18,9 +18,9 @@ public class ConfigFeederWS {
 	private static String feederWsUsername = "";
 	private static String feederWsPassword = "";
 	private static String feederWsChannel = "";
-	private static int feederWsTimeout = 0;
-	private static int feederWsReconnectDelay = 0;
-	private static int feederWsRefresh = 0;
+	private static long feederWsTimeout = 0;
+	private static long feederWsReconnectDelay = 0;
+	private static long feederWsRefresh = 0;
 	
 	private static boolean connected = false;
 	
@@ -193,27 +193,27 @@ public class ConfigFeederWS {
 		ConfigFeederWS.feederWsChannel = feederWsChannel;
 	}
 
-	public static int getFeederWsTimeout() {
+	public static long getFeederWsTimeout() {
 		return feederWsTimeout;
 	}
 
-	public static void setFeederWsTimeout(int feederWsTimeout) {
+	public static void setFeederWsTimeout(long feederWsTimeout) {
 		ConfigFeederWS.feederWsTimeout = feederWsTimeout;
 	}
 
-	public static int getFeederWsReconnectDelay() {
+	public static long getFeederWsReconnectDelay() {
 		return feederWsReconnectDelay;
 	}
 
-	public static void setFeederWsReconnectDelay(int feederWsReconnectDelay) {
+	public static void setFeederWsReconnectDelay(long feederWsReconnectDelay) {
 		ConfigFeederWS.feederWsReconnectDelay = feederWsReconnectDelay;
 	}
 
-	public static int getFeederWsRefresh() {
+	public static long getFeederWsRefresh() {
 		return feederWsRefresh;
 	}
 
-	public static void setFeederWsRefresh(int feederWsRefresh) {
+	public static void setFeederWsRefresh(long feederWsRefresh) {
 		ConfigFeederWS.feederWsRefresh = feederWsRefresh;
 	}
 

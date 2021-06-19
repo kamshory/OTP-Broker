@@ -14,13 +14,9 @@ import javax.websocket.WebSocketContainer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigFeederWS;
-import com.planetbiru.constant.JsonKey;
+import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.Utility;
 
 public class WebSocketClient extends Thread
@@ -42,8 +38,7 @@ public class WebSocketClient extends Thread
 	{
 		this.container = null;
 		this.session = null;
-		stoped = false;
-		
+		this.stoped = false;
 		
 		boolean connected = false;
 		do
@@ -53,7 +48,7 @@ public class WebSocketClient extends Thread
 				this.initWSClient();
 				connected = true;
 				ConfigFeederWS.setConnected(true);
-				sendWSStatus(true);
+				ServerInfo.sendWSStatus(true);
 			} 
 			catch (WebSocketConnectionException e) 
 			{
@@ -63,11 +58,13 @@ public class WebSocketClient extends Thread
 					this.initWSClient();
 					connected = true;
 					ConfigFeederWS.setConnected(true);
-					sendWSStatus(true);
+					ServerInfo.sendWSStatus(true, e.getMessage());
 				} 
 				catch (WebSocketConnectionException e1) 
 				{
-					e1.printStackTrace();
+					/**
+					 * Do nothing
+					 */
 				}
 			}
 			sleep(Config.getReconnectDelay());			
@@ -92,7 +89,7 @@ public class WebSocketClient extends Thread
 		this.container = null;
 		try
 		{
-			String url = Config.getSsClientEndpoint();
+			String url = this.createWSEndpoint();
 			setContainer(ContainerProvider.getWebSocketContainer()); 	
 			
 			ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
@@ -107,7 +104,7 @@ public class WebSocketClient extends Thread
 			
 			this.session = getContainer().connectToServer(new WebSocketEndpoint(this), clientConfig, URI.create(url)); 
 			ConfigFeederWS.setConnected(true);
-			sendWSStatus(true);
+			ServerInfo.sendWSStatus(true);
 			wait4TerminateSignal();
 			
 		} 
@@ -131,43 +128,51 @@ public class WebSocketClient extends Thread
 		} 
 	}
 	
+	private String createWSEndpoint() {
+		String protocol = "";
+		String host = ConfigFeederWS.getFeederWsAddress();
+		String port = "";
+		String path = ConfigFeederWS.getFeederWsPath();
+		if(!path.startsWith("/"))
+		{
+			path = "/"+path;
+		}
+		if(ConfigFeederWS.isFeederWsSSL())
+		{
+			protocol = "wss://";
+			if(ConfigFeederWS.getFeederWsPort() != 443)
+			{
+				port = ":"+ConfigFeederWS.getFeederWsPort();
+			}
+		}
+		else
+		{
+			protocol = "ws://";
+			if(ConfigFeederWS.getFeederWsPort() != 80)
+			{
+				port = ":"+ConfigFeederWS.getFeederWsPort();
+			}
+		}	
+		return String.format("%s%s%s%s", protocol, host, port, path);
+	}
+
+
 	public void close() {
 		try 
 		{
 			ConfigFeederWS.setConnected(false);
-			sendWSStatus(false);
+			ServerInfo.sendWSStatus(false);
 			getSession().close();
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			/**
+			 * Do nothing
+			 */
 		}		
 	}
 	
-	void sendWSStatus(boolean connected, String message) 
-    {
-		JSONArray data = new JSONArray();
-		JSONObject info = new JSONObject();
-		
-		JSONObject ws = new JSONObject();
-		ws.put(JsonKey.NAME, "ws_connected");
-		ws.put(JsonKey.VALUE, connected);
-		ws.put(JsonKey.MESSAGE, message);
-		data.put(ws);
-		
-		info.put(JsonKey.COMMAND, "server-info");
-		info.put(JsonKey.DATA, data);
 	
-		ServerWebSocketManager.broadcast(info.toString(4));
-		
-		
-	}
-	
-	
-	public void sendWSStatus(boolean connected) {
-		this.sendWSStatus(connected, "");
-			
-	}
 	private static void wait4TerminateSignal()
 	{
 		synchronized(waitLock)
