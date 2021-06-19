@@ -225,7 +225,6 @@ public class Config {
 		Config.wlanSettingPath = wlanSettingPath;
 	}
 
-
 	public static String getDdnsSettingPath() {
 		return ddnsSettingPath;
 	}
