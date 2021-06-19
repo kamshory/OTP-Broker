@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.receiver.ws.WebSocketTool;
 
@@ -21,7 +22,8 @@ public class WebSocketReceiver {
 	@PostConstruct
 	public void init()
 	{
-		ConfigFeederWS.load(feederWSSettingPath);
+		Config.setFeederWSSettingPath(feederWSSettingPath);
+		ConfigFeederWS.load(Config.getFeederWSSettingPath());
 		this.tool = new WebSocketTool(reconnectDelay);
 		this.tool.start();
 	}

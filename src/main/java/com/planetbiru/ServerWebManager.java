@@ -139,6 +139,8 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		Config.setFeederWSSettingPath(feederWSSettingPath);
+		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
 		Config.setSessionName(sessionName);
 		Config.setSessionLifetime(sessionLifetime);
 		
@@ -595,7 +597,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigFeederAMQP.load(feederAMQPSettingPath);
+				ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
 				String list = ConfigFeederAMQP.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
@@ -1935,6 +1937,7 @@ public class ServerWebManager {
 		if(query.containsKey("save_feeder_ws_setting"))
 		{
 
+			ConfigFeederWS.load(Config.getFeederWSSettingPath());
 			boolean feederWsEnable = query.getOrDefault("feeder_ws_enable", "").equals("1");		
 			boolean feederWsSSL = query.getOrDefault("feeder_ws_ssl", "").equals("1");		
 			String feederWsAddress = query.getOrDefault("feeder_ws_address", "");		
@@ -1964,10 +1967,11 @@ public class ServerWebManager {
 			ConfigFeederWS.setFeederWsReconnectDelay(feederWsReconnectDelay);
 			ConfigFeederWS.setFeederWsRefresh(feederWsRefresh);		
 			
-			ConfigFeederWS.save(feederWSSettingPath);
+			ConfigFeederWS.save(Config.getFeederWSSettingPath());
 		}
 		if(query.containsKey("save_feeder_amqp_setting"))
 		{
+			ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
 			boolean feederAmqpEnable = query.getOrDefault("feeder_amqp_enable", "").equals("1");		
 			boolean feederAmqpSSL = query.getOrDefault("feeder_amqp_ssl", "").equals("1");		
 			String feederAmqpAddress = query.getOrDefault("feeder_amqp_address", "");		
@@ -1994,7 +1998,7 @@ public class ServerWebManager {
 			ConfigFeederAMQP.setFeederAmqpTimeout(feederAmqpTimeout);
 			ConfigFeederAMQP.setFeederAmqpRefresh(feederAmqpRefresh);		
 
-			ConfigFeederAMQP.save(feederAMQPSettingPath);			
+			ConfigFeederAMQP.save(Config.getFeederAMQPSettingPath());			
 		}		
 	}
 	

@@ -24,6 +24,8 @@ public class Config {
 	private static String sessionName = "SMSSESSID";
 	private static long sessionLifetime = 1440000;
 	private static String emailSettingPath = "";
+	private static String feederAMQPSettingPath = "";
+	private static String feederWSSettingPath = "";
 	
 	private Config()
 	{
@@ -190,6 +192,26 @@ public class Config {
 
 	public static void setEmailSettingPath(String emailSettingPath) {
 		Config.emailSettingPath = emailSettingPath;
+	}
+
+
+	public static String getFeederAMQPSettingPath() {
+		return feederAMQPSettingPath;
+	}
+
+
+	public static void setFeederAMQPSettingPath(String feederAMQPSettingPath) {
+		Config.feederAMQPSettingPath = feederAMQPSettingPath;
+	}
+
+
+	public static String getFeederWSSettingPath() {
+		return feederWSSettingPath;
+	}
+
+
+	public static void setFeederWSSettingPath(String feederWSSettingPath) {
+		Config.feederWSSettingPath = feederWSSettingPath;
 	}
 
 
