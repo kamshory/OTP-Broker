@@ -36,6 +36,7 @@ import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
+import com.planetbiru.config.ConfigNoIP;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.config.ModemData;
@@ -68,6 +69,11 @@ public class ServerWebManager {
 	private WebUserAccount userAccount;
 	private WebUserAccount userAPIAccount;
 
+	@Value("${otpbroker.device.name}")
+	private String deviceName;
+
+	@Value("${otpbroker.device.version}")
+	private String deviceVersion;
 
 	@Value("${otpbroker.web.session.name}")
 	private String sessionName;
@@ -108,6 +114,9 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.cloudflare}")
 	private String cloudflareSettingPath;
 
+	@Value("${otpbroker.path.setting.noip}")
+	private String noIPSettingPath;
+
 	@Value("${otpbroker.path.setting.dhcp}")
 	private String dhcpSettingPath;
 
@@ -130,6 +139,10 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		Config.setDeviceName(deviceName);
+		Config.setDeviceVersion(deviceVersion);
+		Config.setNoIPDevice(deviceName+"/"+deviceVersion);
+		
 		Config.setModemSettingPath(modemSettingPath);
 		Config.setDhcpSettingPath(dhcpSettingPath);
 		
@@ -142,6 +155,7 @@ public class ServerWebManager {
 		
 		Config.setDdnsSettingPath(ddnsSettingPath);
 		Config.setCloudflareSettingPath(cloudflareSettingPath);
+		Config.setNoIPSettingPath(noIPSettingPath);
 		Config.setApiSettingPath(apiSettingPath);
 		
 		Config.setSmsSettingPath(smsSettingPath);
@@ -151,6 +165,7 @@ public class ServerWebManager {
 		Config.setBaseDirConfig(baseDirConfig);
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 		ConfigCloudflare.load(Config.getCloudflareSettingPath());
+		ConfigNoIP.load(Config.getNoIPSettingPath());
 		ConfigAPI.load(Config.getApiSettingPath());
 
 		Config.setPortName(portName);		
@@ -872,9 +887,42 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				ConfigCloudflare.load(Config.getEmailSettingPath());
+				ConfigCloudflare.load(Config.getCloudflareSettingPath());
 				
 				responseBody = ConfigCloudflare.toJSONObject().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/noip/get")
+	public ResponseEntity<byte[]> handleNoIPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigNoIP.load(Config.getNoIPSettingPath());				
+				responseBody = ConfigNoIP.toJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -1644,6 +1692,10 @@ public class ServerWebManager {
 				{
 					this.processCloudflareSetting(requestBody);
 				}
+				if(path.equals("/noip.html"))
+				{
+					this.processNoIPSetting(requestBody);
+				}
 				if(path.equals("/network-setting.html"))
 				{
 					this.processNetworkSetting(requestBody);
@@ -1796,7 +1848,30 @@ public class ServerWebManager {
 			ConfigCloudflare.setAuthEmail(authEmail);
 			ConfigCloudflare.setAuthApiKey(authApiKey);
 			ConfigCloudflare.setAuthToken(authToken);
-			ConfigCloudflare.save(cloudflareSettingPath);
+			ConfigCloudflare.save(Config.getCloudflareSettingPath());
+		}
+	}
+	
+	private void processNoIPSetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		String endpoint = query.getOrDefault("endpoint", "").trim();
+		String username = query.getOrDefault("username", "").trim();
+		String email = query.getOrDefault("email", "").trim();
+		String password = query.getOrDefault("password", "").trim();
+		String company = query.getOrDefault("company", "").trim();
+		
+		if(!endpoint.isEmpty())
+		{
+			ConfigNoIP.load(Config.getNoIPSettingPath());
+			ConfigNoIP.setEndpoint(endpoint);
+			ConfigNoIP.setUsername(username);
+			if(!password.isEmpty())
+			{
+				ConfigNoIP.setPassword(password);
+			}
+			ConfigNoIP.setCompany(company);
+			ConfigNoIP.setEmail(email);		
+			ConfigNoIP.save(Config.getNoIPSettingPath());
 		}
 	}
 	
