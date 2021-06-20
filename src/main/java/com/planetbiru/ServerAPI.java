@@ -108,8 +108,8 @@ public class ServerAPI {
 		ConfigAPI.setHttpEnable(httpEnable);	
 		ConfigAPI.setHttpsEnable(httpsEnable);	
 		ConfigAPI.setMessagePath(messagePath);
-		ConfigAPI.setBlockinPath(blockinPath);
-		ConfigAPI.setUnblockinPath(unblockinPath);
+		ConfigAPI.setBlockingPath(blockinPath);
+		ConfigAPI.setUnblockingPath(unblockinPath);
 		
 		ConfigAPI.load(Config.getApiSettingPath());
 	}

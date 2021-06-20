@@ -21,8 +21,8 @@ public class ConfigAPI {
 	private static boolean httpEnable = true;	
 	private static boolean httpsEnable = true;	
 	private static String messagePath = "/";
-	private static String blockinPath = "/";
-	private static String unblockinPath = "/";
+	private static String blockingPath = "/";
+	private static String unblockingPath = "/";
 	
 	public static void load(String path) {
 		String dir = Utility.getBaseDir();
@@ -47,8 +47,8 @@ public class ConfigAPI {
 					boolean lHttpEnable = json.optBoolean("httpEnable", false);	
 					boolean lHttpsEnable = json.optBoolean("httpsEnable", false);	
 					String lMessagePath = json.optString("messagePath", "");
-					String lBlockinPath = json.optString("blockinPath", "");
-					String lUnblockinPath = json.optString("unblockinPath", "");
+					String lBlockingPath = json.optString("blockingPath", "");
+					String lUnblockingPath = json.optString("unblockingPath", "");
 
 					
 					ConfigAPI.httpPort = lHttpPort;
@@ -57,8 +57,8 @@ public class ConfigAPI {
 					ConfigAPI.httpsEnable = lHttpsEnable;
 					
 					ConfigAPI.messagePath = lMessagePath;
-					ConfigAPI.blockinPath = lBlockinPath;
-					ConfigAPI.unblockinPath = lUnblockinPath;
+					ConfigAPI.blockingPath = lBlockingPath;
+					ConfigAPI.unblockingPath = lUnblockingPath;
 				}
 			}
 		} 
@@ -85,8 +85,6 @@ public class ConfigAPI {
 		
 		try 
 		{
-			System.out.println(fileName.toString());
-			System.out.println(config.toString());
 			FileConfigUtil.write(fileName, config.toString().getBytes());
 		}
 		catch (IOException e) 
@@ -123,8 +121,8 @@ public class ConfigAPI {
 		config.put("httpsEnable", ConfigAPI.httpsEnable);
 
 		config.put("messagePath", ConfigAPI.messagePath);
-		config.put("blockinPath", ConfigAPI.blockinPath);
-		config.put("unblockinPath", ConfigAPI.unblockinPath);
+		config.put("blockingPath", ConfigAPI.blockingPath);
+		config.put("unblockingPath", ConfigAPI.unblockingPath);
 		return config;
 	}
 
@@ -168,25 +166,27 @@ public class ConfigAPI {
 		ConfigAPI.messagePath = messagePath;
 	}
 
-	public static String getBlockinPath() {
-		return blockinPath;
+	public static String getBlockingPath() {
+		return blockingPath;
 	}
 
-	public static void setBlockinPath(String blockinPath) {
-		ConfigAPI.blockinPath = blockinPath;
+	public static void setBlockingPath(String blockinPath) {
+		ConfigAPI.blockingPath = blockinPath;
 	}
 
-	public static String getUnblockinPath() {
-		return unblockinPath;
+	public static String getUnblockingPath() {
+		return unblockingPath;
 	}
 
-	public static void setUnblockinPath(String unblockinPath) {
-		ConfigAPI.unblockinPath = unblockinPath;
+	public static void setUnblockingPath(String unblockinPath) {
+		ConfigAPI.unblockingPath = unblockinPath;
 	}
 
 	public static JSONObject toJSONObject() {
 		return getJSONObject();
 	}
+	
+	
 	
 	
 }

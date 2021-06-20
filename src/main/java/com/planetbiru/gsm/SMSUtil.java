@@ -56,7 +56,7 @@ public class SMSUtil {
 		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)
 		{
 			SMSInstance instance =  SMSUtil.smsInstance.get(i);
-			if(instance.getId().endsWith(modemID))
+			if(instance.getId().equals(modemID))
 			{
 				instance.connect(modem.getConnectionType());
 				ConfigModem.getModemData(modemID).setConnected(instance.isConnected());
@@ -69,7 +69,7 @@ public class SMSUtil {
 		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)
 		{
 			SMSInstance instance =  SMSUtil.smsInstance.get(i);
-			if(instance.getId().endsWith(modemID))
+			if(instance.getId().equals(modemID))
 			{
 				instance.disconnect();
 				ConfigModem.getModemData(modemID).setConnected(instance.isConnected());
@@ -88,13 +88,33 @@ public class SMSUtil {
 		SMSUtil.smsInstance.get(index).sendSMS(receiver, message);
 		
 	}
-	public static String executeUSSD(String ussd) throws GSMException {
+	public static String executeUSSD(String ussd, String modemID) throws GSMException {
 		if(smsInstance.isEmpty())
 		{
 			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 		}
-		int index = SMSUtil.getModemIndex();
-		return SMSUtil.smsInstance.get(index).executeUSSD(ussd);
+		SMSInstance instance = SMSUtil.get(modemID);		
+		if(instance.isConnected())
+		{
+			return instance.executeUSSD(ussd);
+		}
+		else
+		{
+			throw new GSMException("The selected device is not connected");
+		}
+	}
+
+
+	private static SMSInstance get(String modemID) throws GSMException {
+		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)
+		{
+			SMSInstance instance =  SMSUtil.smsInstance.get(i);
+			if(instance.getId().equals(modemID))
+			{
+				return instance;
+			}
+		}
+		throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 	}
 
 

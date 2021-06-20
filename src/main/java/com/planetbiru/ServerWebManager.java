@@ -136,6 +136,7 @@ public class ServerWebManager {
     {
     }
 	
+	
 	@PostConstruct
 	public void init()
 	{
@@ -298,6 +299,7 @@ public class ServerWebManager {
 				responseJSON = new JSONObject();
 				Map<String, String> query = Utility.parseURLEncoded(requestBody);
 				String ussd = query.getOrDefault("ussd", "");
+				String modemID = query.getOrDefault("id", "");
 				String message = "";
 				String responseCode = ResponseCode.SUCCESS;
 				String responseText = "";
@@ -305,7 +307,7 @@ public class ServerWebManager {
 				{
 					try 
 					{
-						message = SMSUtil.executeUSSD(ussd);
+						message = SMSUtil.executeUSSD(ussd, modemID);
 					} 
 					catch (GSMException e) 
 					{
@@ -1740,7 +1742,7 @@ public class ServerWebManager {
 			config.put("blockingPath", lBlockingPath);
 			config.put("unblockingPath", lUnblockingPath);
 			
-			ConfigAPI.save(apiSettingPath, config);
+			ConfigAPI.save(Config.getApiSettingPath(), config);
 		}
 	}
 
@@ -1799,7 +1801,7 @@ public class ServerWebManager {
 			ConfigNetDHCP.setMaxLeaseTime(maxLeaseTime);
 			ConfigNetDHCP.setRanges(rangeList);
 			ConfigNetDHCP.setDomainNameServers(nsList);
-			ConfigNetDHCP.save(dhcpSettingPath);	
+			ConfigNetDHCP.save(Config.getDhcpSettingPath());	
 			ConfigNetDHCP.apply();
 		}
 		
@@ -1827,7 +1829,7 @@ public class ServerWebManager {
 			ConfigNetEthernet.setGateway(query.getOrDefault("gateway", "").trim());
 			ConfigNetEthernet.setDns1(query.getOrDefault("dns1", "").trim());
 			ConfigNetEthernet.setDns2(query.getOrDefault("dns2", "").trim());
-			ConfigNetEthernet.save(ethernetSettingPath);
+			ConfigNetEthernet.save(Config.getEthernetSettingPath());
 			ConfigNetEthernet.apply();
 		}
 	}
@@ -1879,7 +1881,7 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_email_setting"))
 		{
-			ConfigAPI.load(Config.getApiSettingPath());
+			ConfigAPI.load(Config.getEmailSettingPath());
 			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
 			String lMailHost = query.getOrDefault("smtp_host", "").trim();
 	
@@ -1904,7 +1906,7 @@ public class ServerWebManager {
 			config.put("mailSSL", lMailSSL);
 			config.put("mailStartTLS", lMailStartTLS);
 			
-			ConfigAPI.save(apiSettingPath, config);
+			ConfigAPI.save(Config.getEmailSettingPath(), config);
 		}
 		
 	}
@@ -1927,7 +1929,7 @@ public class ServerWebManager {
 					ConfigModem.deleteRecord(value);
 				}
 			}
-			ConfigModem.save(modemSettingPath);
+			ConfigModem.save(Config.getModemSettingPath());
 		}
 		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
@@ -1940,7 +1942,7 @@ public class ServerWebManager {
 					ConfigModem.deactivate(value);
 				}
 			}
-			ConfigModem.save(modemSettingPath);
+			ConfigModem.save(Config.getModemSettingPath());
 		}
 		if(query.containsKey(JsonKey.ACTIVATE))
 		{
@@ -1953,7 +1955,7 @@ public class ServerWebManager {
 					ConfigModem.activate(value);
 				}
 			}
-			ConfigModem.save(modemSettingPath);
+			ConfigModem.save(Config.getModemSettingPath());
 		}
 		
 		if(query.containsKey(JsonKey.ADD))
@@ -2008,7 +2010,7 @@ public class ServerWebManager {
 		modem.setActive(active);
 
 		ConfigModem.update(id, modem);
-		ConfigModem.save(modemSettingPath);	
+		ConfigModem.save(Config.getModemSettingPath());	
 	}
 
 	private void processFeederSetting(String requestBody) {
