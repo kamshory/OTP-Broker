@@ -32,6 +32,7 @@ import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.ConfigKeystore;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
@@ -39,7 +40,8 @@ import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigNoIP;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.ConfigSaved;
-import com.planetbiru.config.ModemData;
+import com.planetbiru.config.DataModem;
+import com.planetbiru.config.FileConfigUtil;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
@@ -132,14 +134,22 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
 	
+	@Value("${otpbroker.path.setting.keystore}")
+	private String keystoreSettingPath;
+	
+	@Value("${otpbroker.path.setting.keystore.data}")
+	private String keystoreDataSettingPath;
+	
 	private ServerWebManager()
     {
     }
 	
-	
 	@PostConstruct
 	public void init()
 	{
+		Config.setKeystoreDataSettingPath(keystoreDataSettingPath);
+		Config.setKeystoreSettingPath(keystoreSettingPath);
+		
 		Config.setDeviceName(deviceName);
 		Config.setDeviceVersion(deviceVersion);
 		Config.setNoIPDevice(deviceName+"/"+deviceVersion);
@@ -214,7 +224,9 @@ public class ServerWebManager {
 					}
 					catch (GSMException e) 
 					{
-						e.printStackTrace();
+						/**
+						 * 
+						 */
 					}
 				}
 			} else {
@@ -945,6 +957,73 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	@GetMapping(path="/keystore/list")
+	public ResponseEntity<byte[]> handleKeystoreList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigKeystore.load(Config.getKeystoreSettingPath());				
+				responseBody = ConfigKeystore.toJSONObject().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/keystore/detail/{id}")
+	public ResponseEntity<byte[]> handleKeystoreDetail(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
+				ConfigKeystore.load(Config.getKeystoreSettingPath());				
+				responseBody = ConfigKeystore.get(id).toJSONObject().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+
+	
 	@GetMapping(path="/user/list")
 	public ResponseEntity<byte[]> handleUserList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -1265,7 +1344,7 @@ public class ServerWebManager {
 			if(userAccount.checkUserAuth(headers))
 			{
 				ConfigModem.load(Config.getModemSettingPath());
-				String list = ConfigModem.geModemData(id).toJSONObject().toString();
+				String list = ConfigModem.getModemData(id).toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -1638,6 +1717,14 @@ public class ServerWebManager {
 			{
 				CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 				String path = request.getServletPath();
+				if(path.equals("/keystore.html"))
+				{
+					this.processKeystore(requestBody);
+				}
+				if(path.equals("/keystore-update.html"))
+				{
+					this.processKeystore(requestBody);
+				}
 				if(path.equals("/admin.html"))
 				{
 					this.processAdmin(requestBody, cookie);
@@ -1672,7 +1759,7 @@ public class ServerWebManager {
 				}
 				if(path.equals("/sms-setting.html"))
 				{
-					//this.processSMSSetting(requestBody);
+					this.processSMSSetting(requestBody);
 				}
 				if(path.equals("/modem.html") || path.equals("/modem-add.html") || path.equals("/modem-update.html"))
 				{
@@ -1712,6 +1799,129 @@ public class ServerWebManager {
 		}
 	}
 	
+	private void processKeystore(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		if(query.containsKey(JsonKey.DELETE))
+		{
+			ConfigKeystore.load(Config.getKeystoreSettingPath());
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigKeystore.remove(value);
+				}
+			}
+			ConfigKeystore.save(Config.getKeystoreSettingPath());
+		}
+		if(query.containsKey(JsonKey.DEACTIVATE))
+		{
+			ConfigKeystore.load(Config.getKeystoreSettingPath());
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigKeystore.deactivate(value);
+				}
+			}
+			ConfigKeystore.save(Config.getKeystoreSettingPath());
+		}
+		if(query.containsKey(JsonKey.ACTIVATE))
+		{
+			ConfigKeystore.load(Config.getKeystoreSettingPath());
+			for (Map.Entry<String, String> entry : query.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigKeystore.activate(value);
+				}
+			}
+			ConfigKeystore.save(Config.getKeystoreSettingPath());
+		}
+		if(query.containsKey(JsonKey.UPDATE))
+		{
+			String id = query.getOrDefault("id", "");
+			if(!id.isEmpty())
+			{
+				ConfigKeystore.load(Config.getKeystoreSettingPath());
+				String fileName = query.getOrDefault("file_name", "").trim();
+				String filePassword = query.getOrDefault("file_password", "").trim();
+				boolean active = query.getOrDefault("active", "").trim().equals("1");
+				JSONObject data = ConfigKeystore.get(id).toJSONObject();
+				
+				data.put("id", id);
+				data.put("fileName", fileName);
+				if(!filePassword.isEmpty())
+				{
+					data.put("filePassword", filePassword);
+				}
+				data.put("active", active);
+				
+				ConfigKeystore.update(id, data);
+				System.out.println(data.toString(4));
+				ConfigKeystore.save(Config.getKeystoreSettingPath());
+			}
+		}
+		
+		if(query.containsKey(JsonKey.ADD))
+		{
+			String id = Utility.md5(String.format("%d", System.nanoTime()));
+			String fileName = query.getOrDefault("file_name", "").trim();
+			String filePassword = query.getOrDefault("file_password", "").trim();
+			if(!fileName.isEmpty() && !filePassword.isEmpty())
+			{
+				boolean active = query.getOrDefault("active", "").trim().equals("1");
+				JSONObject data = new JSONObject();
+				
+				String fileExtension = FileConfigUtil.getFileExtension(fileName);
+				
+				data.put("id", id);
+				data.put("fileName", fileName);
+				data.put("fileExtension", fileExtension);
+				data.put("filePassword", filePassword);
+				data.put("active", active);
+				byte[] binaryData = Utility.base64DecodeRaw(query.getOrDefault("data", ""));
+				data.put("fileSize", binaryData.length);
+				
+				String fn = id + "." + fileExtension;
+				
+				ConfigKeystore.writeFile(Config.getKeystoreDataSettingPath(), fn, binaryData);
+				ConfigKeystore.load(Config.getKeystoreSettingPath());
+				ConfigKeystore.add(data);
+				ConfigKeystore.save(Config.getKeystoreSettingPath());
+			}
+		}
+	}
+
+	private void processSMSSetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		if(query.containsKey("save_sms_setting"))
+		{
+			ConfigSMS.load(Config.getSmsSettingPath());
+			boolean lSendIncommingSMS = query.getOrDefault("send_incomming_sms", "").trim().equals("1");
+			String v1 = query.getOrDefault("incomming_interval", "0").trim();
+			int lIncommingInterval = Utility.atoi(v1);
+			
+			String v2 = query.getOrDefault("time_range", "0").trim();
+			int lTimeRange = Utility.atoi(v2);
+			
+			String v3 = query.getOrDefault("max_per_time_range", "0").trim();
+			int lMaxPerTimeRange = Utility.atoi(v3);
+			
+			ConfigSMS.setSendIncommingSMS(lSendIncommingSMS);
+			ConfigSMS.setIncommingInterval(lIncommingInterval);
+			ConfigSMS.setTimeRange(lTimeRange);
+			ConfigSMS.setMaxPerTimeRange(lMaxPerTimeRange);
+			
+			ConfigSMS.save(Config.getSmsSettingPath());
+		}	
+	}
+
 	private void processAPISetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_api_setting"))
@@ -1907,10 +2117,8 @@ public class ServerWebManager {
 			config.put("mailStartTLS", lMailStartTLS);
 			
 			ConfigAPI.save(Config.getEmailSettingPath(), config);
-		}
-		
+		}	
 	}
-
 	
 	private void processModemSetting(String requestBody) {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
@@ -1990,7 +2198,7 @@ public class ServerWebManager {
 		String name = query.getOrDefault("name", "").trim();
 		String simCardPIN = query.getOrDefault("sim_card_pin", "").trim();
 			
-		ModemData modem = ConfigModem.geModemData(id);
+		DataModem modem = ConfigModem.getModemData(id);
 		if(action.equals(JsonKey.ADD) || id.isEmpty())
 		{
 			id = Utility.md5(String.format("%d", System.nanoTime()));

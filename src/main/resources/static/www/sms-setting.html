@@ -64,6 +64,7 @@
                   <li role="separator" class="divider"></li>
                   <li class="dropdown-header">Other Configs</li>
                   <li class=""><a href="network-setting.html">Network Setting</a></li>
+                  <li class=""><a href="keystore.html">Keystore</a></li>
                   <li class=""><a href="cloudflare.html">Cloudflare</a></li>
                   <li class=""><a href="noip.html">No IP</a></li>
                 </ul>
@@ -82,26 +83,6 @@
         <form action="sms-setting.html" method="post">
           <table class="config-table config-table-connection">
             <tbody>
-              <tr>
-                <td>Connection Type</td>
-                <td><input type="text" name="connection_type" id="connection_type" value="usb/tty">	
-                </td>
-              </tr>
-              <tr>
-                <td>IMEI</td>
-                <td><input type="text" name="imei" id="imei" value="">	
-                </td>
-              </tr>
-              <tr>
-                <td>SIM Card PIN</td>
-                <td><input type="text" name="sim_card_pin" id="sim_card_pin" value="">	
-                </td>
-              </tr>
-              <tr>
-                <td>SMS Center</td>
-                <td><input type="text" name="sms_center" id="sms_center" value="">	
-                </td>
-              </tr>
               <tr>
                 <td>Send Incomming SMS</td>
                 <td><label><input type="checkbox" name="send_incomming_sms" id="send_incomming_sms" value="1">	Yes</label>
@@ -126,7 +107,6 @@
                 <td></td>
                 <td>
                 <input type="submit" class="btn btn-success" name="save_sms_setting" id="save_sms_setting" value="Save">	
-                <input type="button" class="btn btn-primary" name="detect_device" id="detect_device" value="Detect Device">	
                 <input type="reset" class="btn btn-default" value="Reset">	
                 </td>
               </tr>
@@ -141,15 +121,10 @@
                     url:"sms-setting/get",
                     dataType:"json",
                     success:function(data){
-                      $('input[name="connection_type"]').val(data.connectionType);
-                      $('input[name="imei"]').val(data.imei);
-                      $('input[name="sim_card_pin"]').val(data.simCardPIN);
-                      $('input[name="sms_center"]').val(data.smsCenter);
+                      $('input[name="send_incomming_sms"]').prop("checked", data.sendIncommingSMS);
                       $('input[name="incomming_interval"]').val(data.incommingInterval+"");
                       $('input[name="time_range"]').val(data.timeRange+"");
                       $('input[name="max_per_time_range"]').val(data.maxPerTimeRange+"");
-                      $('input[name="send_incomming_sms"]').prop("checked", data.sendIncommingSMS);
-                      
                     }
                 });
             });

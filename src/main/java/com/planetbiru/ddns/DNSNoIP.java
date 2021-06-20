@@ -66,11 +66,12 @@ public class DNSNoIP extends DNS{
 		return String.format("%s %s %s", this.company, Config.getNoIPDevice(), this.email);
 	}
 
-	public void setConfig(String endpoint, String username, String password, String email) {
+	public void setConfig(String endpoint, String username, String password, String email, String company) {
 		this.endpoint = endpoint;
 		this.username = username;
 		this.password = password;
 		this.email = email;		
+		this.company = company;
 	}
 
 

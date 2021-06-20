@@ -40,13 +40,31 @@ public class ConfigSMS {
 		return smsSetting;
 	}
 	
+	public static void save(String path, JSONObject config) {
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = FileConfigUtil.fixFileName(dir + path);
+		ConfigSMS.prepareDir(fileName);	
+		try 
+		{
+			FileConfigUtil.write(fileName, config.toString().getBytes());
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		
+	}
 	public static void save(String path) {
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		ConfigSMS.prepareDir(fileName);	
 		try 
 		{
@@ -65,7 +83,7 @@ public class ConfigSMS {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		ConfigSMS.prepareDir(fileName);
 		byte[] data = null;
 		try 
@@ -184,6 +202,8 @@ public class ConfigSMS {
 	public static void setSendIncommingSMS(boolean sendIncommingSMS) {
 		ConfigSMS.sendIncommingSMS = sendIncommingSMS;
 	}
+
+	
 
 	
 }

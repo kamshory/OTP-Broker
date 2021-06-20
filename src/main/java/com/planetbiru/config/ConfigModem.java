@@ -15,7 +15,7 @@ import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
 
 public class ConfigModem {
-    private static Map<String, ModemData> modemData = new HashMap<>();
+    private static Map<String, DataModem> modemData = new HashMap<>();
 	private static String configPath;
 	
 	private ConfigModem()
@@ -23,11 +23,11 @@ public class ConfigModem {
 		
 	}
 	
-	public static ModemData getModemData(String modemID) {
-		return ConfigModem.modemData.getOrDefault(modemID, new ModemData());
+	public static DataModem getModemData(String modemID) {
+		return ConfigModem.modemData.getOrDefault(modemID, new DataModem());
 	}
 	
-	public static Map<String, ModemData> getModemData()
+	public static Map<String, DataModem> getModemData()
 	{
 		return ConfigModem.modemData;
 	}
@@ -40,7 +40,7 @@ public class ConfigModem {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		ConfigModem.prepareDir(fileName);
 		try 
 		{
@@ -53,8 +53,8 @@ public class ConfigModem {
 				while(keys.hasNext()) {
 				    String id = keys.next();
 				    JSONObject modem = jsonObject.optJSONObject(id);
-				    ModemData modemData = new ModemData(modem);
-				    ConfigModem.addModemData(id, modemData);
+				    DataModem modemData = new DataModem(modem);
+				    ConfigModem.addDataModem(id, modemData);
 				}
 			}
 		} 
@@ -86,32 +86,32 @@ public class ConfigModem {
 		}		
 	}
 	
-	public static void addModemData(ModemData modem)
+	public static void addDataModem(DataModem modem)
 	{
 		ConfigModem.modemData.put(modem.getId(), modem);
 	}
 	
-	public static void addModemData(String id, ModemData modem)
+	public static void addDataModem(String id, DataModem modem)
 	{
 		ConfigModem.modemData.put(id, modem);
 	}
 	
-	public static void addModemData(String id, JSONObject jsonObject) 
+	public static void addDataModem(String id, JSONObject jsonObject) 
 	{
-		ModemData modem = new ModemData(jsonObject);
+		DataModem modem = new DataModem(jsonObject);
 		ConfigModem.modemData.put(id, modem);
 	}
 	
-	public static void addModemData(JSONObject jsonObject) 
+	public static void addDataModem(JSONObject jsonObject) 
 	{
-		ModemData modem = new ModemData(jsonObject);
+		DataModem modem = new DataModem(jsonObject);
 		ConfigModem.modemData.put(jsonObject.optString(JsonKey.USERNAME, ""), modem);
 	}
 	
 	
-	public static ModemData geModemData(String id)
+	public static DataModem geDataModem(String id)
 	{		
-		return ConfigModem.modemData.getOrDefault(id, new ModemData());
+		return ConfigModem.modemData.getOrDefault(id, new DataModem());
 	}
 	
 	public static void save(String path) {
@@ -126,7 +126,7 @@ public class ConfigModem {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		prepareDir(fileName);		
 		try 
 		{
@@ -145,10 +145,10 @@ public class ConfigModem {
 	public static JSONObject toJSONObject()
 	{
 		JSONObject json = new JSONObject();
-		for (Map.Entry<String, ModemData> entry : modemData.entrySet())
+		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
 		{
 			String id = entry.getKey();
-			JSONObject modem = ((ModemData) entry.getValue()).toJSONObject();
+			JSONObject modem = ((DataModem) entry.getValue()).toJSONObject();
 			json.put(id, modem);
 		}
 		return json;
@@ -167,18 +167,18 @@ public class ConfigModem {
 	}
 	
 	public static void deactivate(String id) {
-		ModemData modem = ConfigModem.modemData.getOrDefault(id, new ModemData());
+		DataModem modem = ConfigModem.modemData.getOrDefault(id, new DataModem());
 		modem.setActive(false);
 		ConfigModem.modemData.put(id, modem);	
 	}
 	
 	public static void activate(String id) {
-		ModemData modem = ConfigModem.modemData.getOrDefault(id, new ModemData());
+		DataModem modem = ConfigModem.modemData.getOrDefault(id, new DataModem());
 		modem.setActive(true);
 		ConfigModem.modemData.put(id, modem);		
 	}
 	
-	public static void update(String id, ModemData modem) {
+	public static void update(String id, DataModem modem) {
 		boolean connected = SMSUtil.isConnected(id);
 		modem.setConnected(connected);
 		ConfigModem.modemData.put(id, modem);		

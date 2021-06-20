@@ -89,7 +89,7 @@ public class ConfigFeederAMQP {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		ConfigFeederAMQP.prepareDir(fileName);	
 		try 
 		{
@@ -107,7 +107,7 @@ public class ConfigFeederAMQP {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		ConfigFeederAMQP.prepareDir(fileName);
 		byte[] data = null;
 		try 

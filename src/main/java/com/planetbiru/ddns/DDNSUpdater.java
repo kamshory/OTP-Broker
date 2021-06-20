@@ -66,7 +66,7 @@ public class DDNSUpdater extends Thread{
 			String company = ConfigNoIP.getCompany();
 			String email = ConfigNoIP.getEmail();
 			
-			ddns.setConfig(endpoint, username, password, email);
+			ddns.setConfig(endpoint, username, password, email, company);
 
 			JSONObject res2 = ddns.update(ddnsRecord);		
 			if(res2 != null)
