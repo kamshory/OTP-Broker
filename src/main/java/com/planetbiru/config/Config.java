@@ -35,6 +35,10 @@ public class Config {
 	private static String ethernetSettingPath = "";
 	private static String modemSettingPath = "";
 	private static long feederWSRecoonectDelay;
+	private static String noIPDevice = "OTP Broker/version 1.0";
+	private static String noIPSettingPath = "";
+	private static String deviceName = "OTP Broker";
+	private static String deviceVersion = "version 1.0";
 	
 	private Config()
 	{
@@ -312,6 +316,46 @@ public class Config {
 
 	public static void setFeederWSRecoonectDelay(long feederWSRecoonectDelay) {
 		Config.feederWSRecoonectDelay = feederWSRecoonectDelay;
+	}
+
+
+	public static String getNoIPSettingPath() {
+		return noIPSettingPath;
+	}
+
+
+	public static void setNoIPSettingPath(String noIPSettingPath) {
+		Config.noIPSettingPath = noIPSettingPath;
+	}
+
+
+	public static String getNoIPDevice() {
+		return noIPDevice;
+	}
+
+
+	public static void setNoIPDevice(String noIPDevice) {
+		Config.noIPDevice = noIPDevice;
+	}
+
+
+	public static String getDeviceName() {
+		return deviceName;
+	}
+
+
+	public static void setDeviceName(String deviceName) {
+		Config.deviceName = deviceName;
+	}
+
+
+	public static String getDeviceVersion() {
+		return deviceVersion;
+	}
+
+
+	public static void setDeviceVersion(String deviceVersion) {
+		Config.deviceVersion = deviceVersion;
 	}
 
 

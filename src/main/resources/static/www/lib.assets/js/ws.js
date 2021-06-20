@@ -215,6 +215,7 @@ function updateUSBColor(receivedJSON)
         }
     }
 }
+
 function updateServerInfo(receivedJSON)
 {
     var data = receivedJSON.data;

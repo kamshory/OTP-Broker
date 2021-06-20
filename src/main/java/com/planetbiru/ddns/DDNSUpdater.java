@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import com.planetbiru.config.ConfigCloudflare;
+import com.planetbiru.config.ConfigNoIP;
 
 public class DDNSUpdater extends Thread{
 	
@@ -25,12 +26,10 @@ public class DDNSUpdater extends Thread{
 	@Override
 	public void run()
 	{
-		DNS ddns;
 		if(this.ddnsRecord.getProvider().equals("cloudflare"))
 		{
-			System.out.println("Executing update DDNS");
 			logger.info("Executing update DDNS");
-			ddns = new DNSCloudflare();
+			DNSCloudflare ddns = new DNSCloudflare();
 			
 			String endpoint = ConfigCloudflare.getEndpoint();
 			String accountId = ConfigCloudflare.getAccountId();
@@ -44,11 +43,31 @@ public class DDNSUpdater extends Thread{
 				JSONObject res1 = ddns.createZoneIfNotExists(ddnsRecord);
 				logger.info("RECORD                  : {}", ddnsRecord.toJSONObject().toString(4));
 				if(res1 != null)
-				logger.info("res1                    : {}", res1.toString(4));
+				{
+					logger.info("res1                    : {}", res1.toString(4));
+				}
 				logger.info("prevFireTimeStr         : {}", prevFireTimeStr);
 				logger.info("currentTimeStr          : {}", currentTimeStr);
 				logger.info("nextValidTimeAfterStr   : {}", nextValidTimeAfterStr);
 			}
+			JSONObject res2 = ddns.update(ddnsRecord);		
+			if(res2 != null)
+			logger.info("res2                    : {}", res2.toString(4));
+		}
+		else if(this.ddnsRecord.getProvider().equals("noip"))
+		{
+			System.out.println("Executing update DDNS");
+			logger.info("Executing update DDNS");
+			DNSNoIP ddns = new DNSNoIP();
+			
+			String endpoint = ConfigNoIP.getEndpoint();
+			String username = ConfigNoIP.getUsername();
+			String password = ConfigNoIP.getPassword();
+			String company = ConfigNoIP.getCompany();
+			String email = ConfigNoIP.getEmail();
+			
+			ddns.setConfig(endpoint, username, password, email);
+
 			JSONObject res2 = ddns.update(ddnsRecord);		
 			if(res2 != null)
 			logger.info("res2                    : {}", res2.toString(4));

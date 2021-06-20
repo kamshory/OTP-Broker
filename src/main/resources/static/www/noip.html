@@ -35,7 +35,7 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-			<span class="usb-device-symbol"></span>
+                    <span class="usb-device-symbol"></span>
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                         aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
@@ -55,7 +55,7 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li class="active"><a href="admin.html">Administrator Setting</a></li>
+                                <li class=""><a href="admin.html">Administrator Setting</a></li>
                                 <li class=""><a href="api-setting.html">API Setting</a></li>
                                 <li class=""><a href="api-user.html">API User</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
@@ -67,7 +67,7 @@
                                 <li class="dropdown-header">Other Configs</li>
                                 <li class=""><a href="network-setting.html">Network Setting</a></li>
                                 <li class=""><a href="cloudflare.html">Cloudflare</a></li>
-                                <li class=""><a href="noip.html">No IP</a></li>
+                                <li class="active"><a href="noip.html">No IP</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -81,81 +81,64 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>DNS Record</h3>
-            <form action="ddns-record/add" method="post">
-                <table class="two-cols-responsive">
+            <h3>No IP</h3>
+            <form action="noip.html" method="post">
+                <table class="config-table config-table-connection">
                     <tbody>
                         <tr>
-                        <td>Provider</td>
-                        <td><select name="provider" id="provider" class="form-control">
-                            <option value="cloudflare">Cloudflare</option>
-                            <option value="noip">No IP</option>
-                        </select></td>
+                            <td>No IP Endpoint</td>
+                            <td><input type="url" name="endpoint" id="endpoint" value="">
+                            </td>
                         </tr>
                         <tr>
-                        <td>Zone</td>
-                        <td><input type="text" class="form-control" name="zone" value=""></td>
+                            <td>Username</td>
+                            <td><input type="text" name="username" id="username" value="">
+                            </td>
                         </tr>
                         <tr>
-                        <td>Record Name</td>
-                        <td><input type="text" class="form-control" name="record_name" value=""></td>
+                            <td>Password</td>
+                            <td><input type="password" name="password" id="password" value="">
+                            </td>
                         </tr>
                         <tr>
-                        <tr>
-                        <td>TTL</td>
-                        <td><input type="number" class="form-control" name="ttl" value=""></td>
+                            <td>Company Name</td>
+                            <td><input type="text" name="company" id="company" value="">
+                            </td>
                         </tr>
                         <tr>
-                        <td>Proxied</td>
-                        <td><label><input type="checkbox" name="proxied" value="1"> Yes</label></td>
+                            <td>Maintainer Email</td>
+                            <td><input type="email" name="email" id="email" value="">
+                            </td>
                         </tr>
-                        <tr>
-                        <td>Update DNS</td>
-                        <td><select name="cron_expression" class="form-control">
-                            <option value="0 * * * * ?">Every minute</option>
-                            <option value="0 */2 * * * * ?">Every 2 minutes</option>
-                            <option value="0 */3 * * * * ?">Every 3 minutes</option>
-                            <option value="0 */4 * * * * ?">Every 4 minutes</option>
-                            <option value="0 */5 * * * * ?">Every 5 minutes</option>
-                            <option value="0 */6 * * * * ?">Every 6 minutes</option>
-                            <option value="0 */10 * * * * ?" selected>Every 10 minutes</option>
-                            <option value="0 */12 * * * * ?">Every 12 minutes</option>
-                            <option value="0 */15 * * * * ?">Every 15 minutes</option>
-                            <option value="0 */20 * * * * ?">Every 20 minutes</option>
-                            <option value="0 */30 * * * * ?">Every 30 minutes</option>
-                            <option value="0 0 * * * * ?">Every hour</option>
-                            <option value="0 0 */2 * * * ?">Every 2 hours</option>
-                            <option value="0 0 */3 * * * ?">Every 3 hours</option>
-                            <option value="0 0 */4 * * * ?">Every 4 hours</option>
-                            <option value="0 0 */6 * * * ?">Every 6 hours</option>
-                            <option value="0 0 */12 * * * ?">Every 12 hours</option>
-                            <option value="0 0 0 * * * ?">Everyday at 00:00:00</option>
-                            </select></td>
-                        </tr>
-                        <tr>
-                        <td>Force Create Zone</td>
-                        <td><label><input type="checkbox" name="force_create_zone" value="1"> Yes</label></td>
-                        </tr>
-                        <tr>
-                        <td>Active</td>
-                        <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
-                        </tr>
-                        </tbody>
-                </table>
-                <table class="two-cols-responsive">
-                    <tbody>
                         <tr>
                             <td></td>
                             <td>
-                                <input type="submit" class="btn btn-success" name="add" value="Save"
-                                    onclick="return confirm('Are you sure you want to save this record')">
-                                <input type="button" class="btn btn-primary" value="Cancel"
-                                    onclick="window.location='ddns-record.html'">
+                                <input type="submit" class="btn btn-success" name="save_sms_setting"
+                                    id="save_sms_setting" value="Save">
+                                <input type="reset" class="btn btn-default" value="Reset">
                             </td>
                         </tr>
                     </tbody>
                 </table>
+
             </form>
+            <script type="text/javascript">
+                $(document).ready(function (e) {
+                    $.ajax({
+                        type: "GET",
+                        url: "noip/get",
+                        dataType: "json",
+                        success: function (data) {
+                            $('input[name="endpoint"]').val(data.endpoint);
+                            $('input[name="username"]').val(data.username);
+                            $('input[name="email"]').val(data.email);
+                            $('input[name="company"]').val(data.company);
+                        }
+                    });
+                });
+            </script>
+
+
         </div>
         <!-- /container -->
     </div>
