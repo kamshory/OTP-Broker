@@ -79,6 +79,14 @@ public class SMSUtil {
 		
 	}
 	
+	public static void sendSMS(String receiver, String message, String modemID) throws GSMException {
+		if(SMSUtil.smsInstance.isEmpty())
+		{
+			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
+		}
+		SMSUtil.get(modemID).sendSMS(receiver, message);		
+	}
+	
 	public static void sendSMS(String receiver, String message) throws GSMException {
 		if(SMSUtil.smsInstance.isEmpty())
 		{

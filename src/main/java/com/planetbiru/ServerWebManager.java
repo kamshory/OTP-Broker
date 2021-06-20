@@ -274,14 +274,23 @@ public class ServerWebManager {
 	public ResponseEntity<String> sendSMS(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
-		
 		HttpStatus statusCode;
 		JSONObject responseJSON = new JSONObject();
 		statusCode = HttpStatus.OK;
 		try {
 			if(userAccount.checkUserAuth(headers))
 			{
-				responseJSON = RESTAPI.processMessageRequest(requestBody);
+				Map<String, String> query = Utility.parseURLEncoded(requestBody);		
+
+				String modemID = query.getOrDefault("modem_id", "");
+				String receiver = query.getOrDefault("receiver", "");
+				String message = query.getOrDefault("message", "");
+				try {
+					SMSUtil.sendSMS(receiver, message, modemID);
+				} catch (GSMException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else
 			{
@@ -311,7 +320,7 @@ public class ServerWebManager {
 				responseJSON = new JSONObject();
 				Map<String, String> query = Utility.parseURLEncoded(requestBody);
 				String ussd = query.getOrDefault("ussd", "");
-				String modemID = query.getOrDefault("id", "");
+				String modemID = query.getOrDefault("modem_id", "");
 				String message = "";
 				String responseCode = ResponseCode.SUCCESS;
 				String responseText = "";
