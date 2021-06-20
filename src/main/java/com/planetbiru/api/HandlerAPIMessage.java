@@ -20,7 +20,6 @@ public class HandlerAPIMessage implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange httpExchange) throws IOException {
-		logger.info("AAAAAAAAAAAAAAAAAA");
 		Headers requestHeaders = httpExchange.getRequestHeaders();
         Headers responseHeaders = httpExchange.getResponseHeaders();
        	

@@ -1,4 +1,4 @@
-package com.planetbiru.config;
+package com.planetbiru.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,8 +9,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
 
-import com.planetbiru.util.FileNotFoundException;
-import com.planetbiru.util.OSUtil;
 import com.planetbiru.util.OSUtil.OS;
 
 public class FileConfigUtil {
