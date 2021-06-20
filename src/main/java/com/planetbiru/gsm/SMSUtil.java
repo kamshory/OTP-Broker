@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.planetbiru.config.ConfigModem;
-import com.planetbiru.config.ModemData;
+import com.planetbiru.config.DataModem;
 
 public class SMSUtil {
 	
@@ -26,11 +26,11 @@ public class SMSUtil {
 	public static void init()
 	{
 		SMSUtil.smsInstance = new ArrayList<>();
-		Map<String, ModemData> modemData = ConfigModem.getModemData();	
+		Map<String, DataModem> modemData = ConfigModem.getModemData();	
 		
-		for (Map.Entry<String, ModemData> entry : modemData.entrySet())
+		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
 		{
-			ModemData modem = entry.getValue();
+			DataModem modem = entry.getValue();
 			String port = modem.getConnectionType();			
 			SMSInstance instance = new SMSInstance();
 			try {
@@ -52,7 +52,7 @@ public class SMSUtil {
 
 	public static void connect(String modemID) throws GSMException
 	{
-		ModemData modem = ConfigModem.getModemData(modemID);
+		DataModem modem = ConfigModem.getModemData(modemID);
 		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)
 		{
 			SMSInstance instance =  SMSUtil.smsInstance.get(i);
@@ -129,10 +129,10 @@ public class SMSUtil {
 	public static int countConnected()
 	{
 		int connected = 0;
-		Map<String, ModemData> modemData = ConfigModem.getModemData();	
-		for (Map.Entry<String, ModemData> entry : modemData.entrySet())
+		Map<String, DataModem> modemData = ConfigModem.getModemData();	
+		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
 		{
-			ModemData modem = entry.getValue();
+			DataModem modem = entry.getValue();
 			if(modem.isConnected())
 			{
 				connected++;
@@ -143,10 +143,10 @@ public class SMSUtil {
 	
 	public static boolean isConnected(String modemID)
 	{
-		Map<String, ModemData> modemData = ConfigModem.getModemData();	
-		for (Map.Entry<String, ModemData> entry : modemData.entrySet())
+		Map<String, DataModem> modemData = ConfigModem.getModemData();	
+		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
 		{
-			ModemData modem = entry.getValue();
+			DataModem modem = entry.getValue();
 			if(modem.isConnected() && modem.getId().equals(modemID))
 			{
 				return true;

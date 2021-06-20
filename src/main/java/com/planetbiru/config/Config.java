@@ -39,6 +39,8 @@ public class Config {
 	private static String noIPSettingPath = "";
 	private static String deviceName = "OTP Broker";
 	private static String deviceVersion = "version 1.0";
+	private static String keystoreSettingPath = "";
+	private static String keystoreDataSettingPath = "";
 	
 	private Config()
 	{
@@ -356,6 +358,26 @@ public class Config {
 
 	public static void setDeviceVersion(String deviceVersion) {
 		Config.deviceVersion = deviceVersion;
+	}
+
+
+	public static String getKeystoreSettingPath() {
+		return keystoreSettingPath;
+	}
+
+
+	public static void setKeystoreSettingPath(String keystoreSettingPath) {
+		Config.keystoreSettingPath = keystoreSettingPath;
+	}
+
+
+	public static String getKeystoreDataSettingPath() {
+		return keystoreDataSettingPath;
+	}
+
+
+	public static void setKeystoreDataSettingPath(String keystoreDataSettingPath) {
+		Config.keystoreDataSettingPath = keystoreDataSettingPath;
 	}
 
 

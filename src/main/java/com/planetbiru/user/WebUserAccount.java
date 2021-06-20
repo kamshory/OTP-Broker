@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
+import com.planetbiru.config.FileConfigUtil;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.util.FileNotFoundException;
@@ -178,7 +179,7 @@ public class WebUserAccount {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		this.prepareDir(fileName);
 		try 
 		{
@@ -210,7 +211,7 @@ public class WebUserAccount {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		String userData = this.toString();
 		try 
 		{

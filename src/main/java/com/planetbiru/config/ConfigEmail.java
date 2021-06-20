@@ -73,7 +73,7 @@ public class ConfigEmail {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		
 		try 
 		{
@@ -125,7 +125,7 @@ public class ConfigEmail {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		prepareDir(fileName);
 		
 		try 

@@ -2,7 +2,7 @@ package com.planetbiru.config;
 
 import org.json.JSONObject;
 
-public class ModemData {
+public class DataModem {
 	private String id = "";
 	private String name = "";
 	private String connectionType = "";
@@ -15,7 +15,7 @@ public class ModemData {
 	private boolean connected = false;
 	private boolean active = false;
 
-	public ModemData(JSONObject jsonObject) {
+	public DataModem(JSONObject jsonObject) {
 		this.id = jsonObject.optString("id", "");
 		this.name = jsonObject.optString("name", "");
 		this.connectionType = jsonObject.optString("connectionType", "");
@@ -27,7 +27,7 @@ public class ModemData {
 		this.simCardPIN = jsonObject.optString("simCardPIN", "");
 		this.active = jsonObject.optBoolean("active", false);
 	}
-	public ModemData() {
+	public DataModem() {
 	}
 	
 	public JSONObject toJSONObject() {

@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 
+import com.planetbiru.config.FileConfigUtil;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.util.FileNotFoundException;
@@ -31,7 +32,7 @@ public class APIUserAccount {
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
-		String fileName = dir + path;
+		String fileName = FileConfigUtil.fixFileName(dir + path);
 		APIUserAccount.prepareDir(fileName);
 		try 
 		{
