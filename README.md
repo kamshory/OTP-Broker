@@ -1,4 +1,36 @@
+
 # OTP Broker
+
+OTP atau `One Time Password` adalah sebuah password satu kali pakai yang memiliki masa berlaku tertentu. Umumnya masa berlaku dibuat sangat singkat dan hanya memberikan kesempatan kepada penerimanya untuk memasukkannya ke dalam aplikasi dan mengirimkannya ke server aplikasi yang memerlukannya. OTP bersifat sangat rahasia sehingga `clear text` dari OTP tidak boleh disimpan oleh pihak manapun. Bahkan, server aplikasi hanya menyimpan `hash` atau `token` yang cocok dengan OTP tersebut. `Clear text` hanya dibuat lalu dikirim ke penerima. Dengan kata lain, `clear text` hanya diketahui oleh penerima OTP saja.
+
+OTP yang paling populer dikirimkan melalui SMS atau Short Message Service. Penggunaan SMS memiliki kelebihan sebagai berikut:
+
+1. Hanya dapat diterima oleh perangkat di mana SIM card dari nomor penerima terpasang. Hal ini tentu saja berkaitan dengan `What you have` pada `multifactor authentication`
+2. Dapat dengan mudah dibaca pada hampir semua merek dan model perangkat telepon seluler
+3. Umumnya perangkat langsung memberitahukan adanya pesan masuk tanpa memerlukan aksi pengguna
+4. Pada perangkat telepon seluler pintar, aplikasi pengguna OTP dapat langsung membaca pesan masuk apabila diijinkan oleh penggunanya. Dengan demikian, aplikasi dapat langsung memverifikasi OTP tanpa memerlukan tindakan manual dari penggunanya. Hal ini akan menghemat waktu dan mengurangi kesalahan 
+5. Tidak memerlukan credit penerima sehingga penerima pesan tidak perlu membayar apapun untuk dapat menerima pesan tersebut
+6. Memiliki jangkauan yang sangat luas
+7. Perangkat penerima SMS tersedia dalam berbagai kelas harga sehingga dapat dijangkau oleh hampir semua kalangan 
+
+Dari sekian banyak kelebihan di atas, ternyata SMS memiliki keterbatasan secara teknis. SMS harus dikirim melalui operator telekomunikasi yang secara legal terdaftar di negara pengirim. SMS dapat dikirm menggunakan perangkat GSM yang tersambung ke operator telekomunikasi. Perangkat yang paling murah untuk mengirimkan SMS adalah telepon seluler dan modem GSM.
+
+Cara lain untuk mengirimkan SMS yaitu dengan bekerjasama langsung dengan operator telekomunikasi atau menggunakan jasa pihak ketiga. Kerjasama dengan operator telekomunikasi tentu saja tidak mudah. Selain harus berbadan hukum, biaya yang diperlukan tentu saja tidak sedikit. Selain itu, volume pengiriman SMS juga menjadi bahan pertimbangan kerjasama tersebut diterima atau tidak oleh operator telekomunikasi. Penggunaan jasa pihak ketiga adalah opsi lain. Faktor keamanan tentu saja menjadi pertimbangan. Penyedia layanan tentu saja harus bisa dipercaya untuk menjaga kerahasiaan OTP yang dikirimkan.
+
+Bagi perusahaan berskala kecil yang ingin membangun sendiri sistem pengiriman OTP dapat menggunakan berbagai macam aplikasi yang tersedia secara gratis maupun berbayar di pasaran. Beberapa pertimbangan dalam memilih aplikasi OTP adalah sevagai berikut:
+
+1. Kecepatan pengiriman
+2. Keamanan/kerahasiaan
+3. Kemudahan dalam instalasi dan integrasi
+4. Biaya awal dan biaya operasional
+
+Aplikasi yang menggunakan database untuk menghubungkan antara sisi penerima pesan dan modem GSM tentu saja tidak aman. Data di dalam database dapat dibaca oleh administrator. Bahkan, administrator dapat meminta OTP pada saat pengguna sedang tidak menyadarinya dan sedang tidak bertransaksi.
+
+Aplikasi yang mewajibkan penggunaan public IP address tentu saja tidak memberikan keleluasaan bagi pengguna. Perusahaan atau perorangan yang tidak berlangganan internet dengan IP public tidak dapat menggunakan palikasi tersebut. Pengguna perlu menempatkan server pada jaringan dengan IP public.
+
+Aplikasi yang berjalan pada desktop dan laptop tentu saja memerlukan biaya investasi dan biaya operasional yang tinggi. Laptop atau desktop yang digunakan harus beroperasi selama 24 jam sehari dan 7 hari dalam seminggu. Listrik yang digunakan tentu saja tidak sedikit.
+
+OTP Broker menjawab semua tantangan di atas. Dengan perangkat yang sangat murah, pengguna dapat memiliki sebuah SMS gateway yang memberikan banyak fitur serta dapat dioperasikan dengan biaya yang sangat murah.
 
 OTP Broker adalah server untuk mengirimkan SMS melalui protokol HTTP, WebSocket dan Message Broker. Pengguna dapat memasang OTP Broker pada server dengan IP address statis yang diapat diakses oleh klien yang akan mengirimkan SMS. Selain itu, pengguna juga dapat memasang OTP Broker pada server dengan IP address dinamis. Server ini kemudian mengakses sebuah server websocket atau server RabbitMQ. OTP Broker bertindak sebagai consumer yang akan mengirimkan semua SMS yang diterimanya.
 
@@ -15,6 +47,13 @@ Untuk menggunakan Message Broker, silakan gunakan RabbitMQ dengan link https://w
 Pada skenario ini, App Server dapat langsung mengirimkan OTP ke OTP Broker melalui HTTP.
 
 ![OTP Broker Topology Skenario 1](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology-1.png)
+Pengguna dapat menggunakan sebuah domain murah dan menggunakan Dynamic Domain Name Server gratis. Dengan penggunaan port forwarding pada router, OTP Broker dapat diakses dari manapun dengan menggunakan domain atau subdomain. Dalam skenario ini, pengguna membutuhkan:
+
+1. OTP Broker
+2. Koneksi internet fix dengan IP public (statis atau dinamis)
+3. Router yang dapat melakukan port forwarding
+4. Domain yang name servernya dapat diatur
+5. Layanan Dynamic DNS (gratis maupun berbayar)
 
 **Sekenario 2 - OTP Broker Tidak Dapat Diakses App Server**
 
@@ -25,6 +64,14 @@ App Server bertindak sebagai publisher dan OTP Broker menjadi consumer dari Rabb
 ![OTP Broker Topology Skenario 2](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology-2.png)
 
 Dari kedua skenario di atas, OTP Broker akan mengirmkan SMS menggunakan modem GSM yang terpasang secara fisik pada perangkat OTP Broker. Pengguna dapat menggunakan salah satu dari RabbitMQ Server atau WSMessageBroker dan dapat pula menggunakan keduanya dalam waktu bersamaan. Akan tetapi, apabila App Server mengirimkan sebuah OTP yang sama ke RabbitMQ Server dan WSMessageBroker, maka OTP Broker akan mengirimkan SMS tersebut dua kali ke nomor penerima.
+
+Pada skenario ini, pengguna tidak memerlukan IP public. Pengguna hanya memerlukan:
+
+1. OTP Broker
+2. Koneksi internet (tidak memerlukan IP public dan port forwarding)
+3. Server RabbitMQ atau WSMessageBroker
+
+Server WSMessageBroker berbasis menggunakan protokol WebSocket dan PHP. Silakan download WSMessageBroker di https://github.com/kamshory/WSMessageBrocker 
 
 # Feature
 
