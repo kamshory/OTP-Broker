@@ -245,6 +245,7 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	
 	@PostMapping(path="/api/email**")
 	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
@@ -256,13 +257,13 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
+				ConfigEmail.load(Config.getEmailSettingPath());
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
 				MailUtil mailUtil = new MailUtil();
 				String to = queryPairs.getOrDefault("recipient", "").trim();
 				String subject = queryPairs.getOrDefault("subject", "").trim();
 				String message = queryPairs.getOrDefault(JsonKey.MESSAGE, "").trim();
 				String result = "";
-
 
 				try 
 				{
@@ -414,6 +415,7 @@ public class ServerWebManager {
 		String userID = request.getParameter("userid");
 		return this.sendTokenResetPassword(userID);
 	}
+	
 	
 	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
 		byte[] responseBody = "".getBytes();
