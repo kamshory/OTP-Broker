@@ -50,13 +50,6 @@ public class MailUtil {
     	this.ssl = ConfigEmail.isMailSSL();
     	this.starttls = ConfigEmail.isMailStartTLS();
     	this.init();
-       	System.out.println("smtpHost     " + this.smtpHost);
-       	System.out.println("smtpHost     " + this.smtpHost);
-       	System.out.println("smtpPort     " + this.smtpPort);
-       	System.out.println("smtpUser     " + this.smtpUser);
-       	System.out.println("smtpPassword " + this.smtpPassword);
-      	System.out.println("ssl          " + this.ssl);
-      	System.out.println("starttls     " + this.starttls);
 	}
 
 
@@ -64,10 +57,11 @@ public class MailUtil {
 	{
         Properties properties = System.getProperties();
         properties.put("mail.smtp.host", this.smtpHost);
-        properties.put("mail.smtp.port", this.smtpPort);
+        properties.put("mail.smtp.port", this.smtpPort+"");
         
         if(this.ssl)
         {
+            properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");   
         	properties.put("mail.smtp.ssl.enable", "true");
         }
         if(this.starttls)
@@ -78,8 +72,9 @@ public class MailUtil {
         if(this.mailAuth)
         {
         	properties.put("mail.smtp.auth", "true");
-        }
-
+        }       
+        properties.put("mail.smtp.socketFactory.port", this.smtpPort+"");
+        
         session = Session.getInstance(properties, new Authenticator() {
         	@Override
 			protected PasswordAuthentication getPasswordAuthentication() 

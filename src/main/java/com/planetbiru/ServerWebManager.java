@@ -188,7 +188,9 @@ public class ServerWebManager {
 			/**
 			 * Do nothing	
 			 */
-		}
+		}	
+		
+		
 	}
 	
 	@PostMapping(path="/api/device/**")
@@ -274,6 +276,7 @@ public class ServerWebManager {
 				catch (MessagingException e) 
 				{
 					result = e.getMessage();
+					this.broardcastWebSocket(result);
 					response.put(JsonKey.SUCCESS, false);
 				}
 				response.put(JsonKey.MESSAGE, result);
@@ -418,6 +421,7 @@ public class ServerWebManager {
 	
 	
 	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
+		System.out.println("userID = "+userID);
 		byte[] responseBody = "".getBytes();
 		HttpHeaders responseHeaders = new HttpHeaders();
 		userAccount.load();
@@ -443,6 +447,7 @@ public class ServerWebManager {
 				if(!email.isEmpty() && userID.equalsIgnoreCase(email))
 				{
 					String message = "Username : "+user.getUsername()+"\r\nPassword : "+user.getPassword();
+					ConfigEmail.load(Config.getEmailSettingPath());
 					String smtpHost = ConfigEmail.getMailHost();
 					int smtpPort = ConfigEmail.getMailPort();
 				    String smtpUser = ConfigEmail.getMailSenderAddress();
@@ -450,7 +455,7 @@ public class ServerWebManager {
 				    boolean ssl = ConfigEmail.isMailSSL();
 				    boolean starttls = ConfigEmail.isMailStartTLS();   
 				    boolean debug = false;
-					
+					System.out.println(String.format("smtpHost = %s, smtpPort = %d, smtpUser = %s, smtpPassword = %s, ssl = %s, starttls = %s, debug = %s", smtpHost, smtpPort, smtpUser, smtpPassword, ssl, starttls, debug));
 					MailUtil senEmail = new MailUtil(smtpHost, smtpPort, smtpUser, smtpPassword, ssl, starttls, debug);
 					try 
 					{
