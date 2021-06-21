@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.planetbiru.constant.JsonKey;
@@ -16,6 +18,7 @@ import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
 
 public class ConfigModem {
+	private static Logger logger = LogManager.getLogger(ConfigModem.class);
     private static Map<String, DataModem> modemData = new HashMap<>();
 	private static String configPath;
 	
@@ -135,7 +138,8 @@ public class ConfigModem {
 		}
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 	}
 	

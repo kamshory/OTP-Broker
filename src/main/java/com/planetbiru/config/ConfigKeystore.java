@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +18,7 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigKeystore {
+	private static Logger logger = LogManager.getLogger(ConfigKeystore.class);
 	
 	private static Map<String, DataKeystore> keystores = new HashMap<>();
 	
@@ -73,7 +76,8 @@ public class ConfigKeystore {
 		} 
 		catch (FileNotFoundException | JSONException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 		
 	}	
@@ -99,7 +103,8 @@ public class ConfigKeystore {
 		}
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 	}
 	
@@ -178,7 +183,8 @@ public class ConfigKeystore {
 		}
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}		
 		
 		

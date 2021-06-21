@@ -7,9 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import com.planetbiru.ServerScheduler;
 import com.planetbiru.constant.ConstantString;
-import com.planetbiru.util.Utility;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -27,7 +25,7 @@ public class HandlerAPIMessage implements HttpHandler {
        	{
            if(httpExchange.getRequestMethod().equalsIgnoreCase("POST") || httpExchange.getRequestMethod().equalsIgnoreCase("PUT"))
 	        {
-	            byte[] requestBody = this.getRequestBody(httpExchange);
+	            byte[] requestBody = RESTAPI.getRequestBody(httpExchange);
 	            String requestBodyStr = new String(requestBody);            
 	            JSONObject result = RESTAPI.processMessageRequest(requestBodyStr);            
 	            String response = result.toString(4);            
@@ -46,34 +44,6 @@ public class HandlerAPIMessage implements HttpHandler {
        	}
         httpExchange.close();
 	}
-	private byte[] getRequestBody(HttpExchange httpExchange)
-	{
-        Headers requestHeaders = httpExchange.getRequestHeaders();
-		String cl = requestHeaders.getFirst("Content-length");
-		byte[] requestBody = "".getBytes();
-        if(cl != null)
-        {
-            try
-            {
-	            int contentLength = Utility.atoi(cl);	
-	            requestBody = new byte[contentLength];
-	            for(int j = 0; j < contentLength; j++)
-	            {
-	            	requestBody[j] = (byte) httpExchange.getRequestBody().read();
-	            }
-            }
-            catch(NumberFormatException | IOException e)
-            {
-            	/**
-            	 * Do nothing
-            	 */
-            }
-            return requestBody;
-        }
-        else
-        {
-        	return "".getBytes();
-        }
-	}
+	
 
 }

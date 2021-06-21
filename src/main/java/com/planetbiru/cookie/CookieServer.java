@@ -102,7 +102,8 @@ public class CookieServer {
 	        }
 	        catch (DecoderException e) 
 	        {
-	        	e.printStackTrace();
+				logger.error(e.getMessage());
+	        	//e.printStackTrace();
 	        }
 	        CookieItem cookie = new CookieItem(cookieName, cookieValue);
 	        list.put(cookieName, cookie);
@@ -141,7 +142,8 @@ public class CookieServer {
 			        }
 			        catch (DecoderException e) 
 			        {
-			        	e.printStackTrace();
+						logger.error(e.getMessage());
+			        	//e.printStackTrace();
 			        }
 			        CookieItem cookie = new CookieItem(cookieName, cookieValue);
 			        list.put(cookieName, cookie);

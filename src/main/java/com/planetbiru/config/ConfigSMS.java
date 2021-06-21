@@ -3,6 +3,8 @@ package com.planetbiru.config;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,6 +14,7 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigSMS {
+	private static Logger logger = LogManager.getLogger(ConfigSMS.class);
 	
 	private static String connectionType = "";
 	private static String smsCenter = "";
@@ -55,7 +58,8 @@ public class ConfigSMS {
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 		
 	}
@@ -73,7 +77,8 @@ public class ConfigSMS {
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 	}
 	

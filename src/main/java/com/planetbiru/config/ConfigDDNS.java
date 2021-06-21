@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +19,7 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigDDNS {
+	private static Logger logger = LogManager.getLogger(ConfigDDNS.class);
 	private static Map<String, DDNSRecord> records = new HashMap<>();
 	private static String path = "";
 	private ConfigDDNS()
@@ -81,7 +84,8 @@ public class ConfigDDNS {
 		
 		catch (FileNotFoundException | JSONException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}	
 	}	
 
@@ -117,7 +121,8 @@ public class ConfigDDNS {
 		}
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 	}
 	

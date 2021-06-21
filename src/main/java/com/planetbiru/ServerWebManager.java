@@ -131,11 +131,6 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
 	
-	@Value("${otpbroker.path.setting.keystore}")
-	private String keystoreSettingPath;
-	
-	@Value("${otpbroker.path.setting.keystore.data}")
-	private String keystoreDataSettingPath;
 	
 	private ServerWebManager()
     {
@@ -143,10 +138,7 @@ public class ServerWebManager {
 	
 	@PostConstruct
 	public void init()
-	{
-		
-		Config.setKeystoreDataSettingPath(keystoreDataSettingPath);
-		Config.setKeystoreSettingPath(keystoreSettingPath);
+	{		
 		
 		Config.setDeviceName(deviceName);
 		Config.setDeviceVersion(deviceVersion);
@@ -189,10 +181,7 @@ public class ServerWebManager {
 			/**
 			 * Do nothing	
 			 */
-		}	
-		
-		
-		
+		}
 	}
 	
 	@PostMapping(path="/api/device/**")
@@ -247,8 +236,7 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		String responseBody = responseJSON.toString(4);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
-	}
-	
+	}	
 	
 	@PostMapping(path="/api/email**")
 	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
@@ -314,8 +302,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				Map<String, String> query = Utility.parseURLEncoded(requestBody);		
-
+				Map<String, String> query = Utility.parseURLEncoded(requestBody);
 				String modemID = query.getOrDefault("modem_id", "");
 				String receiver = query.getOrDefault("receiver", "");
 				String message = query.getOrDefault(JsonKey.MESSAGE, "");
@@ -420,8 +407,7 @@ public class ServerWebManager {
 	{	
 		String userID = request.getParameter("userid");
 		return this.sendTokenResetPassword(userID);
-	}
-	
+	}	
 	
 	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
 		byte[] responseBody = "".getBytes();
@@ -450,15 +436,7 @@ public class ServerWebManager {
 				{
 					String message = "Username : "+user.getUsername()+"\r\nPassword : "+user.getPassword();
 					ConfigEmail.load(Config.getEmailSettingPath());
-					String smtpHost = ConfigEmail.getMailHost();
-					int smtpPort = ConfigEmail.getMailPort();
-				    String smtpUser = ConfigEmail.getMailSenderAddress();
-				    String smtpPassword = ConfigEmail.getMailSenderPassword();
-				    boolean ssl = ConfigEmail.isMailSSL();
-				    boolean starttls = ConfigEmail.isMailStartTLS();   
-				    boolean debug = false;
-					System.out.println(String.format("smtpHost = %s, smtpPort = %d, smtpUser = %s, smtpPassword = %s, ssl = %s, starttls = %s, debug = %s", smtpHost, smtpPort, smtpUser, smtpPassword, ssl, starttls, debug));
-					MailUtil senEmail = new MailUtil(smtpHost, smtpPort, smtpUser, smtpPassword, ssl, starttls, debug);
+					MailUtil senEmail = new MailUtil();
 					try 
 					{
 						senEmail.send(email, "Account Information", message);
@@ -638,8 +616,7 @@ public class ServerWebManager {
 			 * Do nothing
 			 */
 			statusCode = HttpStatus.UNAUTHORIZED;
-		}
-		
+		}		
 		cookie.saveSessionData();
 		cookie.putToHeaders(responseHeaders);
 		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
@@ -913,10 +890,6 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	
-	
-	
-	
 	@GetMapping(path="/server-info/get")
 	public ResponseEntity<byte[]> handleServerInfo(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -948,7 +921,6 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
 	
 	@GetMapping(path="/cloudflare/get")
 	public ResponseEntity<byte[]> handleCloudflareSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -1082,7 +1054,6 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-
 	
 	@GetMapping(path="/user/list")
 	public ResponseEntity<byte[]> handleUserList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -1182,7 +1153,6 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-
 	
 	@GetMapping(path="/api-user/list")
 	public ResponseEntity<byte[]> handleUserAPIList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -1217,7 +1187,6 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 
-
 	@GetMapping(path="/api-user/detail/{username}")
 	public ResponseEntity<byte[]> handleUserAPIGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.USERNAME) String username, HttpServletRequest request)
 	{
@@ -1251,7 +1220,6 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 
-	
 	@PostMapping(path="/user/init**")
 	public ResponseEntity<byte[]> userInit(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
@@ -1392,6 +1360,7 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+	
 	@GetMapping(path="/modem/detail/{id}")
 	public ResponseEntity<byte[]> handleModemGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
 	{
@@ -1662,7 +1631,7 @@ public class ServerWebManager {
 			    String cronExpression = queryPairs.getOrDefault("cron_expression", "").trim();
 			    boolean proxied = queryPairs.getOrDefault(JsonKey.PROXIED, "").trim().equals("1");
 			    boolean forceCreateZone = queryPairs.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").trim().equals("1");
-			    boolean active = queryPairs.getOrDefault("active", "").trim().equals("1");
+			    boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
 			    
 				String ttls = queryPairs.getOrDefault(JsonKey.TTL, "0");
 			    int ttl = Utility.atoi(ttls);
@@ -1725,7 +1694,8 @@ public class ServerWebManager {
 				} 
 				catch (FileNotFoundException e1) 
 				{
-					e1.printStackTrace();
+					logger.error(e1.getMessage());
+					//e1.printStackTrace();
 				}
 			}
 		}
@@ -1911,7 +1881,7 @@ public class ServerWebManager {
 				ConfigKeystore.load(Config.getKeystoreSettingPath());
 				String fileName = query.getOrDefault("file_name", "").trim();
 				String filePassword = query.getOrDefault("file_password", "").trim();
-				boolean active = query.getOrDefault("active", "").trim().equals("1");
+				boolean active = query.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
 				JSONObject data = ConfigKeystore.get(id).toJSONObject();
 				
 				data.put("id", id);
@@ -1920,7 +1890,7 @@ public class ServerWebManager {
 				{
 					data.put("filePassword", filePassword);
 				}
-				data.put("active", active);
+				data.put(JsonKey.ACTIVE, active);
 				
 				ConfigKeystore.update(id, data);
 				System.out.println(data.toString(4));
@@ -1935,7 +1905,7 @@ public class ServerWebManager {
 			String filePassword = query.getOrDefault("file_password", "").trim();
 			if(!fileName.isEmpty() && !filePassword.isEmpty())
 			{
-				boolean active = query.getOrDefault("active", "").trim().equals("1");
+				boolean active = query.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
 				JSONObject data = new JSONObject();
 				
 				String fileExtension = FileConfigUtil.getFileExtension(fileName);
@@ -1944,7 +1914,7 @@ public class ServerWebManager {
 				data.put("fileName", fileName);
 				data.put("fileExtension", fileExtension);
 				data.put("filePassword", filePassword);
-				data.put("active", active);
+				data.put(JsonKey.ACTIVE, active);
 				byte[] binaryData = Utility.base64DecodeRaw(query.getOrDefault("data", ""));
 				data.put("fileSize", binaryData.length);
 				
@@ -2165,7 +2135,7 @@ public class ServerWebManager {
 			}
 			boolean lMailSSL = query.getOrDefault("ssl", "").trim().equals("1");
 			boolean lMailStartTLS = query.getOrDefault("start_tls", "").trim().equals("1");
-			boolean active = query.getOrDefault("active", "").trim().equals("1");
+			boolean active = query.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
 			
 			JSONObject config = new JSONObject();
 			
@@ -2243,7 +2213,7 @@ public class ServerWebManager {
 		
 		String id = query.getOrDefault("id", "").trim();		
 		String connectionType = query.getOrDefault("connection_type", "").trim();
-		boolean active = query.getOrDefault("active", "").trim().equals("1");		
+		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");		
 
 		String smsCenter = query.getOrDefault("sms_center", "").trim();		
 		
@@ -2369,7 +2339,8 @@ public class ServerWebManager {
 				catch (GSMException e) 
 				{
 					this.broardcastWebSocket(e.getMessage());
-					e.printStackTrace();
+					logger.error(e.getMessage());
+					//e.printStackTrace();
 				}
 			}
 		}		
