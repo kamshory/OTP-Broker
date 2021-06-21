@@ -50,7 +50,13 @@ public class MailUtil {
     	this.ssl = ConfigEmail.isMailSSL();
     	this.starttls = ConfigEmail.isMailStartTLS();
     	this.init();
-    	System.out.println(this.smtpHost);
+       	System.out.println("smtpHost     " + this.smtpHost);
+       	System.out.println("smtpHost     " + this.smtpHost);
+       	System.out.println("smtpPort     " + this.smtpPort);
+       	System.out.println("smtpUser     " + this.smtpUser);
+       	System.out.println("smtpPassword " + this.smtpPassword);
+      	System.out.println("ssl          " + this.ssl);
+      	System.out.println("starttls     " + this.starttls);
 	}
 
 
