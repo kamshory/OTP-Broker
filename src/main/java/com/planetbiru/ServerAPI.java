@@ -89,10 +89,32 @@ public class ServerAPI {
 	@Value("${otpbroker.api.path.unblock}")
 	private String unblockinPath;
 
+	
+	@Value("${otpbroker.default.smtp.host}")
+	private String defaultSMTPHost;
+	
+	@Value("${otpbroker.default.smtp.port}")
+	private String defaultSMTPPort;
+	
+	@Value("${otpbroker.default.smtp.user}")
+	private String defaultSMTPUsername;
+
+	@Value("${otpbroker.default.smtp.password}")
+	private String defaultSMTPPassword;
+
+	@Value("${otpbroker.default.smtp.auth}")
+	private String defaultSMTPAuth;
+
 
 	@PostConstruct
 	public void init()
 	{
+		Config.setDefaultSMTPHost(defaultSMTPHost);
+		Config.setDefaultSMTPPort(defaultSMTPPort);
+		Config.setDefaultSMTPUsername(defaultSMTPUsername);
+		Config.setDefaultSMTPPassword(defaultSMTPPassword);
+		Config.setDefaultSMTPAuth(defaultSMTPAuth);
+		
 		this.loadConfigHttp();
 		this.loadConfigEmail();
 

@@ -21,13 +21,11 @@ public class SMSUtil {
 		 * Do nothing
 		 */
 	}
-
 	
 	public static void init()
 	{
 		SMSUtil.smsInstance = new ArrayList<>();
-		Map<String, DataModem> modemData = ConfigModem.getModemData();	
-		
+		Map<String, DataModem> modemData = ConfigModem.getModemData();		
 		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
 		{
 			DataModem modem = entry.getValue();
@@ -111,7 +109,6 @@ public class SMSUtil {
 			throw new GSMException("The selected device is not connected");
 		}
 	}
-
 
 	private static SMSInstance get(String modemID) throws GSMException {
 		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)

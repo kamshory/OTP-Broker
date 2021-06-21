@@ -421,7 +421,6 @@ public class ServerWebManager {
 	
 	
 	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
-		System.out.println("userID = "+userID);
 		byte[] responseBody = "".getBytes();
 		HttpHeaders responseHeaders = new HttpHeaders();
 		userAccount.load();

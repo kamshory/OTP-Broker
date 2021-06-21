@@ -17,6 +17,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigEmail;
 
 public class MailUtil {
@@ -56,24 +57,34 @@ public class MailUtil {
 	public void init()
 	{
         Properties properties = System.getProperties();
-        properties.put("mail.smtp.host", this.smtpHost);
-        properties.put("mail.smtp.port", this.smtpPort+"");
         
-        if(this.ssl)
-        {
-            properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");   
-        	properties.put("mail.smtp.ssl.enable", "true");
-        }
-        if(this.starttls)
-        {
-        	properties.put("mail.smtp.starttls.enable","true");
-        }
-
         if(this.mailAuth)
-        {
+        {       
+	        properties.put("mail.smtp.host", this.smtpHost);
+	        properties.put("mail.smtp.port", this.smtpPort+"");
+	        
+	        if(this.ssl)
+	        {
+	            properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");   
+	        	properties.put("mail.smtp.ssl.enable", "true");
+	        }
+	        if(this.starttls)
+	        {
+	        	properties.put("mail.smtp.starttls.enable","true");
+	        }
+	
         	properties.put("mail.smtp.auth", "true");
-        }       
-        properties.put("mail.smtp.socketFactory.port", this.smtpPort+"");
+	        properties.put("mail.smtp.socketFactory.port", this.smtpPort+"");
+        }
+        else
+        {
+        	properties.put("mail.smtp.host", Config.getDefaultSMTPHost());
+	        properties.put("mail.smtp.port", Config.getDefaultSMTPPort());
+	        properties.put("mail.smtp.auth", Config.getDefaultSMTPAuth());
+	     
+	        this.smtpUser = Config.getDefaultSMTPUsername();
+	        this.smtpPassword = Config.getDefaultSMTPPassword();
+        }
         
         session = Session.getInstance(properties, new Authenticator() {
         	@Override
