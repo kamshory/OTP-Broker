@@ -43,7 +43,6 @@ import com.planetbiru.config.ConfigSaved;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
@@ -59,8 +58,6 @@ import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.Utility;
-
-
 
 @RestController
 public class ServerWebManager {
@@ -170,8 +167,7 @@ public class ServerWebManager {
 		Config.setApiSettingPath(apiSettingPath);
 		
 		Config.setSmsSettingPath(smsSettingPath);
-		Config.setEthernetSettingPath(ethernetSettingPath);
-		
+		Config.setEthernetSettingPath(ethernetSettingPath);	
 		
 		Config.setBaseDirConfig(baseDirConfig);
 		ConfigDDNS.load(Config.getDdnsSettingPath());
@@ -203,8 +199,10 @@ public class ServerWebManager {
 		HttpStatus statusCode;
 		JSONObject responseJSON = new JSONObject();
 		statusCode = HttpStatus.OK;
-		try {
-			if(userAccount.checkUserAuth(headers)){
+		try 
+		{
+			if(userAccount.checkUserAuth(headers))
+			{
 				String action = query.getOrDefault("action", "");
 				String modemID = query.getOrDefault("id", "");
 				if(!modemID.isEmpty())
@@ -229,11 +227,15 @@ public class ServerWebManager {
 						 */
 					}
 				}
-			} else {
+			} 
+			else 
+			{
 				statusCode = HttpStatus.UNAUTHORIZED;
 				responseJSON = RESTAPI.unauthorized(requestBody);					
 			}
-		} catch (NoUserRegisteredException e) {
+		} 
+		catch (NoUserRegisteredException e) 
+		{
 			statusCode = HttpStatus.UNAUTHORIZED;
 			responseJSON = RESTAPI.unauthorized(requestBody);					
 		}
@@ -246,27 +248,51 @@ public class ServerWebManager {
 	@PostMapping(path="/api/email**")
 	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
+		JSONObject response = new JSONObject();
 		HttpHeaders responseHeaders = new HttpHeaders();
 		HttpStatus statusCode;
-		JSONObject responseJSON = new JSONObject();
 		statusCode = HttpStatus.OK;
-		try {
+		try 
+		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				responseJSON = RESTAPI.processEmailRequest(requestBody);
+				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
+				MailUtil mailUtil = new MailUtil();
+				String to = queryPairs.getOrDefault("recipient", "").trim();
+				String subject = queryPairs.getOrDefault("subject", "").trim();
+				String message = queryPairs.getOrDefault(JsonKey.MESSAGE, "").trim();
+				String result = "";
+
+
+				try 
+				{
+					mailUtil.send(to, subject, message);
+					result = "The message was sent successfuly";
+					response.put(JsonKey.SUCCESS, true);
+				} 
+				catch (MessagingException e) 
+				{
+					result = e.getMessage();
+					response.put(JsonKey.SUCCESS, false);
+				}
+				response.put(JsonKey.MESSAGE, result);
 			}
 			else
 			{
 				statusCode = HttpStatus.UNAUTHORIZED;
-				responseJSON = RESTAPI.unauthorized(requestBody);					
+				response.put(JsonKey.SUCCESS, false);	
+				response.put(JsonKey.MESSAGE, ConstantString.UNAUTHORIZED);
 			}
-		} catch (NoUserRegisteredException e) {
+		} 
+		catch (NoUserRegisteredException e) 
+		{
+			response.put(JsonKey.SUCCESS, false);
+			response.put(JsonKey.MESSAGE, ConstantString.UNAUTHORIZED);
 			statusCode = HttpStatus.UNAUTHORIZED;
-			responseJSON = RESTAPI.unauthorized(requestBody);					
 		}
 		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
-		String responseBody = responseJSON.toString(4);
+		String responseBody = response.toString(4);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
@@ -275,35 +301,47 @@ public class ServerWebManager {
 	{		
 		HttpHeaders responseHeaders = new HttpHeaders();
 		HttpStatus statusCode;
-		JSONObject responseJSON = new JSONObject();
 		statusCode = HttpStatus.OK;
-		try {
+		JSONObject response = new JSONObject();
+		try 
+		{
 			if(userAccount.checkUserAuth(headers))
 			{
 				Map<String, String> query = Utility.parseURLEncoded(requestBody);		
 
 				String modemID = query.getOrDefault("modem_id", "");
 				String receiver = query.getOrDefault("receiver", "");
-				String message = query.getOrDefault("message", "");
-				try {
+				String message = query.getOrDefault(JsonKey.MESSAGE, "");
+				String result = "";
+				try 
+				{
 					SMSUtil.sendSMS(receiver, message, modemID);
-				} catch (GSMException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					result = "The message was sent via device "+modemID;
+					response.put(JsonKey.SUCCESS, false);
+				} 
+				catch (GSMException e) 
+				{
+					result = e.getMessage();
+					response.put(JsonKey.SUCCESS, false);
 				}
+				response.put(JsonKey.MESSAGE, result);
 			}
 			else
 			{
+				response.put(JsonKey.SUCCESS, false);
+				response.put(JsonKey.MESSAGE, ConstantString.UNAUTHORIZED);
 				statusCode = HttpStatus.UNAUTHORIZED;
-				responseJSON = RESTAPI.unauthorized(requestBody);			
 			}
-		} catch (NoUserRegisteredException e) {
-			statusCode = HttpStatus.OK;
-			responseJSON = RESTAPI.unauthorized(requestBody);			
+		} 
+		catch (NoUserRegisteredException e) 
+		{
+			statusCode = HttpStatus.UNAUTHORIZED;
+			response.put(JsonKey.SUCCESS, false);
+			response.put(JsonKey.MESSAGE, ConstantString.UNAUTHORIZED);
 		}
 		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
-		String responseBody = responseJSON.toString(4);
+		String responseBody = response.toString(4);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 
@@ -313,46 +351,52 @@ public class ServerWebManager {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		HttpStatus statusCode;
 		statusCode = HttpStatus.OK;
-		JSONObject responseJSON = new JSONObject();
-		try {
+		JSONObject response = new JSONObject();
+		try 
+		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				responseJSON = new JSONObject();
+				response = new JSONObject();
 				Map<String, String> query = Utility.parseURLEncoded(requestBody);
 				String ussd = query.getOrDefault("ussd", "");
 				String modemID = query.getOrDefault("modem_id", "");
 				String message = "";
-				String responseCode = ResponseCode.SUCCESS;
-				String responseText = "";
 				if(ussd != null && !ussd.isEmpty())
 				{
 					try 
 					{
 						message = SMSUtil.executeUSSD(ussd, modemID);
+						response.put(JsonKey.SUCCESS, true);		
 					} 
 					catch (GSMException e) 
 					{
 						message = e.getMessage();
+						response.put(JsonKey.SUCCESS, false);	
 					}		
 				}
-				JSONObject data = new JSONObject();
-				data.put(JsonKey.MESSAGE, message);
-				responseJSON.put(JsonKey.RESPONSE_CODE, responseCode);
-				responseJSON.put(JsonKey.RESPONSE_TEXT, responseText);
-				responseJSON.put(JsonKey.DATA, data);		
-				responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
-				responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+				response.put(JsonKey.MESSAGE, message);
 			}
 			else
 			{
 				statusCode = HttpStatus.UNAUTHORIZED;
-				responseJSON = RESTAPI.unauthorized(requestBody);
+				response.put(JsonKey.SUCCESS, false);	
+				response.put(JsonKey.MESSAGE, ConstantString.UNAUTHORIZED);
+				
 			}
-		} catch (JSONException | NoUserRegisteredException e) {
-			statusCode = HttpStatus.UNAUTHORIZED;
-			responseJSON = RESTAPI.unauthorized(requestBody);
+		} 
+		catch (JSONException e)
+		{
+			response.put(JsonKey.MESSAGE, e.getMessage());
 		}
-		String responseBody = responseJSON.toString(4);
+		catch(NoUserRegisteredException e)
+		{
+			statusCode = HttpStatus.UNAUTHORIZED;		
+			response.put(JsonKey.MESSAGE, ConstantString.UNAUTHORIZED);
+			response.put(JsonKey.SUCCESS, false);	
+		}
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		String responseBody = response.toString(4);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
@@ -451,9 +495,8 @@ public class ServerWebManager {
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
 		byte[] responseBody = "".getBytes();
-		HttpStatus statusCode = HttpStatus.OK;
-		
-		String message = Utility.date("yyyy-MM-dd HH:mm:ss.SSS")+" This page uses the non standard property “zoom”. Consider using calc() in the relevant property values, or using “transform” along with “transform-origin: 0 0...";
+		HttpStatus statusCode = HttpStatus.OK;		
+		String message = "";
 		this.broardcastWebSocket(message);
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
@@ -693,6 +736,7 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+	
 	@GetMapping(path="/api-setting/get")
 	public ResponseEntity<byte[]> handleAPISetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -725,8 +769,6 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
-	
 	
 	@GetMapping(path="/email-setting/get")
 	public ResponseEntity<byte[]> handleEmailSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)

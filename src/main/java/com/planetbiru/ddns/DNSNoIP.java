@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
@@ -15,8 +13,6 @@ import com.planetbiru.util.Utility;
 
 public class DNSNoIP extends DNS{
 	
-	private static final Logger logger = LoggerFactory.getLogger(DNSNoIP.class);
-
 	private String email = "";
 	private String username = "";
 	private String endpoint = "https://dynupdate.no-ip.com/nic/update";

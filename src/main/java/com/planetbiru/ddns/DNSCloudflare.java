@@ -59,13 +59,12 @@ public class DNSCloudflare extends DNS{
 		{
 			JSONObject obj = new JSONObject(params);
 			body = obj.toString();
-		}
-		
+		}	
 		return this.httpExchange(method, endpoint, headers, body, timeout);
-	}
+	}	
 	
-	
-	public JSONObject createZoneIfNotExists(DDNSRecord ddnsRecord) {
+	public JSONObject createZoneIfNotExists(DDNSRecord ddnsRecord) 
+	{
 		if(this.getZone(ddnsRecord.getZone()) == null)
 		{
 			return this.createZone(ddnsRecord);
@@ -259,9 +258,6 @@ public class DNSCloudflare extends DNS{
 		String body = json.toString();
 		int timeout = 1000;
 		ResponseEntityCustom response = httpExchange(HttpMethod.POST, url, requestHeaders, body, timeout);
-				
-		logger.info("Create Record Result {}", response.getBody());
-		
 		JSONObject resp = new JSONObject(response.getBody());
 		return resp.optJSONObject(DDNSKey.RESULT);
 	}
@@ -279,7 +275,6 @@ public class DNSCloudflare extends DNS{
 		}
 		if(zone.has("id"))
 		{
-			logger.info("Zone Info {}", zone);
 			String zoneId = zone.optString("id", "");
 			String recordName = ddnsRecord.getRecordName().trim();
 			boolean proxied = ddnsRecord.isProxied();

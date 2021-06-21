@@ -115,7 +115,7 @@ public class MailUtil {
         return sent;
 	}
 	
-	public boolean send(String to, String subject, String message, String from, String contentType, List<String> files) throws MessagingException
+	public boolean send(String to, String subject, String message, String from, String contentType, List<String> files) throws MessagingException, IOException
 	{
  		boolean sent = false;
 
@@ -139,15 +139,10 @@ public class MailUtil {
 				multipart.addBodyPart(messageBodyPart);
 		
 				MimeBodyPart attachPart = new MimeBodyPart();
-				try {
-					attachPart.attachFile(path);
-					multipart.addBodyPart(attachPart);
-					mimeMessage.setContent(multipart);
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (MessagingException e) {
-					e.printStackTrace();
-				}
+				attachPart.attachFile(path);
+				multipart.addBodyPart(attachPart);
+				mimeMessage.setContent(multipart);
+				
 			}
 		}
 

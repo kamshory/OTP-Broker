@@ -82,6 +82,7 @@ public class JsonKey {
 	public static final String VALUE                         = "value";
 	public static final String SEND_INCOMMING_SMS            = "sendIncommingSMS";
 	public static final String ADD                           = "add";
+	public static final String SUCCESS                       = "success";
 	
 	private JsonKey()
 	{
