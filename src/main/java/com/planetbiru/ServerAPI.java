@@ -105,6 +105,12 @@ public class ServerAPI {
 	@Value("${otpbroker.default.smtp.auth}")
 	private String defaultSMTPAuth;
 
+	@Value("${otpbroker.default.smtp.ssl}")
+	private String defaultSMTPSSLEnable;
+
+	@Value("${otpbroker.default.smtp.starttls}")
+	private String defaultStarttlsEnable;
+
 
 	@PostConstruct
 	public void init()
@@ -114,6 +120,9 @@ public class ServerAPI {
 		Config.setDefaultSMTPUsername(defaultSMTPUsername);
 		Config.setDefaultSMTPPassword(defaultSMTPPassword);
 		Config.setDefaultSMTPAuth(defaultSMTPAuth);
+		Config.setDefaultSMTPSSLEnable(defaultSMTPSSLEnable);
+		Config.setDefaultStarttlsEnable(defaultStarttlsEnable);
+
 		
 		this.loadConfigHttp();
 		this.loadConfigEmail();

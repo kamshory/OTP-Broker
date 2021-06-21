@@ -144,6 +144,7 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		
 		Config.setKeystoreDataSettingPath(keystoreDataSettingPath);
 		Config.setKeystoreSettingPath(keystoreSettingPath);
 		
@@ -189,6 +190,7 @@ public class ServerWebManager {
 			 * Do nothing	
 			 */
 		}	
+		
 		
 		
 	}
@@ -279,6 +281,7 @@ public class ServerWebManager {
 					this.broardcastWebSocket(result);
 					response.put(JsonKey.SUCCESS, false);
 				}
+				this.broardcastWebSocket(result);
 				response.put(JsonKey.MESSAGE, result);
 			}
 			else
@@ -2148,7 +2151,7 @@ public class ServerWebManager {
 		Map<String, String> query = Utility.parseURLEncoded(requestBody);
 		if(query.containsKey("save_email_setting"))
 		{
-			ConfigAPI.load(Config.getEmailSettingPath());
+			ConfigEmail.load(Config.getEmailSettingPath());
 			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
 			String lMailHost = query.getOrDefault("smtp_host", "").trim();
 	
@@ -2162,6 +2165,7 @@ public class ServerWebManager {
 			}
 			boolean lMailSSL = query.getOrDefault("ssl", "").trim().equals("1");
 			boolean lMailStartTLS = query.getOrDefault("start_tls", "").trim().equals("1");
+			boolean active = query.getOrDefault("active", "").trim().equals("1");
 			
 			JSONObject config = new JSONObject();
 			
@@ -2172,8 +2176,9 @@ public class ServerWebManager {
 			config.put("mailSenderPassword", lMailSenderPassword);
 			config.put("mailSSL", lMailSSL);
 			config.put("mailStartTLS", lMailStartTLS);
+			config.put("mailActive", active);
 			
-			ConfigAPI.save(Config.getEmailSettingPath(), config);
+			ConfigEmail.save(Config.getEmailSettingPath(), config);
 		}	
 	}
 	

@@ -46,6 +46,9 @@ public class Config {
 	private static String defaultSMTPUsername = "";
 	private static String defaultSMTPPassword = "";
 	private static String defaultSMTPAuth = "false";
+	private static String defaultSMTPEnable = "false";
+	private static String defaultStarttlsEnable = "false";
+	private static String defaultSMTPSSLEnable = "false";
 	
 	private Config()
 	{
@@ -433,6 +436,36 @@ public class Config {
 
 	public static void setDefaultSMTPAuth(String defaultSMTPAuth) {
 		Config.defaultSMTPAuth = defaultSMTPAuth;
+	}
+
+
+	public static String getDefaultSMTPEnable() {
+		return defaultSMTPEnable;
+	}
+
+
+	public static void setDefaultSMTPEnable(String defaultSMTPEnable) {
+		Config.defaultSMTPEnable = defaultSMTPEnable;
+	}
+
+
+	public static String getDefaultStarttlsEnable() {
+		return defaultStarttlsEnable;
+	}
+
+
+	public static void setDefaultStarttlsEnable(String defaultStarttlsEnable) {
+		Config.defaultStarttlsEnable = defaultStarttlsEnable;
+	}
+
+
+	public static String getDefaultSMTPSSLEnable() {
+		return defaultSMTPSSLEnable;
+	}
+
+
+	public static void setDefaultSMTPSSLEnable(String defaultSMTPSSLEnable) {
+		Config.defaultSMTPSSLEnable = defaultSMTPSSLEnable;
 	}
 
 

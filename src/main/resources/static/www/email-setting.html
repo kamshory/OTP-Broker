@@ -97,8 +97,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>SSL</td>
-                            <td><label><input type="checkbox" name="ssl" id="ssl" value="1"> Using SSL</label>
+                            <td>SSL Enable</td>
+                            <td><label><input type="checkbox" name="ssl" id="ssl" value="1"> Enable</label>
                             </td>
                         </tr>
                         <tr>
@@ -117,8 +117,13 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Sender Password</td>
-                            <td><input type="password" name="sender_password" id="sender_password" value="">
+                        <td>Sender Password</td>
+                        <td><input type="password" name="sender_password" id="sender_password" value="">
+                        </td>
+                        </tr>
+                        <tr>
+                            <td>Active</td>
+                            <td><label><input type="checkbox" name="active" id="active" value="1"> Active</label>
                             </td>
                         </tr>
                         
@@ -150,6 +155,7 @@
                             $('input[name="mail_auth"]').prop("checked", data.mailAuth);
                             $('input[name="ssl"]').prop("checked", data.mailSSL);
                             $('input[name="start_tls"]').prop("checked", data.mailStartTLS);
+                            $('input[name="active"]').prop("checked", data.mailActive);
                         }
                     });
                 });
