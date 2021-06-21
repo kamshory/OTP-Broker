@@ -131,11 +131,6 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
 	
-	@Value("${otpbroker.path.setting.keystore}")
-	private String keystoreSettingPath;
-	
-	@Value("${otpbroker.path.setting.keystore.data}")
-	private String keystoreDataSettingPath;
 	
 	private ServerWebManager()
     {
@@ -144,8 +139,6 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{		
-		Config.setKeystoreDataSettingPath(keystoreDataSettingPath);
-		Config.setKeystoreSettingPath(keystoreSettingPath);
 		
 		Config.setDeviceName(deviceName);
 		Config.setDeviceVersion(deviceVersion);
@@ -1701,7 +1694,8 @@ public class ServerWebManager {
 				} 
 				catch (FileNotFoundException e1) 
 				{
-					e1.printStackTrace();
+					logger.error(e1.getMessage());
+					//e1.printStackTrace();
 				}
 			}
 		}
@@ -2345,7 +2339,8 @@ public class ServerWebManager {
 				catch (GSMException e) 
 				{
 					this.broardcastWebSocket(e.getMessage());
-					e.printStackTrace();
+					logger.error(e.getMessage());
+					//e.printStackTrace();
 				}
 			}
 		}		

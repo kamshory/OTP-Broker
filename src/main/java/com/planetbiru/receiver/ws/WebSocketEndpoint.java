@@ -8,6 +8,8 @@ import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +19,7 @@ import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.ServerInfo;
 
 public class WebSocketEndpoint extends Endpoint {
+	private static Logger logger = LogManager.getLogger(WebSocketEndpoint.class);
 	private WebSocketClient webSocketClient;
 	private Session session;
 	public WebSocketEndpoint(WebSocketClient webSocketClient) {
@@ -66,7 +69,8 @@ public class WebSocketEndpoint extends Endpoint {
 		}
 		catch(JSONException e)
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 	}
 	
@@ -81,7 +85,8 @@ public class WebSocketEndpoint extends Endpoint {
 			} 
 			catch (GSMException e) 
 			{
-				e.printStackTrace();
+				logger.error(e.getMessage());
+				//e.printStackTrace();
 			}
 		}
 	}

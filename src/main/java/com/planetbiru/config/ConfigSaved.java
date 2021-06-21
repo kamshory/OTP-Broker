@@ -10,7 +10,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class ConfigSaved {
+	private static Logger logger = LogManager.getLogger(ConfigSaved.class);
+	
 	private Pattern mSection = Pattern.compile("\\s*\\[([^]]*)\\]\\s*");
 	private Pattern mKeyValue = Pattern.compile("\\s*([^=]*)=(.*)");
 	private Map <String, Map<String, String>> mEntries = new HashMap<>();

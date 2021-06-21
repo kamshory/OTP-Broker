@@ -8,9 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 
 public class FileUtil {
+	private static Logger logger = LogManager.getLogger(FileUtil.class);
 	private FileUtil()
 	{
 		
@@ -34,8 +37,9 @@ public class FileUtil {
 		 } 
 		 catch (IOException ex) 
 		 {
-			 ex.printStackTrace();
-			 throw new FileNotFoundException(ex);
+			logger.error(ex.getMessage());
+			//ex.printStackTrace();
+			throw new FileNotFoundException(ex);
 		 }
 		 return allBytes;
 	}

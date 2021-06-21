@@ -3,6 +3,8 @@ package com.planetbiru.config;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.amqp.AmqpException;
@@ -20,7 +22,8 @@ import com.planetbiru.util.Utility;
 
 public class ConfigFeederAMQP {
 
-
+	private static Logger logger = LogManager.getLogger(ConfigFeederAMQP.class);
+	
 	private static boolean feederAmqpEnable = false;
 	private static boolean feederAmqpSSL = false;
 	private static String feederAmqpAddress = "";
@@ -98,7 +101,8 @@ public class ConfigFeederAMQP {
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 	}
 	public static void load(String path)

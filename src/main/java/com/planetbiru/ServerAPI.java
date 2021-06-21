@@ -38,9 +38,6 @@ public class ServerAPI {
 
 	private Logger logger = LogManager.getLogger(ServerAPI.class);
 	
-	private String keystorePassword = "4lt0@1234!";
-	private String keystoreFile = "C:/static/keystore.jks";
-	
 	@Value("${otpbroker.path.setting.api.service}")
 	private String apiSettingPath;
 
@@ -112,9 +109,23 @@ public class ServerAPI {
 	private String defaultStarttlsEnable;
 
 
+	@Value("${otpbroker.path.setting.keystore.data}")
+	private String keystoreDataSettingPath;
+	
+	@Value("${otpbroker.path.setting.keystore}")
+	private String keystoreSettingPath;
+
+	@Value("${otpbroker.path.base.setting}")
+	private String baseDirConfig;
+	
+	
+
 	@PostConstruct
 	public void init()
 	{
+
+		Config.setBaseDirConfig(baseDirConfig);
+
 		Config.setDefaultSMTPHost(defaultSMTPHost);
 		Config.setDefaultSMTPPort(defaultSMTPPort);
 		Config.setDefaultSMTPUsername(defaultSMTPUsername);
@@ -122,6 +133,8 @@ public class ServerAPI {
 		Config.setDefaultSMTPAuth(defaultSMTPAuth);
 		Config.setDefaultSMTPSSLEnable(defaultSMTPSSLEnable);
 		Config.setDefaultStarttlsEnable(defaultStarttlsEnable);
+		Config.setKeystoreDataSettingPath(keystoreDataSettingPath);
+		Config.setKeystoreSettingPath(keystoreSettingPath);
 
 		
 		this.loadConfigHttp();
@@ -150,7 +163,6 @@ public class ServerAPI {
 	private void loadConfigEmail()
 	{
 		Config.setEmailSettingPath(emailSettingPath);
-		
 		ConfigEmail.setMailSenderAddress(mailSenderAddress);
 		ConfigEmail.setMailSenderPassword(mailSenderPassword);
 		ConfigEmail.setMailAuth(mailAuth);
@@ -166,59 +178,60 @@ public class ServerAPI {
 	}	
 	
 	private void initHttps() {
+		
+		
 		if(ConfigAPI.isHttpsEnable())
 		{
-			ConfigKeystore.load(Config.getKeystoreDataSettingPath());
-			try {
+			ConfigKeystore.load(Config.getKeystoreSettingPath());
+			
+			boolean started = false;
+			try 
+			{
 				DataKeystore keystore = ConfigKeystore.getActiveKeystore();
-				keystoreFile = keystore.getFullPath();
-				keystorePassword = keystore.getFilePassword();
-				try {
+				String keystoreFile = keystore.getFullPath();
+				String keystorePassword = keystore.getFilePassword();
+				try (FileInputStream fileInputStream = new FileInputStream(keystoreFile))
+				{
 					HttpsServer httpsServer = HttpsServer.create(new InetSocketAddress(ConfigAPI.getHttpsPort()), 0);
 					ServiceHTTP.setHttpsServer(httpsServer);
-					try (FileInputStream fileInputStream = new FileInputStream(keystoreFile))
-					{
-						char[] password = keystorePassword.toCharArray();
-					    KeyStore keyStore;
-						keyStore = KeyStore.getInstance("JKS");	
-						SSLContext sslContext = SSLContext.getInstance("TLS");
-						keyStore.load(fileInputStream, password);
-					    KeyManagerFactory keyManagementFactory = KeyManagerFactory.getInstance("SunX509");
-					    keyManagementFactory.init (keyStore, password);
-					    TrustManagerFactory trustFactory = TrustManagerFactory.getInstance("SunX509");
-					    trustFactory.init(keyStore);
-					    sslContext.init(keyManagementFactory.getKeyManagers(), trustFactory.getTrustManagers(), null);		
-						HttpsConfigurator httpsConfigurator = new HttpsConfigurator(sslContext);
-						ServiceHTTP.getHttpsServer().setHttpsConfigurator(httpsConfigurator);		
-				        ServiceHTTP.getHttpsServer().createContext(ConfigAPI.getMessagePath(), new HandlerAPIMessage());
-				        ServiceHTTP.getHttpsServer().start();
-					} 
-					catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException | UnrecoverableKeyException e) 
-					{
-						logger.info(e.getMessage());
-					}
-				} catch (IOException e1) {
-					logger.info(e1.getMessage());
-				}	
-				
-			} catch (KeyStoreException e2) {
-				e2.printStackTrace();
-				HttpsServer httpsServer;
-				try {
-					httpsServer = HttpsServer.create(new InetSocketAddress(8899), 0);
-					ServiceHTTP.setHttpsServer(httpsServer);
-					ServiceHTTP.getHttpsServer().createContext("/", new HandlerAPIMessage());
+					char[] password = keystorePassword.toCharArray();
+				    KeyStore keyStore;
+					keyStore = KeyStore.getInstance("JKS");	
+					SSLContext sslContext = SSLContext.getInstance("TLS");
+					keyStore.load(fileInputStream, password);
+				    KeyManagerFactory keyManagementFactory = KeyManagerFactory.getInstance("SunX509");
+				    keyManagementFactory.init (keyStore, password);
+				    TrustManagerFactory trustFactory = TrustManagerFactory.getInstance("SunX509");
+				    trustFactory.init(keyStore);
+				    sslContext.init(keyManagementFactory.getKeyManagers(), trustFactory.getTrustManagers(), null);		
+					HttpsConfigurator httpsConfigurator = new HttpsConfigurator(sslContext);
+					ServiceHTTP.getHttpsServer().setHttpsConfigurator(httpsConfigurator);		
+			        ServiceHTTP.getHttpsServer().createContext(ConfigAPI.getMessagePath(), new HandlerAPIMessage());
 			        ServiceHTTP.getHttpsServer().start();
+			        started = true;
 				} 
-				catch (IOException e) 
+				catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException | UnrecoverableKeyException e) 
 				{
-				}
+					started = false;
+					logger.info(e.getMessage());
+				}			
+			} 
+			catch (KeyStoreException e2) 
+			{
+				started = false;
+				logger.error(e2.getMessage());
 			}
-				
-			
-			
+			if(!started)
+			{
+				if(ServiceHTTP.getHttpsServer() != null)
+				{
+					ServiceHTTP.getHttpsServer().stop(0);
+				}
+				ServiceHTTP.setHttpsServer(null);
+			}
 		}	
 	}
+	
 	
 	private void initHttp() {
 		if(ConfigAPI.isHttpsEnable())
@@ -231,7 +244,7 @@ public class ServerAPI {
 			} 
 			catch (IOException e) 
 			{
-				logger.info(e.getMessage());
+				logger.error(e.getMessage());
 			}
 		}		
 	}

@@ -7,17 +7,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class ProcessKiller {
 
+	private Logger logger = LogManager.getLogger(FileUtil.class);
 	/**
 	 * Image name of this application
 	 */
-	public String path = "";	
+	private String path = "";	
 	/**
 	 * Flag to keep. false to kill all processes. true to kill all processes except the current process
 	 */
-	public boolean exceptThis = false;
+	private boolean exceptThis = false;
 	
 	/**
 	 * Default constructor 
@@ -139,12 +143,14 @@ public class ProcessKiller {
 	        } 
 			catch (Throwable t)
 	        {
-	            t.printStackTrace();
+				logger.error(t.getMessage());
+	            //t.printStackTrace();
 	        }
 		} 
 		catch (Exception e) 
 		{
-		    e.printStackTrace();
+			logger.error(e.getMessage());
+		    //e.printStackTrace();
 		}		
 	}
 	private void killProcessWindow(String commandLine) {
@@ -207,7 +213,8 @@ public class ProcessKiller {
         } 
 		catch (Throwable t)
         {
-            t.printStackTrace();
+			logger.error(t.getMessage());
+            //t.printStackTrace();
         }
 		
 	}

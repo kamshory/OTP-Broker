@@ -40,7 +40,8 @@ public class DNS {
 		} 
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			//e.printStackTrace();
 		}
 		return ip;
 	}

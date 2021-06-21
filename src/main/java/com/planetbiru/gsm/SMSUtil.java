@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.DataModem;
 
 public class SMSUtil {
 	
+	private static Logger logger = LogManager.getLogger(SMSUtil.class);
 	private static final String NO_DEVICE_CONNECTED = "No device connected";
 	private static boolean initialized = false;
 	private static List<SMSInstance> smsInstance = new ArrayList<>();
@@ -38,8 +42,11 @@ public class SMSUtil {
 					instance.setConnected(true);
 					modem.setConnected(true);
 				}
-			} catch (GSMException e) {
-				e.printStackTrace();
+			} 
+			catch (GSMException e) 
+			{
+				logger.error(e.getMessage());
+				//e.printStackTrace();
 			}
 			
 			SMSUtil.smsInstance.add(instance);

@@ -1150,7 +1150,8 @@ public class Utility {
 			} 
 	        catch (UnsupportedEncodingException e) 
 	        {
-				e.printStackTrace();
+				logger.error(e.getMessage());
+				//e.printStackTrace();
 			}
 	        index++;
 	    }

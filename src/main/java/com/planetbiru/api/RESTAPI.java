@@ -1,5 +1,6 @@
 package com.planetbiru.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import com.planetbiru.user.APIUserAccount;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.Utility;
 import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
 
 public class RESTAPI {
 	private RESTAPI()
@@ -193,6 +195,36 @@ public class RESTAPI {
 				 */
 			}
 		}		
+	}
+	
+	public static byte[] getRequestBody(HttpExchange httpExchange)
+	{
+        Headers requestHeaders = httpExchange.getRequestHeaders();
+		String cl = requestHeaders.getFirst("Content-length");
+		byte[] requestBody = "".getBytes();
+        if(cl != null)
+        {
+            try
+            {
+	            int contentLength = Utility.atoi(cl);	
+	            requestBody = new byte[contentLength];
+	            for(int j = 0; j < contentLength; j++)
+	            {
+	            	requestBody[j] = (byte) httpExchange.getRequestBody().read();
+	            }
+            }
+            catch(NumberFormatException | IOException e)
+            {
+            	/**
+            	 * Do nothing
+            	 */
+            }
+            return requestBody;
+        }
+        else
+        {
+        	return "".getBytes();
+        }
 	}
 	
 }

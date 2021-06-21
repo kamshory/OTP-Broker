@@ -22,7 +22,7 @@ import com.planetbiru.receiver.amqp.RabbitMQReceiver;
 public class ClientReceiverAMQP {
 
 	@Value("${otpbroker.rabbitmq.username}")
-	String username;
+	private String username;
 
 	@Value("${otpbroker.rabbitmq.password}")
 	private String password;

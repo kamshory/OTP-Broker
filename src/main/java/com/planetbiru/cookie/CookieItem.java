@@ -106,7 +106,7 @@ public class CookieItem {
 		} 
 		catch (EncoderException e) 
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		builder.append(this.name+"="+encodedValue);
 		if(this.domain != null && !domain.isEmpty())
@@ -134,4 +134,5 @@ public class CookieItem {
 		return builder.toString();
 	}
 
+	
 }
