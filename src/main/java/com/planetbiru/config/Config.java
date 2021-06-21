@@ -41,6 +41,14 @@ public class Config {
 	private static String deviceVersion = "version 1.0";
 	private static String keystoreSettingPath = "";
 	private static String keystoreDataSettingPath = "";
+	private static String defaultSMTPHost = "localhost";
+	private static String defaultSMTPPort = "25";
+	private static String defaultSMTPUsername = "";
+	private static String defaultSMTPPassword = "";
+	private static String defaultSMTPAuth = "false";
+	private static String defaultSMTPEnable = "false";
+	private static String defaultStarttlsEnable = "false";
+	private static String defaultSMTPSSLEnable = "false";
 	
 	private Config()
 	{
@@ -378,6 +386,86 @@ public class Config {
 
 	public static void setKeystoreDataSettingPath(String keystoreDataSettingPath) {
 		Config.keystoreDataSettingPath = keystoreDataSettingPath;
+	}
+
+
+	public static String getDefaultSMTPHost() {
+		return defaultSMTPHost;
+	}
+
+
+	public static void setDefaultSMTPHost(String defaultSMTPHost) {
+		Config.defaultSMTPHost = defaultSMTPHost;
+	}
+
+
+	public static String getDefaultSMTPPort() {
+		return defaultSMTPPort;
+	}
+
+
+	public static void setDefaultSMTPPort(String defaultSMTPPort) {
+		Config.defaultSMTPPort = defaultSMTPPort;
+	}
+
+
+	public static String getDefaultSMTPUsername() {
+		return defaultSMTPUsername;
+	}
+
+
+	public static void setDefaultSMTPUsername(String defaultSMTPUsername) {
+		Config.defaultSMTPUsername = defaultSMTPUsername;
+	}
+
+
+	public static String getDefaultSMTPPassword() {
+		return defaultSMTPPassword;
+	}
+
+
+	public static void setDefaultSMTPPassword(String defaultSMTPPassword) {
+		Config.defaultSMTPPassword = defaultSMTPPassword;
+	}
+
+
+	public static String getDefaultSMTPAuth() {
+		return defaultSMTPAuth;
+	}
+
+
+	public static void setDefaultSMTPAuth(String defaultSMTPAuth) {
+		Config.defaultSMTPAuth = defaultSMTPAuth;
+	}
+
+
+	public static String getDefaultSMTPEnable() {
+		return defaultSMTPEnable;
+	}
+
+
+	public static void setDefaultSMTPEnable(String defaultSMTPEnable) {
+		Config.defaultSMTPEnable = defaultSMTPEnable;
+	}
+
+
+	public static String getDefaultStarttlsEnable() {
+		return defaultStarttlsEnable;
+	}
+
+
+	public static void setDefaultStarttlsEnable(String defaultStarttlsEnable) {
+		Config.defaultStarttlsEnable = defaultStarttlsEnable;
+	}
+
+
+	public static String getDefaultSMTPSSLEnable() {
+		return defaultSMTPSSLEnable;
+	}
+
+
+	public static void setDefaultSMTPSSLEnable(String defaultSMTPSSLEnable) {
+		Config.defaultSMTPSSLEnable = defaultSMTPSSLEnable;
 	}
 
 

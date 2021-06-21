@@ -25,6 +25,8 @@ import com.planetbiru.api.HandlerAPIMessage;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigEmail;
+import com.planetbiru.config.ConfigKeystore;
+import com.planetbiru.config.DataKeystore;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.ServiceHTTP;
 import com.sun.net.httpserver.HttpServer;
@@ -87,10 +89,41 @@ public class ServerAPI {
 	@Value("${otpbroker.api.path.unblock}")
 	private String unblockinPath;
 
+	
+	@Value("${otpbroker.default.smtp.host}")
+	private String defaultSMTPHost;
+	
+	@Value("${otpbroker.default.smtp.port}")
+	private String defaultSMTPPort;
+	
+	@Value("${otpbroker.default.smtp.user}")
+	private String defaultSMTPUsername;
+
+	@Value("${otpbroker.default.smtp.password}")
+	private String defaultSMTPPassword;
+
+	@Value("${otpbroker.default.smtp.auth}")
+	private String defaultSMTPAuth;
+
+	@Value("${otpbroker.default.smtp.ssl}")
+	private String defaultSMTPSSLEnable;
+
+	@Value("${otpbroker.default.smtp.starttls}")
+	private String defaultStarttlsEnable;
+
 
 	@PostConstruct
 	public void init()
 	{
+		Config.setDefaultSMTPHost(defaultSMTPHost);
+		Config.setDefaultSMTPPort(defaultSMTPPort);
+		Config.setDefaultSMTPUsername(defaultSMTPUsername);
+		Config.setDefaultSMTPPassword(defaultSMTPPassword);
+		Config.setDefaultSMTPAuth(defaultSMTPAuth);
+		Config.setDefaultSMTPSSLEnable(defaultSMTPSSLEnable);
+		Config.setDefaultStarttlsEnable(defaultStarttlsEnable);
+
+		
 		this.loadConfigHttp();
 		this.loadConfigEmail();
 
@@ -135,32 +168,55 @@ public class ServerAPI {
 	private void initHttps() {
 		if(ConfigAPI.isHttpsEnable())
 		{
+			ConfigKeystore.load(Config.getKeystoreDataSettingPath());
 			try {
-				ServiceHTTP.setHttpsServer(HttpsServer.create(new InetSocketAddress(ConfigAPI.getHttpsPort()), 0));
-				try (FileInputStream fileInputStream = new FileInputStream(keystoreFile))
-				{
-					char[] password = keystorePassword.toCharArray();
-				    KeyStore keyStore;
-					keyStore = KeyStore.getInstance("JKS");	
-					SSLContext sslContext = SSLContext.getInstance("TLS");
-					keyStore.load(fileInputStream, password);
-				    KeyManagerFactory keyManagementFactory = KeyManagerFactory.getInstance("SunX509");
-				    keyManagementFactory.init (keyStore, password);
-				    TrustManagerFactory trustFactory = TrustManagerFactory.getInstance("SunX509");
-				    trustFactory.init(keyStore);
-				    sslContext.init(keyManagementFactory.getKeyManagers(), trustFactory.getTrustManagers(), null);		
-					HttpsConfigurator httpsConfigurator = new HttpsConfigurator(sslContext);
-					ServiceHTTP.getHttpsServer().setHttpsConfigurator(httpsConfigurator);		
-			        ServiceHTTP.getHttpsServer().createContext(ConfigAPI.getMessagePath(), new HandlerAPIMessage());
+				DataKeystore keystore = ConfigKeystore.getActiveKeystore();
+				keystoreFile = keystore.getFullPath();
+				keystorePassword = keystore.getFilePassword();
+				try {
+					HttpsServer httpsServer = HttpsServer.create(new InetSocketAddress(ConfigAPI.getHttpsPort()), 0);
+					ServiceHTTP.setHttpsServer(httpsServer);
+					try (FileInputStream fileInputStream = new FileInputStream(keystoreFile))
+					{
+						char[] password = keystorePassword.toCharArray();
+					    KeyStore keyStore;
+						keyStore = KeyStore.getInstance("JKS");	
+						SSLContext sslContext = SSLContext.getInstance("TLS");
+						keyStore.load(fileInputStream, password);
+					    KeyManagerFactory keyManagementFactory = KeyManagerFactory.getInstance("SunX509");
+					    keyManagementFactory.init (keyStore, password);
+					    TrustManagerFactory trustFactory = TrustManagerFactory.getInstance("SunX509");
+					    trustFactory.init(keyStore);
+					    sslContext.init(keyManagementFactory.getKeyManagers(), trustFactory.getTrustManagers(), null);		
+						HttpsConfigurator httpsConfigurator = new HttpsConfigurator(sslContext);
+						ServiceHTTP.getHttpsServer().setHttpsConfigurator(httpsConfigurator);		
+				        ServiceHTTP.getHttpsServer().createContext(ConfigAPI.getMessagePath(), new HandlerAPIMessage());
+				        ServiceHTTP.getHttpsServer().start();
+					} 
+					catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException | UnrecoverableKeyException e) 
+					{
+						logger.info(e.getMessage());
+					}
+				} catch (IOException e1) {
+					logger.info(e1.getMessage());
+				}	
+				
+			} catch (KeyStoreException e2) {
+				e2.printStackTrace();
+				HttpsServer httpsServer;
+				try {
+					httpsServer = HttpsServer.create(new InetSocketAddress(8899), 0);
+					ServiceHTTP.setHttpsServer(httpsServer);
+					ServiceHTTP.getHttpsServer().createContext("/", new HandlerAPIMessage());
 			        ServiceHTTP.getHttpsServer().start();
 				} 
-				catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException | UnrecoverableKeyException e) 
+				catch (IOException e) 
 				{
-					logger.info(e.getMessage());
 				}
-			} catch (IOException e1) {
-				logger.info(e1.getMessage());
-			}	
+			}
+				
+			
+			
 		}	
 	}
 	

@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
@@ -23,6 +24,7 @@ public class ConfigEmail {
 	private static boolean mailSSL = false;
 	private static String mailHost = "";
 	private static int mailPort = 587;
+	private static boolean mailActive = false;
 	public static String getMailSenderAddress() {
 		return mailSenderAddress;
 	}
@@ -91,6 +93,7 @@ public class ConfigEmail {
 					boolean lMailSSL = json.optBoolean("mailSSL", false);
 					String lMailHost = json.optString("mailHost", "");
 					int lMailPort = json.optInt("mailPort", 0);
+					boolean lMailActive = json.optBoolean("mailActive", false);
 					
 					ConfigEmail.mailSenderAddress = lMailSenderAddress;
 					ConfigEmail.mailSenderPassword = lMailSenderPassword;
@@ -99,6 +102,7 @@ public class ConfigEmail {
 					ConfigEmail.mailSSL = lMailSSL;
 					ConfigEmail.mailHost = lMailHost;
 					ConfigEmail.mailPort = lMailPort;
+					ConfigEmail.setMailActive(lMailActive);
 				}
 			}
 		} 
@@ -167,7 +171,14 @@ public class ConfigEmail {
 		config.put("mailSenderPassword", ConfigEmail.mailSenderPassword);
 		config.put("mailSSL", ConfigEmail.mailSSL);
 		config.put("mailStartTLS", ConfigEmail.mailStartTLS);
+		config.put("mailActive", ConfigEmail.isMailActive());
 		return config;
+	}
+	public static boolean isMailActive() {
+		return mailActive;
+	}
+	public static void setMailActive(boolean mailActive) {
+		ConfigEmail.mailActive = mailActive;
 	}
 	
 	

@@ -2,13 +2,16 @@ package com.planetbiru.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyStoreException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
@@ -179,6 +182,16 @@ public class ConfigKeystore {
 		}		
 		
 		
+	}
+
+	public static DataKeystore getActiveKeystore() throws KeyStoreException {
+		for (Entry<String, DataKeystore> entry : ConfigKeystore.keystores.entrySet()) {
+			if(entry.getValue().isActive())
+			{
+				return entry.getValue();
+			}
+	    }
+		throw new KeyStoreException("No active keystore found");
 	}
 
 	

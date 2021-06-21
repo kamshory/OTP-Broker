@@ -1,5 +1,7 @@
 package com.planetbiru.constant;
 
+import java.util.Collection;
+
 public class ConstantString {
 	
 	public static final String SQL_FULL_FORMAT               = "yyyy-MM-dd HH:mm:ss";
@@ -32,6 +34,7 @@ public class ConstantString {
 	public static final String SERIAL_PORT_NULL              = "Serial port is null";
 	public static final String MODEM_NOT_CONNECTED           = "Modem is not connected";
 	public static final String URL_ENCODE                    = "application/x-www-form-urlencoded";
+	public static final String UNAUTHORIZED                  = "Unauthorized";
 	
 	private ConstantString()
 	{

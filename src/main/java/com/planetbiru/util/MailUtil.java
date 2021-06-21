@@ -17,6 +17,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigEmail;
 
 public class MailUtil {
@@ -29,6 +30,8 @@ public class MailUtil {
     private boolean ssl = false;
     private boolean starttls = true;   
     private boolean debug = false;
+    private boolean active = false;
+    
     public MailUtil(String smtpHost, int smtpPort, String smtpUser, String smtpPassword, boolean ssl, boolean starttls, boolean debug)
     {
     	this.smtpHost = smtpHost;
@@ -38,9 +41,10 @@ public class MailUtil {
     	this.ssl = ssl;
     	this.starttls = starttls;
     	this.debug = debug;
+    	this.mailAuth = true;
+    	this.active = true;
     	this.init();
-    }
-    
+    }   
     
 	public MailUtil() {
 		this.smtpHost = ConfigEmail.getMailHost();
@@ -49,34 +53,54 @@ public class MailUtil {
     	this.smtpPassword = ConfigEmail.getMailSenderPassword();
     	this.ssl = ConfigEmail.isMailSSL();
     	this.starttls = ConfigEmail.isMailStartTLS();
+    	this.mailAuth = ConfigEmail.getMailAuth();
+    	this.active = ConfigEmail.isMailActive();
+    	this.init();
 	}
-
 
 	public void init()
 	{
-        Properties properties = System.getProperties();
-        properties.put("mail.smtp.host", this.smtpHost);
-        properties.put("mail.smtp.port", this.smtpPort);
+		Properties properties = new Properties();
+ 		if(this.active)
+        {
+ 			properties.put("mail.smtp.auth", Boolean.toString(this.mailAuth));
+	        if(this.starttls)
+ 			{
+	        	properties.put("mail.smtp.starttls.enable", Boolean.toString(this.starttls));
+ 			}
+	        if(this.ssl)
+ 			{
+	        	properties.put("mail.smtp.ssl.enable", Boolean.toString(this.ssl));
+ 			}
+ 			properties.put("mail.smtp.host", this.smtpHost);
+ 			properties.put("mail.smtp.port", Integer.toString(this.smtpPort));	
+	        properties.put("mail.smtp.socketFactory.port", this.smtpPort+"");
+        }
+        else
+        {
+        	properties.put("mail.smtp.host", Config.getDefaultSMTPHost());
+	        properties.put("mail.smtp.port", Config.getDefaultSMTPPort());
+	        properties.put("mail.smtp.auth", Config.getDefaultSMTPAuth());        
+	        if(this.ssl)
+ 			{
+	        	properties.put("mail.smtp.ssl.enable", Config.getDefaultSMTPSSLEnable());
+ 			}
+	        if(Config.getDefaultStarttlsEnable().equals("true"))
+	        {
+	        	properties.put("mail.smtp.starttls.enable", Config.getDefaultStarttlsEnable());        
+	        }
+	        this.smtpUser = Config.getDefaultSMTPUsername();
+	        this.smtpPassword = Config.getDefaultSMTPPassword();     
+        }
+ 		
+        String localSmtpUser = this.smtpUser;
+        String localSmtpPassword = this.smtpPassword;
         
-        if(this.ssl)
-        {
-        	properties.put("mail.smtp.ssl.enable", "true");
-        }
-        if(this.starttls)
-        {
-        	properties.put("mail.smtp.starttls.enable","true");
-        }
-
-        if(this.mailAuth)
-        {
-        	properties.put("mail.smtp.auth", "true");
-        }
-
         session = Session.getInstance(properties, new Authenticator() {
         	@Override
 			protected PasswordAuthentication getPasswordAuthentication() 
         	{
-                return new PasswordAuthentication(smtpUser, smtpPassword);
+                return new PasswordAuthentication(localSmtpUser, localSmtpPassword);
             }
         });
         session.setDebug(debug);
@@ -115,7 +139,41 @@ public class MailUtil {
         return sent;
 	}
 	
-	public boolean send(String to, String subject, String message, String from, String contentType, List<String> files) throws MessagingException
+	
+	public void sendmail(String to, String subject, String message, String contentType, String from, List<String> files) throws MessagingException, IOException 
+	{
+		
+		Message msg = new MimeMessage(session);
+		msg.setFrom(new InternetAddress(from, false));
+		
+		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+		msg.setSubject(subject);
+		msg.setContent(message, contentType);
+		msg.setSentDate(new Date());
+		
+		MimeBodyPart messageBodyPart = new MimeBodyPart();
+		messageBodyPart.setContent(message, contentType);
+		
+		Multipart multipart = new MimeMultipart();
+		multipart.addBodyPart(messageBodyPart);
+		
+		if(files != null)
+		{
+			for(int i = 0; i<files.size(); i++)
+			{
+				String path = files.get(i);
+				MimeBodyPart attachPart = new MimeBodyPart();
+				attachPart.attachFile(path);
+				multipart.addBodyPart(attachPart);
+				msg.setContent(multipart);
+				
+			}
+		}
+		
+		Transport.send(msg);  
+	}
+	
+	public boolean send(String to, String subject, String message, String from, String contentType, List<String> files) throws MessagingException, IOException
 	{
  		boolean sent = false;
 
@@ -139,15 +197,10 @@ public class MailUtil {
 				multipart.addBodyPart(messageBodyPart);
 		
 				MimeBodyPart attachPart = new MimeBodyPart();
-				try {
-					attachPart.attachFile(path);
-					multipart.addBodyPart(attachPart);
-					mimeMessage.setContent(multipart);
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (MessagingException e) {
-					e.printStackTrace();
-				}
+				attachPart.attachFile(path);
+				multipart.addBodyPart(attachPart);
+				mimeMessage.setContent(multipart);
+				
 			}
 		}
 

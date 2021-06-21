@@ -1,4 +1,4 @@
-package com.planetbiru.config;
+package com.planetbiru.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,10 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Collection;
-
-import com.planetbiru.util.FileNotFoundException;
-import com.planetbiru.util.OSUtil;
 import com.planetbiru.util.OSUtil.OS;
 
 public class FileConfigUtil {
@@ -18,6 +14,7 @@ public class FileConfigUtil {
 	{
 		
 	}
+	
 	public static byte[] read(String fileName) throws FileNotFoundException
 	{
 		byte[] allBytes = null;
@@ -40,7 +37,8 @@ public class FileConfigUtil {
 			 throw new FileNotFoundException(ex);
 		 }
 		 return allBytes;
-	 }
+	}
+	
 	public static void write(String fileName, byte[] data) throws IOException
 	{
 		try 

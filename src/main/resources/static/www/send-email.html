@@ -35,7 +35,7 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-			<span class="usb-device-symbol"></span>
+                    <span class="usb-device-symbol"></span>
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                         aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
@@ -82,86 +82,46 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>Email Setting</h3>
-            <form action="email-setting.html" method="post">
-                <table class="config-table config-table-connection">
-                    <tbody>
-                        <tr>
-                            <td>SMTP Host</td>
-                            <td><input type="text" name="smtp_host" id="smtp_host" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>SMTP Port</td>
-                            <td><input type="number" name="smtp_port" id="smtp_port" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>SSL Enable</td>
-                            <td><label><input type="checkbox" name="ssl" id="ssl" value="1"> Enable</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TLS</td>
-                            <td><label><input type="checkbox" name="start_tls" id="start_tls" value="1"> Start TLS Before Send</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Authentication</td>
-                            <td><label><input type="checkbox" name="mail_auth" id="mail_auth" value="1"> Use Authentication</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Sender Account</td>
-                            <td><input type="email" name="sender_address" id="sender_address" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                        <td>Sender Password</td>
-                        <td><input type="password" name="sender_password" id="sender_password" value="">
-                        </td>
-                        </tr>
-                        <tr>
-                            <td>Active</td>
-                            <td><label><input type="checkbox" name="active" id="active" value="1"> Active</label>
-                            </td>
-                        </tr>
-                        
-                        
-                        <tr>
-                            <td></td>
-                            <td>
-                                <input type="submit" class="btn btn-success" name="save_email_setting"
-                                    id="save_email_setting" value="Save">
-                                <input type="button" class="btn btn-primary" id="test_send_email" onclick="window.location='send-email.html'"
-                                    value="Test Send Email">
-                                <input type="reset" class="btn btn-default" value="Reset">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <form action="sms.html" method="POST" onsubmit="return processForm(this)">
+                <div class="receiver-area">
+                    <div class="input-label">Receiver</div>
+                    <input type="email" name="recipient" id="recipient" class="input-text">
+                </div>
 
+                <div class="receiver-area">
+                    <div class="input-label">Subject</div>
+                    <input type="text" name="subject" id="subject" class="input-text">
+                </div>
+
+                <div class="message-area">
+                    <div class="input-label">Message</div>
+                    <textarea class="text-message" name="message" id="message" cols="30" rows="10"
+                        maxlength="150"></textarea>
+                </div>
+                <div class="text-right">
+                    <input type="reset" class="btn btn-default" value="Reset">
+                    <input type="submit" class="btn btn-success" value="Send" name="send">
+                </div>
             </form>
-            <script type="text/javascript">
-                $(document).ready(function (e) {
+            <script>
+                function processForm(obj) {
+                    var recipient = $('#recipient').val();
+                    var subject = $('#subject').val();
+                    var message = $('#message').val();
                     $.ajax({
-                        type: "GET",
-                        url: "email-setting/get",
-                        dataType: "json",
+                        'type': 'POST',
+                        'url': 'api/email/',
+                        'data': { recipient: recipient, subject:subject, message: message, send: 'send' },
                         success: function (data) {
-                            $('input[name="smtp_host"]').val(data.mailHost);
-                            $('input[name="smtp_port"]').val(data.mailPort);
-                            $('input[name="sender_address"]').val(data.mailSenderAddress);
-                            $('input[name="mail_auth"]').prop("checked", data.mailAuth);
-                            $('input[name="ssl"]').prop("checked", data.mailSSL);
-                            $('input[name="start_tls"]').prop("checked", data.mailStartTLS);
-                            $('input[name="active"]').prop("checked", data.mailActive);
+                            console.log(data);
+                            //$('#recipient').val('');
+                            //$('#subject').val('');
+                            //$('#message').val('');
                         }
                     });
-                });
+                    return false;
+                }
             </script>
-
-
         </div>
         <!-- /container -->
     </div>

@@ -29,7 +29,6 @@ public class GSM {
     public GSM()
     {
     	logger.info("Constructor GSM called");
-    	//listPort();
     }  
    
     /**
@@ -52,22 +51,22 @@ public class GSM {
         int i = 0;
         byte[] bytes = at.getBytes();
         int written = this.serialPort.writeBytes(bytes, bytes.length);
-        System.out.println(written);
-        while ((result.trim().equals("") || result.trim().equals("\n")) && i < waitingTime) 
+        if(written > 0)
         {
-            try 
-            {
-                i++;
-                Thread.sleep(500);
-            } 
-            catch (InterruptedException e) 
-            {
-                logger.error(e.getMessage());
-                Thread.currentThread().interrupt();
-            }
+	        while ((result.trim().equals("") || result.trim().equals("\n")) && i < waitingTime) 
+	        {
+	            try 
+	            {
+	                i++;
+	                Thread.sleep(500);
+	            } 
+	            catch (InterruptedException e) 
+	            {
+	                logger.error(e.getMessage());
+	                Thread.currentThread().interrupt();
+	            }
+	        }
         }
-        System.out.println("RESULT "+result);
-        logger.info("Result : {}", result);
         return result;
     }
 
@@ -306,7 +305,6 @@ public class GSM {
                 {
                     byte[] msg = new byte[getSerialPort().bytesAvailable()];
                     getSerialPort().readBytes(msg, msg.length);
-                    //logger.info(res);
                     String result = new String(msg);
                     onChangeStateSerial(result);
                     

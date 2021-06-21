@@ -44,6 +44,9 @@ public class ServerScheduler {
 	@Value("${otpbroker.cron.enable.device}")
 	private boolean cronDeviceEnable;
 
+	@Value("${otpbroker.cron.enable.amqp}")
+	private boolean cronAMQPEnable;
+
 	@Value("${otpbroker.cron.time.resolution:minute}")
 	private String timeResolution;
 	
@@ -67,18 +70,21 @@ public class ServerScheduler {
 		if(cronDeviceEnable)
 		{					
 			modemCheck();
-			
-			if(ConfigFeederAMQP.isFeederAmqpEnable())
-			{
-				amqpCheck();
-				ServerInfo.sendAMQPStatus(ConfigFeederAMQP.isConnected());
-			}
+		}
+	}
+	
+	@Scheduled(cron = "${otpbroker.cron.expression.amqp}")
+	public void inspectAMQP()
+	{
+		if(cronAMQPEnable && ConfigFeederAMQP.isFeederAmqpEnable())
+		{					
+			amqpCheck();
 		}
 	}
 	
 	private void modemCheck()
 	{
-		if(SMSUtil.isConnected())
+		if(!SMSUtil.isConnected())
 		{	
 			String alert = ConstantString.MODEM_NOT_CONNECTED;
 			JSONObject messageJSON = new JSONObject();
@@ -98,7 +104,8 @@ public class ServerScheduler {
 	private void amqpCheck()
 	{
 		boolean connected = ConfigFeederAMQP.echoTest();
-		ConfigFeederAMQP.setConnected(connected);		
+		ConfigFeederAMQP.setConnected(connected);	
+		ServerInfo.sendAMQPStatus(ConfigFeederAMQP.isConnected());
 	}
 	
 		

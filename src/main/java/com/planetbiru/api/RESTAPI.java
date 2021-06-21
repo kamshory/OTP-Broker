@@ -21,6 +21,10 @@ import com.planetbiru.util.Utility;
 import com.sun.net.httpserver.Headers;
 
 public class RESTAPI {
+	private RESTAPI()
+	{
+		
+	}
 	public static JSONObject unauthorized(String requestBody) {
 		JSONObject requestJSON = new JSONObject();
 		String command = "";
@@ -46,10 +50,12 @@ public class RESTAPI {
 	{
 		return RESTAPI.parseBasicAuth(headers);
 	}
+	
 	public static boolean validRequest(Headers headers) 
 	{
 		return RESTAPI.parseBasicAuth(headers);
 	}
+	
 	public static boolean parseBasicAuth(Map<String, List<String>> requestHeaders) 
     {
 		String username = "";
@@ -75,8 +81,7 @@ public class RESTAPI {
 			}
     	}
     	return false;
-	}
-	
+	}	
 	
 	public static JSONObject processMessageRequest(String requestBody) 
 	{
@@ -150,7 +155,8 @@ public class RESTAPI {
 		return requestJSON;
 	}
 	
-	public static void sendMail(JSONObject data) {
+	public static void sendMail(JSONObject data) 
+	{
 		if(data != null)
 		{
 			String receiver = data.optString(JsonKey.RECEIVER, "");
@@ -163,7 +169,9 @@ public class RESTAPI {
 			} 
 			catch (MessagingException e) 
 			{
-				
+				/**
+				 * Do nothing
+				 */
 			}
 		}	
 	}
@@ -180,8 +188,9 @@ public class RESTAPI {
 			} 
 			catch (GSMException e) 
 			{
-				
-				e.printStackTrace();
+				/**
+				 * Do nothing
+				 */
 			}
 		}		
 	}

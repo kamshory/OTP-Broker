@@ -20,33 +20,30 @@ public class HandlerAPIMessage implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange httpExchange) throws IOException {
-		logger.info("AAAAAAAAAAAAAAAAAA");
 		Headers requestHeaders = httpExchange.getRequestHeaders();
         Headers responseHeaders = httpExchange.getResponseHeaders();
        	
-       	RESTAPI.validRequest(requestHeaders);
-           	
-        if(
-           	httpExchange.getRequestMethod().equalsIgnoreCase("POST")
-        	|| 
-        	httpExchange.getRequestMethod().equalsIgnoreCase("PUT")
-        	)
-        {
-            byte[] requestBody = this.getRequestBody(httpExchange);
-            String requestBodyStr = new String(requestBody);
-            
-            JSONObject result = RESTAPI.processMessageRequest(requestBodyStr);
-            
-            String response = result.toString(4);
-            
-            responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
-            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());	 
-            httpExchange.getResponseBody().write(response.getBytes());
-        }
-        else
-        {
-            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_METHOD, 0);	        	
-        }
+       	if(RESTAPI.validRequest(requestHeaders))
+       	{
+           if(httpExchange.getRequestMethod().equalsIgnoreCase("POST") || httpExchange.getRequestMethod().equalsIgnoreCase("PUT"))
+	        {
+	            byte[] requestBody = this.getRequestBody(httpExchange);
+	            String requestBodyStr = new String(requestBody);            
+	            JSONObject result = RESTAPI.processMessageRequest(requestBodyStr);            
+	            String response = result.toString(4);            
+	            responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+	            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());	 
+	            httpExchange.getResponseBody().write(response.getBytes());
+	        }
+	        else
+	        {
+	            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_METHOD, 0);	        	
+	        }
+       	}
+       	else
+       	{
+       		httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_UNAUTHORIZED, 0);	      
+       	}
         httpExchange.close();
 	}
 	private byte[] getRequestBody(HttpExchange httpExchange)
@@ -59,7 +56,7 @@ public class HandlerAPIMessage implements HttpHandler {
             try
             {
 	            int contentLength = Utility.atoi(cl);	
-	             requestBody = new byte[contentLength];
+	            requestBody = new byte[contentLength];
 	            for(int j = 0; j < contentLength; j++)
 	            {
 	            	requestBody[j] = (byte) httpExchange.getRequestBody().read();
@@ -67,7 +64,9 @@ public class HandlerAPIMessage implements HttpHandler {
             }
             catch(NumberFormatException | IOException e)
             {
-            	e.printStackTrace();
+            	/**
+            	 * Do nothing
+            	 */
             }
             return requestBody;
         }

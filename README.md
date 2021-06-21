@@ -151,7 +151,9 @@ Modul NoIP adalah modul untuk mengatur akun NoIP yang digunakan.
 1. WSMessageBroker : OK
 2. RabbitMQ : OK
 	
-SMS Setting : =============
+**SMS Setting**
+
+1. Send SMS : OK
 
 **Modem**
 

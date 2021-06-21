@@ -10,9 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 
-import com.planetbiru.config.FileConfigUtil;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
+import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;

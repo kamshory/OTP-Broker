@@ -290,13 +290,14 @@ button span.number{
     border: 1px solid #DDDDDD;
 }
 
-.input-phone-number, .text-message{
+.input-text, .input-phone-number, .text-message{
     padding: 5px 10px;
     width: 100%;
     box-sizing: border-box;
     border: 1px solid #DDDDDD;
 }
 .text-message:focus, .text-message:active,
+.input-text:focus, .input-text:active
 .input-phone-number:focus, .input-phone-number:active{
     outline: none;
 }
@@ -305,8 +306,6 @@ button span.number{
     margin-bottom: 10px;
     position: relative;
 
-}
-.input-phone-number{
 }
 .text-message{
     height: 100px;

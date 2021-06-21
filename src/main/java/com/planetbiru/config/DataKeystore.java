@@ -4,6 +4,9 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
+import com.planetbiru.util.FileConfigUtil;
+import com.planetbiru.util.Utility;
+
 public class DataKeystore {
 
 	private String id = "";
@@ -85,6 +88,12 @@ public class DataKeystore {
 	}
 	public void setFileExtension(String fileExtension) {
 		this.fileExtension = fileExtension;
+	}
+	public String getFullPath() {
+		String base = Utility.getBaseDir();
+		String loc = Config.getKeystoreDataSettingPath();
+		String file = String.format("%s/%s/%s.%s", base, loc, this.id, this.fileExtension);
+		return FileConfigUtil.fixFileName(file);
 	}
 	
 
