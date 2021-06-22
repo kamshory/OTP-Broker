@@ -21,11 +21,16 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.planetbiru.api.HandlerAPIBlocking;
 import com.planetbiru.api.HandlerAPIMessage;
+import com.planetbiru.api.HandlerAPIUnblocking;
+import com.planetbiru.config.ConfigAPIUser;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
+import com.planetbiru.config.ConfigBlocking;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigKeystore;
+import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataKeystore;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.ServiceHTTP;
@@ -40,6 +45,9 @@ public class ServerAPI {
 	
 	@Value("${otpbroker.path.setting.api.service}")
 	private String apiSettingPath;
+
+	@Value("${otpbroker.path.setting.api.user}")
+	private String userAPISettingPath;
 
 	@Value("${otpbroker.path.setting.email}")
 	private String emailSettingPath;
@@ -109,6 +117,9 @@ public class ServerAPI {
 	private String defaultStarttlsEnable;
 
 
+	@Value("${otpbroker.path.setting.blocking}")
+	private String blockingSettingPath;
+	
 	@Value("${otpbroker.path.setting.keystore.data}")
 	private String keystoreDataSettingPath;
 	
@@ -118,11 +129,20 @@ public class ServerAPI {
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
 	
-	
+	@Value("${otpbroker.path.setting.sms}")
+	private String smsSettingPath;
+
+
+
 
 	@PostConstruct
 	public void init()
 	{
+		Config.setApiSettingPath(apiSettingPath);
+		Config.setUserAPISettingPath(userAPISettingPath);
+
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
+		Config.setBlockingSettingPath(blockingSettingPath);
 
 		Config.setBaseDirConfig(baseDirConfig);
 
@@ -137,16 +157,22 @@ public class ServerAPI {
 		Config.setKeystoreSettingPath(keystoreSettingPath);
 
 		
-		this.loadConfigHttp();
+		this.loadConfigAPI();
 		this.loadConfigEmail();
 
 		SMSUtil.init();	
 		this.initHttp();
 		this.initHttps();
 		
+		Config.setSmsSettingPath(smsSettingPath);	
+		ConfigSMS.load(Config.getSmsSettingPath());
+		
+		ConfigBlocking.setCountryCode(ConfigSMS.getCountryCode());
+		ConfigBlocking.load(Config.getBlockingSettingPath());
+		
 	}
 	
-	private void loadConfigHttp() {
+	private void loadConfigAPI() {
 		Config.setApiSettingPath(apiSettingPath);
 		
 		ConfigAPI.setHttpPort(httpPort);
@@ -178,8 +204,6 @@ public class ServerAPI {
 	}	
 	
 	private void initHttps() {
-		
-		
 		if(ConfigAPI.isHttpsEnable())
 		{
 			ConfigKeystore.load(Config.getKeystoreSettingPath());
@@ -205,8 +229,12 @@ public class ServerAPI {
 				    trustFactory.init(keyStore);
 				    sslContext.init(keyManagementFactory.getKeyManagers(), trustFactory.getTrustManagers(), null);		
 					HttpsConfigurator httpsConfigurator = new HttpsConfigurator(sslContext);
-					ServiceHTTP.getHttpsServer().setHttpsConfigurator(httpsConfigurator);		
+					ServiceHTTP.getHttpsServer().setHttpsConfigurator(httpsConfigurator);	
+					
 			        ServiceHTTP.getHttpsServer().createContext(ConfigAPI.getMessagePath(), new HandlerAPIMessage());
+			        ServiceHTTP.getHttpsServer().createContext(ConfigAPI.getBlockingPath(), new HandlerAPIBlocking());
+			        ServiceHTTP.getHttpsServer().createContext(ConfigAPI.getUnblockingPath(), new HandlerAPIUnblocking());
+			        
 			        ServiceHTTP.getHttpsServer().start();
 			        started = true;
 				} 
@@ -240,6 +268,8 @@ public class ServerAPI {
 			{
 				ServiceHTTP.setHttpServer(HttpServer.create(new InetSocketAddress(ConfigAPI.getHttpPort()), 0));
 		        ServiceHTTP.getHttpServer().createContext(ConfigAPI.getMessagePath(), new HandlerAPIMessage());
+		        ServiceHTTP.getHttpServer().createContext(ConfigAPI.getBlockingPath(), new HandlerAPIBlocking());
+		        ServiceHTTP.getHttpServer().createContext(ConfigAPI.getUnblockingPath(), new HandlerAPIUnblocking());
 		        ServiceHTTP.getHttpServer().start();
 			} 
 			catch (IOException e) 

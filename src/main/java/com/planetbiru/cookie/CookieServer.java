@@ -314,7 +314,7 @@ public class CookieServer {
 		String sessionFile = this.getSessionFile();
 		try 
 		{
-			byte[] data = FileUtil.read(sessionFile);
+			byte[] data = FileUtil.readResource(sessionFile);
 			if(data != null)
 			{
 				String text = new String(data);

@@ -17,7 +17,7 @@ Dari sekian banyak kelebihan di atas, ternyata SMS memiliki keterbatasan secara 
 
 Cara lain untuk mengirimkan SMS yaitu dengan bekerjasama langsung dengan operator telekomunikasi atau menggunakan jasa pihak ketiga. Kerjasama dengan operator telekomunikasi tentu saja tidak mudah. Selain harus berbadan hukum, biaya yang diperlukan tentu saja tidak sedikit. Selain itu, volume pengiriman SMS juga menjadi bahan pertimbangan kerjasama tersebut diterima atau tidak oleh operator telekomunikasi. Penggunaan jasa pihak ketiga adalah opsi lain. Faktor keamanan tentu saja menjadi pertimbangan. Penyedia layanan tentu saja harus bisa dipercaya untuk menjaga kerahasiaan OTP yang dikirimkan.
 
-Bagi perusahaan berskala kecil yang ingin membangun sendiri sistem pengiriman OTP dapat menggunakan berbagai macam aplikasi yang tersedia secara gratis maupun berbayar di pasaran. Beberapa pertimbangan dalam memilih aplikasi OTP adalah sevagai berikut:
+Bagi perusahaan berskala kecil yang ingin membangun sendiri sistem pengiriman OTP dapat menggunakan berbagai macam aplikasi yang tersedia secara gratis maupun berbayar di pasaran. Beberapa pertimbangan dalam memilih aplikasi OTP adalah sebagai berikut:
 
 1. Kecepatan pengiriman
 2. Keamanan/kerahasiaan
@@ -85,7 +85,7 @@ OTP Broker memungkinkan pengguna melakukan perintah USSD pada masing-masing mode
 
 ## Manual SMS
 
-Manual SMS digunakan untuk menguji apakah masing-masing modem dapat mengirim SMS.
+Manual SMS digunakan untuk menguji apakah masing-masing modem dapat mengirimkan SMS.
 
 ## Administrator Setting
 

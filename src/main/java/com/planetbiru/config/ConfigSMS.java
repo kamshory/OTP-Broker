@@ -24,6 +24,7 @@ public class ConfigSMS {
 	private static String imei = "";
 	private static String simCardPIN = "";
 	private static boolean sendIncommingSMS = false;
+	private static String countryCode = "";
 	
 	private ConfigSMS()
 	{
@@ -41,6 +42,7 @@ public class ConfigSMS {
 		smsSetting.put(JsonKey.IMEI, ConfigSMS.imei);
 		smsSetting.put(JsonKey.SIM_CARD_PIN, ConfigSMS.simCardPIN);
 		smsSetting.put(JsonKey.SEND_INCOMMING_SMS, ConfigSMS.sendIncommingSMS);
+		smsSetting.put(JsonKey.COUNTRY_CODE, ConfigSMS.countryCode);
 		return smsSetting;
 	}
 	
@@ -116,6 +118,7 @@ public class ConfigSMS {
 				ConfigSMS.timeRange = smsSetting.optInt(JsonKey.TIME_RANGE, 0);
 				ConfigSMS.maxPerTimeRange = smsSetting.optInt(JsonKey.MAX_PER_TIME_RANGE, 0);
 				ConfigSMS.sendIncommingSMS = smsSetting.optBoolean(JsonKey.SEND_INCOMMING_SMS, false);
+				ConfigSMS.countryCode = smsSetting.optString(JsonKey.COUNTRY_CODE, "");
 			}
 			catch(JSONException e)
 			{
@@ -207,6 +210,14 @@ public class ConfigSMS {
 
 	public static void setSendIncommingSMS(boolean sendIncommingSMS) {
 		ConfigSMS.sendIncommingSMS = sendIncommingSMS;
+	}
+
+	public static String getCountryCode() {
+		return countryCode;
+	}
+
+	public static void setCountryCode(String countryCode) {
+		ConfigSMS.countryCode = countryCode;
 	}
 
 	

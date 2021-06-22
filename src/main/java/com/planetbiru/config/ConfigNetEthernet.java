@@ -131,8 +131,9 @@ public class ConfigNetEthernet {
 		return config;
 	}
 
-	public static void apply()
+	public static void apply(String path)
 	{
+		ConfigNetEthernet.configPath = path;
 		String uuid = "a5ae9a6c-3951-4e8a-b99d-a4ea5dc33bf1";
 		String format = "TYPE=\"Ethernet\"\r\n"
 				+ "BOOTPROTO=none\r\n"

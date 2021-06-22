@@ -41,6 +41,8 @@ public class Config {
 	private static String deviceVersion = "version 1.0";
 	private static String keystoreSettingPath = "";
 	private static String keystoreDataSettingPath = "";
+	private static String blockingSettingPath = "";
+
 	private static String defaultSMTPHost = "localhost";
 	private static String defaultSMTPPort = "25";
 	private static String defaultSMTPUsername = "";
@@ -49,6 +51,17 @@ public class Config {
 	private static String defaultSMTPEnable = "false";
 	private static String defaultStarttlsEnable = "false";
 	private static String defaultSMTPSSLEnable = "false";
+	private static String userAPISettingPath = "";
+	private static String dhcpSettingPathDefault = "";
+	private static String wlanSettingPathDefault = "";
+	private static String ethernetSettingPathDefault = "";
+	
+	private static String osWLANConfigPath = "";
+	private static String osSSIDKey = "";
+	private static String osEthernetConfigPath = "";
+	private static String osDHCPConfigPath = "";
+	private static String documentRoot = "/static/www";
+	private static String userSettingPath = "";
 	
 	private Config()
 	{
@@ -466,6 +479,116 @@ public class Config {
 
 	public static void setDefaultSMTPSSLEnable(String defaultSMTPSSLEnable) {
 		Config.defaultSMTPSSLEnable = defaultSMTPSSLEnable;
+	}
+
+
+	public static String getBlockingSettingPath() {
+		return blockingSettingPath;
+	}
+
+
+	public static void setBlockingSettingPath(String blockingSettingPath) {
+		Config.blockingSettingPath = blockingSettingPath;
+	}
+
+
+	public static String getUserAPISettingPath() {
+		return userAPISettingPath;
+	}
+
+
+	public static void setUserAPISettingPath(String userAPISettingPath) {
+		Config.userAPISettingPath = userAPISettingPath;
+	}
+
+
+	public static String getDhcpSettingPathDefault() {
+		return dhcpSettingPathDefault;
+	}
+
+
+	public static void setDhcpSettingPathDefault(String dhcpSettingPathDefault) {
+		Config.dhcpSettingPathDefault = dhcpSettingPathDefault;
+	}
+
+
+	public static String getWlanSettingPathDefault() {
+		return wlanSettingPathDefault;
+	}
+
+
+	public static void setWlanSettingPathDefault(String wlanSettingPathDefault) {
+		Config.wlanSettingPathDefault = wlanSettingPathDefault;
+	}
+
+
+	public static String getEthernetSettingPathDefault() {
+		return ethernetSettingPathDefault;
+	}
+
+
+	public static void setEthernetSettingPathDefault(String ethernetSettingPathDefault) {
+		Config.ethernetSettingPathDefault = ethernetSettingPathDefault;
+	}
+
+
+	public static String getOsWLANConfigPath() {
+		return osWLANConfigPath;
+	}
+
+
+	public static void setOsWLANConfigPath(String osWLANConfigPath) {
+		Config.osWLANConfigPath = osWLANConfigPath;
+	}
+
+
+	public static String getOsSSIDKey() {
+		return osSSIDKey;
+	}
+
+
+	public static void setOsSSIDKey(String osSSIDKey) {
+		Config.osSSIDKey = osSSIDKey;
+	}
+
+
+	public static String getOsEthernetConfigPath() {
+		return osEthernetConfigPath;
+	}
+
+
+	public static void setOsEthernetConfigPath(String osEthernetConfigPath) {
+		Config.osEthernetConfigPath = osEthernetConfigPath;
+	}
+
+
+	public static String getOsDHCPConfigPath() {
+		return osDHCPConfigPath;
+	}
+
+
+	public static void setOsDHCPConfigPath(String osDHCPConfigPath) {
+		Config.osDHCPConfigPath = osDHCPConfigPath;
+	}
+
+
+	public static String getDocumentRoot() {
+		return documentRoot;
+	}
+
+
+	public static void setDocumentRoot(String documentRoot) {
+		Config.documentRoot = documentRoot;
+	}
+
+
+	public static String getUserSettingPath() {
+		return userSettingPath;
+	}
+
+
+	public static void setUserSettingPath(String userSettingPath) {
+		Config.userSettingPath = userSettingPath;
 	}
 
 

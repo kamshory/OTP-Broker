@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.api.RESTAPI;
+import com.planetbiru.config.ConfigAPIUser;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigCloudflare;
@@ -39,7 +40,7 @@ import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigNoIP;
 import com.planetbiru.config.ConfigSMS;
-import com.planetbiru.config.ConfigSaved;
+import com.planetbiru.config.GeneralConfig;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
@@ -48,7 +49,6 @@ import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.receiver.ws.WebSocketContent;
-import com.planetbiru.user.APIUserAccount;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.user.User;
 import com.planetbiru.user.WebUserAccount;
@@ -56,18 +56,17 @@ import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
+import com.planetbiru.util.OSUtil;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.Utility;
+import com.planetbiru.util.OSUtil.OS;
 
 @RestController
 public class ServerWebManager {
 	
-	private ConfigSaved configSaved = new ConfigSaved();
+	private GeneralConfig configSaved = new GeneralConfig();
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
-	private WebUserAccount userAccount;
-	private WebUserAccount userAPIAccount;
-
 	@Value("${otpbroker.device.name}")
 	private String deviceName;
 
@@ -88,21 +87,12 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.path.setting.feeder.amqp}")
 	private String feederAMQPSettingPath;
-
-	@Value("${otpbroker.path.setting.sms}")
-	private String smsSettingPath;
 	
 	@Value("${otpbroker.path.setting.all}")
 	private String mimeSettingPath;	
 	
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
-
-	@Value("${otpbroker.path.setting.api.service}")
-	private String apiSettingPath;
-
-	@Value("${otpbroker.path.setting.api.user}")
-	private String userAPISettingPath;
 
 	@Value("${otpbroker.device.connection.type}")
 	private String portName;
@@ -115,15 +105,6 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.path.setting.noip}")
 	private String noIPSettingPath;
-
-	@Value("${otpbroker.path.setting.dhcp}")
-	private String dhcpSettingPath;
-
-	@Value("${otpbroker.path.setting.wlan}")
-	private String wlanSettingPath;
-
-	@Value("${otpbroker.path.setting.ethernet}")
-	private String ethernetSettingPath;
 
 	@Value("${otpbroker.path.setting.modem}")
 	private String modemSettingPath;
@@ -138,17 +119,18 @@ public class ServerWebManager {
 	
 	@PostConstruct
 	public void init()
-	{		
-		
+	{
+		Config.setBaseDirConfig(baseDirConfig);
+
+		Config.setUserSettingPath(userSettingPath);
+		Config.setDocumentRoot(documentRoot);
 		Config.setDeviceName(deviceName);
 		Config.setDeviceVersion(deviceVersion);
 		Config.setNoIPDevice(deviceName+"/"+deviceVersion);
 		
 		Config.setModemSettingPath(modemSettingPath);
-		Config.setDhcpSettingPath(dhcpSettingPath);
 		
 		Config.setFeederWSSettingPath(feederWSSettingPath);
-		Config.setWlanSettingPath(wlanSettingPath);	
 		Config.setFeederWSSettingPath(feederWSSettingPath);
 		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
 		Config.setSessionName(sessionName);
@@ -157,24 +139,19 @@ public class ServerWebManager {
 		Config.setDdnsSettingPath(ddnsSettingPath);
 		Config.setCloudflareSettingPath(cloudflareSettingPath);
 		Config.setNoIPSettingPath(noIPSettingPath);
-		Config.setApiSettingPath(apiSettingPath);
 		
-		Config.setSmsSettingPath(smsSettingPath);
-		Config.setEthernetSettingPath(ethernetSettingPath);	
-		
-		Config.setBaseDirConfig(baseDirConfig);
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 		ConfigCloudflare.load(Config.getCloudflareSettingPath());
 		ConfigNoIP.load(Config.getNoIPSettingPath());
 		ConfigAPI.load(Config.getApiSettingPath());
 
 		Config.setPortName(portName);		
-		userAccount = new WebUserAccount(userSettingPath);		
-		userAPIAccount = new WebUserAccount(userAPISettingPath);		
+		WebUserAccount.load(Config.getUserSettingPath());
+			
 		
 		try 
 		{
-			configSaved = new ConfigSaved(mimeSettingPath);
+			configSaved = new GeneralConfig(mimeSettingPath);
 		} 
 		catch (IOException e) 
 		{
@@ -194,7 +171,7 @@ public class ServerWebManager {
 		statusCode = HttpStatus.OK;
 		try 
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				String action = query.getOrDefault("action", "");
 				String modemID = query.getOrDefault("id", "");
@@ -247,7 +224,7 @@ public class ServerWebManager {
 		statusCode = HttpStatus.OK;
 		try 
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigEmail.load(Config.getEmailSettingPath());
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
@@ -300,7 +277,7 @@ public class ServerWebManager {
 		JSONObject response = new JSONObject();
 		try 
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				Map<String, String> query = Utility.parseURLEncoded(requestBody);
 				String modemID = query.getOrDefault("modem_id", "");
@@ -348,7 +325,7 @@ public class ServerWebManager {
 		JSONObject response = new JSONObject();
 		try 
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				response = new JSONObject();
 				Map<String, String> query = Utility.parseURLEncoded(requestBody);
@@ -412,20 +389,20 @@ public class ServerWebManager {
 	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
 		byte[] responseBody = "".getBytes();
 		HttpHeaders responseHeaders = new HttpHeaders();
-		userAccount.load();
+		WebUserAccount.load(Config.getUserSettingPath());
 		HttpStatus statusCode = HttpStatus.OK;
 		try 
 		{
-			User user = userAccount.getUser(userID);
+			User user = WebUserAccount.getUser(userID);
 			if(user.getUsername().isEmpty())
 			{
 				/**
 				 * User not found
 				 */
-				user = userAccount.getUserByPhone(userID);
+				user = WebUserAccount.getUserByPhone(userID);
 				if(user.getUsername().isEmpty())
 				{
-					user = userAccount.getUserByEmail(userID);
+					user = WebUserAccount.getUserByEmail(userID);
 				}
 			}
 			if(!user.getUsername().isEmpty())
@@ -495,7 +472,7 @@ public class ServerWebManager {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
-		ServerApplication.restart();
+		Application.restart();
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}	
@@ -543,11 +520,11 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			userAccount.load();
-			if(userAccount.checkUserAuth(username, password))
+			WebUserAccount.load(Config.getUserSettingPath());
+			if(WebUserAccount.checkUserAuth(username, password))
 			{
-				userAccount.updateLastActive(username);
-				userAccount.save();
+				WebUserAccount.updateLastActive(username);
+				WebUserAccount.save(Config.getUserSettingPath());
 			    payload.put(JsonKey.NEXT_URL, next);
 			    res.put("code", 0);
 			    res.put(JsonKey.PAYLOAD, payload);
@@ -583,7 +560,7 @@ public class ServerWebManager {
 		byte[] responseBody = "".getBytes();
 		cookie.destroySession();
 		cookie.putToHeaders(responseHeaders);
-		userAccount.load();
+		WebUserAccount.load(Config.getUserSettingPath());
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		responseHeaders.add(ConstantString.LOCATION, "/");
@@ -599,10 +576,10 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
-				String list = userAccount.getUser(loggedUsername).toString();
+				String list = WebUserAccount.getUser(loggedUsername).toString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -633,7 +610,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigFeederWS.load(Config.getFeederWSSettingPath());
 				String list = ConfigFeederWS.toJSONObject().toString();
@@ -666,7 +643,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
 				String list = ConfigFeederAMQP.toJSONObject().toString();
@@ -699,7 +676,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigSMS.load(Config.getSmsSettingPath());
 				String list = ConfigSMS.toJSONObject().toString();
@@ -732,7 +709,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigAPI.load(Config.getApiSettingPath());
 				String list = ConfigAPI.toJSONObject().toString();
@@ -765,7 +742,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigEmail.load(Config.getEmailSettingPath());				
 				responseBody = ConfigEmail.toJSONObject().toString().getBytes();
@@ -798,7 +775,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigNetDHCP.load(Config.getDhcpSettingPath());		
 				responseBody = ConfigNetDHCP.toJSONObject().toString().getBytes();
@@ -832,7 +809,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigNetWLAN.load(Config.getWlanSettingPath());		
 				responseBody = ConfigNetWLAN.toJSONObject().toString().getBytes();
@@ -866,7 +843,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigNetEthernet.load(Config.getEthernetSettingPath());
 				responseBody = ConfigNetEthernet.toJSONObject().toString().getBytes();				
@@ -899,7 +876,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				responseBody = ServerInfo.getInfo().getBytes();	
 			}
@@ -931,7 +908,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigCloudflare.load(Config.getCloudflareSettingPath());
 				
@@ -965,7 +942,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigNoIP.load(Config.getNoIPSettingPath());				
 				responseBody = ConfigNoIP.toJSONObject().toString().getBytes();
@@ -998,7 +975,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigKeystore.load(Config.getKeystoreSettingPath());				
 				responseBody = ConfigKeystore.toJSONObject().toString().getBytes();
@@ -1031,7 +1008,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigKeystore.load(Config.getKeystoreSettingPath());				
 				responseBody = ConfigKeystore.get(id).toJSONObject().toString().getBytes();
@@ -1064,9 +1041,9 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
-				String list = userAccount.listAsString();
+				String list = WebUserAccount.listAsString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -1097,9 +1074,9 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
-				String data = userAccount.getUser(username).toString();
+				String data = WebUserAccount.getUser(username).toString();
 				responseBody = data.getBytes();
 			}
 			else
@@ -1130,7 +1107,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				String data = ConfigDDNS.getJSONObject(id).toString();
 				responseBody = data.getBytes();
@@ -1163,9 +1140,10 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
-				String list = userAPIAccount.listAsString();
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
+				String list = ConfigAPIUser.listAsString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -1196,9 +1174,10 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
-				String data = userAPIAccount.getUser(username).toString();
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
+				String data = ConfigAPIUser.getUser(username).toString();
 				responseBody = data.getBytes();
 			}
 			else
@@ -1227,7 +1206,7 @@ public class ServerWebManager {
 		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
-		if(userAccount.isEmpty())
+		if(WebUserAccount.isEmpty())
 		{
 			Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
 		    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
@@ -1247,18 +1226,18 @@ public class ServerWebManager {
 				jsonObject.put(JsonKey.BLOCKED, false);
 				jsonObject.put(JsonKey.ACTIVE, true);
 				
-				userAccount.addUser(new User(jsonObject));		
-				userAccount.save();				
+				WebUserAccount.addUser(new User(jsonObject));		
+				WebUserAccount.save(Config.getUserSettingPath());				
 				
 				cookie.setSessionValue(JsonKey.USERNAME, username);
 				cookie.setSessionValue(JsonKey.PASSWORD, password);
 				try
 				{
-					userAccount.load();
-					if(userAccount.checkUserAuth(username, password))
+					WebUserAccount.load(Config.getUserSettingPath());
+					if(WebUserAccount.checkUserAuth(username, password))
 					{
-						userAccount.updateLastActive(username);
-						userAccount.save();
+						WebUserAccount.updateLastActive(username);
+						WebUserAccount.save(Config.getUserSettingPath());
 					}
 				}
 				catch(NoUserRegisteredException e)
@@ -1289,7 +1268,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
 			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
@@ -1309,8 +1288,8 @@ public class ServerWebManager {
 				
 				if(!username.isEmpty())
 				{
-					userAccount.addUser(new User(jsonObject));		
-					userAccount.save();
+					WebUserAccount.addUser(new User(jsonObject));		
+					WebUserAccount.save(Config.getUserSettingPath());
 				}		    
 			}
 		}
@@ -1336,7 +1315,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigDDNS.load(Config.getDdnsSettingPath());
 				String list = ConfigDDNS.toJSONObject().toString();
@@ -1370,7 +1349,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigModem.load(Config.getModemSettingPath());
 				String list = ConfigModem.getModemData(id).toJSONObject().toString();
@@ -1404,7 +1383,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.OK;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigModem.load(Config.getModemSettingPath());
 				String list = ConfigModem.toJSONObject().toString();
@@ -1439,8 +1418,9 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
 			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
 			    String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "");
@@ -1459,9 +1439,8 @@ public class ServerWebManager {
 				
 				if(!username.isEmpty())
 				{
-					userAPIAccount.addUser(new User(jsonObject));		
-					userAPIAccount.save();
-					APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+					ConfigAPIUser.addUser(new User(jsonObject));		
+					ConfigAPIUser.save(Config.getUserAPISettingPath());;
 				}		    
 			}
 		}
@@ -1487,7 +1466,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);				
 			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
@@ -1513,8 +1492,8 @@ public class ServerWebManager {
 				{
 					jsonObject.put(JsonKey.PASSWORD, password);
 				}
-				userAccount.updateUser(new User(jsonObject));		
-				userAccount.save();		    
+				WebUserAccount.updateUser(new User(jsonObject));		
+				WebUserAccount.save(Config.getUserSettingPath());		    
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -1539,8 +1518,9 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);				
 			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
 			    String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "");
@@ -1565,9 +1545,8 @@ public class ServerWebManager {
 				{
 					jsonObject.put(JsonKey.PASSWORD, password);
 				}
-				userAPIAccount.updateUser(new User(jsonObject));		
-				userAPIAccount.save();	
-				APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+				ConfigAPIUser.updateUser(new User(jsonObject));		
+				ConfigAPIUser.save(Config.getUserAPISettingPath());;	
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -1592,12 +1571,12 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{			
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);			
 			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");	
-			    userAccount.deleteUser(username);		
-				userAccount.save();
+			    WebUserAccount.deleteUser(username);		
+				WebUserAccount.save(Config.getUserSettingPath());
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -1622,7 +1601,7 @@ public class ServerWebManager {
 		HttpStatus statusCode = HttpStatus.MOVED_PERMANENTLY;
 		try
 		{
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
 			    String provider = queryPairs.getOrDefault(JsonKey.PROVIDER, "").trim();
@@ -1743,7 +1722,7 @@ public class ServerWebManager {
 	private void processFeedbackPost(HttpHeaders headers, String requestBody, HttpServletRequest request) 
 	{		
 		try {
-			if(userAccount.checkUserAuth(headers))
+			if(WebUserAccount.checkUserAuth(headers))
 			{
 				CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 				String path = request.getServletPath();
@@ -1942,7 +1921,9 @@ public class ServerWebManager {
 			
 			String v3 = query.getOrDefault("max_per_time_range", "0").trim();
 			int lMaxPerTimeRange = Utility.atoi(v3);
+			String countryCode = query.getOrDefault("country_code", "").trim();
 			
+			ConfigSMS.setCountryCode(countryCode);
 			ConfigSMS.setSendIncommingSMS(lSendIncommingSMS);
 			ConfigSMS.setIncommingInterval(lIncommingInterval);
 			ConfigSMS.setTimeRange(lTimeRange);
@@ -2042,7 +2023,7 @@ public class ServerWebManager {
 			ConfigNetDHCP.setRanges(rangeList);
 			ConfigNetDHCP.setDomainNameServers(nsList);
 			ConfigNetDHCP.save(Config.getDhcpSettingPath());	
-			ConfigNetDHCP.apply();
+			ConfigNetDHCP.apply(Config.getOsDHCPConfigPath());
 		}
 		
 		if(query.containsKey("save_wlan"))
@@ -2057,7 +2038,7 @@ public class ServerWebManager {
 			ConfigNetWLAN.setGateway(query.getOrDefault("gateway", "").trim());
 			ConfigNetWLAN.setDns1(query.getOrDefault("dns1", "").trim());
 			ConfigNetWLAN.save(Config.getWlanSettingPath());
-			ConfigNetWLAN.apply();
+			ConfigNetWLAN.apply(Config.getOsWLANConfigPath(), Config.getOsSSIDKey());
 		}
 
 		if(query.containsKey("save_ethernet"))
@@ -2070,7 +2051,7 @@ public class ServerWebManager {
 			ConfigNetEthernet.setDns1(query.getOrDefault("dns1", "").trim());
 			ConfigNetEthernet.setDns2(query.getOrDefault("dns2", "").trim());
 			ConfigNetEthernet.save(Config.getEthernetSettingPath());
-			ConfigNetEthernet.apply();
+			ConfigNetEthernet.apply(Config.getOsEthernetConfigPath());
 		}
 	}
 
@@ -2243,7 +2224,7 @@ public class ServerWebManager {
 		modem.setTimeRange(timeRange);
 		modem.setMaxPerTimeRange(maxPerTimeRange);
 		modem.setImei(imei);
-		if(!simCardPIN.isBlank())
+		if(!simCardPIN.isEmpty())
 		{
 			modem.setSimCardPIN(simCardPIN);
 		}
@@ -2358,7 +2339,7 @@ public class ServerWebManager {
 			User user;
 			try 
 			{
-				user = userAccount.getUser(loggedUsername);
+				user = WebUserAccount.getUser(loggedUsername);
 				user.setName(name);
 				user.setPhone(phone);
 				user.setEmail(email);
@@ -2366,8 +2347,8 @@ public class ServerWebManager {
 				{
 					user.setPassword(password);
 				}
-				userAccount.updateUser(user);
-				userAccount.save();
+				WebUserAccount.updateUser(user);
+				WebUserAccount.save(Config.getUserSettingPath());
 			} 
 			catch (NoUserRegisteredException e) 
 			{
@@ -2392,10 +2373,10 @@ public class ServerWebManager {
 				String value = entry.getValue();
 				if(key.startsWith("id[") && !value.equals(loggedUsername))
 				{
-					userAccount.deleteUser(value);
+					WebUserAccount.deleteUser(value);
 				}
 			}
-			userAccount.save();
+			WebUserAccount.save(Config.getUserSettingPath());
 		}
 		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
@@ -2442,13 +2423,13 @@ public class ServerWebManager {
 			/**
 			 * Delete
 			 */
+			ConfigAPIUser.load(Config.getUserAPISettingPath());
 			for (Map.Entry<String, String> entry : query.entrySet()) 
 			{
 				String value = entry.getValue();
-				userAPIAccount.deleteUser(value);
+				ConfigAPIUser.deleteUser(value);
 			}
-			userAPIAccount.save();
-			APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+			ConfigAPIUser.save(Config.getUserAPISettingPath());
 		}
 		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
@@ -2494,7 +2475,7 @@ public class ServerWebManager {
 			if(key.startsWith("id[") && !value.equals(loggedUsername))
 			{
 				try {
-					userAccount.deactivate(value);
+					WebUserAccount.deactivate(value);
 				} catch (NoUserRegisteredException e) {
 					/**
 					 * Do nothing
@@ -2502,7 +2483,7 @@ public class ServerWebManager {
 				}
 			}
 		}
-		userAccount.save();
+		WebUserAccount.save(Config.getUserSettingPath());
 	}
 	
 	private void processAdminActivate(Map<String, String> query)
@@ -2515,7 +2496,7 @@ public class ServerWebManager {
 			{
 				try 
 				{
-					userAccount.activate(value);
+					WebUserAccount.activate(value);
 				} 
 				catch (NoUserRegisteredException e) 
 				{
@@ -2525,7 +2506,7 @@ public class ServerWebManager {
 				}
 			}
 		}
-		userAccount.save();
+		WebUserAccount.save(Config.getUserSettingPath());
 	}
 	
 	private void processAdminBlock(Map<String, String> query, String loggedUsername)
@@ -2538,7 +2519,7 @@ public class ServerWebManager {
 			{
 				try 
 				{
-					userAccount.block(value);
+					WebUserAccount.block(value);
 				} 
 				catch (NoUserRegisteredException e) 
 				{
@@ -2548,7 +2529,7 @@ public class ServerWebManager {
 				}
 			}
 		}
-		userAccount.save();
+		WebUserAccount.save(Config.getUserSettingPath());
 	}
 	
 	private void processAdminUnblock(Map<String, String> query)
@@ -2561,7 +2542,7 @@ public class ServerWebManager {
 			{
 				try 
 				{
-					userAccount.unblock(value);
+					WebUserAccount.unblock(value);
 				} 
 				catch (NoUserRegisteredException e) 
 				{
@@ -2571,7 +2552,7 @@ public class ServerWebManager {
 				}
 			}
 		}
-		userAccount.save();
+		WebUserAccount.save(Config.getUserSettingPath());
 	}
 	
 	private void processAdminUpdateData(Map<String, String> query)
@@ -2584,7 +2565,7 @@ public class ServerWebManager {
 			User user;
 			try 
 			{
-				user = userAccount.getUser(pkID);
+				user = WebUserAccount.getUser(pkID);
 				if(field.equals(JsonKey.PHONE))
 				{
 					user.setPhone(value);
@@ -2593,8 +2574,8 @@ public class ServerWebManager {
 				{
 					user.setName(value);
 				}
-				userAccount.updateUser(user);
-				userAccount.save();
+				WebUserAccount.updateUser(user);
+				WebUserAccount.save(Config.getUserSettingPath());
 			} 
 			catch (NoUserRegisteredException e) 
 			{
@@ -2620,7 +2601,7 @@ public class ServerWebManager {
 			User user;
 			try 
 			{
-				user = userAccount.getUser(username);
+				user = WebUserAccount.getUser(username);
 				if(user.getUsername().isEmpty())
 				{
 					user.setUsername(username);
@@ -2637,8 +2618,8 @@ public class ServerWebManager {
 				}
 				user.setBlocked(blocked);
 				user.setActive(active);
-				userAccount.updateUser(user);
-				userAccount.save();
+				WebUserAccount.updateUser(user);
+				WebUserAccount.save(Config.getUserSettingPath());
 			} 
 			catch (NoUserRegisteredException e) 
 			{
@@ -2651,92 +2632,59 @@ public class ServerWebManager {
 	
 	private void processAPIUserDeactivate(Map<String, String> query)
 	{
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		for (Map.Entry<String, String> entry : query.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if(key.startsWith("id["))
 			{
-				try {
-					userAPIAccount.deactivate(value);
-				} catch (NoUserRegisteredException e) {
-					/**
-					 * Do nothing
-					 */
-				}
+				ConfigAPIUser.deactivate(value);
 			}
 		}
-		userAPIAccount.save();
-		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	private void processAPIUserActivate(Map<String, String> query)
 	{
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		for (Map.Entry<String, String> entry : query.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if(key.startsWith("id["))
 			{
-				try 
-				{
-					userAPIAccount.activate(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
+				ConfigAPIUser.activate(value);
 			}
 		}
-		userAPIAccount.save();
-		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	private void processAPIUserBlock(Map<String, String> query)
 	{
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		for (Map.Entry<String, String> entry : query.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if(key.startsWith("id["))
 			{
-				try 
-				{
-					userAPIAccount.block(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
+				ConfigAPIUser.block(value);
 			}
 		}
-		userAPIAccount.save();
-		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	private void processAPIUserUnblock(Map<String, String> query)
 	{
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		for (Map.Entry<String, String> entry : query.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if(key.startsWith("id["))
 			{
-				try 
-				{
-					userAPIAccount.unblock(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
+				ConfigAPIUser.unblock(value);
 			}
 		}
-		userAPIAccount.save();
-		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	
 	private void processAPIUserUpdate(Map<String, String> query)
@@ -2751,36 +2699,26 @@ public class ServerWebManager {
 
 		if(!username.isEmpty())
 		{
+			ConfigAPIUser.load(Config.getUserAPISettingPath());
 			User user;
-			try 
+			user = ConfigAPIUser.getUser(username);
+			if(user.getUsername().isEmpty())
 			{
-				user = userAPIAccount.getUser(username);
-				if(user.getUsername().isEmpty())
-				{
-					user.setUsername(username);
-				}
-				if(!name.isEmpty())
-				{
-					user.setName(name);
-				}
-				user.setPhone(phone);
-				user.setEmail(email);
-				if(!password.isEmpty())
-				{
-					user.setPassword(password);
-				}
-				user.setBlocked(blocked);
-				user.setActive(active);
-				userAPIAccount.updateUser(user);
-				userAPIAccount.save();
-				APIUserAccount.update(userAPIAccount.toJSONObject().toString());
-			} 
-			catch (NoUserRegisteredException e) 
-			{
-				/**
-				 * Do nothing
-				 */
+				user.setUsername(username);
 			}
+			if(!name.isEmpty())
+			{
+				user.setName(name);
+			}
+			user.setPhone(phone);
+			user.setEmail(email);
+			if(!password.isEmpty())
+			{
+				user.setPassword(password);
+			}
+			user.setBlocked(blocked);
+			user.setActive(active);
+			ConfigAPIUser.save(Config.getUserAPISettingPath());
 		}
 	}
 	
@@ -2959,7 +2897,7 @@ public class ServerWebManager {
 			webContent.setResponseHeaders(responseHeaders);
 			try
 			{
-				if(!userAccount.checkUserAuth(username, password))	
+				if(!WebUserAccount.checkUserAuth(username, password))	
 				{
 					try 
 					{
@@ -3121,13 +3059,46 @@ public class ServerWebManager {
 		{
 			file = Config.getDefaultFile();
 		}		
-		String dir = "";
-		return dir + documentRoot+file;		
+		return this.getFileName(file);		
 	}
 	
-	private String getFileName(String request) 
+	private String getFileName(String path) 
 	{
-		return documentRoot+request;
+		String dir = Config.getDocumentRoot();
+		if(!path.startsWith("/"))
+		{
+			path = "/"+path;
+		}
+		if(dir.endsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		
+		String filename = this.fixFileName(dir+path);
+		return filename;
+	}
+	public String fixFileName(String fileName) {
+		if(OSUtil.getOS().equals(OS.WINDOWS))
+		{
+			fileName = fileName.replace("/", "\\");
+			fileName = fileName.replace("\\\\", "\\");
+		}
+		else
+		{
+			fileName = fileName.replace("\\", "/");		
+			fileName = fileName.replace("//", "/");
+		}
+		return fileName;
+	}
+	
+	public String getFileExtension(String fileName) 
+	{
+		String extension = fileName;
+		int index = fileName.lastIndexOf('.');
+		if (index > 0) {
+		      extension = fileName.substring(index + 1);
+		}
+		return extension;
 	}
 	
 }

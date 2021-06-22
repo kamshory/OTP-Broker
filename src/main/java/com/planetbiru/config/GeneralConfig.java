@@ -10,21 +10,16 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-public class ConfigSaved {
-	private static Logger logger = LogManager.getLogger(ConfigSaved.class);
-	
+public class GeneralConfig {
 	private Pattern mSection = Pattern.compile("\\s*\\[([^]]*)\\]\\s*");
 	private Pattern mKeyValue = Pattern.compile("\\s*([^=]*)=(.*)");
 	private Map <String, Map<String, String>> mEntries = new HashMap<>();
 
-	public ConfigSaved(String path) throws IOException {
+	public GeneralConfig(String path) throws IOException {
 	    load(path);
 	}
 
-	public ConfigSaved() {
+	public GeneralConfig() {
 		/**
 		 * Do nothing
 		 */
@@ -47,20 +42,23 @@ public class ConfigSaved {
                 {
                     String key = m.group(1).trim();
                     String value = m.group(2).trim();
-                    Map<String, String> kv = mEntries.get(section);
-                    if (kv == null) 
+                    if(mEntries != null && mEntries.containsKey(section))
                     {
-                    	kv = new HashMap<>();
-                        mEntries.put(section, kv);
+	                    Map<String, String> kv = mEntries.get(section);
+	                    if (kv == null) 
+	                    {
+	                    	kv = new HashMap<>();
+	                        mEntries.put(section, kv);
+	                    }
+	                    kv.put(key, value);
                     }
-                    kv.put(key, value);
                 }
             }
 		}
 	}
 
 	public void load(String fileName) throws IOException {
-		InputStream resourceStream = ConfigSaved.class.getResourceAsStream(fileName);
+		InputStream resourceStream = GeneralConfig.class.getResourceAsStream(fileName);
 		if(resourceStream != null)
 		{
 		    try (
@@ -83,13 +81,16 @@ public class ConfigSaved {
 		                {
 		                    String key = m.group(1).trim();
 		                    String value = m.group(2).trim();
-		                    Map<String, String> kv = mEntries.get(section);
-		                    if (kv == null) 
+		                    if(mEntries != null && mEntries.containsKey(section))
 		                    {
-		                    	kv = new HashMap<>();
-		                        mEntries.put(section, kv);
+			                    Map<String, String> kv = mEntries.get(section);
+			                    if (kv == null) 
+			                    {
+			                    	kv = new HashMap<>();
+			                        mEntries.put(section, kv);
+			                    }
+			                    kv.put(key, value);
 		                    }
-		                    kv.put(key, value);
 		                }
 		            }
 		        }

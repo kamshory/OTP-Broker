@@ -9,149 +9,123 @@ import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
-import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
 
 public class WebUserAccount {
-	private static final String USER_FILE = "/static/data/user/urses.json";
-	private static final Logger logger = LoggerFactory.getLogger(WebUserAccount.class);
-	private String path = USER_FILE;
-	
-	private Map<String, User> users = new HashMap<>();
-	
-	public WebUserAccount(String userSettingPath) {
-		this.path = userSettingPath;
-		this.init();
-	}
-	public void init(String userSettingPath)
+	private static Map<String, User> users = new HashMap<>();
+
+	private WebUserAccount()
 	{
-		this.path = userSettingPath;
-		this.load();
+		
 	}
-	public void init()
+	public static void addUser(User user)
 	{
-		this.load();
+		WebUserAccount.users.put(user.getUsername(), user);
 	}
-	public WebUserAccount() {
-	}
-	public boolean isEmpty()
-	{
-		if(this.users.isEmpty())
-		{
-			this.load();
-		}
-		return this.users.isEmpty();
-	}
-	public void addUser(User user)
-	{
-		this.users.put(user.getUsername(), user);
-	}
-	public void addUser(String username, JSONObject jsonObject) 
+	public static void addUser(String username, JSONObject jsonObject) 
 	{
 		User user = new User(jsonObject);
-		this.users.put(username, user);
+		WebUserAccount.users.put(username, user);
 	}
 	
-	public void addUser(JSONObject jsonObject) {
+	public static void addUser(JSONObject jsonObject) {
 		User user = new User(jsonObject);
-		this.users.put(jsonObject.optString(JsonKey.USERNAME, ""), user);
+		WebUserAccount.users.put(jsonObject.optString(JsonKey.USERNAME, ""), user);
 	}	
 	
-	public User getUser(String username) throws NoUserRegisteredException
+	public static User getUser(String username) throws NoUserRegisteredException
 	{
-		if(this.users.isEmpty())
+		if(WebUserAccount.users.isEmpty())
 		{
 			throw new NoUserRegisteredException("No user registered");
 		}
 	
-		return this.users.getOrDefault(username, new User());
+		return WebUserAccount.users.getOrDefault(username, new User());
 	}
 	
-	public void activate(String username) throws NoUserRegisteredException 
+	public static void activate(String username) throws NoUserRegisteredException 
 	{
-		User user = this.getUser(username);
+		User user = WebUserAccount.getUser(username);
 		user.setActive(true);
-		this.updateUser(user);
+		WebUserAccount.updateUser(user);
 	}
 	
-	public void deactivate(String username) throws NoUserRegisteredException 
+	public static void deactivate(String username) throws NoUserRegisteredException 
 	{
-		User user = this.getUser(username);
+		User user = WebUserAccount.getUser(username);
 		user.setActive(false);
-		this.updateUser(user);
+		WebUserAccount.updateUser(user);
 	}
 	
-	public void block(String username) throws NoUserRegisteredException 
+	public static void block(String username) throws NoUserRegisteredException 
 	{
-		User user = this.getUser(username);
+		User user = WebUserAccount.getUser(username);
 		user.setBlocked(true);
-		this.updateUser(user);
+		WebUserAccount.updateUser(user);
 	}
 	
-	public void unblock(String username) throws NoUserRegisteredException 
+	public static void unblock(String username) throws NoUserRegisteredException 
 	{
-		User user = this.getUser(username);
+		User user = WebUserAccount.getUser(username);
 		user.setBlocked(false);
-		this.updateUser(user);
+		WebUserAccount.updateUser(user);
 	}
 	
-	public void updateLastActive(String username) throws NoUserRegisteredException 
+	public static void updateLastActive(String username) throws NoUserRegisteredException 
 	{
-		User user = this.getUser(username);
+		User user = WebUserAccount.getUser(username);
 		user.setLastActive(System.currentTimeMillis());
-		this.updateUser(user);
+		WebUserAccount.updateUser(user);
 	}
 	
-	public void updateUser(User user)
+	public static void updateUser(User user)
 	{
-		this.users.put(user.getUsername(), user);
+		WebUserAccount.users.put(user.getUsername(), user);
 	}
 	
-	public void deleteUser(User user)
+	public static void deleteUser(User user)
 	{
-		this.users.remove(user.getUsername());
+		WebUserAccount.users.remove(user.getUsername());
 	}
 	
-	public void deleteUser(String username) 
+	public static void deleteUser(String username) 
 	{
-		this.users.remove(username);
+		WebUserAccount.users.remove(username);
 	}
 	
-	public boolean checkUserAuth(Map<String, List<String>> headers) throws NoUserRegisteredException 
-	{
-		CookieServer cookie = new CookieServer(headers);
-		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
-		String password = cookie.getSessionData().optString(JsonKey.PASSWORD, "");
-		return this.checkUserAuth(username, password);
-	}
-	
-	public boolean checkUserAuth(HttpHeaders headers) throws NoUserRegisteredException
+	public static boolean checkUserAuth(Map<String, List<String>> headers) throws NoUserRegisteredException 
 	{
 		CookieServer cookie = new CookieServer(headers);
 		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
 		String password = cookie.getSessionData().optString(JsonKey.PASSWORD, "");
-		return this.checkUserAuth(username, password);
+		return WebUserAccount.checkUserAuth(username, password);
 	}
 	
-	public boolean checkUserAuth(String username, String password) throws NoUserRegisteredException 
+	public static boolean checkUserAuth(HttpHeaders headers) throws NoUserRegisteredException
+	{
+		CookieServer cookie = new CookieServer(headers);
+		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
+		String password = cookie.getSessionData().optString(JsonKey.PASSWORD, "");
+		return WebUserAccount.checkUserAuth(username, password);
+	}
+	
+	public static boolean checkUserAuth(String username, String password) throws NoUserRegisteredException 
 	{
 		if(username.isEmpty())
 		{
 			return false;
 		}
-		User user = this.getUser(username);
+		User user = WebUserAccount.getUser(username);
 		return user.getPassword().equals(password) && user.isActive() && !user.isBlocked();
 	}
 	
-	private void prepareDir(String fileName) 
+	private static void prepareDir(String fileName) 
 	{
 		File file = new File(fileName);
 		String directory1 = file.getParent();
@@ -172,7 +146,7 @@ public class WebUserAccount {
 	}
 	
 	
-	public void load()
+	public static void load(String path)
 	{
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
@@ -180,10 +154,11 @@ public class WebUserAccount {
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = FileConfigUtil.fixFileName(dir + path);
-		this.prepareDir(fileName);
+
+		WebUserAccount.prepareDir(fileName);
 		try 
 		{
-			byte[] data = FileUtil.read(fileName);
+			byte[] data = FileConfigUtil.read(fileName);
 			if(data != null)
 			{
 				String text = new String(data);
@@ -192,7 +167,7 @@ public class WebUserAccount {
 				while(keys.hasNext()) {
 				    String username = keys.next();
 				    JSONObject user = jsonObject.optJSONObject(username);
-				    this.addUser(username, user);
+				    WebUserAccount.addUser(username, user);
 				}
 			}
 		} 
@@ -204,7 +179,7 @@ public class WebUserAccount {
 		}
 	}
 	
-	public void save()
+	public static void save(String path)
 	{
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
@@ -212,29 +187,31 @@ public class WebUserAccount {
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = FileConfigUtil.fixFileName(dir + path);
-		String userData = this.toString();
+		String userData = WebUserAccount.listAsString();
 		try 
 		{
 			if(userData.length() > 20)
 			{
-				FileUtil.write(fileName, userData.getBytes());
+				FileConfigUtil.write(fileName, userData.getBytes());
 			}
 		} 
 		catch (IOException e) 
 		{
-			logger.error(e.getMessage());
+			/**
+			 * Do nothing
+			 */
 		}
 	}
 	
-	public String toString()
+	public static String listAsString()
 	{
-		return this.toJSONObject().toString();
+		return WebUserAccount.toJSONObject().toString();
 	}
 	
-	public JSONObject toJSONObject()
+	public static JSONObject toJSONObject()
 	{
 		JSONObject json = new JSONObject();
-		for (Map.Entry<String, User> entry : this.users.entrySet())
+		for (Map.Entry<String, User> entry : WebUserAccount.users.entrySet())
 		{
 			String username = entry.getKey();
 			JSONObject user = ((User) entry.getValue()).toJSONObject();
@@ -243,13 +220,10 @@ public class WebUserAccount {
 		return json;
 	}
 	
-	public String listAsString() 
-	{
-		return this.toString();
-	}
 	
-	public User getUserByPhone(String userID) {
-		for (Map.Entry<String, User> entry : this.users.entrySet())
+	
+	public static User getUserByPhone(String userID) {
+		for (Map.Entry<String, User> entry : WebUserAccount.users.entrySet())
 		{
 			if(!userID.isEmpty() && entry.getValue().getPhone().equals(userID))
 			{
@@ -258,8 +232,8 @@ public class WebUserAccount {
 		}
 		return new User();
 	}
-	public User getUserByEmail(String userID) {
-		for (Map.Entry<String, User> entry : this.users.entrySet())
+	public static User getUserByEmail(String userID) {
+		for (Map.Entry<String, User> entry : WebUserAccount.users.entrySet())
 		{
 			if(!userID.isEmpty() && entry.getValue().getEmail().equals(userID))
 			{
@@ -267,6 +241,9 @@ public class WebUserAccount {
 			}
 		}
 		return new User();
+	}
+	public static boolean isEmpty() {
+		return WebUserAccount.users.isEmpty();
 	}
 
 }
