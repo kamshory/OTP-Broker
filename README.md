@@ -59,7 +59,7 @@ Pengguna dapat menggunakan sebuah domain murah dan menggunakan Dynamic Domain Na
 **Send SMS Request**
 
 ```http
-POST /api/message HTTP/1.1
+POST /api/sms HTTP/1.1
 Host: sub.domain.tld
 Connection: close
 User-agent: KSPS
@@ -68,7 +68,7 @@ Content-length: 124
 Authorization: Basic dXNlcjpwYXNzd29yZA==
 
 {
-	"command":"send-message",
+	"command":"send-sms",
 	"data":{
 		"id": 123456,
 		"msisdn": "08126666666",
