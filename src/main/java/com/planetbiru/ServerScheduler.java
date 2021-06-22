@@ -53,7 +53,7 @@ public class ServerScheduler {
 	@Value("${otpbroker.path.setting.ddns}")
 	private String ddnsSettingPath;
 	
-	@Value("${otpbroker.path.setting.cloudflare}")
+	@Value("${otpbroker.path.setting.ddns.cloudflare}")
 	private String cloudflareSettingPath;
 	
 	@PostConstruct

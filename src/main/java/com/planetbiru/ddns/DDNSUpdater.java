@@ -4,7 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+import com.planetbiru.config.ConfigAfraid;
 import com.planetbiru.config.ConfigCloudflare;
+import com.planetbiru.config.ConfigDynu;
 import com.planetbiru.config.ConfigNoIP;
 
 public class DDNSUpdater extends Thread{
@@ -52,7 +54,9 @@ public class DDNSUpdater extends Thread{
 			}
 			JSONObject res2 = ddns.update(ddnsRecord);		
 			if(res2 != null)
-			logger.info("res2                    : {}", res2.toString(4));
+			{
+				logger.info("res2                    : {}", res2.toString(4));
+			}
 		}
 		else if(this.ddnsRecord.getProvider().equals("noip"))
 		{
@@ -70,7 +74,49 @@ public class DDNSUpdater extends Thread{
 
 			JSONObject res2 = ddns.update(ddnsRecord);		
 			if(res2 != null)
-			logger.info("res2                    : {}", res2.toString(4));
+			{
+				logger.info("res2                    : {}", res2.toString(4));
+			}
+		}
+		else if(this.ddnsRecord.getProvider().equals("afraid"))
+		{
+			System.out.println("Executing update DDNS");
+			logger.info("Executing update DDNS");
+			DNSAfraid ddns = new DNSAfraid();
+			
+			String endpoint = ConfigAfraid.getEndpoint();
+			String username = ConfigAfraid.getUsername();
+			String password = ConfigAfraid.getPassword();
+			String company = ConfigAfraid.getCompany();
+			String email = ConfigAfraid.getEmail();
+			
+			ddns.setConfig(endpoint, username, password, email, company);
+
+			JSONObject res2 = ddns.update(ddnsRecord);		
+			if(res2 != null)
+			{
+				logger.info("res2                    : {}", res2.toString(4));
+			}
+		}
+		else if(this.ddnsRecord.getProvider().equals("dynu"))
+		{
+			System.out.println("Executing update DDNS");
+			logger.info("Executing update DDNS");
+			DNSDynu ddns = new DNSDynu();
+			
+			String endpoint = ConfigDynu.getEndpoint();
+			String username = ConfigDynu.getUsername();
+			String password = ConfigDynu.getPassword();
+			String company = ConfigDynu.getCompany();
+			String email = ConfigDynu.getEmail();
+			
+			ddns.setConfig(endpoint, username, password, email, company);
+
+			JSONObject res2 = ddns.update(ddnsRecord);		
+			if(res2 != null)
+			{
+				logger.info("res2                    : {}", res2.toString(4));
+			}
 		}
 	}
 }

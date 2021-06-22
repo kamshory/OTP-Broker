@@ -26,10 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.api.RESTAPI;
 import com.planetbiru.config.ConfigAPIUser;
+import com.planetbiru.config.ConfigAfraid;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.config.ConfigDDNS;
+import com.planetbiru.config.ConfigDynu;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
@@ -100,11 +102,17 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.ddns}")
 	private String ddnsSettingPath;
 	
-	@Value("${otpbroker.path.setting.cloudflare}")
+	@Value("${otpbroker.path.setting.ddns.cloudflare}")
 	private String cloudflareSettingPath;
 
-	@Value("${otpbroker.path.setting.noip}")
+	@Value("${otpbroker.path.setting.ddns.noip}")
 	private String noIPSettingPath;
+
+	@Value("${otpbroker.path.setting.ddns.afraid}")
+	private String afraidSettingPath;
+	
+	@Value("${otpbroker.path.setting.ddns.dynu}")
+	private String dynuSettingPath;
 
 	@Value("${otpbroker.path.setting.modem}")
 	private String modemSettingPath;
@@ -139,6 +147,8 @@ public class ServerWebManager {
 		Config.setDdnsSettingPath(ddnsSettingPath);
 		Config.setCloudflareSettingPath(cloudflareSettingPath);
 		Config.setNoIPSettingPath(noIPSettingPath);
+		Config.setAfraidSettingPath(afraidSettingPath);
+		Config.setDynuSettingPath(dynuSettingPath);
 		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 		ConfigCloudflare.load(Config.getCloudflareSettingPath());
@@ -946,6 +956,72 @@ public class ServerWebManager {
 			{
 				ConfigNoIP.load(Config.getNoIPSettingPath());				
 				responseBody = ConfigNoIP.toJSONObject().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	
+	@GetMapping(path="/afraid/get")
+	public ResponseEntity<byte[]> handleAfraidSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				ConfigAfraid.load(Config.getAfraidSettingPath());				
+				responseBody = ConfigAfraid.toJSONObject().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	@GetMapping(path="/dynu/get")
+	public ResponseEntity<byte[]> handleDynuSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				ConfigDynu.load(Config.getDynuSettingPath());				
+				responseBody = ConfigDynu.toJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -1794,6 +1870,14 @@ public class ServerWebManager {
 				{
 					this.processNoIPSetting(requestBody);
 				}
+				if(path.equals("/afraid.html"))
+				{
+					this.processAfraidSetting(requestBody);
+				}
+				if(path.equals("/dynu.html"))
+				{
+					this.processDynuSetting(requestBody);
+				}
 				if(path.equals("/network-setting.html"))
 				{
 					this.processNetworkSetting(requestBody);
@@ -2095,6 +2179,52 @@ public class ServerWebManager {
 			ConfigNoIP.setCompany(company);
 			ConfigNoIP.setEmail(email);		
 			ConfigNoIP.save(Config.getNoIPSettingPath());
+		}
+	}
+	
+	private void processAfraidSetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		String endpoint = query.getOrDefault("endpoint", "").trim();
+		String username = query.getOrDefault("username", "").trim();
+		String email = query.getOrDefault("email", "").trim();
+		String password = query.getOrDefault("password", "").trim();
+		String company = query.getOrDefault("company", "").trim();
+		
+		if(!endpoint.isEmpty())
+		{
+			ConfigAfraid.load(Config.getAfraidSettingPath());
+			ConfigAfraid.setEndpoint(endpoint);
+			ConfigAfraid.setUsername(username);
+			if(!password.isEmpty())
+			{
+				ConfigAfraid.setPassword(password);
+			}
+			ConfigAfraid.setCompany(company);
+			ConfigAfraid.setEmail(email);		
+			ConfigAfraid.save(Config.getAfraidSettingPath());
+		}
+	}
+	
+	private void processDynuSetting(String requestBody) {
+		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		String endpoint = query.getOrDefault("endpoint", "").trim();
+		String username = query.getOrDefault("username", "").trim();
+		String email = query.getOrDefault("email", "").trim();
+		String password = query.getOrDefault("password", "").trim();
+		String company = query.getOrDefault("company", "").trim();
+		
+		if(!endpoint.isEmpty())
+		{
+			ConfigDynu.load(Config.getDynuSettingPath());
+			ConfigDynu.setEndpoint(endpoint);
+			ConfigDynu.setUsername(username);
+			if(!password.isEmpty())
+			{
+				ConfigDynu.setPassword(password);
+			}
+			ConfigDynu.setCompany(company);
+			ConfigDynu.setEmail(email);		
+			ConfigDynu.save(Config.getDynuSettingPath());
 		}
 	}
 	

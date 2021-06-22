@@ -549,3 +549,7 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
 .service-button{
   padding-top: 5px;;
 }
+
+.button-area button, .button-area input[type="button"], .button-area input[type="reset"], .button-area input[type="submit"]{
+  margin-bottom: 5px;
+}

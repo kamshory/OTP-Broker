@@ -37,6 +37,7 @@ public class FileUtil {
 		 }
 		 return allBytes;
 	}
+	
 	public static void write(String fileName, byte[] data) throws IOException
 	{
 		try 
@@ -48,9 +49,9 @@ public class FileUtil {
 	        printStream.write(data);
 	        printStream.close();
 		}
-		 catch (IOException ex) 
-		 {
-			 throw new IOException(ex);
-		 }
+		catch (IOException ex) 
+		{
+			throw new IOException(ex);
+		}
 	}
 }

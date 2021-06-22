@@ -7,10 +7,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 
+import com.planetbiru.ServerScheduler;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.util.FileConfigUtil;
@@ -18,6 +21,7 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class WebUserAccount {
+	private static Logger logger = LogManager.getLogger(WebUserAccount.class);
 	private static Map<String, User> users = new HashMap<>();
 
 	private WebUserAccount()
@@ -187,6 +191,7 @@ public class WebUserAccount {
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = FileConfigUtil.fixFileName(dir + path);
+		logger.info("fileName : {}", fileName);
 		String userData = WebUserAccount.listAsString();
 		try 
 		{
