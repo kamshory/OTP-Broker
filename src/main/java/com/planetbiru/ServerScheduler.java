@@ -20,9 +20,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigAfraid;
 import com.planetbiru.config.ConfigCloudflare;
 import com.planetbiru.config.ConfigDDNS;
+import com.planetbiru.config.ConfigDynu;
 import com.planetbiru.config.ConfigFeederAMQP;
+import com.planetbiru.config.ConfigNoIP;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.ddns.DDNSUpdater;
@@ -37,6 +41,10 @@ import com.planetbiru.util.Utility;
 public class ServerScheduler {
 
 	private Logger logger = LogManager.getLogger(ServerScheduler.class);
+	
+	@Value("${otpbroker.path.base.setting}")
+	private String baseDirConfig;
+
 	
 	@Value("${otpbroker.cron.enable.ddns}")
 	private boolean ddnsUpdate;
@@ -53,14 +61,38 @@ public class ServerScheduler {
 	@Value("${otpbroker.path.setting.ddns}")
 	private String ddnsSettingPath;
 	
-	@Value("${otpbroker.path.setting.cloudflare}")
+	@Value("${otpbroker.path.setting.ddns.cloudflare}")
 	private String cloudflareSettingPath;
+	
+	@Value("${otpbroker.path.setting.ddns.noip}")
+	private String noIPSettingPath;
+
+	@Value("${otpbroker.path.setting.ddns.afraid}")
+	private String afraidSettingPath;
+	
+	@Value("${otpbroker.path.setting.ddns.dynu}")
+	private String dynuSettingPath;
+
 	
 	@PostConstruct
 	public void init()
 	{
-		ConfigDDNS.load(ddnsSettingPath);
-		ConfigCloudflare.load(cloudflareSettingPath);
+		Config.setBaseDirConfig(baseDirConfig);
+		Config.setDdnsSettingPath(ddnsSettingPath);
+		
+		Config.setCloudflareSettingPath(cloudflareSettingPath);
+		Config.setNoIPSettingPath(noIPSettingPath);
+		Config.setDynuSettingPath(dynuSettingPath);
+		Config.setAfraidSettingPath(afraidSettingPath);
+		
+		
+		ConfigDDNS.load(Config.getDdnsSettingPath());
+
+		ConfigCloudflare.load(Config.getCloudflareSettingPath());
+		ConfigNoIP.load(Config.getNoIPSettingPath());
+		ConfigDynu.load(Config.getDynuSettingPath());
+		ConfigAfraid.load(Config.getAfraidSettingPath());
+		
 	}
 	
 	

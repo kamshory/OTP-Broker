@@ -35,7 +35,7 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-			<span class="usb-device-symbol"></span>
+                    <span class="usb-device-symbol"></span>
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                         aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
@@ -67,10 +67,10 @@
                                 <li class="dropdown-header">Other Configs</li>
                                 <li class=""><a href="network-setting.html">Network Setting</a></li>
                                 <li class=""><a href="keystore.html">Keystore</a></li>
-                                <li class="active"><a href="cloudflare.html">Cloudflare</a></li>
+                                <li class=""><a href="cloudflare.html">Cloudflare</a></li>
                                 <li class=""><a href="noip.html">No IP</a></li>
                                 <li class=""><a href="dynu.html">Dynu</a></li>
-                                <li class=""><a href="afraid.html">Afraid</a></li>
+                                <li class="active"><a href="afraid.html">Afraid</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -84,40 +84,40 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>Cloudflare</h3>
-            <form action="cloudflare.html" method="post">
+            <h3>Afraid</h3>
+            <form action="afraid.html" method="post">
                 <table class="config-table config-table-connection">
                     <tbody>
                         <tr>
-                            <td>Cloudflare Endpoint</td>
-                            <td><input type="url" name="endpoint" id="endpoint" value="https://api.cloudflare.com/client/v4">
+                            <td>AfraidEndpoint</td>
+                            <td><input type="url" name="endpoint" id="endpoint" value="https://freedns.afraid.org/nic/update">
                             </td>
                         </tr>
                         <tr>
-                            <td>Account ID</td>
-                            <td><input type="text" name="account_id" id="account_id" value="">
+                            <td>Username</td>
+                            <td><input type="text" name="username" id="username" value="">
                             </td>
                         </tr>
                         <tr>
-                            <td>Email</td>
-                            <td><input type="email" name="auth_email" id="auth_email" value="">
+                            <td>Password</td>
+                            <td><input type="password" name="password" id="password" value="">
                             </td>
                         </tr>
                         <tr>
-                            <td>API Key</td>
-                            <td><input type="text" name="auth_api_key" id="auth_api_key" value="">
+                            <td>Company Name</td>
+                            <td><input type="text" name="company" id="company" value="">
                             </td>
                         </tr>
                         <tr>
-                            <td>Token</td>
-                            <td><input type="text" name="auth_token" id="auth_token" value="">
+                            <td>Maintainer Email</td>
+                            <td><input type="email" name="email" id="email" value="">
                             </td>
                         </tr>
                         <tr>
                             <td></td>
                             <td>
                                 <input type="submit" class="btn btn-success" name="save_ddns_setting"
-                                    id="save_sms_setting" value="Save">
+                                    id="save_ddns_setting" value="Save">
                                 <input type="reset" class="btn btn-default" value="Reset">
                             </td>
                         </tr>
@@ -129,14 +129,13 @@
                 $(document).ready(function (e) {
                     $.ajax({
                         type: "GET",
-                        url: "cloudflare/get",
+                        url: "afraid/get",
                         dataType: "json",
                         success: function (data) {
                             $('input[name="endpoint"]').val(data.endpoint);
-                            $('input[name="account_id"]').val(data.accountId);
-                            $('input[name="auth_email"]').val(data.authEmail);
-                            $('input[name="auth_api_key"]').val(data.authApiKey);
-                            $('input[name="auth_token"]').val(data.authToken + "");
+                            $('input[name="username"]').val(data.username);
+                            $('input[name="email"]').val(data.email);
+                            $('input[name="company"]').val(data.company);
                         }
                     });
                 });

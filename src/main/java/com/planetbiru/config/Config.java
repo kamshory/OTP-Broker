@@ -62,6 +62,8 @@ public class Config {
 	private static String osDHCPConfigPath = "";
 	private static String documentRoot = "/static/www";
 	private static String userSettingPath = "";
+	private static String afraidSettingPath = "";
+	private static String dynuSettingPath = ""; 
 	
 	private Config()
 	{
@@ -589,6 +591,26 @@ public class Config {
 
 	public static void setUserSettingPath(String userSettingPath) {
 		Config.userSettingPath = userSettingPath;
+	}
+
+
+	public static String getAfraidSettingPath() {
+		return afraidSettingPath;
+	}
+
+
+	public static void setAfraidSettingPath(String afraidSettingPath) {
+		Config.afraidSettingPath = afraidSettingPath;
+	}
+
+
+	public static String getDynuSettingPath() {
+		return dynuSettingPath;
+	}
+
+
+	public static void setDynuSettingPath(String dynuSettingPath) {
+		Config.dynuSettingPath = dynuSettingPath;
 	}
 
 
