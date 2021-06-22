@@ -35,6 +35,7 @@ public class ConstantString {
 	public static final String UNAUTHORIZED                  = "Unauthorized";
 	public static final String BLOCK_MSISDN                  = "block-msisdn";
 	public static final String UNBLOCK_MSISDN                = "unblock-msisdn";
+	public static final String SEND_SMS                      = "send-sms";
 	
 	private ConstantString()
 	{
