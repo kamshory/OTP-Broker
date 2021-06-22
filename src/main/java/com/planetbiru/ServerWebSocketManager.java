@@ -23,12 +23,13 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.gsm.SMSUtil;
-import com.planetbiru.user.WebSocketUserAccount;
+import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.util.Utility;
 import com.planetbiru.wstools.MessageDecoder;
@@ -61,7 +62,8 @@ public class ServerWebSocketManager {
     @PostConstruct
     public void init()
     {
-    	WebSocketUserAccount.init(userSettingPath);
+    	Config.setUserSettingPath(userSettingPath);
+    	WebUserAccount.load(Config.getUserSettingPath());
     }
     
 	@SuppressWarnings("unchecked")
@@ -81,8 +83,7 @@ public class ServerWebSocketManager {
         boolean auth = true;
         try 
         {
-        	WebSocketUserAccount.getUserAccount().load();
-        	auth = WebSocketUserAccount.getUserAccount().checkUserAuth(requestHdr);
+        	auth = WebUserAccount.checkUserAuth(requestHdr);
             if(auth)
             {
                 listeners.add(this);

@@ -1227,7 +1227,7 @@ public class Utility {
 	}
 	public static String getBaseDir()
 	{
-		if(Config.getBaseDirConfig().isEmpty())
+		if(!Config.getBaseDirConfig().isEmpty())
 		{
 			return Config.getBaseDirConfig();
 		}

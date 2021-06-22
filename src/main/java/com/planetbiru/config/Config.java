@@ -61,6 +61,7 @@ public class Config {
 	private static String osEthernetConfigPath = "";
 	private static String osDHCPConfigPath = "";
 	private static String documentRoot = "/static/www";
+	private static String userSettingPath = "";
 	
 	private Config()
 	{
@@ -578,6 +579,16 @@ public class Config {
 
 	public static void setDocumentRoot(String documentRoot) {
 		Config.documentRoot = documentRoot;
+	}
+
+
+	public static String getUserSettingPath() {
+		return userSettingPath;
+	}
+
+
+	public static void setUserSettingPath(String userSettingPath) {
+		Config.userSettingPath = userSettingPath;
 	}
 
 
