@@ -35,7 +35,6 @@ import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.Utility;
 
-
 @EnableScheduling
 @Component
 public class ServerScheduler {
@@ -143,8 +142,7 @@ public class ServerScheduler {
 		
 	@Scheduled(cron = "${otpbroker.cron.expression.ddns}")
 	public void updateDNS() 
-	{
-		
+	{		
 		if(ddnsUpdate)
 		{
 			int countUpdate = 0;	

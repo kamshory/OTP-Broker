@@ -47,6 +47,7 @@ Untuk menggunakan Message Broker, silakan gunakan RabbitMQ dengan link https://w
 Pada skenario ini, App Server dapat langsung mengirimkan OTP ke OTP Broker melalui HTTP.
 
 ![OTP Broker Topology Skenario 1](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology-1.png)
+
 Pengguna dapat menggunakan sebuah domain murah dan menggunakan Dynamic Domain Name Server gratis. Dengan penggunaan port forwarding pada router, OTP Broker dapat diakses dari manapun dengan menggunakan domain atau subdomain. Dalam skenario ini, pengguna membutuhkan:
 
 1. OTP Broker
@@ -54,6 +55,65 @@ Pengguna dapat menggunakan sebuah domain murah dan menggunakan Dynamic Domain Na
 3. Router yang dapat melakukan port forwarding
 4. Domain yang name servernya dapat diatur
 5. Layanan Dynamic DNS (gratis maupun berbayar)
+
+**Send SMS Request**
+
+```http
+POST /api/message HTTP/1.1
+Host: sub.domain.tld
+Connection: close
+User-agent: KSPS
+Content-type: application/json
+Content-length: 124
+Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+{
+	"command":"send-message",
+	"data":{
+		"id": 123456,
+		"msisdn": "08126666666",
+		"message": "OTP Anda adalah 1234"
+	}
+}
+```
+
+**Block Number Request**
+
+```http
+POST /api/block HTTP/1.1
+Host: sub.domain.tld
+Connection: close
+User-agent: KSPS
+Content-type: application/json
+Content-length: 86
+Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+{
+	"command":"block-msisdn",
+	"data":{
+		"msisdn": "08126666666",
+	}
+}
+```
+
+**Unblock Number Request**
+
+```http
+POST /api/block HTTP/1.1
+Host: sub.domain.tld
+Connection: close
+User-agent: KSPS
+Content-type: application/json
+Content-length: 86
+Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+{
+	"command":"unblock-msisdn",
+	"data":{
+		"msisdn": "08126666666",
+	}
+}
+```
 
 **Sekenario 2 - OTP Broker Tidak Dapat Diakses App Server**
 
