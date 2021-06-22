@@ -40,7 +40,7 @@ import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigNoIP;
 import com.planetbiru.config.ConfigSMS;
-import com.planetbiru.config.ConfigSaved;
+import com.planetbiru.config.GeneralConfig;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
@@ -56,13 +56,15 @@ import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
+import com.planetbiru.util.OSUtil;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.Utility;
+import com.planetbiru.util.OSUtil.OS;
 
 @RestController
 public class ServerWebManager {
 	
-	private ConfigSaved configSaved = new ConfigSaved();
+	private GeneralConfig configSaved = new GeneralConfig();
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
 	private WebUserAccount userAccount;
@@ -120,6 +122,7 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		Config.setDocumentRoot(documentRoot);
 		Config.setDeviceName(deviceName);
 		Config.setDeviceVersion(deviceVersion);
 		Config.setNoIPDevice(deviceName+"/"+deviceVersion);
@@ -148,7 +151,7 @@ public class ServerWebManager {
 		
 		try 
 		{
-			configSaved = new ConfigSaved(mimeSettingPath);
+			configSaved = new GeneralConfig(mimeSettingPath);
 		} 
 		catch (IOException e) 
 		{
@@ -3056,13 +3059,46 @@ public class ServerWebManager {
 		{
 			file = Config.getDefaultFile();
 		}		
-		String dir = "";
-		return dir + documentRoot+file;		
+		return this.getFileName(file);		
 	}
 	
-	private String getFileName(String request) 
+	private String getFileName(String path) 
 	{
-		return documentRoot+request;
+		String dir = Config.getDocumentRoot();
+		if(!path.startsWith("/"))
+		{
+			path = "/"+path;
+		}
+		if(dir.endsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		
+		String filename = this.fixFileName(dir+path);
+		return filename;
+	}
+	public String fixFileName(String fileName) {
+		if(OSUtil.getOS().equals(OS.WINDOWS))
+		{
+			fileName = fileName.replace("/", "\\");
+			fileName = fileName.replace("\\\\", "\\");
+		}
+		else
+		{
+			fileName = fileName.replace("\\", "/");		
+			fileName = fileName.replace("//", "/");
+		}
+		return fileName;
+	}
+	
+	public String getFileExtension(String fileName) 
+	{
+		String extension = fileName;
+		int index = fileName.lastIndexOf('.');
+		if (index > 0) {
+		      extension = fileName.substring(index + 1);
+		}
+		return extension;
 	}
 	
 }

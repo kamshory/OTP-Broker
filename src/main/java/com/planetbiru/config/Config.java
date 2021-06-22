@@ -60,6 +60,7 @@ public class Config {
 	private static String osSSIDKey = "";
 	private static String osEthernetConfigPath = "";
 	private static String osDHCPConfigPath = "";
+	private static String documentRoot = "/static/www";
 	
 	private Config()
 	{
@@ -567,6 +568,16 @@ public class Config {
 
 	public static void setOsDHCPConfigPath(String osDHCPConfigPath) {
 		Config.osDHCPConfigPath = osDHCPConfigPath;
+	}
+
+
+	public static String getDocumentRoot() {
+		return documentRoot;
+	}
+
+
+	public static void setDocumentRoot(String documentRoot) {
+		Config.documentRoot = documentRoot;
 	}
 
 

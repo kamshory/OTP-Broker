@@ -60,7 +60,6 @@ public class Application {
 		logger.info("public static void main(String[] args)");
 		context = SpringApplication.run(Application.class);
 	}
-	
 
 	public static void stop()
 	{

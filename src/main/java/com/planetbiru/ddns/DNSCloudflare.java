@@ -486,6 +486,37 @@ public class DNSCloudflare extends DNS{
 	{
 		return this.delete(DDNSKey.ZONES + zoneId + "/dns_records/" + recordId, ConstantString.URL_ENCODE);
 	}
+	public String getAuthEmail() {
+		return authEmail;
+	}
+	public void setAuthEmail(String authEmail) {
+		this.authEmail = authEmail;
+	}
+	public String getAccountId() {
+		return accountId;
+	}
+	public void setAccountId(String accountId) {
+		this.accountId = accountId;
+	}
+	public String getEndpoint() {
+		return endpoint;
+	}
+	public void setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
+	}
+	public String getAuthApiKey() {
+		return authApiKey;
+	}
+	public void setAuthApiKey(String authApiKey) {
+		this.authApiKey = authApiKey;
+	}
+	public String getAuthToken() {
+		return authToken;
+	}
+	public void setAuthToken(String authToken) {
+		this.authToken = authToken;
+	}
+	
 
 
 }

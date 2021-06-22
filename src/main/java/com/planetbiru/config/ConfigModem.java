@@ -48,7 +48,7 @@ public class ConfigModem {
 		ConfigModem.prepareDir(fileName);
 		try 
 		{
-			byte[] data = FileUtil.read(fileName);
+			byte[] data = FileUtil.readResource(fileName);
 			if(data != null)
 			{
 				String text = new String(data);
