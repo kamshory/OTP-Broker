@@ -147,8 +147,8 @@ public class ServerWebManager {
 		Config.setDdnsSettingPath(ddnsSettingPath);
 		Config.setCloudflareSettingPath(cloudflareSettingPath);
 		Config.setNoIPSettingPath(noIPSettingPath);
-		Config.setAfraidSettingPath(afraidSettingPath);
 		Config.setDynuSettingPath(dynuSettingPath);
+		Config.setAfraidSettingPath(afraidSettingPath);
 		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 		ConfigCloudflare.load(Config.getCloudflareSettingPath());

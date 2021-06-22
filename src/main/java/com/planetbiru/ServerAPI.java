@@ -133,8 +133,6 @@ public class ServerAPI {
 	private String smsSettingPath;
 
 
-
-
 	@PostConstruct
 	public void init()
 	{
