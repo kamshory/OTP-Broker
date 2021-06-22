@@ -99,7 +99,7 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 **Unblock Number Request**
 
 ```http
-POST /api/block HTTP/1.1
+POST /api/unblock HTTP/1.1
 Host: sub.domain.tld
 Connection: close
 User-agent: KSPS
