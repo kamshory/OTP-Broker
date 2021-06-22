@@ -155,7 +155,12 @@ Email Setting adalah konfigurasi SMTP untuk mengirimkan password apabila penggun
 
 DDNS Record adalah data untuk melakukan pengaturan DNS secara dinamis. DDNS atau Dymanic Domain Name Server adalah sebuah mekanisme pengaturan DNS yang dilakukan secara berulang-ulang disebabkan karena alamat IP publik dari server yang selalu berubah-ubah.
 
-OTP Broker menyediakan pengaturan DDNS menggunakan Cloudflare dan NoIP. Pada Cloudflare, alamat IP publik dilakukan dengan mengirimkan request ke ipv4.icanhazip.com. DMS kemdian dikonfigurasi dengan alamat IP yang didapat. Pada NoIP, OTP Broker hanya akan mengirimkan nama server yang akan diatur ulang alamat IPnya. NoIP akan menggunakan alamat IP publik dari mana request tersebut berasal.
+OTP Broker menyediakan pengaturan DDNS menggunakan vendor DDNS. Beberapa vendor DDNS yang didukung adalah sebagai berikut:
+
+1. Cloudflare - https://www.cloudflare.com/
+2. NoIP - https://www.noip.com/
+3. Dynu Dyn DNS - https://www.dynu.com/
+4. Free DNS Afraid - https://freedns.afraid.org/
 
 ## Network Setting 
 
@@ -180,6 +185,14 @@ Modul Cloudflare adalah modul untuk mengatur akun Cloudflare yang digunakan.
 ## NoIP
 
 Modul NoIP adalah modul untuk mengatur akun NoIP yang digunakan.
+
+## Dynu
+
+Modul Dynu adalah modul untuk mengatur akun Dynu Dyn DNS yang digunakan.
+
+## Afraid
+
+Modul Afraid adalah modul untuk mengatur akun Free DNS Afraid yang digunakan.
 
 
 ## Pengujian Modul
