@@ -139,9 +139,9 @@ public class ConfigNetDHCP {
 		return config;
 	}
 
-	public static void apply()
+	public static void apply(String path)
 	{
-		
+		ConfigNetDHCP.configPath = path;
 		String data = ConfigNetDHCP.buildConfig();
 		logger.info("data : {}", data);
 		try 

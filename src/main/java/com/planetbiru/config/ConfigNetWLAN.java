@@ -138,10 +138,11 @@ public class ConfigNetWLAN {
 		return config;
 	}
 
-	public static void apply()
+	public static void apply(String path1, String path2)
 	{
-		String uuid = "605a8783-c38b-4351-8f28-e82f99fdd0c6";
-		
+		ConfigNetWLAN.configPath = path1;
+		ConfigNetWLAN.configPathWPAPSK = path2;
+		String uuid = "605a8783-c38b-4351-8f28-e82f99fdd0c6";		
 		String format = "ESSID=\"%s\"\r\n"
 				+ "MODE=Ap\r\n"
 				+ "KEY_MGMT=%s\r\n"

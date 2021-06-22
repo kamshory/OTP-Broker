@@ -11,12 +11,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 
+import com.planetbiru.config.ConfigAPIUser;
+import com.planetbiru.config.ConfigBlocking;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
-import com.planetbiru.user.APIUserAccount;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.Utility;
 import com.sun.net.httpserver.Headers;
@@ -48,17 +49,17 @@ public class RESTAPI {
 		return requestJSON;
 	}
 
-	public static boolean validRequest(HttpHeaders headers) 
+	public static boolean isValidRequest(HttpHeaders headers) 
 	{
-		return RESTAPI.parseBasicAuth(headers);
+		return RESTAPI.checkValidRequest(headers);
 	}
 	
-	public static boolean validRequest(Headers headers) 
+	public static boolean isValidRequest(Headers headers) 
 	{
-		return RESTAPI.parseBasicAuth(headers);
+		return RESTAPI.checkValidRequest(headers);
 	}
 	
-	public static boolean parseBasicAuth(Map<String, List<String>> requestHeaders) 
+	public static boolean checkValidRequest(Map<String, List<String>> requestHeaders) 
     {
 		String username = "";
 		String password = "";
@@ -77,7 +78,7 @@ public class RESTAPI {
 					if(arr.length > 1)
 					{
 						password = arr[1];
-						return APIUserAccount.checkUserAuth(username, password);
+						return ConfigAPIUser.checkUserAuth(username, password);
 					}
 				}
 			}
@@ -85,48 +86,6 @@ public class RESTAPI {
     	return false;
 	}	
 	
-	public static JSONObject processMessageRequest(String requestBody) 
-	{
-		JSONObject requestJSON = new JSONObject();
-		try
-		{
-			requestJSON = new JSONObject(requestBody);
-			String command = requestJSON.optString(JsonKey.COMMAND, "");
-			if(command.equals(ConstantString.SEND_MESSAGE))
-			{
-				JSONArray data = requestJSON.optJSONArray(JsonKey.DATA);
-				if(data != null && !data.isEmpty())
-				{
-					int length = data.length();
-					int i;
-					for(i = 0; i<length; i++)
-					{
-						RESTAPI.sendMessage(data.getJSONObject(i));					
-					}
-				}
-			}
-			else if(command.equals(ConstantString.SEND_MAIL))
-			{
-				JSONArray data = requestJSON.optJSONArray(JsonKey.DATA);
-				if(data != null && !data.isEmpty())
-				{
-					int length = data.length();
-					int i;
-					for(i = 0; i<length; i++)
-					{
-						RESTAPI.sendMail(data.getJSONObject(i));					
-					}
-				}
-			}
-		}
-		catch(JSONException e)
-		{
-			/**
-			 * Do nothing
-			 */
-		}
-		return requestJSON;
-	}
 	public static JSONObject processEmailRequest(String requestBody) 
 	{
 		JSONObject requestJSON = new JSONObject();
@@ -187,9 +146,11 @@ public class RESTAPI {
 			try 
 			{
 				SMSUtil.sendSMS(receiver, textMessage);
+				
 			} 
 			catch (GSMException e) 
 			{
+				e.printStackTrace();
 				/**
 				 * Do nothing
 				 */
@@ -225,6 +186,61 @@ public class RESTAPI {
         {
         	return "".getBytes();
         }
+	}
+	public static JSONObject processRequest(String requestBody) {
+		JSONObject requestJSON = new JSONObject();
+		JSONObject responseJSON = new JSONObject();
+		try
+		{
+			requestJSON = new JSONObject(requestBody);
+			String command = requestJSON.optString(JsonKey.COMMAND, "");
+			if(command.equals(ConstantString.SEND_MESSAGE))
+			{
+				JSONObject data = requestJSON.optJSONObject(JsonKey.DATA);
+				RESTAPI.sendMessage(data);		
+				responseJSON.put("response_code", ResponseCode.SUCCESS);
+			}
+			else if(command.equals(ConstantString.SEND_MAIL))
+			{
+				JSONObject data = requestJSON.optJSONObject(JsonKey.DATA);
+				RESTAPI.sendEmail(data);					
+			}
+			else if(command.equals(ConstantString.BLOCK_MSISDN))
+			{
+				JSONObject data = requestJSON.optJSONObject(JsonKey.DATA);
+				if(data != null)
+				{
+					RESTAPI.blockMSISDN(data.optString("msisdn", ""));					
+				}
+			}
+			else if(command.equals(ConstantString.UNBLOCK_MSISDN))
+			{
+				JSONObject data = requestJSON.optJSONObject(JsonKey.DATA);
+				if(data != null)
+				{
+					RESTAPI.unblockMSISDN(data.optString("msisdn", ""));					
+				}
+			}
+		}
+		catch(JSONException | GSMException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		return responseJSON;
+	}
+	private static void sendEmail(JSONObject data) {
+		// TODO Auto-generated method stub
+		
+	}
+	private static void blockMSISDN(String msisdn) throws GSMException {
+		ConfigBlocking.block(msisdn);
+		
+	}
+	private static void unblockMSISDN(String msisdn) throws GSMException {
+		ConfigBlocking.unblock(msisdn);
+		
 	}
 	
 }

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.api.RESTAPI;
+import com.planetbiru.config.ConfigAPIUser;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigCloudflare;
@@ -48,7 +49,6 @@ import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.receiver.ws.WebSocketContent;
-import com.planetbiru.user.APIUserAccount;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.user.User;
 import com.planetbiru.user.WebUserAccount;
@@ -66,7 +66,6 @@ public class ServerWebManager {
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
 	private WebUserAccount userAccount;
-	private WebUserAccount userAPIAccount;
 
 	@Value("${otpbroker.device.name}")
 	private String deviceName;
@@ -88,21 +87,12 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.path.setting.feeder.amqp}")
 	private String feederAMQPSettingPath;
-
-	@Value("${otpbroker.path.setting.sms}")
-	private String smsSettingPath;
 	
 	@Value("${otpbroker.path.setting.all}")
 	private String mimeSettingPath;	
 	
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
-
-	@Value("${otpbroker.path.setting.api.service}")
-	private String apiSettingPath;
-
-	@Value("${otpbroker.path.setting.api.user}")
-	private String userAPISettingPath;
 
 	@Value("${otpbroker.device.connection.type}")
 	private String portName;
@@ -115,15 +105,6 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.path.setting.noip}")
 	private String noIPSettingPath;
-
-	@Value("${otpbroker.path.setting.dhcp}")
-	private String dhcpSettingPath;
-
-	@Value("${otpbroker.path.setting.wlan}")
-	private String wlanSettingPath;
-
-	@Value("${otpbroker.path.setting.ethernet}")
-	private String ethernetSettingPath;
 
 	@Value("${otpbroker.path.setting.modem}")
 	private String modemSettingPath;
@@ -138,17 +119,14 @@ public class ServerWebManager {
 	
 	@PostConstruct
 	public void init()
-	{		
-		
+	{
 		Config.setDeviceName(deviceName);
 		Config.setDeviceVersion(deviceVersion);
 		Config.setNoIPDevice(deviceName+"/"+deviceVersion);
 		
 		Config.setModemSettingPath(modemSettingPath);
-		Config.setDhcpSettingPath(dhcpSettingPath);
 		
 		Config.setFeederWSSettingPath(feederWSSettingPath);
-		Config.setWlanSettingPath(wlanSettingPath);	
 		Config.setFeederWSSettingPath(feederWSSettingPath);
 		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
 		Config.setSessionName(sessionName);
@@ -157,10 +135,6 @@ public class ServerWebManager {
 		Config.setDdnsSettingPath(ddnsSettingPath);
 		Config.setCloudflareSettingPath(cloudflareSettingPath);
 		Config.setNoIPSettingPath(noIPSettingPath);
-		Config.setApiSettingPath(apiSettingPath);
-		
-		Config.setSmsSettingPath(smsSettingPath);
-		Config.setEthernetSettingPath(ethernetSettingPath);	
 		
 		Config.setBaseDirConfig(baseDirConfig);
 		ConfigDDNS.load(Config.getDdnsSettingPath());
@@ -170,7 +144,7 @@ public class ServerWebManager {
 
 		Config.setPortName(portName);		
 		userAccount = new WebUserAccount(userSettingPath);		
-		userAPIAccount = new WebUserAccount(userAPISettingPath);		
+			
 		
 		try 
 		{
@@ -495,7 +469,7 @@ public class ServerWebManager {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
-		ServerApplication.restart();
+		Application.restart();
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}	
@@ -1165,7 +1139,8 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				String list = userAPIAccount.listAsString();
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
+				String list = ConfigAPIUser.listAsString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -1198,7 +1173,8 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
-				String data = userAPIAccount.getUser(username).toString();
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
+				String data = ConfigAPIUser.getUser(username).toString();
 				responseBody = data.getBytes();
 			}
 			else
@@ -1441,6 +1417,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
 			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
 			    String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "");
@@ -1459,9 +1436,8 @@ public class ServerWebManager {
 				
 				if(!username.isEmpty())
 				{
-					userAPIAccount.addUser(new User(jsonObject));		
-					userAPIAccount.save();
-					APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+					ConfigAPIUser.addUser(new User(jsonObject));		
+					ConfigAPIUser.save(Config.getUserAPISettingPath());;
 				}		    
 			}
 		}
@@ -1541,6 +1517,7 @@ public class ServerWebManager {
 		{
 			if(userAccount.checkUserAuth(headers))
 			{
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);				
 			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");
 			    String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "");
@@ -1565,9 +1542,8 @@ public class ServerWebManager {
 				{
 					jsonObject.put(JsonKey.PASSWORD, password);
 				}
-				userAPIAccount.updateUser(new User(jsonObject));		
-				userAPIAccount.save();	
-				APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+				ConfigAPIUser.updateUser(new User(jsonObject));		
+				ConfigAPIUser.save(Config.getUserAPISettingPath());;	
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -1942,7 +1918,9 @@ public class ServerWebManager {
 			
 			String v3 = query.getOrDefault("max_per_time_range", "0").trim();
 			int lMaxPerTimeRange = Utility.atoi(v3);
+			String countryCode = query.getOrDefault("country_code", "").trim();
 			
+			ConfigSMS.setCountryCode(countryCode);
 			ConfigSMS.setSendIncommingSMS(lSendIncommingSMS);
 			ConfigSMS.setIncommingInterval(lIncommingInterval);
 			ConfigSMS.setTimeRange(lTimeRange);
@@ -2042,7 +2020,7 @@ public class ServerWebManager {
 			ConfigNetDHCP.setRanges(rangeList);
 			ConfigNetDHCP.setDomainNameServers(nsList);
 			ConfigNetDHCP.save(Config.getDhcpSettingPath());	
-			ConfigNetDHCP.apply();
+			ConfigNetDHCP.apply(Config.getOsDHCPConfigPath());
 		}
 		
 		if(query.containsKey("save_wlan"))
@@ -2057,7 +2035,7 @@ public class ServerWebManager {
 			ConfigNetWLAN.setGateway(query.getOrDefault("gateway", "").trim());
 			ConfigNetWLAN.setDns1(query.getOrDefault("dns1", "").trim());
 			ConfigNetWLAN.save(Config.getWlanSettingPath());
-			ConfigNetWLAN.apply();
+			ConfigNetWLAN.apply(Config.getOsWLANConfigPath(), Config.getOsSSIDKey());
 		}
 
 		if(query.containsKey("save_ethernet"))
@@ -2070,7 +2048,7 @@ public class ServerWebManager {
 			ConfigNetEthernet.setDns1(query.getOrDefault("dns1", "").trim());
 			ConfigNetEthernet.setDns2(query.getOrDefault("dns2", "").trim());
 			ConfigNetEthernet.save(Config.getEthernetSettingPath());
-			ConfigNetEthernet.apply();
+			ConfigNetEthernet.apply(Config.getOsEthernetConfigPath());
 		}
 	}
 
@@ -2442,13 +2420,13 @@ public class ServerWebManager {
 			/**
 			 * Delete
 			 */
+			ConfigAPIUser.load(Config.getUserAPISettingPath());
 			for (Map.Entry<String, String> entry : query.entrySet()) 
 			{
 				String value = entry.getValue();
-				userAPIAccount.deleteUser(value);
+				ConfigAPIUser.deleteUser(value);
 			}
-			userAPIAccount.save();
-			APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+			ConfigAPIUser.save(Config.getUserAPISettingPath());
 		}
 		if(query.containsKey(JsonKey.DEACTIVATE))
 		{
@@ -2651,92 +2629,59 @@ public class ServerWebManager {
 	
 	private void processAPIUserDeactivate(Map<String, String> query)
 	{
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		for (Map.Entry<String, String> entry : query.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if(key.startsWith("id["))
 			{
-				try {
-					userAPIAccount.deactivate(value);
-				} catch (NoUserRegisteredException e) {
-					/**
-					 * Do nothing
-					 */
-				}
+				ConfigAPIUser.deactivate(value);
 			}
 		}
-		userAPIAccount.save();
-		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	private void processAPIUserActivate(Map<String, String> query)
 	{
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		for (Map.Entry<String, String> entry : query.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if(key.startsWith("id["))
 			{
-				try 
-				{
-					userAPIAccount.activate(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
+				ConfigAPIUser.activate(value);
 			}
 		}
-		userAPIAccount.save();
-		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	private void processAPIUserBlock(Map<String, String> query)
 	{
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		for (Map.Entry<String, String> entry : query.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if(key.startsWith("id["))
 			{
-				try 
-				{
-					userAPIAccount.block(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
+				ConfigAPIUser.block(value);
 			}
 		}
-		userAPIAccount.save();
-		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	private void processAPIUserUnblock(Map<String, String> query)
 	{
+		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		for (Map.Entry<String, String> entry : query.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if(key.startsWith("id["))
 			{
-				try 
-				{
-					userAPIAccount.unblock(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
+				ConfigAPIUser.unblock(value);
 			}
 		}
-		userAPIAccount.save();
-		APIUserAccount.update(userAPIAccount.toJSONObject().toString());
+		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	
 	private void processAPIUserUpdate(Map<String, String> query)
@@ -2751,36 +2696,26 @@ public class ServerWebManager {
 
 		if(!username.isEmpty())
 		{
+			ConfigAPIUser.load(Config.getUserAPISettingPath());
 			User user;
-			try 
+			user = ConfigAPIUser.getUser(username);
+			if(user.getUsername().isEmpty())
 			{
-				user = userAPIAccount.getUser(username);
-				if(user.getUsername().isEmpty())
-				{
-					user.setUsername(username);
-				}
-				if(!name.isEmpty())
-				{
-					user.setName(name);
-				}
-				user.setPhone(phone);
-				user.setEmail(email);
-				if(!password.isEmpty())
-				{
-					user.setPassword(password);
-				}
-				user.setBlocked(blocked);
-				user.setActive(active);
-				userAPIAccount.updateUser(user);
-				userAPIAccount.save();
-				APIUserAccount.update(userAPIAccount.toJSONObject().toString());
-			} 
-			catch (NoUserRegisteredException e) 
-			{
-				/**
-				 * Do nothing
-				 */
+				user.setUsername(username);
 			}
+			if(!name.isEmpty())
+			{
+				user.setName(name);
+			}
+			user.setPhone(phone);
+			user.setEmail(email);
+			if(!password.isEmpty())
+			{
+				user.setPassword(password);
+			}
+			user.setBlocked(blocked);
+			user.setActive(active);
+			ConfigAPIUser.save(Config.getUserAPISettingPath());
 		}
 	}
 	
