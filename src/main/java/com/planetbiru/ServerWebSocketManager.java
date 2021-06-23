@@ -78,7 +78,7 @@ public class ServerWebSocketManager {
         this.requestHeader = requestHdr;
         this.responseHeader = responseHdr;
         this.parameter = param;
-        this.sessionID = Utility.sha1(""+System.currentTimeMillis()+rand.nextInt(1000000000));
+        this.sessionID = this.createSessionID();
         
         boolean auth = true;
         try 
@@ -100,7 +100,11 @@ public class ServerWebSocketManager {
 
 	
 	
-    private void sendServerStatus() 
+    private String createSessionID() {
+    	return Utility.sha1(""+System.currentTimeMillis()+rand.nextInt(1000000000));
+	}
+
+	private void sendServerStatus() 
     {
 		JSONArray data = new JSONArray();
 		JSONObject info = new JSONObject();

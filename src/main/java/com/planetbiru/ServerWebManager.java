@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.XML;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -50,7 +49,7 @@ import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.SMSUtil;
-import com.planetbiru.receiver.ws.WebSocketContent;
+import com.planetbiru.receiver.ws.WebManagerContent;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.user.User;
 import com.planetbiru.user.WebUserAccount;
@@ -58,10 +57,9 @@ import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
-import com.planetbiru.util.OSUtil;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.Utility;
-import com.planetbiru.util.OSUtil.OS;
+import com.planetbiru.util.WebManagerTool;
 
 @RestController
 public class ServerWebManager {
@@ -453,7 +451,6 @@ public class ServerWebManager {
 			responseHeaders.add(ConstantString.LOCATION, "/");
 			responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 			statusCode = HttpStatus.MOVED_PERMANENTLY;
-
 		} 
 		catch (NoUserRegisteredException e1) 
 		{
@@ -536,14 +533,14 @@ public class ServerWebManager {
 				WebUserAccount.updateLastActive(username);
 				WebUserAccount.save(Config.getUserSettingPath());
 			    payload.put(JsonKey.NEXT_URL, next);
-			    res.put("code", 0);
+			    res.put(JsonKey.CODE, 0);
 			    res.put(JsonKey.PAYLOAD, payload);
 				responseBody = res.toString().getBytes();
 			}
 			else
 			{
 			    payload.put(JsonKey.NEXT_URL, "/");
-			    res.put("code", 0);
+			    res.put(JsonKey.CODE, 0);
 			    res.put(JsonKey.PAYLOAD, payload);
 				responseBody = res.toString().getBytes();				
 			}
@@ -554,7 +551,7 @@ public class ServerWebManager {
 		catch(NoUserRegisteredException e)
 		{
 		    payload.put(JsonKey.NEXT_URL, "/admin-init.html");
-		    res.put("code", 0);
+		    res.put(JsonKey.CODE, 0);
 		    res.put(JsonKey.PAYLOAD, payload);
 			responseBody = res.toString().getBytes();				
 		}	
@@ -1516,7 +1513,7 @@ public class ServerWebManager {
 				if(!username.isEmpty())
 				{
 					ConfigAPIUser.addUser(new User(jsonObject));		
-					ConfigAPIUser.save(Config.getUserAPISettingPath());;
+					ConfigAPIUser.save(Config.getUserAPISettingPath());
 				}		    
 			}
 		}
@@ -1622,7 +1619,7 @@ public class ServerWebManager {
 					jsonObject.put(JsonKey.PASSWORD, password);
 				}
 				ConfigAPIUser.updateUser(new User(jsonObject));		
-				ConfigAPIUser.save(Config.getUserAPISettingPath());;	
+				ConfigAPIUser.save(Config.getUserAPISettingPath());	
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -1732,7 +1729,7 @@ public class ServerWebManager {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		HttpStatus statusCode = HttpStatus.OK;
 		
-		String fileName = this.getFileName(request);
+		String fileName = WebManagerTool.getFileName(request);
 		byte[] responseBody = "".getBytes();
 		try 
 		{
@@ -1745,17 +1742,16 @@ public class ServerWebManager {
 			{
 				try 
 				{
-					responseBody = FileUtil.readResource(this.getFileName("/404.html"));
+					responseBody = FileUtil.readResource(WebManagerTool.getFileName("/404.html"));
 				} 
 				catch (FileNotFoundException e1) 
 				{
 					logger.error(e1.getMessage());
-					//e1.printStackTrace();
 				}
 			}
 		}
 		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());		
-		WebSocketContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
+		WebManagerContent newContent = this.updateContent(fileName, responseHeaders, responseBody, statusCode, cookie);	
 		
 		responseBody = newContent.getResponseBody();
 		responseHeaders = newContent.getResponseHeaders();
@@ -1793,7 +1789,6 @@ public class ServerWebManager {
 		}
 		return lifetime;
 	}
-
 	
 	private void processFeedbackPost(HttpHeaders headers, String requestBody, HttpServletRequest request) 
 	{		
@@ -1956,7 +1951,6 @@ public class ServerWebManager {
 				data.put(JsonKey.ACTIVE, active);
 				
 				ConfigKeystore.update(id, data);
-				System.out.println(data.toString(4));
 				ConfigKeystore.save(Config.getKeystoreSettingPath());
 			}
 		}
@@ -2369,7 +2363,6 @@ public class ServerWebManager {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		if(queryPairs.containsKey("save_feeder_ws_setting"))
 		{
-
 			ConfigFeederWS.load(Config.getFeederWSSettingPath());
 			boolean feederWsEnable = queryPairs.getOrDefault("feeder_ws_enable", "").equals("1");		
 			boolean feederWsSSL = queryPairs.getOrDefault("feeder_ws_ssl", "").equals("1");		
@@ -2402,6 +2395,7 @@ public class ServerWebManager {
 			
 			ConfigFeederWS.save(Config.getFeederWSSettingPath());
 		}
+		
 		if(queryPairs.containsKey("save_feeder_amqp_setting"))
 		{
 			ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
@@ -2452,7 +2446,6 @@ public class ServerWebManager {
 				{
 					this.broardcastWebSocket(e.getMessage());
 					logger.error(e.getMessage());
-					//e.printStackTrace();
 				}
 			}
 		}		
@@ -2514,21 +2507,75 @@ public class ServerWebManager {
 			/**
 			 * Deactivate
 			 */
-			this.processAdminDeactivate(queryPairs, loggedUsername);
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id[") && !value.equals(loggedUsername))
+				{
+					try 
+					{
+						WebUserAccount.deactivate(value);
+					} 
+					catch (NoUserRegisteredException e) 
+					{
+						/**
+						 * Do nothing
+						 */
+					}
+				}
+			}
+			WebUserAccount.save(Config.getUserSettingPath());
 		}
 		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
 			 */
-			this.processAdminActivate(queryPairs);
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					try 
+					{
+						WebUserAccount.activate(value);
+					} 
+					catch (NoUserRegisteredException e) 
+					{
+						/**
+						 * Do nothing
+						 */
+					}
+				}
+			}
+			WebUserAccount.save(Config.getUserSettingPath());
 		}
 		if(queryPairs.containsKey("block"))
 		{
 			/**
 			 * Block
 			 */
-			this.processAdminBlock(queryPairs, loggedUsername);
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id[") && !value.equals(loggedUsername))
+				{
+					try 
+					{
+						WebUserAccount.block(value);
+					} 
+					catch (NoUserRegisteredException e) 
+					{
+						/**
+						 * Do nothing
+						 */
+					}
+				}
+			}
+			WebUserAccount.save(Config.getUserSettingPath());
 			
 		}
 		if(queryPairs.containsKey("unblock"))
@@ -2536,15 +2583,98 @@ public class ServerWebManager {
 			/**
 			 * Unblock
 			 */
-			this.processAdminUnblock(queryPairs);
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					try 
+					{
+						WebUserAccount.unblock(value);
+					} 
+					catch (NoUserRegisteredException e) 
+					{
+						/**
+						 * Do nothing
+						 */
+					}
+				}
+			}
+			WebUserAccount.save(Config.getUserSettingPath());
 		}
 		if(queryPairs.containsKey("update-data"))
 		{
-			this.processAdminUpdateData(queryPairs);
+			String pkID = queryPairs.getOrDefault("pk_id", "");
+			String field = queryPairs.getOrDefault("field", "");
+			String value = queryPairs.getOrDefault("value", "");
+			if(!field.equals(JsonKey.USERNAME))
+			{
+				User user;
+				try 
+				{
+					user = WebUserAccount.getUser(pkID);
+					if(field.equals(JsonKey.PHONE))
+					{
+						user.setPhone(value);
+					}
+					if(field.equals(JsonKey.NAME))
+					{
+						user.setName(value);
+					}
+					WebUserAccount.updateUser(user);
+					WebUserAccount.save(Config.getUserSettingPath());
+				} 
+				catch (NoUserRegisteredException e) 
+				{
+					/**
+					 * Do nothing
+					 */
+				}
+			}
 		}
 		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
-			this.processAdminUpdate(queryPairs);
+			String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
+			String name = queryPairs.getOrDefault(JsonKey.NAME, "").trim();
+			String phone = queryPairs.getOrDefault(JsonKey.PHONE, "").trim();
+			String email = queryPairs.getOrDefault(JsonKey.EMAIL, "").trim();
+			String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "").trim();
+			boolean blocked = queryPairs.getOrDefault(JsonKey.BLOCKED, "").equals("1");
+			boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+
+			if(!username.isEmpty())
+			{
+				User user;
+				try 
+				{
+					user = WebUserAccount.getUser(username);
+					if(user.getUsername().isEmpty())
+					{
+						user.setUsername(username);
+					}
+					if(!name.isEmpty())
+					{
+						user.setName(name);
+					}
+					user.setPhone(phone);
+					user.setEmail(email);
+					if(!password.isEmpty())
+					{
+						user.setPassword(password);
+					}
+					user.setBlocked(blocked);
+					user.setActive(active);
+					WebUserAccount.updateUser(user);
+					WebUserAccount.save(Config.getUserSettingPath());
+				} 
+				catch (NoUserRegisteredException e) 
+				{
+					/**
+					 * Do nothing
+					 */
+				}
+			}
 		}
 	}
 	private void processAPIUser(String requestBody) {
@@ -2567,21 +2697,51 @@ public class ServerWebManager {
 			/**
 			 * Deactivate
 			 */
-			this.processAPIUserDeactivate(queryPairs);
+			ConfigAPIUser.load(Config.getUserAPISettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigAPIUser.deactivate(value);
+				}
+			}
+			ConfigAPIUser.save(Config.getUserAPISettingPath());
 		}
 		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
 			 */
-			this.processAPIUserActivate(queryPairs);
+			ConfigAPIUser.load(Config.getUserAPISettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigAPIUser.activate(value);
+				}
+			}
+			ConfigAPIUser.save(Config.getUserAPISettingPath());
 		}
 		if(queryPairs.containsKey("block"))
 		{
 			/**
 			 * Block
 			 */
-			this.processAPIUserBlock(queryPairs);
+			ConfigAPIUser.load(Config.getUserAPISettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigAPIUser.block(value);
+				}
+			}
+			ConfigAPIUser.save(Config.getUserAPISettingPath());
 			
 		}
 		if(queryPairs.containsKey("unblock"))
@@ -2589,150 +2749,33 @@ public class ServerWebManager {
 			/**
 			 * Unblock
 			 */
-			this.processAPIUserUnblock(queryPairs);
+			ConfigAPIUser.load(Config.getUserAPISettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigAPIUser.unblock(value);
+				}
+			}
+			ConfigAPIUser.save(Config.getUserAPISettingPath());
 		}
 		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
-			this.processAPIUserUpdate(queryPairs);
-		}
-	}
-	
-	private void processAdminDeactivate(Map<String, String> queryPairs, String loggedUsername)
-	{
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id[") && !value.equals(loggedUsername))
-			{
-				try {
-					WebUserAccount.deactivate(value);
-				} catch (NoUserRegisteredException e) {
-					/**
-					 * Do nothing
-					 */
-				}
-			}
-		}
-		WebUserAccount.save(Config.getUserSettingPath());
-	}
-	
-	private void processAdminActivate(Map<String, String> queryPairs)
-	{
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				try 
-				{
-					WebUserAccount.activate(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
-			}
-		}
-		WebUserAccount.save(Config.getUserSettingPath());
-	}
-	
-	private void processAdminBlock(Map<String, String> queryPairs, String loggedUsername)
-	{
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id[") && !value.equals(loggedUsername))
-			{
-				try 
-				{
-					WebUserAccount.block(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
-			}
-		}
-		WebUserAccount.save(Config.getUserSettingPath());
-	}
-	
-	private void processAdminUnblock(Map<String, String> queryPairs)
-	{
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				try 
-				{
-					WebUserAccount.unblock(value);
-				} 
-				catch (NoUserRegisteredException e) 
-				{
-					/**
-					 * Do nothing
-					 */
-				}
-			}
-		}
-		WebUserAccount.save(Config.getUserSettingPath());
-	}
-	
-	private void processAdminUpdateData(Map<String, String> queryPairs)
-	{
-		String pkID = queryPairs.getOrDefault("pk_id", "");
-		String field = queryPairs.getOrDefault("field", "");
-		String value = queryPairs.getOrDefault("value", "");
-		if(!field.equals(JsonKey.USERNAME))
-		{
-			User user;
-			try 
-			{
-				user = WebUserAccount.getUser(pkID);
-				if(field.equals(JsonKey.PHONE))
-				{
-					user.setPhone(value);
-				}
-				if(field.equals(JsonKey.NAME))
-				{
-					user.setName(value);
-				}
-				WebUserAccount.updateUser(user);
-				WebUserAccount.save(Config.getUserSettingPath());
-			} 
-			catch (NoUserRegisteredException e) 
-			{
-				/**
-				 * Do nothing
-				 */
-			}
-		}
-	}
-	
-	private void processAdminUpdate(Map<String, String> queryPairs)
-	{
-		String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
-		String name = queryPairs.getOrDefault(JsonKey.NAME, "").trim();
-		String phone = queryPairs.getOrDefault(JsonKey.PHONE, "").trim();
-		String email = queryPairs.getOrDefault(JsonKey.EMAIL, "").trim();
-		String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "").trim();
-		boolean blocked = queryPairs.getOrDefault(JsonKey.BLOCKED, "").equals("1");
-		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+			String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
+			String name = queryPairs.getOrDefault(JsonKey.NAME, "").trim();
+			String phone = queryPairs.getOrDefault(JsonKey.PHONE, "").trim();
+			String email = queryPairs.getOrDefault(JsonKey.EMAIL, "").trim();
+			String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "").trim();
+			boolean blocked = queryPairs.getOrDefault(JsonKey.BLOCKED, "").equals("1");
+			boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
 
-		if(!username.isEmpty())
-		{
-			User user;
-			try 
+			if(!username.isEmpty())
 			{
-				user = WebUserAccount.getUser(username);
+				ConfigAPIUser.load(Config.getUserAPISettingPath());
+				User user;
+				user = ConfigAPIUser.getUser(username);
 				if(user.getUsername().isEmpty())
 				{
 					user.setUsername(username);
@@ -2749,110 +2792,11 @@ public class ServerWebManager {
 				}
 				user.setBlocked(blocked);
 				user.setActive(active);
-				WebUserAccount.updateUser(user);
-				WebUserAccount.save(Config.getUserSettingPath());
-			} 
-			catch (NoUserRegisteredException e) 
-			{
-				/**
-				 * Do nothing
-				 */
+				ConfigAPIUser.save(Config.getUserAPISettingPath());
 			}
 		}
 	}
-	
-	private void processAPIUserDeactivate(Map<String, String> queryPairs)
-	{
-		ConfigAPIUser.load(Config.getUserAPISettingPath());
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				ConfigAPIUser.deactivate(value);
-			}
-		}
-		ConfigAPIUser.save(Config.getUserAPISettingPath());
-	}
-	private void processAPIUserActivate(Map<String, String> queryPairs)
-	{
-		ConfigAPIUser.load(Config.getUserAPISettingPath());
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				ConfigAPIUser.activate(value);
-			}
-		}
-		ConfigAPIUser.save(Config.getUserAPISettingPath());
-	}
-	private void processAPIUserBlock(Map<String, String> queryPairs)
-	{
-		ConfigAPIUser.load(Config.getUserAPISettingPath());
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				ConfigAPIUser.block(value);
-			}
-		}
-		ConfigAPIUser.save(Config.getUserAPISettingPath());
-	}
-	private void processAPIUserUnblock(Map<String, String> queryPairs)
-	{
-		ConfigAPIUser.load(Config.getUserAPISettingPath());
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				ConfigAPIUser.unblock(value);
-			}
-		}
-		ConfigAPIUser.save(Config.getUserAPISettingPath());
-	}
-	
-	private void processAPIUserUpdate(Map<String, String> queryPairs)
-	{
-		String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
-		String name = queryPairs.getOrDefault(JsonKey.NAME, "").trim();
-		String phone = queryPairs.getOrDefault(JsonKey.PHONE, "").trim();
-		String email = queryPairs.getOrDefault(JsonKey.EMAIL, "").trim();
-		String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "").trim();
-		boolean blocked = queryPairs.getOrDefault(JsonKey.BLOCKED, "").equals("1");
-		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
 
-		if(!username.isEmpty())
-		{
-			ConfigAPIUser.load(Config.getUserAPISettingPath());
-			User user;
-			user = ConfigAPIUser.getUser(username);
-			if(user.getUsername().isEmpty())
-			{
-				user.setUsername(username);
-			}
-			if(!name.isEmpty())
-			{
-				user.setName(name);
-			}
-			user.setPhone(phone);
-			user.setEmail(email);
-			if(!password.isEmpty())
-			{
-				user.setPassword(password);
-			}
-			user.setBlocked(blocked);
-			user.setActive(active);
-			ConfigAPIUser.save(Config.getUserAPISettingPath());
-		}
-	}
-	
 	private void processDDNS(String requestBody, CookieServer cookie) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		if(queryPairs.containsKey(JsonKey.DELETE))
@@ -2876,150 +2820,126 @@ public class ServerWebManager {
 			/**
 			 * Deactivate
 			 */
-			this.processDDNSDeactivate(queryPairs);
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigDDNS.deactivate(value);
+				}
+			}
+			ConfigDDNS.save();
 		}
 		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
 			 */
-			this.processDDNSActivate(queryPairs);
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigDDNS.activate(value);
+				}
+			}
+			ConfigDDNS.save();
 		}
 		if(queryPairs.containsKey(JsonKey.PROXIED))
 		{
 			/**
 			 * Proxied
 			 */
-			this.processDDNSProxied(queryPairs);
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigDDNS.proxied(value);
+				}
+			}
+			ConfigDDNS.save();
 		}
 		if(queryPairs.containsKey(JsonKey.UNPROXIED))
 		{
 			/**
 			 * Unproxied
 			 */
-			this.processDDNSUnproxied(queryPairs);
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigDDNS.unproxied(value);
+				}
+			}
+			ConfigDDNS.save();
 		}
 		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
-			this.processDDNSUpdate(queryPairs);
-		}
-	}
-
-	private void processDDNSUpdate(Map<String, String> queryPairs) {
-		String id = queryPairs.getOrDefault(JsonKey.ID, "").trim();
-		String provider = queryPairs.getOrDefault(JsonKey.PROVIDER, "").trim();
-		String zone = queryPairs.getOrDefault(JsonKey.ZONE, "").trim();
-		String recordName = queryPairs.getOrDefault(JsonKey.RECORD_NAME, "").trim();
-		String ttls = queryPairs.getOrDefault(JsonKey.TTL, "").trim();
-		String cronExpression = queryPairs.getOrDefault(JsonKey.CRON_EXPRESSION, "").trim();
-		boolean proxied = queryPairs.getOrDefault(JsonKey.PROXIED, "").equals("1");
-		boolean forceCreateZone = queryPairs.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").equals("1");
-		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
-		String type = queryPairs.getOrDefault(JsonKey.TYPE, "0");
-		int ttl = Utility.atoi(ttls);
-		
-		if(!id.isEmpty())
-		{
-			DDNSRecord record = ConfigDDNS.getRecords().getOrDefault(id, new DDNSRecord());
+			String id = queryPairs.getOrDefault(JsonKey.ID, "").trim();
+			String provider = queryPairs.getOrDefault(JsonKey.PROVIDER, "").trim();
+			String zone = queryPairs.getOrDefault(JsonKey.ZONE, "").trim();
+			String recordName = queryPairs.getOrDefault(JsonKey.RECORD_NAME, "").trim();
+			String ttls = queryPairs.getOrDefault(JsonKey.TTL, "").trim();
+			String cronExpression = queryPairs.getOrDefault(JsonKey.CRON_EXPRESSION, "").trim();
+			boolean proxied = queryPairs.getOrDefault(JsonKey.PROXIED, "").equals("1");
+			boolean forceCreateZone = queryPairs.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").equals("1");
+			boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+			String type = queryPairs.getOrDefault(JsonKey.TYPE, "0");
+			int ttl = Utility.atoi(ttls);
+			
 			if(!id.isEmpty())
 			{
-				record.setId(id);
+				DDNSRecord record = ConfigDDNS.getRecords().getOrDefault(id, new DDNSRecord());
+				if(!id.isEmpty())
+				{
+					record.setId(id);
+				}
+				if(!zone.isEmpty())
+				{
+					record.setZone(zone);
+				}
+				if(!recordName.isEmpty())
+				{
+					record.setRecordName(recordName);
+				}
+				record.setProvider(provider);
+				record.setProxied(proxied);
+				record.setForceCreateZone(forceCreateZone);
+				record.setCronExpression(cronExpression);
+				record.setTtl(ttl);
+				record.setActive(active);		
+				record.setType(type);
+				ConfigDDNS.updateRecord(record);
+				ConfigDDNS.save();
 			}
-			if(!zone.isEmpty())
-			{
-				record.setZone(zone);
-			}
-			if(!recordName.isEmpty())
-			{
-				record.setRecordName(recordName);
-			}
-			record.setProvider(provider);
-			record.setProxied(proxied);
-			record.setForceCreateZone(forceCreateZone);
-			record.setCronExpression(cronExpression);
-			record.setTtl(ttl);
-			record.setActive(active);		
-			record.setType(type);
-			ConfigDDNS.updateRecord(record);
-			ConfigDDNS.save();
 		}
 	}
 
-	private void processDDNSDeactivate(Map<String, String> queryPairs)
-	{
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				ConfigDDNS.deactivate(value);
-			}
-		}
-		ConfigDDNS.save();
-	}
-	
-	private void processDDNSActivate(Map<String, String> queryPairs)
-	{
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				ConfigDDNS.activate(value);
-			}
-		}
-		ConfigDDNS.save();
-	}
-	
-	private void processDDNSProxied(Map<String, String> queryPairs)
-	{
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				ConfigDDNS.proxied(value);
-			}
-		}
-		ConfigDDNS.save();
-	}
-		
-	private void processDDNSUnproxied(Map<String, String> queryPairs)
-	{
-		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
-		{
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if(key.startsWith("id["))
-			{
-				ConfigDDNS.unproxied(value);
-			}
-		}
-		ConfigDDNS.save();
-	}
-	
 	private String getMIMEType(String fileName) 
 	{
 		String[] arr = fileName.split("\\.");	
 		String ext = arr[arr.length - 1];
-		return 	configSaved.getString("MIME", ext, "");
+		return configSaved.getString("MIME", ext, "");
 	}
 
-	private WebSocketContent updateContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie) 
+	private WebManagerContent updateContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie) 
 	{
 		String contentType = this.getMIMEType(fileName);
-		WebSocketContent webContent = new WebSocketContent(fileName, responseHeaders, responseBody, statusCode, cookie, contentType);
+		WebManagerContent webContent = new WebManagerContent(fileName, responseHeaders, responseBody, statusCode, cookie, contentType);
 		boolean requireLogin = false;
 		String fileSub = "";
 		
 		if(fileName.toLowerCase().endsWith(ConstantString.EXT_HTML))
 		{
-			JSONObject authFileInfo = this.processAuthFile(responseBody);
+			JSONObject authFileInfo = WebManagerTool.processAuthFile(responseBody);
 			requireLogin = authFileInfo.optBoolean(JsonKey.CONTENT, false);
-			fileSub = this.getFileName(authFileInfo.optString("data-file", ""));
+			fileSub = WebManagerTool.getFileName(authFileInfo.optString("data-file", ""));
 		}
 		
 		String username = cookie.getSessionData().optString(JsonKey.USERNAME, "");
@@ -3043,7 +2963,7 @@ public class ServerWebManager {
 						webContent.setStatusCode(statusCode);
 					}	
 				}
-				responseBody = this.removeMeta(responseBody);
+				responseBody = WebManagerTool.removeMeta(responseBody);
 			}
 			catch(NoUserRegisteredException e)
 			{
@@ -3063,175 +2983,5 @@ public class ServerWebManager {
 		return webContent;
 	}
 	
-	private JSONObject processAuthFile(byte[] responseBody) 
-	{
-		String responseString = new String(responseBody);
-		int start = 0;
-		int end = 0;
-		do 
-		{
-			start = responseString.toLowerCase().indexOf("<meta ", end);
-			end = responseString.toLowerCase().indexOf(">", start);
-			if(start >-1 && end >-1 && end < responseString.length())
-			{
-				String meta = responseString.substring(start, end+1);
-				meta = this.fixMeta(meta);
-				try
-				{
-					JSONObject metaObj = XML.toJSONObject(meta);
-					JSONObject metaObjFixed = this.lowerCaseJSONKey(metaObj);
-					if(requireLogin(metaObjFixed))
-					{
-						return metaObjFixed.optJSONObject(JsonKey.META);
-					}
-				}
-				catch(JSONException e)
-				{
-					/**
-					 * Do nothing
-					 */
-				}
-			}
-		}
-		while(start > -1);
-		return new JSONObject();
-	}
-	
-	private byte[] removeMeta(byte[] responseBody) 
-	{
-		String responseString = new String(responseBody);
-		int start = 0;
-		int end = 0;
-		String metaOri = "";
-		boolean found = false;
-		do 
-		{
-			start = responseString.toLowerCase().indexOf("<meta ", end);
-			end = responseString.toLowerCase().indexOf(">", start);
-			if(start >-1 && end >-1 && end < responseString.length())
-			{
-				metaOri = responseString.substring(start, end+1);
-				String meta = this.fixMeta(metaOri);
-				try
-				{
-					JSONObject metaObj = XML.toJSONObject(meta);
-					JSONObject metaObjFixed = this.lowerCaseJSONKey(metaObj); 
-					if(requireLogin(metaObjFixed))
-					{
-						found = true;
-						break;
-					}
-				}
-				catch(JSONException e)
-				{
-					/**
-					 * Do nothing
-					 */
-				}
-			}
-		}
-		while(start > -1);
-		String content = "";
-		if(found && responseBody != null)
-		{
-			content = new String(responseBody);
-			return content.replace(metaOri, "").getBytes();
-		}
-		return responseBody;
-	}
-
-	private boolean requireLogin(JSONObject metaObj) {
-		if(metaObj != null && metaObj.has(JsonKey.META))
-		{
-			JSONObject metaData = metaObj.optJSONObject(JsonKey.META);
-			if(metaData != null)
-			{
-				String name = metaData.optString(JsonKey.NAME, "");
-				boolean content = metaData.optBoolean(JsonKey.CONTENT, false);
-				if(name.equals(JsonKey.REQUIRE_LOGIN) && content)
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private String fixMeta(String input)
-	{
-		if(input.indexOf("</meta>") == -1 && input.indexOf("/>") == -1)
-		{
-			input = input.replace(">", "/>");
-		}
-		return input;
-	}
-	
-	private JSONObject lowerCaseJSONKey(Object object) 
-	{
-		JSONObject newMetaObj = new JSONObject();
-		JSONArray keys = ((JSONObject) object).names();
-		for (int i = 0; i < keys.length (); ++i) 
-		{
-		   String key = keys.getString(i); 
-		   if(((JSONObject) object).get(key) instanceof JSONObject)
-		   {
-			   newMetaObj.put(key.toLowerCase(), this.lowerCaseJSONKey(((JSONObject) object).get(key)));
-		   }
-		   else
-		   {
-			   newMetaObj.put(key.toLowerCase(), ((JSONObject) object).get(key));
-		   }
-		}
-		return newMetaObj;
-	}
-
-	private String getFileName(HttpServletRequest request) 
-	{
-		String file = request.getServletPath();
-		if(file == null || file.isEmpty() || file.equals("/"))
-		{
-			file = Config.getDefaultFile();
-		}		
-		return this.getFileName(file);		
-	}
-	
-	private String getFileName(String path) 
-	{
-		String dir = Config.getDocumentRoot();
-		if(!path.startsWith("/"))
-		{
-			path = "/"+path;
-		}
-		if(dir.endsWith("/"))
-		{
-			dir = dir.substring(0, dir.length() - 1);
-		}
-		
-		String filename = this.fixFileName(dir+path);
-		return filename;
-	}
-	public String fixFileName(String fileName) {
-		if(OSUtil.getOS().equals(OS.WINDOWS))
-		{
-			fileName = fileName.replace("/", "\\");
-			fileName = fileName.replace("\\\\", "\\");
-		}
-		else
-		{
-			fileName = fileName.replace("\\", "/");		
-			fileName = fileName.replace("//", "/");
-		}
-		return fileName;
-	}
-	
-	public String getFileExtension(String fileName) 
-	{
-		String extension = fileName;
-		int index = fileName.lastIndexOf('.');
-		if (index > 0) {
-		      extension = fileName.substring(index + 1);
-		}
-		return extension;
-	}
 	
 }
