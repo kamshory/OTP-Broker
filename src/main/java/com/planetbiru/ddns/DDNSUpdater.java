@@ -4,10 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import com.planetbiru.config.ConfigAfraid;
-import com.planetbiru.config.ConfigCloudflare;
-import com.planetbiru.config.ConfigDynu;
-import com.planetbiru.config.ConfigNoIP;
+import com.planetbiru.config.ConfigVendorAfraid;
+import com.planetbiru.config.ConfigVendorCloudflare;
+import com.planetbiru.config.ConfigVendorDynu;
+import com.planetbiru.config.ConfigVendorNoIP;
 
 public class DDNSUpdater extends Thread{
 	
@@ -33,11 +33,11 @@ public class DDNSUpdater extends Thread{
 			logger.info("Executing update DDNS");
 			DNSCloudflare ddns = new DNSCloudflare();
 			
-			String endpoint = ConfigCloudflare.getEndpoint();
-			String accountId = ConfigCloudflare.getAccountId();
-			String authEmail = ConfigCloudflare.getAuthEmail();
-			String authApiKey = ConfigCloudflare.getAuthApiKey();
-			String authToken = ConfigCloudflare.getAuthToken();
+			String endpoint = ConfigVendorCloudflare.getEndpoint();
+			String accountId = ConfigVendorCloudflare.getAccountId();
+			String authEmail = ConfigVendorCloudflare.getAuthEmail();
+			String authApiKey = ConfigVendorCloudflare.getAuthApiKey();
+			String authToken = ConfigVendorCloudflare.getAuthToken();
 			ddns.setConfig(endpoint, accountId, authEmail, authApiKey, authToken);
 			
 			if(this.ddnsRecord.isForceCreateZone())
@@ -64,11 +64,11 @@ public class DDNSUpdater extends Thread{
 			logger.info("Executing update DDNS");
 			DNSNoIP ddns = new DNSNoIP();
 			
-			String endpoint = ConfigNoIP.getEndpoint();
-			String username = ConfigNoIP.getUsername();
-			String password = ConfigNoIP.getPassword();
-			String company = ConfigNoIP.getCompany();
-			String email = ConfigNoIP.getEmail();
+			String endpoint = ConfigVendorNoIP.getEndpoint();
+			String username = ConfigVendorNoIP.getUsername();
+			String password = ConfigVendorNoIP.getPassword();
+			String company = ConfigVendorNoIP.getCompany();
+			String email = ConfigVendorNoIP.getEmail();
 			
 			ddns.setConfig(endpoint, username, password, email, company);
 
@@ -84,11 +84,11 @@ public class DDNSUpdater extends Thread{
 			logger.info("Executing update DDNS");
 			DNSAfraid ddns = new DNSAfraid();
 			
-			String endpoint = ConfigAfraid.getEndpoint();
-			String username = ConfigAfraid.getUsername();
-			String password = ConfigAfraid.getPassword();
-			String company = ConfigAfraid.getCompany();
-			String email = ConfigAfraid.getEmail();
+			String endpoint = ConfigVendorAfraid.getEndpoint();
+			String username = ConfigVendorAfraid.getUsername();
+			String password = ConfigVendorAfraid.getPassword();
+			String company = ConfigVendorAfraid.getCompany();
+			String email = ConfigVendorAfraid.getEmail();
 			
 			ddns.setConfig(endpoint, username, password, email, company);
 
@@ -104,11 +104,11 @@ public class DDNSUpdater extends Thread{
 			logger.info("Executing update DDNS");
 			DNSDynu ddns = new DNSDynu();
 			
-			String endpoint = ConfigDynu.getEndpoint();
-			String username = ConfigDynu.getUsername();
-			String password = ConfigDynu.getPassword();
-			String company = ConfigDynu.getCompany();
-			String email = ConfigDynu.getEmail();
+			String endpoint = ConfigVendorDynu.getEndpoint();
+			String username = ConfigVendorDynu.getUsername();
+			String password = ConfigVendorDynu.getPassword();
+			String company = ConfigVendorDynu.getCompany();
+			String email = ConfigVendorDynu.getEmail();
 			
 			ddns.setConfig(endpoint, username, password, email, company);
 

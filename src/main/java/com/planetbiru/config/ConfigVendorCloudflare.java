@@ -12,18 +12,17 @@ import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
-public class ConfigNoIP {
-	private static Logger logger = LogManager.getLogger(ConfigNoIP.class);
-	private ConfigNoIP()
+public class ConfigVendorCloudflare {
+	private static Logger logger = LogManager.getLogger(ConfigVendorCloudflare.class);
+	private ConfigVendorCloudflare()
 	{
 		
 	}
-	
 	private static String endpoint = "";
-	private static String username = "";
-	private static String email = "";
-	private static String password = "";
-	private static String company = "";
+	private static String accountId = "";
+	private static String authEmail = "";
+	private static String authApiKey = "";
+	private static String authToken = "";
 	
 	public static void load(String path) {
 		String dir = Utility.getBaseDir();
@@ -43,16 +42,16 @@ public class ConfigNoIP {
 				{
 					JSONObject json = new JSONObject(text);
 					String lEndpoint = json.optString("endpoint", "");
-					String lUsername = json.optString("username", "");
-					String lEmail = json.optString("email", "");
-					String lPassword = json.optString("password", "");
-					String lCompany = json.optString("company", "");
+					String lAccountId = json.optString("accountId", "");
+					String lAuthEmail = json.optString("authEmail", "");
+					String lAuthApiKey = json.optString("authApiKey", "");
+					String lAuthToken = json.optString("authToken", "");
 					
-					ConfigNoIP.setEndpoint(lEndpoint);
-					ConfigNoIP.setUsername(lUsername);
-					ConfigNoIP.setEmail(lEmail);
-					ConfigNoIP.setPassword(lPassword);
-					ConfigNoIP.setCompany(lCompany);
+					ConfigVendorCloudflare.setEndpoint(lEndpoint);
+					ConfigVendorCloudflare.setAccountId(lAccountId);
+					ConfigVendorCloudflare.setAuthEmail(lAuthEmail);
+					ConfigVendorCloudflare.setAuthApiKey(lAuthApiKey);
+					ConfigVendorCloudflare.setAuthToken(lAuthToken);
 				}
 			}
 		} 
@@ -114,11 +113,11 @@ public class ConfigNoIP {
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
 
-		config.put("endpoint", ConfigNoIP.getEndpoint());
-		config.put("username", ConfigNoIP.getUsername());
-		config.put("email", ConfigNoIP.getEmail());
-		config.put("password", ConfigNoIP.getPassword());
-		config.put("company", ConfigNoIP.getCompany());
+		config.put("endpoint", ConfigVendorCloudflare.getEndpoint());
+		config.put("accountId", ConfigVendorCloudflare.getAccountId());
+		config.put("authEmail", ConfigVendorCloudflare.getAuthEmail());
+		config.put("authApiKey", ConfigVendorCloudflare.getAuthApiKey());
+		config.put("authToken", ConfigVendorCloudflare.getAuthToken());
 		return config;
 	}
 
@@ -127,41 +126,39 @@ public class ConfigNoIP {
 	}
 
 	public static void setEndpoint(String endpoint) {
-		ConfigNoIP.endpoint = endpoint;
+		ConfigVendorCloudflare.endpoint = endpoint;
 	}
 
-	
-
-	public static String getUsername() {
-		return username;
+	public static String getAccountId() {
+		return accountId;
 	}
 
-	public static void setUsername(String username) {
-		ConfigNoIP.username = username;
+	public static void setAccountId(String accountId) {
+		ConfigVendorCloudflare.accountId = accountId;
 	}
 
-	public static String getEmail() {
-		return email;
+	public static String getAuthEmail() {
+		return authEmail;
 	}
 
-	public static void setEmail(String email) {
-		ConfigNoIP.email = email;
+	public static void setAuthEmail(String authEmail) {
+		ConfigVendorCloudflare.authEmail = authEmail;
 	}
 
-	public static String getPassword() {
-		return password;
+	public static String getAuthApiKey() {
+		return authApiKey;
 	}
 
-	public static void setPassword(String password) {
-		ConfigNoIP.password = password;
+	public static void setAuthApiKey(String authApiKey) {
+		ConfigVendorCloudflare.authApiKey = authApiKey;
 	}
 
-	public static String getCompany() {
-		return company;
+	public static String getAuthToken() {
+		return authToken;
 	}
 
-	public static void setCompany(String company) {
-		ConfigNoIP.company = company;
+	public static void setAuthToken(String authToken) {
+		ConfigVendorCloudflare.authToken = authToken;
 	}
 
 	public static JSONObject toJSONObject()

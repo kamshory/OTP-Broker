@@ -12,17 +12,18 @@ import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
-public class ConfigCloudflare {
-	private static Logger logger = LogManager.getLogger(ConfigCloudflare.class);
-	private ConfigCloudflare()
+public class ConfigVendorAfraid {
+	private static Logger logger = LogManager.getLogger(ConfigVendorAfraid.class);
+	private ConfigVendorAfraid()
 	{
 		
 	}
+	
 	private static String endpoint = "";
-	private static String accountId = "";
-	private static String authEmail = "";
-	private static String authApiKey = "";
-	private static String authToken = "";
+	private static String username = "";
+	private static String email = "";
+	private static String password = "";
+	private static String company = "";
 	
 	public static void load(String path) {
 		String dir = Utility.getBaseDir();
@@ -42,16 +43,16 @@ public class ConfigCloudflare {
 				{
 					JSONObject json = new JSONObject(text);
 					String lEndpoint = json.optString("endpoint", "");
-					String lAccountId = json.optString("accountId", "");
-					String lAuthEmail = json.optString("authEmail", "");
-					String lAuthApiKey = json.optString("authApiKey", "");
-					String lAuthToken = json.optString("authToken", "");
+					String lUsername = json.optString("username", "");
+					String lEmail = json.optString("email", "");
+					String lPassword = json.optString("password", "");
+					String lCompany = json.optString("company", "");
 					
-					ConfigCloudflare.setEndpoint(lEndpoint);
-					ConfigCloudflare.setAccountId(lAccountId);
-					ConfigCloudflare.setAuthEmail(lAuthEmail);
-					ConfigCloudflare.setAuthApiKey(lAuthApiKey);
-					ConfigCloudflare.setAuthToken(lAuthToken);
+					ConfigVendorAfraid.setEndpoint(lEndpoint);
+					ConfigVendorAfraid.setUsername(lUsername);
+					ConfigVendorAfraid.setEmail(lEmail);
+					ConfigVendorAfraid.setPassword(lPassword);
+					ConfigVendorAfraid.setCompany(lCompany);
 				}
 			}
 		} 
@@ -113,11 +114,11 @@ public class ConfigCloudflare {
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
 
-		config.put("endpoint", ConfigCloudflare.getEndpoint());
-		config.put("accountId", ConfigCloudflare.getAccountId());
-		config.put("authEmail", ConfigCloudflare.getAuthEmail());
-		config.put("authApiKey", ConfigCloudflare.getAuthApiKey());
-		config.put("authToken", ConfigCloudflare.getAuthToken());
+		config.put("endpoint", ConfigVendorAfraid.getEndpoint());
+		config.put("username", ConfigVendorAfraid.getUsername());
+		config.put("email", ConfigVendorAfraid.getEmail());
+		config.put("password", ConfigVendorAfraid.getPassword());
+		config.put("company", ConfigVendorAfraid.getCompany());
 		return config;
 	}
 
@@ -126,39 +127,41 @@ public class ConfigCloudflare {
 	}
 
 	public static void setEndpoint(String endpoint) {
-		ConfigCloudflare.endpoint = endpoint;
+		ConfigVendorAfraid.endpoint = endpoint;
 	}
 
-	public static String getAccountId() {
-		return accountId;
+	
+
+	public static String getUsername() {
+		return username;
 	}
 
-	public static void setAccountId(String accountId) {
-		ConfigCloudflare.accountId = accountId;
+	public static void setUsername(String username) {
+		ConfigVendorAfraid.username = username;
 	}
 
-	public static String getAuthEmail() {
-		return authEmail;
+	public static String getEmail() {
+		return email;
 	}
 
-	public static void setAuthEmail(String authEmail) {
-		ConfigCloudflare.authEmail = authEmail;
+	public static void setEmail(String email) {
+		ConfigVendorAfraid.email = email;
 	}
 
-	public static String getAuthApiKey() {
-		return authApiKey;
+	public static String getPassword() {
+		return password;
 	}
 
-	public static void setAuthApiKey(String authApiKey) {
-		ConfigCloudflare.authApiKey = authApiKey;
+	public static void setPassword(String password) {
+		ConfigVendorAfraid.password = password;
 	}
 
-	public static String getAuthToken() {
-		return authToken;
+	public static String getCompany() {
+		return company;
 	}
 
-	public static void setAuthToken(String authToken) {
-		ConfigCloudflare.authToken = authToken;
+	public static void setCompany(String company) {
+		ConfigVendorAfraid.company = company;
 	}
 
 	public static JSONObject toJSONObject()

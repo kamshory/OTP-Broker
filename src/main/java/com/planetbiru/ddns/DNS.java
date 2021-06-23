@@ -41,7 +41,6 @@ public class DNS {
 		catch (Exception e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		return ip;
 	}
@@ -64,8 +63,7 @@ public class DNS {
 		requestHeaders.add(DDNSKey.HEADER_USER_AGENT, "OTP Broker");
 		int timeout = 10000;
 		ResponseEntityCustom response = this.httpExchange(HttpMethod.GET, url, requestHeaders, "", timeout);
-		return response.getBody();
-		
+		return response.getBody();		
 	}
 
 	/**
@@ -141,7 +139,7 @@ public class DNS {
 
 
 	public JSONObject update(DDNSRecord ddnsRecord) {
-		return null;
+		return ddnsRecord.toJSONObject();
 	}
 
 	

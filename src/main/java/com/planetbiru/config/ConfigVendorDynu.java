@@ -12,19 +12,22 @@ import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
-public class ConfigAfraid {
-	private static Logger logger = LogManager.getLogger(ConfigAfraid.class);
-	private ConfigAfraid()
-	{
-		
-	}
+public class ConfigVendorDynu {
+	private static Logger logger = LogManager.getLogger(ConfigVendorDynu.class);
 	
-	private static String endpoint = "";
+	private static String apiVersion = "nic";
+	private static String endpoint = "https://api.dynu.com/nic/update";
 	private static String username = "";
 	private static String email = "";
 	private static String password = "";
+	private static String apiKey = "";
 	private static String company = "";
 	
+	private ConfigVendorDynu()
+	{
+		
+	}
+
 	public static void load(String path) {
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
@@ -42,24 +45,27 @@ public class ConfigAfraid {
 				if(text.length() > 7)
 				{
 					JSONObject json = new JSONObject(text);
-					String lEndpoint = json.optString("endpoint", "");
-					String lUsername = json.optString("username", "");
-					String lEmail = json.optString("email", "");
-					String lPassword = json.optString("password", "");
-					String lCompany = json.optString("company", "");
+					String lVersion = json.optString("apiVersion", "").trim();
+					String lEndpoint = json.optString("endpoint", "").trim();
+					String lUsername = json.optString("username", "").trim();
+					String lEmail = json.optString("email", "").trim();
+					String lPassword = json.optString("password", "").trim();
+					String lCompany = json.optString("company", "").trim();
+					String lApiKey = json.optString("apiKey", "").trim();
 					
-					ConfigAfraid.setEndpoint(lEndpoint);
-					ConfigAfraid.setUsername(lUsername);
-					ConfigAfraid.setEmail(lEmail);
-					ConfigAfraid.setPassword(lPassword);
-					ConfigAfraid.setCompany(lCompany);
+					ConfigVendorDynu.endpoint = lEndpoint;
+					ConfigVendorDynu.username = lUsername;
+					ConfigVendorDynu.email = lEmail;
+					ConfigVendorDynu.password = lPassword;
+					ConfigVendorDynu.company = lCompany;
+					ConfigVendorDynu.apiVersion = lVersion;
+					ConfigVendorDynu.apiKey = lApiKey;
 				}
 			}
 		} 
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}	
@@ -86,7 +92,6 @@ public class ConfigAfraid {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	
@@ -109,16 +114,15 @@ public class ConfigAfraid {
 		}		
 	}
 	
-
-	
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
-
-		config.put("endpoint", ConfigAfraid.getEndpoint());
-		config.put("username", ConfigAfraid.getUsername());
-		config.put("email", ConfigAfraid.getEmail());
-		config.put("password", ConfigAfraid.getPassword());
-		config.put("company", ConfigAfraid.getCompany());
+		config.put("apiVersion", ConfigVendorDynu.apiVersion);
+		config.put("apiKey", ConfigVendorDynu.apiKey);
+		config.put("endpoint", ConfigVendorDynu.endpoint);
+		config.put("username", ConfigVendorDynu.username);
+		config.put("email", ConfigVendorDynu.email);
+		config.put("password", ConfigVendorDynu.password);
+		config.put("company", ConfigVendorDynu.company);
 		return config;
 	}
 
@@ -127,7 +131,7 @@ public class ConfigAfraid {
 	}
 
 	public static void setEndpoint(String endpoint) {
-		ConfigAfraid.endpoint = endpoint;
+		ConfigVendorDynu.endpoint = endpoint;
 	}
 
 	
@@ -137,7 +141,7 @@ public class ConfigAfraid {
 	}
 
 	public static void setUsername(String username) {
-		ConfigAfraid.username = username;
+		ConfigVendorDynu.username = username;
 	}
 
 	public static String getEmail() {
@@ -145,7 +149,7 @@ public class ConfigAfraid {
 	}
 
 	public static void setEmail(String email) {
-		ConfigAfraid.email = email;
+		ConfigVendorDynu.email = email;
 	}
 
 	public static String getPassword() {
@@ -153,7 +157,7 @@ public class ConfigAfraid {
 	}
 
 	public static void setPassword(String password) {
-		ConfigAfraid.password = password;
+		ConfigVendorDynu.password = password;
 	}
 
 	public static String getCompany() {
@@ -161,12 +165,28 @@ public class ConfigAfraid {
 	}
 
 	public static void setCompany(String company) {
-		ConfigAfraid.company = company;
+		ConfigVendorDynu.company = company;
 	}
 
 	public static JSONObject toJSONObject()
 	{
 		return getJSONObject();
+	}
+
+	public static String getApiVersion() {
+		return apiVersion;
+	}
+
+	public static void setApiVersion(String apiVersion) {
+		ConfigVendorDynu.apiVersion = apiVersion;
+	}
+
+	public static String getApiKey() {
+		return apiKey;
+	}
+
+	public static void setApiKey(String apiKey) {
+		ConfigVendorDynu.apiKey = apiKey;
 	}
 	
 }
