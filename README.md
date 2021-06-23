@@ -42,7 +42,7 @@ Untuk menggunakan Message Broker, silakan gunakan RabbitMQ dengan link https://w
 
 ![OTP Broker Topology](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology.png)
 
-**Sekenario 1 - OTP Broker Dapat Diakses App Server**
+## Sekenario 1 - OTP Broker Dapat Diakses App Server
 
 Pada skenario ini, App Server dapat langsung mengirimkan OTP ke OTP Broker melalui HTTP.
 
@@ -55,6 +55,8 @@ Pengguna dapat menggunakan sebuah domain murah dan menggunakan Dynamic Domain Na
 3. Router yang dapat melakukan port forwarding
 4. Domain yang name servernya dapat diatur
 5. Layanan Dynamic DNS (gratis maupun berbayar)
+
+### REST API
 
 **Send SMS Request**
 
@@ -77,6 +79,15 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 }
 ```
 
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah ke OTP Broker |
+| data | Objek | Data untuk OTP Broker | 
+| `data`.id | String | ID SMS |
+| `data`.msisdn | String | Nomor MSISDN penerima |
+| `data`.message| String | Pesan SMS |
+
+
 **Block Number Request**
 
 ```http
@@ -95,6 +106,12 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 	}
 }
 ```
+
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah ke OTP Broker |
+| data | Objek | Data untuk OTP Broker | 
+| `data`.msisdn | String | Nomor MSISDN yang akan diblokir |
 
 **Unblock Number Request**
 
@@ -115,7 +132,13 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 }
 ```
 
-**Sekenario 2 - OTP Broker Tidak Dapat Diakses App Server**
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah ke OTP Broker |
+| data | Objek | Data untuk OTP Broker | 
+| `data`.msisdn | String | Nomor MSISDN yang akan dibuka blokir |
+
+## Sekenario 2 - OTP Broker Tidak Dapat Diakses App Server
 
 Pada skenario ini, App Server dapat mengirimkan OTP ke RabbitMQ Server atau WSMessageBroker. WSMessageBroker menggunakan protokol WebSoket dan Basic Authentication. Baik App Server maupun OTP Broker bertindak sebagai client dari WSMessageBroker.
 
@@ -130,6 +153,143 @@ Pada skenario ini, pengguna tidak memerlukan IP public. Pengguna hanya memerluka
 1. OTP Broker
 2. Koneksi internet (tidak memerlukan IP public dan port forwarding)
 3. Server RabbitMQ atau WSMessageBroker
+
+### RabbitMQ
+
+**Send SMS Request**
+
+```json
+{
+	"command":"send-sms",
+	"data":{
+		"id": 123456,
+		"msisdn": "08126666666",
+		"message": "OTP Anda adalah 1234"
+	}
+}
+```
+
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah ke OTP Broker |
+| data | Objek | Data untuk OTP Broker | 
+| `data`.id | String | ID SMS |
+| `data`.msisdn | String | Nomor MSISDN penerima |
+| `data`.message| String | Pesan SMS |
+
+
+**Block Number Request**
+
+```json
+{
+	"command":"block-msisdn",
+	"data":{
+		"msisdn": "08126666666",
+	}
+}
+```
+
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah ke OTP Broker |
+| data | Objek | Data untuk OTP Broker | 
+| `data`.msisdn | String | Nomor MSISDN yang akan diblokir |
+
+**Unblock Number Request**
+
+```json
+{
+	"command":"unblock-msisdn",
+	"data":{
+		"msisdn": "08126666666",
+	}
+}
+```
+
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah ke OTP Broker |
+| data | Objek | Data untuk OTP Broker | 
+| `data`.msisdn | String | Nomor MSISDN yang akan dibuka blokir |
+
+### WSMessageBroker
+
+**Send SMS Request**
+
+```json
+{
+	"command":"send-message",
+	"channel":"sms",
+	"data":[{
+		"command":"send-sms",
+		"data":{	
+			"id": 123456,
+			"msisdn": "08126666666",
+			"message": "OTP Anda adalah 1234"
+		}
+	}]
+}
+```
+
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah kepada WSMessageBroker. Selalu isi dengan `send-message` untuk menirimkan pesan ke channel |
+| channel | String | Nama channel yang dituju |
+| data | Array Object | Berisi array objek yang dikirim ke channel |
+| `data[index]`.command | String | Perintah ke OTP Broker |
+| `data[index]`.data | Objek | Data untuk OTP Broker | 
+| `data[index].data`.id | String | ID SMS |
+| `data[index].data`.msisdn | String | Nomor MSISDN penerima |
+| `data[index].data`.message| String | Pesan SMS |
+
+
+**Block Number Request**
+
+```json
+{
+	"command":"send-message",
+	"channel":"sms",
+	"data":[{
+		"command":"block-msisdn",
+		"data":{
+			"msisdn": "08126666666",
+		}
+	}]
+}
+```
+
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah kepada WSMessageBroker. Selalu isi dengan `send-message` untuk menirimkan pesan ke channel |
+| channel | String | Nama channel yang dituju |
+| data | Array Object | Berisi array objek yang dikirim ke channel |
+| `data[index]`.command | String | Perintah ke OTP Broker |
+| `data[index]`.data | Objek | Data untuk OTP Broker | 
+| `data[index].data`.msisdn | String | Nomor MSISDN yang akan diblokir |
+
+**Unblock Number Request**
+
+```json
+{
+	"command":"send-message",
+	"channel":"sms",
+	"data":[{
+		"command":"unblock-msisdn",
+		"data":{
+			"msisdn": "08126666666",
+		}
+	}]
+}
+```
+
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah kepada WSMessageBroker. Selalu isi dengan `send-message` untuk menirimkan pesan ke channel |
+| channel | String | Nama channel yang dituju |
+| data | Array Object | Berisi array objek yang dikirim ke channel |
+| `data[index]`.command | String | Perintah ke OTP Broker |
+| `data[index]`.data | Objek | Data untuk OTP Broker | 
+| `data[index].data`.msisdn | String | Nomor MSISDN yang akan dibuka blokir |
 
 Server WSMessageBroker berbasis menggunakan protokol WebSocket dan PHP. Silakan download WSMessageBroker di https://github.com/kamshory/WSMessageBrocker 
 
@@ -338,4 +498,5 @@ Modul Afraid adalah modul untuk mengatur akun Free DNS Afraid yang digunakan.
 **No IP**
 
 1. Update : OK
+
 
