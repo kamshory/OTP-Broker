@@ -12,14 +12,14 @@ import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
-public class ConfigDynu {
-	private static Logger logger = LogManager.getLogger(ConfigDynu.class);
-	private ConfigDynu()
+public class ConfigVendorNoIP {
+	private static Logger logger = LogManager.getLogger(ConfigVendorNoIP.class);
+	private ConfigVendorNoIP()
 	{
 		
 	}
 	
-	private static String endpoint = "https://api.dynu.com/nic/update";
+	private static String endpoint = "";
 	private static String username = "";
 	private static String email = "";
 	private static String password = "";
@@ -48,11 +48,11 @@ public class ConfigDynu {
 					String lPassword = json.optString("password", "");
 					String lCompany = json.optString("company", "");
 					
-					ConfigDynu.setEndpoint(lEndpoint);
-					ConfigDynu.setUsername(lUsername);
-					ConfigDynu.setEmail(lEmail);
-					ConfigDynu.setPassword(lPassword);
-					ConfigDynu.setCompany(lCompany);
+					ConfigVendorNoIP.setEndpoint(lEndpoint);
+					ConfigVendorNoIP.setUsername(lUsername);
+					ConfigVendorNoIP.setEmail(lEmail);
+					ConfigVendorNoIP.setPassword(lPassword);
+					ConfigVendorNoIP.setCompany(lCompany);
 				}
 			}
 		} 
@@ -114,11 +114,11 @@ public class ConfigDynu {
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
 
-		config.put("endpoint", ConfigDynu.getEndpoint());
-		config.put("username", ConfigDynu.getUsername());
-		config.put("email", ConfigDynu.getEmail());
-		config.put("password", ConfigDynu.getPassword());
-		config.put("company", ConfigDynu.getCompany());
+		config.put("endpoint", ConfigVendorNoIP.getEndpoint());
+		config.put("username", ConfigVendorNoIP.getUsername());
+		config.put("email", ConfigVendorNoIP.getEmail());
+		config.put("password", ConfigVendorNoIP.getPassword());
+		config.put("company", ConfigVendorNoIP.getCompany());
 		return config;
 	}
 
@@ -127,7 +127,7 @@ public class ConfigDynu {
 	}
 
 	public static void setEndpoint(String endpoint) {
-		ConfigDynu.endpoint = endpoint;
+		ConfigVendorNoIP.endpoint = endpoint;
 	}
 
 	
@@ -137,7 +137,7 @@ public class ConfigDynu {
 	}
 
 	public static void setUsername(String username) {
-		ConfigDynu.username = username;
+		ConfigVendorNoIP.username = username;
 	}
 
 	public static String getEmail() {
@@ -145,7 +145,7 @@ public class ConfigDynu {
 	}
 
 	public static void setEmail(String email) {
-		ConfigDynu.email = email;
+		ConfigVendorNoIP.email = email;
 	}
 
 	public static String getPassword() {
@@ -153,7 +153,7 @@ public class ConfigDynu {
 	}
 
 	public static void setPassword(String password) {
-		ConfigDynu.password = password;
+		ConfigVendorNoIP.password = password;
 	}
 
 	public static String getCompany() {
@@ -161,7 +161,7 @@ public class ConfigDynu {
 	}
 
 	public static void setCompany(String company) {
-		ConfigDynu.company = company;
+		ConfigVendorNoIP.company = company;
 	}
 
 	public static JSONObject toJSONObject()

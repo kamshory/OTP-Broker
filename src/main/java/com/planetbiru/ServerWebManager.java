@@ -26,12 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.api.RESTAPI;
 import com.planetbiru.config.ConfigAPIUser;
-import com.planetbiru.config.ConfigAfraid;
+import com.planetbiru.config.ConfigVendorAfraid;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
-import com.planetbiru.config.ConfigCloudflare;
+import com.planetbiru.config.ConfigVendorCloudflare;
 import com.planetbiru.config.ConfigDDNS;
-import com.planetbiru.config.ConfigDynu;
+import com.planetbiru.config.ConfigVendorDynu;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
@@ -40,7 +40,7 @@ import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
-import com.planetbiru.config.ConfigNoIP;
+import com.planetbiru.config.ConfigVendorNoIP;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.GeneralConfig;
 import com.planetbiru.config.DataModem;
@@ -151,8 +151,8 @@ public class ServerWebManager {
 		Config.setAfraidSettingPath(afraidSettingPath);
 		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
-		ConfigCloudflare.load(Config.getCloudflareSettingPath());
-		ConfigNoIP.load(Config.getNoIPSettingPath());
+		ConfigVendorCloudflare.load(Config.getCloudflareSettingPath());
+		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
 		ConfigAPI.load(Config.getApiSettingPath());
 
 		Config.setPortName(portName);		
@@ -174,7 +174,7 @@ public class ServerWebManager {
 	@PostMapping(path="/api/device/**")
 	public ResponseEntity<String> modemConnect(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		HttpHeaders responseHeaders = new HttpHeaders();
 		HttpStatus statusCode;
 		JSONObject responseJSON = new JSONObject();
@@ -183,8 +183,8 @@ public class ServerWebManager {
 		{
 			if(WebUserAccount.checkUserAuth(headers))
 			{
-				String action = query.getOrDefault("action", "");
-				String modemID = query.getOrDefault("id", "");
+				String action = queryPairs.getOrDefault("action", "");
+				String modemID = queryPairs.getOrDefault("id", "");
 				if(!modemID.isEmpty())
 				{
 					try 
@@ -289,10 +289,10 @@ public class ServerWebManager {
 		{
 			if(WebUserAccount.checkUserAuth(headers))
 			{
-				Map<String, String> query = Utility.parseURLEncoded(requestBody);
-				String modemID = query.getOrDefault("modem_id", "");
-				String receiver = query.getOrDefault("receiver", "");
-				String message = query.getOrDefault(JsonKey.MESSAGE, "");
+				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+				String modemID = queryPairs.getOrDefault("modem_id", "");
+				String receiver = queryPairs.getOrDefault("receiver", "");
+				String message = queryPairs.getOrDefault(JsonKey.MESSAGE, "");
 				String result = "";
 				try 
 				{
@@ -338,9 +338,9 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				response = new JSONObject();
-				Map<String, String> query = Utility.parseURLEncoded(requestBody);
-				String ussd = query.getOrDefault("ussd", "");
-				String modemID = query.getOrDefault("modem_id", "");
+				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+				String ussd = queryPairs.getOrDefault("ussd", "");
+				String modemID = queryPairs.getOrDefault("modem_id", "");
 				String message = "";
 				if(ussd != null && !ussd.isEmpty())
 				{
@@ -920,9 +920,9 @@ public class ServerWebManager {
 		{
 			if(WebUserAccount.checkUserAuth(headers))
 			{
-				ConfigCloudflare.load(Config.getCloudflareSettingPath());
+				ConfigVendorCloudflare.load(Config.getCloudflareSettingPath());
 				
-				responseBody = ConfigCloudflare.toJSONObject().toString().getBytes();
+				responseBody = ConfigVendorCloudflare.toJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -954,8 +954,8 @@ public class ServerWebManager {
 		{
 			if(WebUserAccount.checkUserAuth(headers))
 			{
-				ConfigNoIP.load(Config.getNoIPSettingPath());				
-				responseBody = ConfigNoIP.toJSONObject().toString().getBytes();
+				ConfigVendorNoIP.load(Config.getNoIPSettingPath());				
+				responseBody = ConfigVendorNoIP.toJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -988,8 +988,8 @@ public class ServerWebManager {
 		{
 			if(WebUserAccount.checkUserAuth(headers))
 			{
-				ConfigAfraid.load(Config.getAfraidSettingPath());				
-				responseBody = ConfigAfraid.toJSONObject().toString().getBytes();
+				ConfigVendorAfraid.load(Config.getAfraidSettingPath());				
+				responseBody = ConfigVendorAfraid.toJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -1020,8 +1020,8 @@ public class ServerWebManager {
 		{
 			if(WebUserAccount.checkUserAuth(headers))
 			{
-				ConfigDynu.load(Config.getDynuSettingPath());				
-				responseBody = ConfigDynu.toJSONObject().toString().getBytes();
+				ConfigVendorDynu.load(Config.getDynuSettingPath());				
+				responseBody = ConfigVendorDynu.toJSONObject().toString().getBytes();
 			}
 			else
 			{
@@ -1690,7 +1690,7 @@ public class ServerWebManager {
 			    
 				String ttls = queryPairs.getOrDefault(JsonKey.TTL, "0");
 			    int ttl = Utility.atoi(ttls);
-			    String type = "A";
+			    String type = queryPairs.getOrDefault(JsonKey.TYPE, "0");
 			    String id = Utility.md5(zone+":"+recordName);
 				DDNSRecord record = new DDNSRecord(id, zone, recordName, type, proxied, ttl, forceCreateZone, provider, active, cronExpression);
 				if(!zone.isEmpty() && !recordName.isEmpty())
@@ -1893,11 +1893,11 @@ public class ServerWebManager {
 	}
 	
 	private void processKeystore(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey(JsonKey.DELETE))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey(JsonKey.DELETE))
 		{
 			ConfigKeystore.load(Config.getKeystoreSettingPath());
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -1908,10 +1908,10 @@ public class ServerWebManager {
 			}
 			ConfigKeystore.save(Config.getKeystoreSettingPath());
 		}
-		if(query.containsKey(JsonKey.DEACTIVATE))
+		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
 			ConfigKeystore.load(Config.getKeystoreSettingPath());
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -1922,10 +1922,10 @@ public class ServerWebManager {
 			}
 			ConfigKeystore.save(Config.getKeystoreSettingPath());
 		}
-		if(query.containsKey(JsonKey.ACTIVATE))
+		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
 			ConfigKeystore.load(Config.getKeystoreSettingPath());
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -1936,15 +1936,15 @@ public class ServerWebManager {
 			}
 			ConfigKeystore.save(Config.getKeystoreSettingPath());
 		}
-		if(query.containsKey(JsonKey.UPDATE))
+		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
-			String id = query.getOrDefault("id", "");
+			String id = queryPairs.getOrDefault("id", "");
 			if(!id.isEmpty())
 			{
 				ConfigKeystore.load(Config.getKeystoreSettingPath());
-				String fileName = query.getOrDefault("file_name", "").trim();
-				String filePassword = query.getOrDefault("file_password", "").trim();
-				boolean active = query.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
+				String fileName = queryPairs.getOrDefault("file_name", "").trim();
+				String filePassword = queryPairs.getOrDefault("file_password", "").trim();
+				boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
 				JSONObject data = ConfigKeystore.get(id).toJSONObject();
 				
 				data.put("id", id);
@@ -1961,14 +1961,14 @@ public class ServerWebManager {
 			}
 		}
 		
-		if(query.containsKey(JsonKey.ADD))
+		if(queryPairs.containsKey(JsonKey.ADD))
 		{
 			String id = Utility.md5(String.format("%d", System.nanoTime()));
-			String fileName = query.getOrDefault("file_name", "").trim();
-			String filePassword = query.getOrDefault("file_password", "").trim();
+			String fileName = queryPairs.getOrDefault("file_name", "").trim();
+			String filePassword = queryPairs.getOrDefault("file_password", "").trim();
 			if(!fileName.isEmpty() && !filePassword.isEmpty())
 			{
-				boolean active = query.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
+				boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
 				JSONObject data = new JSONObject();
 				
 				String fileExtension = FileConfigUtil.getFileExtension(fileName);
@@ -1978,7 +1978,7 @@ public class ServerWebManager {
 				data.put("fileExtension", fileExtension);
 				data.put("filePassword", filePassword);
 				data.put(JsonKey.ACTIVE, active);
-				byte[] binaryData = Utility.base64DecodeRaw(query.getOrDefault("data", ""));
+				byte[] binaryData = Utility.base64DecodeRaw(queryPairs.getOrDefault("data", ""));
 				data.put("fileSize", binaryData.length);
 				
 				String fn = id + "." + fileExtension;
@@ -1992,20 +1992,20 @@ public class ServerWebManager {
 	}
 
 	private void processSMSSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("save_sms_setting"))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("save_sms_setting"))
 		{
 			ConfigSMS.load(Config.getSmsSettingPath());
-			boolean lSendIncommingSMS = query.getOrDefault("send_incomming_sms", "").trim().equals("1");
-			String v1 = query.getOrDefault("incomming_interval", "0").trim();
+			boolean lSendIncommingSMS = queryPairs.getOrDefault("send_incomming_sms", "").trim().equals("1");
+			String v1 = queryPairs.getOrDefault("incomming_interval", "0").trim();
 			int lIncommingInterval = Utility.atoi(v1);
 			
-			String v2 = query.getOrDefault("time_range", "0").trim();
+			String v2 = queryPairs.getOrDefault("time_range", "0").trim();
 			int lTimeRange = Utility.atoi(v2);
 			
-			String v3 = query.getOrDefault("max_per_time_range", "0").trim();
+			String v3 = queryPairs.getOrDefault("max_per_time_range", "0").trim();
 			int lMaxPerTimeRange = Utility.atoi(v3);
-			String countryCode = query.getOrDefault("country_code", "").trim();
+			String countryCode = queryPairs.getOrDefault("country_code", "").trim();
 			
 			ConfigSMS.setCountryCode(countryCode);
 			ConfigSMS.setSendIncommingSMS(lSendIncommingSMS);
@@ -2018,23 +2018,23 @@ public class ServerWebManager {
 	}
 
 	private void processAPISetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("save_api_setting"))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("save_api_setting"))
 		{
 			ConfigAPI.load(Config.getApiSettingPath());
-			String v1 = query.getOrDefault("http_port", "0").trim();
+			String v1 = queryPairs.getOrDefault("http_port", "0").trim();
 			int lHttpPort = Utility.atoi(v1);
 			
-			String v2 = query.getOrDefault("https_port", "0").trim();
+			String v2 = queryPairs.getOrDefault("https_port", "0").trim();
 			int lHttpsPort = Utility.atoi(v2);
 
-			boolean lHttpEnable = query.getOrDefault("http_enable", "").trim().equals("1");
-			boolean lHttpsEnable = query.getOrDefault("https_enable", "").trim().equals("1");
+			boolean lHttpEnable = queryPairs.getOrDefault("http_enable", "").trim().equals("1");
+			boolean lHttpsEnable = queryPairs.getOrDefault("https_enable", "").trim().equals("1");
 	
 			
-			String lMessagePath = query.getOrDefault("message_path", "").trim();
-			String lBlockingPath = query.getOrDefault("blocking_path", "").trim();
-			String lUnblockingPath = query.getOrDefault("unblocking_path", "").trim();
+			String lMessagePath = queryPairs.getOrDefault("message_path", "").trim();
+			String lBlockingPath = queryPairs.getOrDefault("blocking_path", "").trim();
+			String lUnblockingPath = queryPairs.getOrDefault("unblocking_path", "").trim();
 			
 			JSONObject config = new JSONObject();			
 			config.put("httpPort", lHttpPort);
@@ -2052,18 +2052,18 @@ public class ServerWebManager {
 	}
 
 	private void processNetworkSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("save_dhcp"))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("save_dhcp"))
 		{
-			String domainName = query.getOrDefault("domainName", "").trim();
-			String domainNameServersStr = query.getOrDefault("domainNameServers", "").trim();
-			String ipRouter = query.getOrDefault("ipRouter", "").trim();
-			String netmask = query.getOrDefault("netmask", "").trim();
-			String subnetMask = query.getOrDefault("subnetMask", "").trim();
-			String domainNameServersAddress = query.getOrDefault("domainNameServersAddress", "").trim();
-			String defaultLeaseTime = query.getOrDefault("defaultLeaseTime", "").trim();
-			String maxLeaseTime = query.getOrDefault("maxLeaseTime", "").trim();
-			String ranges = query.getOrDefault("ranges", "").trim();
+			String domainName = queryPairs.getOrDefault("domainName", "").trim();
+			String domainNameServersStr = queryPairs.getOrDefault("domainNameServers", "").trim();
+			String ipRouter = queryPairs.getOrDefault("ipRouter", "").trim();
+			String netmask = queryPairs.getOrDefault("netmask", "").trim();
+			String subnetMask = queryPairs.getOrDefault("subnetMask", "").trim();
+			String domainNameServersAddress = queryPairs.getOrDefault("domainNameServersAddress", "").trim();
+			String defaultLeaseTime = queryPairs.getOrDefault("defaultLeaseTime", "").trim();
+			String maxLeaseTime = queryPairs.getOrDefault("maxLeaseTime", "").trim();
+			String ranges = queryPairs.getOrDefault("ranges", "").trim();
 			
 			JSONArray nsList = new JSONArray();
 			
@@ -2110,143 +2110,147 @@ public class ServerWebManager {
 			ConfigNetDHCP.apply(Config.getOsDHCPConfigPath());
 		}
 		
-		if(query.containsKey("save_wlan"))
+		if(queryPairs.containsKey("save_wlan"))
 		{
 			ConfigNetWLAN.load(Config.getWlanSettingPath());
-			ConfigNetWLAN.setEssid(query.getOrDefault("essid", "").trim());
-			ConfigNetWLAN.setKey(query.getOrDefault("key", "").trim());
-			ConfigNetWLAN.setKeyMgmt(query.getOrDefault("keyMgmt", "").trim());
-			ConfigNetWLAN.setIpAddress(query.getOrDefault("ipAddress", "").trim());
-			ConfigNetWLAN.setPrefix(query.getOrDefault("prefix", "").trim());
-			ConfigNetWLAN.setNetmask(query.getOrDefault("netmask", "").trim());
-			ConfigNetWLAN.setGateway(query.getOrDefault("gateway", "").trim());
-			ConfigNetWLAN.setDns1(query.getOrDefault("dns1", "").trim());
+			ConfigNetWLAN.setEssid(queryPairs.getOrDefault("essid", "").trim());
+			ConfigNetWLAN.setKey(queryPairs.getOrDefault("key", "").trim());
+			ConfigNetWLAN.setKeyMgmt(queryPairs.getOrDefault("keyMgmt", "").trim());
+			ConfigNetWLAN.setIpAddress(queryPairs.getOrDefault("ipAddress", "").trim());
+			ConfigNetWLAN.setPrefix(queryPairs.getOrDefault("prefix", "").trim());
+			ConfigNetWLAN.setNetmask(queryPairs.getOrDefault("netmask", "").trim());
+			ConfigNetWLAN.setGateway(queryPairs.getOrDefault("gateway", "").trim());
+			ConfigNetWLAN.setDns1(queryPairs.getOrDefault("dns1", "").trim());
 			ConfigNetWLAN.save(Config.getWlanSettingPath());
 			ConfigNetWLAN.apply(Config.getOsWLANConfigPath(), Config.getOsSSIDKey());
 		}
 
-		if(query.containsKey("save_ethernet"))
+		if(queryPairs.containsKey("save_ethernet"))
 		{
 			ConfigNetEthernet.load(Config.getEthernetSettingPath());
-			ConfigNetEthernet.setIpAddress(query.getOrDefault("ipAddress", "").trim());
-			ConfigNetEthernet.setPrefix(query.getOrDefault("prefix", "").trim());
-			ConfigNetEthernet.setNetmask(query.getOrDefault("netmask", "").trim());
-			ConfigNetEthernet.setGateway(query.getOrDefault("gateway", "").trim());
-			ConfigNetEthernet.setDns1(query.getOrDefault("dns1", "").trim());
-			ConfigNetEthernet.setDns2(query.getOrDefault("dns2", "").trim());
+			ConfigNetEthernet.setIpAddress(queryPairs.getOrDefault("ipAddress", "").trim());
+			ConfigNetEthernet.setPrefix(queryPairs.getOrDefault("prefix", "").trim());
+			ConfigNetEthernet.setNetmask(queryPairs.getOrDefault("netmask", "").trim());
+			ConfigNetEthernet.setGateway(queryPairs.getOrDefault("gateway", "").trim());
+			ConfigNetEthernet.setDns1(queryPairs.getOrDefault("dns1", "").trim());
+			ConfigNetEthernet.setDns2(queryPairs.getOrDefault("dns2", "").trim());
 			ConfigNetEthernet.save(Config.getEthernetSettingPath());
 			ConfigNetEthernet.apply(Config.getOsEthernetConfigPath());
 		}
 	}
 
 	private void processCloudflareSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		String endpoint = query.getOrDefault("endpoint", "").trim();
-		String accountId = query.getOrDefault("account_id", "").trim();
-		String authEmail = query.getOrDefault("auth_email", "").trim();
-		String authApiKey = query.getOrDefault("auth_api_key", "").trim();
-		String authToken = query.getOrDefault("auth_token", "").trim();
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		String endpoint = queryPairs.getOrDefault("endpoint", "").trim();
+		String accountId = queryPairs.getOrDefault("account_id", "").trim();
+		String authEmail = queryPairs.getOrDefault("auth_email", "").trim();
+		String authApiKey = queryPairs.getOrDefault("auth_api_key", "").trim();
+		String authToken = queryPairs.getOrDefault("auth_token", "").trim();
 		
 		if(!endpoint.isEmpty())
 		{
-			ConfigCloudflare.load(Config.getCloudflareSettingPath());
-			ConfigCloudflare.setEndpoint(endpoint);
-			ConfigCloudflare.setAccountId(accountId);
-			ConfigCloudflare.setAuthEmail(authEmail);
-			ConfigCloudflare.setAuthApiKey(authApiKey);
-			ConfigCloudflare.setAuthToken(authToken);
-			ConfigCloudflare.save(Config.getCloudflareSettingPath());
+			ConfigVendorCloudflare.load(Config.getCloudflareSettingPath());
+			ConfigVendorCloudflare.setEndpoint(endpoint);
+			ConfigVendorCloudflare.setAccountId(accountId);
+			ConfigVendorCloudflare.setAuthEmail(authEmail);
+			ConfigVendorCloudflare.setAuthApiKey(authApiKey);
+			ConfigVendorCloudflare.setAuthToken(authToken);
+			ConfigVendorCloudflare.save(Config.getCloudflareSettingPath());
 		}
 	}
 	
 	private void processNoIPSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		String endpoint = query.getOrDefault("endpoint", "").trim();
-		String username = query.getOrDefault("username", "").trim();
-		String email = query.getOrDefault("email", "").trim();
-		String password = query.getOrDefault("password", "").trim();
-		String company = query.getOrDefault("company", "").trim();
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		String endpoint = queryPairs.getOrDefault("endpoint", "").trim();
+		String username = queryPairs.getOrDefault("username", "").trim();
+		String email = queryPairs.getOrDefault("email", "").trim();
+		String password = queryPairs.getOrDefault("password", "").trim();
+		String company = queryPairs.getOrDefault("company", "").trim();
 		
 		if(!endpoint.isEmpty())
 		{
-			ConfigNoIP.load(Config.getNoIPSettingPath());
-			ConfigNoIP.setEndpoint(endpoint);
-			ConfigNoIP.setUsername(username);
+			ConfigVendorNoIP.load(Config.getNoIPSettingPath());
+			ConfigVendorNoIP.setEndpoint(endpoint);
+			ConfigVendorNoIP.setUsername(username);
 			if(!password.isEmpty())
 			{
-				ConfigNoIP.setPassword(password);
+				ConfigVendorNoIP.setPassword(password);
 			}
-			ConfigNoIP.setCompany(company);
-			ConfigNoIP.setEmail(email);		
-			ConfigNoIP.save(Config.getNoIPSettingPath());
+			ConfigVendorNoIP.setCompany(company);
+			ConfigVendorNoIP.setEmail(email);		
+			ConfigVendorNoIP.save(Config.getNoIPSettingPath());
 		}
 	}
 	
 	private void processAfraidSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		String endpoint = query.getOrDefault("endpoint", "").trim();
-		String username = query.getOrDefault("username", "").trim();
-		String email = query.getOrDefault("email", "").trim();
-		String password = query.getOrDefault("password", "").trim();
-		String company = query.getOrDefault("company", "").trim();
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		String endpoint = queryPairs.getOrDefault("endpoint", "").trim();
+		String username = queryPairs.getOrDefault("username", "").trim();
+		String email = queryPairs.getOrDefault("email", "").trim();
+		String password = queryPairs.getOrDefault("password", "").trim();
+		String company = queryPairs.getOrDefault("company", "").trim();
 		
 		if(!endpoint.isEmpty())
 		{
-			ConfigAfraid.load(Config.getAfraidSettingPath());
-			ConfigAfraid.setEndpoint(endpoint);
-			ConfigAfraid.setUsername(username);
+			ConfigVendorAfraid.load(Config.getAfraidSettingPath());
+			ConfigVendorAfraid.setEndpoint(endpoint);
+			ConfigVendorAfraid.setUsername(username);
 			if(!password.isEmpty())
 			{
-				ConfigAfraid.setPassword(password);
+				ConfigVendorAfraid.setPassword(password);
 			}
-			ConfigAfraid.setCompany(company);
-			ConfigAfraid.setEmail(email);		
-			ConfigAfraid.save(Config.getAfraidSettingPath());
+			ConfigVendorAfraid.setCompany(company);
+			ConfigVendorAfraid.setEmail(email);		
+			ConfigVendorAfraid.save(Config.getAfraidSettingPath());
 		}
 	}
 	
 	private void processDynuSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		String endpoint = query.getOrDefault("endpoint", "").trim();
-		String username = query.getOrDefault("username", "").trim();
-		String email = query.getOrDefault("email", "").trim();
-		String password = query.getOrDefault("password", "").trim();
-		String company = query.getOrDefault("company", "").trim();
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		String apiVersion = queryPairs.getOrDefault("api_version", "").trim();
+		String apiKey = queryPairs.getOrDefault("api_key", "").trim();
+		String endpoint = queryPairs.getOrDefault("endpoint", "").trim();
+		String username = queryPairs.getOrDefault("username", "").trim();
+		String email = queryPairs.getOrDefault("email", "").trim();
+		String password = queryPairs.getOrDefault("password", "").trim();
+		String company = queryPairs.getOrDefault("company", "").trim();
 		
 		if(!endpoint.isEmpty())
 		{
-			ConfigDynu.load(Config.getDynuSettingPath());
-			ConfigDynu.setEndpoint(endpoint);
-			ConfigDynu.setUsername(username);
+			ConfigVendorDynu.load(Config.getDynuSettingPath());
+			ConfigVendorDynu.setEndpoint(endpoint);
+			ConfigVendorDynu.setUsername(username);
+			ConfigVendorDynu.setApiVersion(apiVersion);
+			ConfigVendorDynu.setApiKey(apiKey);
 			if(!password.isEmpty())
 			{
-				ConfigDynu.setPassword(password);
+				ConfigVendorDynu.setPassword(password);
 			}
-			ConfigDynu.setCompany(company);
-			ConfigDynu.setEmail(email);		
-			ConfigDynu.save(Config.getDynuSettingPath());
+			ConfigVendorDynu.setCompany(company);
+			ConfigVendorDynu.setEmail(email);		
+			ConfigVendorDynu.save(Config.getDynuSettingPath());
 		}
 	}
 	
 	private void processEmailSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("save_email_setting"))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("save_email_setting"))
 		{
 			ConfigEmail.load(Config.getEmailSettingPath());
-			boolean lMailAuth = query.getOrDefault("mail_auth", "").trim().equals("1");
-			String lMailHost = query.getOrDefault("smtp_host", "").trim();
+			boolean lMailAuth = queryPairs.getOrDefault("mail_auth", "").trim().equals("1");
+			String lMailHost = queryPairs.getOrDefault("smtp_host", "").trim();
 	
-			String v1 = query.getOrDefault("smtp_port", "0").trim();
+			String v1 = queryPairs.getOrDefault("smtp_port", "0").trim();
 			int lMailPort = Utility.atoi(v1);
-			String lMailSenderAddress = query.getOrDefault("sender_address", "").trim();
-			String lMailSenderPassword = query.getOrDefault("sender_password", "").trim();
+			String lMailSenderAddress = queryPairs.getOrDefault("sender_address", "").trim();
+			String lMailSenderPassword = queryPairs.getOrDefault("sender_password", "").trim();
 			if(lMailSenderPassword.isEmpty())
 			{
 				lMailSenderPassword = ConfigEmail.getMailSenderPassword();
 			}
-			boolean lMailSSL = query.getOrDefault("ssl", "").trim().equals("1");
-			boolean lMailStartTLS = query.getOrDefault("start_tls", "").trim().equals("1");
-			boolean active = query.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
+			boolean lMailSSL = queryPairs.getOrDefault("ssl", "").trim().equals("1");
+			boolean lMailStartTLS = queryPairs.getOrDefault("start_tls", "").trim().equals("1");
+			boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
 			
 			JSONObject config = new JSONObject();
 			
@@ -2264,14 +2268,11 @@ public class ServerWebManager {
 	}
 	
 	private void processModemSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		ConfigModem.load(Config.getModemSettingPath());
-		if(query.containsKey(JsonKey.DELETE))
+		if(queryPairs.containsKey(JsonKey.DELETE))
 		{
-			/**
-			 * Delete
-			 */
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -2282,9 +2283,9 @@ public class ServerWebManager {
 			}
 			ConfigModem.save(Config.getModemSettingPath());
 		}
-		if(query.containsKey(JsonKey.DEACTIVATE))
+		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -2295,9 +2296,9 @@ public class ServerWebManager {
 			}
 			ConfigModem.save(Config.getModemSettingPath());
 		}
-		if(query.containsKey(JsonKey.ACTIVATE))
+		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -2309,37 +2310,37 @@ public class ServerWebManager {
 			ConfigModem.save(Config.getModemSettingPath());
 		}
 		
-		if(query.containsKey(JsonKey.ADD))
+		if(queryPairs.containsKey(JsonKey.ADD))
 		{
-			this.processModemUpdate(query, JsonKey.ADD);
+			this.processModemUpdate(queryPairs, JsonKey.ADD);
 		}	
-		if(query.containsKey(JsonKey.UPDATE))
+		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
-			this.processModemUpdate(query, JsonKey.UPDATE);
+			this.processModemUpdate(queryPairs, JsonKey.UPDATE);
 		}	
 	}
 	
 	
-	private void processModemUpdate(Map<String, String> query, String action) {		
+	private void processModemUpdate(Map<String, String> queryPairs, String action) {		
 		
-		String id = query.getOrDefault("id", "").trim();		
-		String connectionType = query.getOrDefault("connection_type", "").trim();
-		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");		
+		String id = queryPairs.getOrDefault("id", "").trim();		
+		String connectionType = queryPairs.getOrDefault("connection_type", "").trim();
+		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");		
 
-		String smsCenter = query.getOrDefault("sms_center", "").trim();		
+		String smsCenter = queryPairs.getOrDefault("sms_center", "").trim();		
 		
-		String incommingIntervalS = query.getOrDefault("incomming_interval", "0").trim();		
+		String incommingIntervalS = queryPairs.getOrDefault("incomming_interval", "0").trim();		
 		int incommingInterval = Utility.atoi(incommingIntervalS);	
 		
-		String timeRangeS = query.getOrDefault("time_range", "").trim();		
+		String timeRangeS = queryPairs.getOrDefault("time_range", "").trim();		
 		int timeRange = Utility.atoi(timeRangeS);
 
-		String maxPerTimeRangeS = query.getOrDefault("maxPer_time_range", "0").trim();
+		String maxPerTimeRangeS = queryPairs.getOrDefault("maxPer_time_range", "0").trim();
 		int maxPerTimeRange = Utility.atoi(maxPerTimeRangeS);
 
-		String imei = query.getOrDefault("imei", "").trim();
-		String name = query.getOrDefault("name", "").trim();
-		String simCardPIN = query.getOrDefault("sim_card_pin", "").trim();
+		String imei = queryPairs.getOrDefault("imei", "").trim();
+		String name = queryPairs.getOrDefault("name", "").trim();
+		String simCardPIN = queryPairs.getOrDefault("sim_card_pin", "").trim();
 			
 		DataModem modem = ConfigModem.getModemData(id);
 		if(action.equals(JsonKey.ADD) || id.isEmpty())
@@ -2365,26 +2366,26 @@ public class ServerWebManager {
 	}
 
 	private void processFeederSetting(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("save_feeder_ws_setting"))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("save_feeder_ws_setting"))
 		{
 
 			ConfigFeederWS.load(Config.getFeederWSSettingPath());
-			boolean feederWsEnable = query.getOrDefault("feeder_ws_enable", "").equals("1");		
-			boolean feederWsSSL = query.getOrDefault("feeder_ws_ssl", "").equals("1");		
-			String feederWsAddress = query.getOrDefault("feeder_ws_address", "");		
-			String port = query.getOrDefault("feeder_ws_port", "0");
+			boolean feederWsEnable = queryPairs.getOrDefault("feeder_ws_enable", "").equals("1");		
+			boolean feederWsSSL = queryPairs.getOrDefault("feeder_ws_ssl", "").equals("1");		
+			String feederWsAddress = queryPairs.getOrDefault("feeder_ws_address", "");		
+			String port = queryPairs.getOrDefault("feeder_ws_port", "0");
 			int feederWsPort = Utility.atoi(port);
-			String feederWsPath = query.getOrDefault("feeder_ws_path", "");		
-			String feederWsUsername = query.getOrDefault("feeder_ws_username", "");		
-			String feederWsPassword = query.getOrDefault("feeder_ws_password", "");		
-			String feederWsChannel = query.getOrDefault("feeder_ws_channel", "");
+			String feederWsPath = queryPairs.getOrDefault("feeder_ws_path", "");		
+			String feederWsUsername = queryPairs.getOrDefault("feeder_ws_username", "");		
+			String feederWsPassword = queryPairs.getOrDefault("feeder_ws_password", "");		
+			String feederWsChannel = queryPairs.getOrDefault("feeder_ws_channel", "");
 			
-			String timeout = query.getOrDefault("feeder_ws_timeout", "0");
+			String timeout = queryPairs.getOrDefault("feeder_ws_timeout", "0");
 			int feederWsTimeout = Utility.atoi(timeout);	
-			String reconnect = query.getOrDefault("feeder_ws_reconnect_delay", "0");
+			String reconnect = queryPairs.getOrDefault("feeder_ws_reconnect_delay", "0");
 			int feederWsReconnectDelay = Utility.atoi(reconnect);
-			String refresh = query.getOrDefault("feeder_ws_refresh", "0");
+			String refresh = queryPairs.getOrDefault("feeder_ws_refresh", "0");
 			int feederWsRefresh = Utility.atoi(refresh);
 			
 			ConfigFeederWS.setFeederWsEnable(feederWsEnable);
@@ -2401,22 +2402,22 @@ public class ServerWebManager {
 			
 			ConfigFeederWS.save(Config.getFeederWSSettingPath());
 		}
-		if(query.containsKey("save_feeder_amqp_setting"))
+		if(queryPairs.containsKey("save_feeder_amqp_setting"))
 		{
 			ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
-			boolean feederAmqpEnable = query.getOrDefault("feeder_amqp_enable", "").equals("1");		
-			boolean feederAmqpSSL = query.getOrDefault("feeder_amqp_ssl", "").equals("1");		
-			String feederAmqpAddress = query.getOrDefault("feeder_amqp_address", "");		
-			String port = query.getOrDefault("feeder_amqp_port", "0");
+			boolean feederAmqpEnable = queryPairs.getOrDefault("feeder_amqp_enable", "").equals("1");		
+			boolean feederAmqpSSL = queryPairs.getOrDefault("feeder_amqp_ssl", "").equals("1");		
+			String feederAmqpAddress = queryPairs.getOrDefault("feeder_amqp_address", "");		
+			String port = queryPairs.getOrDefault("feeder_amqp_port", "0");
 			int feederAmqpPort = Utility.atoi(port);
-			String feederAmqpPath = query.getOrDefault("feeder_amqp_path", "");		
-			String feederAmqpUsername = query.getOrDefault("feeder_amqp_username", "");		
-			String feederAmqpPassword = query.getOrDefault("feeder_amqp_password", "");		
-			String feederAmqpChannel = query.getOrDefault("feeder_amqp_channel", "");
+			String feederAmqpPath = queryPairs.getOrDefault("feeder_amqp_path", "");		
+			String feederAmqpUsername = queryPairs.getOrDefault("feeder_amqp_username", "");		
+			String feederAmqpPassword = queryPairs.getOrDefault("feeder_amqp_password", "");		
+			String feederAmqpChannel = queryPairs.getOrDefault("feeder_amqp_channel", "");
 			
-			String timeout = query.getOrDefault("feeder_amqp_timeout", "0");
+			String timeout = queryPairs.getOrDefault("feeder_amqp_timeout", "0");
 			int feederAmqpTimeout = Utility.atoi(timeout);	
-			String refresh = query.getOrDefault("feeder_amqp_refresh", "0");
+			String refresh = queryPairs.getOrDefault("feeder_amqp_refresh", "0");
 			int feederAmqpRefresh = Utility.atoi(refresh);
 			
 			ConfigFeederAMQP.setFeederAmqpEnable(feederAmqpEnable);
@@ -2435,11 +2436,11 @@ public class ServerWebManager {
 	}
 	
 	private void processSMS(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey("send"))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("send"))
 		{
-			String receiver = query.getOrDefault(JsonKey.RECEIVER, "").trim();			
-			String message = query.getOrDefault(JsonKey.MESSAGE, "").trim();	
+			String receiver = queryPairs.getOrDefault(JsonKey.RECEIVER, "").trim();			
+			String message = queryPairs.getOrDefault(JsonKey.MESSAGE, "").trim();	
 			if(!receiver.isEmpty() && !message.isEmpty())
 			{
 				try 
@@ -2458,13 +2459,13 @@ public class ServerWebManager {
 	}
 	
 	private void processAccount(String requestBody, CookieServer cookie) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
-		String phone = query.getOrDefault(JsonKey.PHONE, "");
-		String password = query.getOrDefault(JsonKey.PASSWORD, "");
-		String email = query.getOrDefault(JsonKey.EMAIL, "");
-		String name = query.getOrDefault(JsonKey.NAME, "");
-		if(query.containsKey(JsonKey.UPDATE))
+		String phone = queryPairs.getOrDefault(JsonKey.PHONE, "");
+		String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "");
+		String email = queryPairs.getOrDefault(JsonKey.EMAIL, "");
+		String name = queryPairs.getOrDefault(JsonKey.NAME, "");
+		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
 			User user;
 			try 
@@ -2490,14 +2491,14 @@ public class ServerWebManager {
 	}
 	
 	private void processAdmin(String requestBody, CookieServer cookie) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		String loggedUsername = (String) cookie.getSessionValue(JsonKey.USERNAME, "");
-		if(query.containsKey(JsonKey.DELETE))
+		if(queryPairs.containsKey(JsonKey.DELETE))
 		{
 			/**
 			 * Delete
 			 */
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -2508,97 +2509,97 @@ public class ServerWebManager {
 			}
 			WebUserAccount.save(Config.getUserSettingPath());
 		}
-		if(query.containsKey(JsonKey.DEACTIVATE))
+		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
 			/**
 			 * Deactivate
 			 */
-			this.processAdminDeactivate(query, loggedUsername);
+			this.processAdminDeactivate(queryPairs, loggedUsername);
 		}
-		if(query.containsKey(JsonKey.ACTIVATE))
+		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
 			 */
-			this.processAdminActivate(query);
+			this.processAdminActivate(queryPairs);
 		}
-		if(query.containsKey("block"))
+		if(queryPairs.containsKey("block"))
 		{
 			/**
 			 * Block
 			 */
-			this.processAdminBlock(query, loggedUsername);
+			this.processAdminBlock(queryPairs, loggedUsername);
 			
 		}
-		if(query.containsKey("unblock"))
+		if(queryPairs.containsKey("unblock"))
 		{
 			/**
 			 * Unblock
 			 */
-			this.processAdminUnblock(query);
+			this.processAdminUnblock(queryPairs);
 		}
-		if(query.containsKey("update-data"))
+		if(queryPairs.containsKey("update-data"))
 		{
-			this.processAdminUpdateData(query);
+			this.processAdminUpdateData(queryPairs);
 		}
-		if(query.containsKey(JsonKey.UPDATE))
+		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
-			this.processAdminUpdate(query);
+			this.processAdminUpdate(queryPairs);
 		}
 	}
 	private void processAPIUser(String requestBody) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey(JsonKey.DELETE))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey(JsonKey.DELETE))
 		{
 			/**
 			 * Delete
 			 */
 			ConfigAPIUser.load(Config.getUserAPISettingPath());
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String value = entry.getValue();
 				ConfigAPIUser.deleteUser(value);
 			}
 			ConfigAPIUser.save(Config.getUserAPISettingPath());
 		}
-		if(query.containsKey(JsonKey.DEACTIVATE))
+		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
 			/**
 			 * Deactivate
 			 */
-			this.processAPIUserDeactivate(query);
+			this.processAPIUserDeactivate(queryPairs);
 		}
-		if(query.containsKey(JsonKey.ACTIVATE))
+		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
 			 */
-			this.processAPIUserActivate(query);
+			this.processAPIUserActivate(queryPairs);
 		}
-		if(query.containsKey("block"))
+		if(queryPairs.containsKey("block"))
 		{
 			/**
 			 * Block
 			 */
-			this.processAPIUserBlock(query);
+			this.processAPIUserBlock(queryPairs);
 			
 		}
-		if(query.containsKey("unblock"))
+		if(queryPairs.containsKey("unblock"))
 		{
 			/**
 			 * Unblock
 			 */
-			this.processAPIUserUnblock(query);
+			this.processAPIUserUnblock(queryPairs);
 		}
-		if(query.containsKey(JsonKey.UPDATE))
+		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
-			this.processAPIUserUpdate(query);
+			this.processAPIUserUpdate(queryPairs);
 		}
 	}
 	
-	private void processAdminDeactivate(Map<String, String> query, String loggedUsername)
+	private void processAdminDeactivate(Map<String, String> queryPairs, String loggedUsername)
 	{
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2616,9 +2617,9 @@ public class ServerWebManager {
 		WebUserAccount.save(Config.getUserSettingPath());
 	}
 	
-	private void processAdminActivate(Map<String, String> query)
+	private void processAdminActivate(Map<String, String> queryPairs)
 	{
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2639,9 +2640,9 @@ public class ServerWebManager {
 		WebUserAccount.save(Config.getUserSettingPath());
 	}
 	
-	private void processAdminBlock(Map<String, String> query, String loggedUsername)
+	private void processAdminBlock(Map<String, String> queryPairs, String loggedUsername)
 	{
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2662,9 +2663,9 @@ public class ServerWebManager {
 		WebUserAccount.save(Config.getUserSettingPath());
 	}
 	
-	private void processAdminUnblock(Map<String, String> query)
+	private void processAdminUnblock(Map<String, String> queryPairs)
 	{
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2685,11 +2686,11 @@ public class ServerWebManager {
 		WebUserAccount.save(Config.getUserSettingPath());
 	}
 	
-	private void processAdminUpdateData(Map<String, String> query)
+	private void processAdminUpdateData(Map<String, String> queryPairs)
 	{
-		String pkID = query.getOrDefault("pk_id", "");
-		String field = query.getOrDefault("field", "");
-		String value = query.getOrDefault("value", "");
+		String pkID = queryPairs.getOrDefault("pk_id", "");
+		String field = queryPairs.getOrDefault("field", "");
+		String value = queryPairs.getOrDefault("value", "");
 		if(!field.equals(JsonKey.USERNAME))
 		{
 			User user;
@@ -2716,15 +2717,15 @@ public class ServerWebManager {
 		}
 	}
 	
-	private void processAdminUpdate(Map<String, String> query)
+	private void processAdminUpdate(Map<String, String> queryPairs)
 	{
-		String username = query.getOrDefault(JsonKey.USERNAME, "").trim();
-		String name = query.getOrDefault(JsonKey.NAME, "").trim();
-		String phone = query.getOrDefault(JsonKey.PHONE, "").trim();
-		String email = query.getOrDefault(JsonKey.EMAIL, "").trim();
-		String password = query.getOrDefault(JsonKey.PASSWORD, "").trim();
-		boolean blocked = query.getOrDefault(JsonKey.BLOCKED, "").equals("1");
-		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+		String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
+		String name = queryPairs.getOrDefault(JsonKey.NAME, "").trim();
+		String phone = queryPairs.getOrDefault(JsonKey.PHONE, "").trim();
+		String email = queryPairs.getOrDefault(JsonKey.EMAIL, "").trim();
+		String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "").trim();
+		boolean blocked = queryPairs.getOrDefault(JsonKey.BLOCKED, "").equals("1");
+		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
 
 		if(!username.isEmpty())
 		{
@@ -2760,10 +2761,10 @@ public class ServerWebManager {
 		}
 	}
 	
-	private void processAPIUserDeactivate(Map<String, String> query)
+	private void processAPIUserDeactivate(Map<String, String> queryPairs)
 	{
 		ConfigAPIUser.load(Config.getUserAPISettingPath());
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2774,10 +2775,10 @@ public class ServerWebManager {
 		}
 		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
-	private void processAPIUserActivate(Map<String, String> query)
+	private void processAPIUserActivate(Map<String, String> queryPairs)
 	{
 		ConfigAPIUser.load(Config.getUserAPISettingPath());
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2788,10 +2789,10 @@ public class ServerWebManager {
 		}
 		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
-	private void processAPIUserBlock(Map<String, String> query)
+	private void processAPIUserBlock(Map<String, String> queryPairs)
 	{
 		ConfigAPIUser.load(Config.getUserAPISettingPath());
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2802,10 +2803,10 @@ public class ServerWebManager {
 		}
 		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
-	private void processAPIUserUnblock(Map<String, String> query)
+	private void processAPIUserUnblock(Map<String, String> queryPairs)
 	{
 		ConfigAPIUser.load(Config.getUserAPISettingPath());
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2817,15 +2818,15 @@ public class ServerWebManager {
 		ConfigAPIUser.save(Config.getUserAPISettingPath());
 	}
 	
-	private void processAPIUserUpdate(Map<String, String> query)
+	private void processAPIUserUpdate(Map<String, String> queryPairs)
 	{
-		String username = query.getOrDefault(JsonKey.USERNAME, "").trim();
-		String name = query.getOrDefault(JsonKey.NAME, "").trim();
-		String phone = query.getOrDefault(JsonKey.PHONE, "").trim();
-		String email = query.getOrDefault(JsonKey.EMAIL, "").trim();
-		String password = query.getOrDefault(JsonKey.PASSWORD, "").trim();
-		boolean blocked = query.getOrDefault(JsonKey.BLOCKED, "").equals("1");
-		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+		String username = queryPairs.getOrDefault(JsonKey.USERNAME, "").trim();
+		String name = queryPairs.getOrDefault(JsonKey.NAME, "").trim();
+		String phone = queryPairs.getOrDefault(JsonKey.PHONE, "").trim();
+		String email = queryPairs.getOrDefault(JsonKey.EMAIL, "").trim();
+		String password = queryPairs.getOrDefault(JsonKey.PASSWORD, "").trim();
+		boolean blocked = queryPairs.getOrDefault(JsonKey.BLOCKED, "").equals("1");
+		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
 
 		if(!username.isEmpty())
 		{
@@ -2853,13 +2854,13 @@ public class ServerWebManager {
 	}
 	
 	private void processDDNS(String requestBody, CookieServer cookie) {
-		Map<String, String> query = Utility.parseURLEncoded(requestBody);
-		if(query.containsKey(JsonKey.DELETE))
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey(JsonKey.DELETE))
 		{
 			/**
 			 * Delete
 			 */
-			for (Map.Entry<String, String> entry : query.entrySet()) 
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 			{
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -2870,50 +2871,51 @@ public class ServerWebManager {
 			}
 			ConfigDDNS.save();
 		}
-		if(query.containsKey(JsonKey.DEACTIVATE))
+		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
 			/**
 			 * Deactivate
 			 */
-			this.processDDNSDeactivate(query);
+			this.processDDNSDeactivate(queryPairs);
 		}
-		if(query.containsKey(JsonKey.ACTIVATE))
+		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
 			/**
 			 * Activate
 			 */
-			this.processDDNSActivate(query);
+			this.processDDNSActivate(queryPairs);
 		}
-		if(query.containsKey(JsonKey.PROXIED))
+		if(queryPairs.containsKey(JsonKey.PROXIED))
 		{
 			/**
 			 * Proxied
 			 */
-			this.processDDNSProxied(query);
+			this.processDDNSProxied(queryPairs);
 		}
-		if(query.containsKey(JsonKey.UNPROXIED))
+		if(queryPairs.containsKey(JsonKey.UNPROXIED))
 		{
 			/**
 			 * Unproxied
 			 */
-			this.processDDNSUnproxied(query);
+			this.processDDNSUnproxied(queryPairs);
 		}
-		if(query.containsKey(JsonKey.UPDATE))
+		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
-			this.processDDNSUpdate(query);
+			this.processDDNSUpdate(queryPairs);
 		}
 	}
 
-	private void processDDNSUpdate(Map<String, String> query) {
-		String id = query.getOrDefault(JsonKey.ID, "").trim();
-		String provider = query.getOrDefault(JsonKey.PROVIDER, "").trim();
-		String zone = query.getOrDefault(JsonKey.ZONE, "").trim();
-		String recordName = query.getOrDefault(JsonKey.RECORD_NAME, "").trim();
-		String ttls = query.getOrDefault(JsonKey.TTL, "").trim();
-		String cronExpression = query.getOrDefault(JsonKey.CRON_EXPRESSION, "").trim();
-		boolean proxied = query.getOrDefault(JsonKey.PROXIED, "").equals("1");
-		boolean forceCreateZone = query.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").equals("1");
-		boolean active = query.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+	private void processDDNSUpdate(Map<String, String> queryPairs) {
+		String id = queryPairs.getOrDefault(JsonKey.ID, "").trim();
+		String provider = queryPairs.getOrDefault(JsonKey.PROVIDER, "").trim();
+		String zone = queryPairs.getOrDefault(JsonKey.ZONE, "").trim();
+		String recordName = queryPairs.getOrDefault(JsonKey.RECORD_NAME, "").trim();
+		String ttls = queryPairs.getOrDefault(JsonKey.TTL, "").trim();
+		String cronExpression = queryPairs.getOrDefault(JsonKey.CRON_EXPRESSION, "").trim();
+		boolean proxied = queryPairs.getOrDefault(JsonKey.PROXIED, "").equals("1");
+		boolean forceCreateZone = queryPairs.getOrDefault(JsonKey.FORCE_CREATE_ZONE, "").equals("1");
+		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").equals("1");
+		String type = queryPairs.getOrDefault(JsonKey.TYPE, "0");
 		int ttl = Utility.atoi(ttls);
 		
 		if(!id.isEmpty())
@@ -2936,15 +2938,16 @@ public class ServerWebManager {
 			record.setForceCreateZone(forceCreateZone);
 			record.setCronExpression(cronExpression);
 			record.setTtl(ttl);
-			record.setActive(active);			
+			record.setActive(active);		
+			record.setType(type);
 			ConfigDDNS.updateRecord(record);
 			ConfigDDNS.save();
 		}
 	}
 
-	private void processDDNSDeactivate(Map<String, String> query)
+	private void processDDNSDeactivate(Map<String, String> queryPairs)
 	{
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2956,9 +2959,9 @@ public class ServerWebManager {
 		ConfigDDNS.save();
 	}
 	
-	private void processDDNSActivate(Map<String, String> query)
+	private void processDDNSActivate(Map<String, String> queryPairs)
 	{
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2970,9 +2973,9 @@ public class ServerWebManager {
 		ConfigDDNS.save();
 	}
 	
-	private void processDDNSProxied(Map<String, String> query)
+	private void processDDNSProxied(Map<String, String> queryPairs)
 	{
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -2984,9 +2987,9 @@ public class ServerWebManager {
 		ConfigDDNS.save();
 	}
 		
-	private void processDDNSUnproxied(Map<String, String> query)
+	private void processDDNSUnproxied(Map<String, String> queryPairs)
 	{
-		for (Map.Entry<String, String> entry : query.entrySet()) 
+		for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
 		{
 			String key = entry.getKey();
 			String value = entry.getValue();

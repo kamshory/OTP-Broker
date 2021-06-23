@@ -93,7 +93,7 @@ public class RESTAPI {
 		{
 			requestJSON = new JSONObject(requestBody);
 			String command = requestJSON.optString(JsonKey.COMMAND, "");
-			if(command.equals(ConstantString.SEND_MESSAGE))
+			if(command.equals(ConstantString.SEND_SMS))
 			{
 				JSONArray data = requestJSON.optJSONArray(JsonKey.DATA);
 				if(data != null && !data.isEmpty())

@@ -95,6 +95,12 @@
                 </select></td>
                 </tr>
                 <tr>
+                <td>Type</td>
+                <td><select name="type" id="type" class="form-control">
+                <option value="A">A</option>
+                </select></td>
+                </tr>
+                <tr>
                 <td>Zone</td>
                 <td><input type="text" class="form-control" name="zone" value=""></td>
                 </tr>
@@ -169,8 +175,9 @@
                       url:"/ddns-record/detail/"+id,
                       dataType:"json",
                       success:function(data){
-                        $('input[name="provider"]').val(data.provider);
+                        $('[name="provider"]').val(data.provider);
                         $('input[name="zone"]').val(data.zone);
+                        $('[name="type"]').val(data.type);
                         $('input[name="record_name"]').val(data.recordName);
                         $('input[name="ttl"]').val(data.ttl);
                         $('select[name="cron_expression"]').val(data.cronExpression);

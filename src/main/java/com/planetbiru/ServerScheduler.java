@@ -21,12 +21,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.planetbiru.config.Config;
-import com.planetbiru.config.ConfigAfraid;
-import com.planetbiru.config.ConfigCloudflare;
+import com.planetbiru.config.ConfigVendorAfraid;
+import com.planetbiru.config.ConfigVendorCloudflare;
 import com.planetbiru.config.ConfigDDNS;
-import com.planetbiru.config.ConfigDynu;
+import com.planetbiru.config.ConfigVendorDynu;
 import com.planetbiru.config.ConfigFeederAMQP;
-import com.planetbiru.config.ConfigNoIP;
+import com.planetbiru.config.ConfigVendorNoIP;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.ddns.DDNSUpdater;
@@ -87,10 +87,10 @@ public class ServerScheduler {
 		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 
-		ConfigCloudflare.load(Config.getCloudflareSettingPath());
-		ConfigNoIP.load(Config.getNoIPSettingPath());
-		ConfigDynu.load(Config.getDynuSettingPath());
-		ConfigAfraid.load(Config.getAfraidSettingPath());
+		ConfigVendorCloudflare.load(Config.getCloudflareSettingPath());
+		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
+		ConfigVendorDynu.load(Config.getDynuSettingPath());
+		ConfigVendorAfraid.load(Config.getAfraidSettingPath());
 		
 	}
 	

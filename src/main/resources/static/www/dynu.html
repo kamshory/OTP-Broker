@@ -89,9 +89,21 @@
                 <table class="config-table config-table-connection">
                     <tbody>
                         <tr>
+                            <td>API Version</td>
+                            <td><select name="api_version" id="api_version">
+                                <option value="nic">NIC</option>
+                            </select>
+                            </td>
+                        </tr>
+                        <tr>
                             <td>Dynu Endpoint</td>
                             <td><input type="url" name="endpoint" id="endpoint"
                                     value="https://api.dynu.com/nic/update">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>API Key</td>
+                            <td><input type="text" name="api_key" id="api_key" value="">
                             </td>
                         </tr>
                         <tr>
@@ -135,6 +147,9 @@
                         success: function (data) {
                             $('input[name="endpoint"]').val(data.endpoint);
                             $('input[name="username"]').val(data.username);
+                            $('input[name="password"]').val(data.password);
+                            $('input[name="api_key"]').val(data.apiKey);
+                            $('[name="api_version"]').val(data.apiVersion);
                             $('input[name="email"]').val(data.email);
                             $('input[name="company"]').val(data.company);
                         }
