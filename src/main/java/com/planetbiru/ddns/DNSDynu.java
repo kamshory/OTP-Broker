@@ -15,8 +15,7 @@ import com.planetbiru.constant.ConstantString;
 import com.planetbiru.util.ResponseEntityCustom;
 import com.planetbiru.util.Utility;
 
-public class DNSDynu extends DNS{
-	
+public class DNSDynu extends DNS {
 	private String email = "";
 	private String username = "";
 	private String endpoint = "https://api.dynu.com/nic/update";
@@ -43,8 +42,7 @@ public class DNSDynu extends DNS{
 	{
 		JSONObject res = new JSONObject();
 		HttpMethod method = HttpMethod.GET;
-		Map<String, String> params = new HashMap<>();
-		
+		Map<String, String> params = new HashMap<>();		
 		params.put("hostname", ddnsRecord.getRecordName());
 		params.put("username", this.username);
 		params.put("password", Utility.md5(this.password));
@@ -52,13 +50,11 @@ public class DNSDynu extends DNS{
 		String base = this.getBase();
 		String queryString = Utility.buildQuery(params);
 		String url = String.format("%s?%s", base, queryString);
-
 		String body = null;
 		int timeout = 10000;
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.add(DDNSKey.HEADER_USER_AGENT, this.createUserAgent());
 		requestHeaders.add(DDNSKey.HEADER_CONNECTION, "close");
-
 		this.httpExchange(method, url, requestHeaders, body, timeout);
 		return res;
 	}
@@ -152,7 +148,6 @@ public class DNSDynu extends DNS{
 	 */
 	private JSONObject addDNSRecord(String token, DDNSRecord ddnsRecord, String domainID, String ipAddress)
 	{
-
 		String base = this.getBase();
 		String url = String.format("%s/dns/%s/record", base, domainID); 
 		HttpMethod method = HttpMethod.POST;		
