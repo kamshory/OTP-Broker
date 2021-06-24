@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 import com.planetbiru.cookie.CookieServer;
 
-public class WebSocketContent {
+public class WebManagerContent {
 
 	private String fileName;
 	private HttpHeaders responseHeaders;
@@ -14,7 +14,7 @@ public class WebSocketContent {
 	private CookieServer cookie;
 	private String contentType;
 
-	public WebSocketContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie, String contentType) {
+	public WebManagerContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie, String contentType) {
 		this.fileName = fileName;
 		this.responseHeaders = responseHeaders;
 		this.responseBody = responseBody;

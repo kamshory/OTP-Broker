@@ -93,7 +93,6 @@ public class ServerAPI {
 	
 	@Value("${otpbroker.api.path.unblock}")
 	private String unblockinPath;
-
 	
 	@Value("${otpbroker.default.smtp.host}")
 	private String defaultSMTPHost;
@@ -136,13 +135,16 @@ public class ServerAPI {
 	@PostConstruct
 	public void init()
 	{
+		/**
+		 * This configuration must be loaded first
+		 */
+		Config.setBaseDirConfig(baseDirConfig);
+
 		Config.setApiSettingPath(apiSettingPath);
 		Config.setUserAPISettingPath(userAPISettingPath);
 
 		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		Config.setBlockingSettingPath(blockingSettingPath);
-
-		Config.setBaseDirConfig(baseDirConfig);
 
 		Config.setDefaultSMTPHost(defaultSMTPHost);
 		Config.setDefaultSMTPPort(defaultSMTPPort);
@@ -204,8 +206,7 @@ public class ServerAPI {
 	private void initHttps() {
 		if(ConfigAPI.isHttpsEnable())
 		{
-			ConfigKeystore.load(Config.getKeystoreSettingPath());
-			
+			ConfigKeystore.load(Config.getKeystoreSettingPath());		
 			boolean started = false;
 			try 
 			{
@@ -256,10 +257,10 @@ public class ServerAPI {
 				ServiceHTTP.setHttpsServer(null);
 			}
 		}	
-	}
+	}	
 	
-	
-	private void initHttp() {
+	private void initHttp() 
+	{
 		if(ConfigAPI.isHttpsEnable())
 		{
 			try 

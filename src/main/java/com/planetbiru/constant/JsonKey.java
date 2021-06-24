@@ -85,6 +85,7 @@ public class JsonKey {
 	public static final String SUCCESS                       = "success";
 	public static final String COUNTRY_CODE                  = "countryCode";
 	public static final String TYPE                          = "type";
+	public static final String CODE                          = "code";
 	
 	private JsonKey()
 	{

@@ -49,10 +49,17 @@ public class ClientReceiverWS {
 	@Value("${otpbroker.ws.reconnect.delay}")
 	private long feederWsReconnectDelay;
 	
+	@Value("${otpbroker.path.base.setting}")
+	private String baseDirConfig;
+	
 	@PostConstruct
 	public void init()
-	{
-		
+	{		
+		/**
+		 * This configuration must be loaded first
+		 */
+		Config.setBaseDirConfig(baseDirConfig);
+
 		ConfigFeederWS.setFeederWsEnable(feederWsEnable);
 		ConfigFeederWS.setFeederWsSSL(feederWsSSL);
 		ConfigFeederWS.setFeederWsAddress(feederWsAddress);

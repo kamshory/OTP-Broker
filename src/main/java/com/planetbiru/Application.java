@@ -51,6 +51,10 @@ public class Application {
 
 	@Value("${otpbroker.path.os.dhcp}")
 	private String osDHCPConfigPath;
+	
+	@Value("${otpbroker.path.base.setting}")
+	private String baseDirConfig;
+
 
 	private static Logger logger = LogManager.getLogger(Application.class);
 	
@@ -83,6 +87,10 @@ public class Application {
 	@PostConstruct
 	public void init()
 	{
+		/**
+		 * This configuration must be loaded first
+		 */
+		Config.setBaseDirConfig(baseDirConfig);
 		
 		Config.setDhcpSettingPath(dhcpSettingPath);
 		Config.setWlanSettingPath(wlanSettingPath);

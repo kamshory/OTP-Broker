@@ -46,6 +46,9 @@ public class ServerWebSocketManager {
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
+	@Value("${otpbroker.path.base.setting}")
+	private String baseDirConfig;
+
 	private Session session;
 	private String clientIP = "";
 	private Map<String, List<String>> requestHeader = new HashMap<>();
@@ -62,7 +65,12 @@ public class ServerWebSocketManager {
     @PostConstruct
     public void init()
     {
-    	Config.setUserSettingPath(userSettingPath);
+		/**
+		 * This configuration must be loaded first
+		 */
+		Config.setBaseDirConfig(baseDirConfig);
+
+		Config.setUserSettingPath(userSettingPath);
     	WebUserAccount.load(Config.getUserSettingPath());
     }
     
@@ -78,7 +86,7 @@ public class ServerWebSocketManager {
         this.requestHeader = requestHdr;
         this.responseHeader = responseHdr;
         this.parameter = param;
-        this.sessionID = Utility.sha1(""+System.currentTimeMillis()+rand.nextInt(1000000000));
+        this.sessionID = this.createSessionID();
         
         boolean auth = true;
         try 
@@ -100,7 +108,11 @@ public class ServerWebSocketManager {
 
 	
 	
-    private void sendServerStatus() 
+    private String createSessionID() {
+    	return Utility.sha1(""+System.currentTimeMillis()+rand.nextInt(1000000000));
+	}
+
+	private void sendServerStatus() 
     {
 		JSONArray data = new JSONArray();
 		JSONObject info = new JSONObject();
