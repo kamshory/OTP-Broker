@@ -1,7 +1,6 @@
 package com.planetbiru;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -172,17 +171,7 @@ public class ServerWebManager {
 		WebUserAccount.load(Config.getUserSettingPath());
 			
 		
-		try 
-		{
-			configSaved = new GeneralConfig(mimeSettingPath);
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-			/**
-			 * Do nothing	
-			 */
-		}
+		configSaved = new GeneralConfig(mimeSettingPath);
 	}
 	
 	@PostMapping(path="/api/device/**")
@@ -701,30 +690,19 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				String fullname = Config.getLogDir() + "/" + path;
-				fullname = FileConfigUtil.fixFileName(fullname);
-				
-				try {
-					configSaved = new GeneralConfig(mimeSettingPath);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				System.out.println(fullname);
-				
+				fullname = FileConfigUtil.fixFileName(fullname);				
 				byte[] list = "".getBytes();
-				try {
+				try 
+				{
 					list = FileUtil.readResource(fullname);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					responseBody = list;
+					String contentType = this.getMIMEType(path);				
+					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
+				} 
+				catch (FileNotFoundException e) 
+				{
+					statusCode = HttpStatus.NOT_FOUND;
 				}
-				responseBody = list;
-				
-				String contentType = this.getMIMEType(path);
-				System.out.println("PATH = "+path);
-				System.out.println("contentType = "+contentType);
-				
-				responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
 			}
 			else
 			{
@@ -3145,7 +3123,6 @@ public class ServerWebManager {
 	{
 		String[] arr = fileName.split("\\.");	
 		String ext = arr[arr.length - 1];
-		System.out.println("EXT = "+ext);
 		return configSaved.getString("MIME", ext, "");
 	}
 
