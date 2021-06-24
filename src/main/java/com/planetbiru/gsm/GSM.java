@@ -19,7 +19,9 @@ public class GSM {
     private SerialPort serialPort;
     private String portName = "";
 
-	private boolean closed = true;    
+	private boolean closed = true;
+
+	private boolean ready = false;    
     
     private static String[] smsStorage = new String[]{
     		"MT", 
@@ -41,6 +43,7 @@ public class GSM {
      */
     public String executeAT(String at, int waitingTime) throws GSMException 
     {
+    	this.setReady(false);
     	System.out.println("AT Command : "+at);
     	if(getSerialPort() == null)
     	{
@@ -67,6 +70,7 @@ public class GSM {
 	            }
 	        }
         }
+        this.setReady(true);
         return result;
     }
 
@@ -79,6 +83,7 @@ public class GSM {
      */
     public String executeUSSD(String ussd) throws GSMException 
     {
+    	this.setReady(false);
     	// executeAT("AT+CUSD=1", 1);
         String cmd = "AT+CUSD=1,\"" + ussd + "\",15";
         String result = "";
@@ -120,6 +125,7 @@ public class GSM {
             }
             */
         }
+        this.setReady(true);
         return str;
     }
     
@@ -132,6 +138,7 @@ public class GSM {
      */
     public List<SMS> readSMS() throws GSMException 
     {
+    	this.setReady(false);
         executeAT("ATE0", 1);
         executeAT("AT+CSCS=\"GSM\"", 1);
         executeAT("AT+CMGF=1", 1);
@@ -202,6 +209,7 @@ public class GSM {
                 }
             }
         }
+        this.setReady(true);
         return str;
     }
 
@@ -215,6 +223,7 @@ public class GSM {
      */
     public String sendSMS(String recipient, String message) throws GSMException 
     {
+    	this.setReady(false);
     	String result = "";
     	recipient = recipient.trim();
     	message = message.trim();
@@ -249,11 +258,13 @@ public class GSM {
     	{
     		result = result6;
     	} 	
+    	this.setReady(true);
         return result;
     }
 
     public String deleteSMS(int smsId, String storage) throws GSMException 
     {
+    	this.setReady(false);
     	String result = "";
     	String result1 = executeAT("AT+CPMS=\"" + storage + "\"", 1);
     	if(result1.isEmpty())
@@ -265,14 +276,17 @@ public class GSM {
     	{
     		result = result2;
     	}
+    	this.setReady(true);
         return result;
     }
 
     public String deleteAllSMS(String storage) throws GSMException 
     {
+    	this.setReady(false);
     	String result = "";
     	result = executeAT("AT+CPMS=\"" + storage + "\"", 1);
     	result = executeAT("AT+CMGD=0, 4", 1);
+    	this.setReady(true);
         return result;
     }
 
@@ -284,7 +298,7 @@ public class GSM {
      */
     public boolean connect(String portName) throws SerialPortInvalidPortException
     {
-    	
+    	this.setReady(false);
     	this.portName = portName;
     	logger.info("INIT port : {}", portName);
     	System.out.println(portName);
@@ -345,6 +359,7 @@ public class GSM {
             // turn off periodic status messages (RSSI status, etc.)
 //            executeAT("AT^CURC=0", 1);
     		this.closed = false;
+    		this.setReady(true);
             return true;
         } 
         else 
@@ -407,6 +422,14 @@ public class GSM {
 
 	public void setClosed(boolean closed) {
 		this.closed = closed;
+	}
+
+	public boolean isReady() {
+		return ready;
+	}
+
+	public void setReady(boolean ready) {
+		this.ready = ready;
 	}
 
 	

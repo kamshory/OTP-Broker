@@ -3,6 +3,7 @@ package com.planetbiru.gsm;
 import java.util.List;
 
 import com.fazecast.jSerialComm.SerialPortInvalidPortException;
+import com.planetbiru.config.Config;
 import com.planetbiru.constant.ConstantString;
 
 public class SMSInstance {
@@ -40,7 +41,18 @@ public class SMSInstance {
 		{
 			throw new GSMException(ConstantString.SERIAL_PORT_NULL);
 		}
+		this.waitUntilReady();
 		return this.gsm.sendSMS(receiver, message);
+	}
+	private void waitUntilReady() {
+		long maxWaith = Config.getMaxWaitModemReady();
+		long ellapsed = 0;
+		long startTime = System.currentTimeMillis();
+		while(!this.gsm.isReady() && ellapsed < maxWaith)
+		{
+			this.sleep(Config.getWaithModemReady());
+			ellapsed = System.currentTimeMillis() - startTime;
+		}
 	}
 	public List<SMS> readSMS() throws GSMException
 	{
@@ -48,6 +60,7 @@ public class SMSInstance {
 		{
 			throw new GSMException(ConstantString.SERIAL_PORT_NULL);
 		}
+		this.waitUntilReady();
 		return this.gsm.readSMS();
 	}
 	public String executeUSSD(String ussd) throws GSMException {
@@ -55,6 +68,7 @@ public class SMSInstance {
 		{
 			throw new GSMException(ConstantString.SERIAL_PORT_NULL);
 		}
+		this.waitUntilReady();
 		return this.gsm.executeUSSD(ussd);
 		
 	}
@@ -75,5 +89,16 @@ public class SMSInstance {
 		this.id = id;
 	}
 	
-	
+	private void sleep(long sleep) 
+	{
+		try 
+		{
+			Thread.sleep(sleep);
+		} 
+		catch (InterruptedException e) 
+		{
+			Thread.currentThread().interrupt();
+		}		
+	}
+
 }
