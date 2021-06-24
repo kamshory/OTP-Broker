@@ -43,18 +43,22 @@ public class ConfigBlocking {
 		}
 		return msisdn;
 	}
+	
 	public static void block(String msisdn) throws GSMException {
 		msisdn = ConfigBlocking.canonical(msisdn);
 		ConfigBlocking.blockList.put(msisdn, Boolean.valueOf(true));
 	}
+	
 	public static void unblock(String msisdn) throws GSMException {
 		msisdn = ConfigBlocking.canonical(msisdn);
 		ConfigBlocking.blockList.put(msisdn, Boolean.valueOf(false));
 	}
+	
 	public static void block(String msisdn, boolean block) throws GSMException {
 		msisdn = ConfigBlocking.canonical(msisdn);
 		ConfigBlocking.blockList.put(msisdn, Boolean.valueOf(block));
 	}
+	
 	public static void add(String msisdn) throws GSMException {
 		if(!msisdn.isEmpty())
 		{
@@ -62,6 +66,7 @@ public class ConfigBlocking {
 			ConfigBlocking.blockList.put(msisdn, Boolean.valueOf(true));
 		}
 	}
+	
 	public static Boolean isBlocked(String msisdn) throws GSMException
 	{
 		msisdn = ConfigBlocking.canonical(msisdn);
@@ -102,10 +107,8 @@ public class ConfigBlocking {
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
-		}
-		
-	}	
+		}	
+	}
 
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
@@ -120,8 +123,7 @@ public class ConfigBlocking {
 		}
 		String fileName = FileConfigUtil.fixFileName(dir + path);
 		fileName = FileConfigUtil.fixFileName(fileName);
-		prepareDir(fileName);
-		
+		prepareDir(fileName);	
 		try 
 		{
 			FileConfigUtil.write(fileName, config.toString().getBytes());
@@ -129,7 +131,6 @@ public class ConfigBlocking {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	
@@ -173,23 +174,12 @@ public class ConfigBlocking {
 			ConfigBlocking.blockList.remove(value);
 		}		
 	}
+	
 	public static String getCountryCode() {
 		return countryCode;
 	}
+	
 	public static void setCountryCode(String countryCode) {
 		ConfigBlocking.countryCode = countryCode;
 	}
-	
-
-
-	
-	
-
-	
-
-	
-	
-	
-	
-	
 }

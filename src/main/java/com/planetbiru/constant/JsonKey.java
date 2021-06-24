@@ -86,6 +86,8 @@ public class JsonKey {
 	public static final String COUNTRY_CODE                  = "countryCode";
 	public static final String TYPE                          = "type";
 	public static final String CODE                          = "code";
+	public static final String BLOCK                         = "block";
+	public static final String UNBLOCK                       = "unblock";
 	
 	private JsonKey()
 	{
