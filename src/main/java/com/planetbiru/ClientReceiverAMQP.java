@@ -58,7 +58,7 @@ public class ClientReceiverAMQP {
 
 		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
 		ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
-    }	
+    }
 	
 	@Bean
 	MessageListenerContainer messageListenerContainer() {

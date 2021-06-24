@@ -33,9 +33,7 @@ public class ServerInfo {
 		info.put(JsonKey.COMMAND, "server-info");
 		info.put(JsonKey.DATA, data);
 	
-		ServerWebSocketManager.broadcast(info.toString(4));
-		
-		
+		ServerWebSocketManager.broadcast(info.toString(4));				
 	}
 	
 	
