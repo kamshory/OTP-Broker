@@ -46,8 +46,7 @@ public class SMSUtil {
 			catch (GSMException e) 
 			{
 				logger.error(e.getMessage());
-			}
-			
+			}			
 			SMSUtil.smsInstance.add(instance);
 		}
 		SMSUtil.initialized = true;
@@ -92,14 +91,11 @@ public class SMSUtil {
 	}
 	
 	public static void sendSMS(String receiver, String message) throws GSMException {
-		System.out.println(receiver);
-		System.out.println(message);
 		if(SMSUtil.smsInstance.isEmpty())
 		{
 			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 		}
 		int index = SMSUtil.getModemIndex();
-		System.out.println(index);
 		SMSUtil.smsInstance.get(index).sendSMS(receiver, message);
 		
 	}
@@ -204,9 +200,6 @@ public class SMSUtil {
 			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 		}
 	}
-
-
-	
 
 }
 

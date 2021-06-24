@@ -44,6 +44,7 @@ public class SMSInstance {
 		this.waitUntilReady();
 		return this.gsm.sendSMS(receiver, message);
 	}
+	
 	private void waitUntilReady() {
 		long maxWaith = Config.getMaxWaitModemReady();
 		long ellapsed = 0;
@@ -54,6 +55,7 @@ public class SMSInstance {
 			ellapsed = System.currentTimeMillis() - startTime;
 		}
 	}
+	
 	public List<SMS> readSMS() throws GSMException
 	{
 		if(this.gsm.getSerialPort() == null)
@@ -63,28 +65,33 @@ public class SMSInstance {
 		this.waitUntilReady();
 		return this.gsm.readSMS();
 	}
+	
 	public String executeUSSD(String ussd) throws GSMException {
 		if(this.gsm.getSerialPort() == null)
 		{
 			throw new GSMException(ConstantString.SERIAL_PORT_NULL);
 		}
 		this.waitUntilReady();
-		return this.gsm.executeUSSD(ussd);
-		
+		return this.gsm.executeUSSD(ussd);	
 	}
+	
 	public boolean isClosed()
 	{
 		return this.gsm.isClosed();
 	}
+	
 	public boolean isConnected() {
 		return connected;
 	}
+	
 	public void setConnected(boolean connected) {
 		this.connected = connected;
 	}
+	
 	public String getId() {
 		return id;
 	}
+	
 	public void setId(String id) {
 		this.id = id;
 	}
