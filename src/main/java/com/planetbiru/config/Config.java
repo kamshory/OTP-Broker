@@ -63,7 +63,9 @@ public class Config {
 	private static String documentRoot = "/static/www";
 	private static String userSettingPath = "";
 	private static String afraidSettingPath = "";
-	private static String dynuSettingPath = ""; 
+	private static String dynuSettingPath = "";
+	private static long waithModemReady = 10;
+	private static long maxWaitModemReady = 10000; 
 	
 	private Config()
 	{
@@ -611,6 +613,26 @@ public class Config {
 
 	public static void setDynuSettingPath(String dynuSettingPath) {
 		Config.dynuSettingPath = dynuSettingPath;
+	}
+
+
+	public static long getWaithModemReady() {
+		return waithModemReady;
+	}
+
+
+	public static void setWaithModemReady(long waithModemReady) {
+		Config.waithModemReady = waithModemReady;
+	}
+
+
+	public static long getMaxWaitModemReady() {
+		return maxWaitModemReady;
+	}
+
+
+	public static void setMaxWaitModemReady(long maxWaitModemReady) {
+		Config.maxWaitModemReady = maxWaitModemReady;
 	}
 
 

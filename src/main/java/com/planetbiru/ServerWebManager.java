@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.planetbiru.api.RESTAPI;
 import com.planetbiru.config.ConfigAPIUser;
+import com.planetbiru.config.ConfigBlocking;
 import com.planetbiru.config.ConfigVendorAfraid;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
@@ -116,7 +117,10 @@ public class ServerWebManager {
 	private String modemSettingPath;
 	
 	@Value("${otpbroker.path.base.setting}")
-	private String baseDirConfig;	
+	private String baseDirConfig;
+	
+	@Value("${otpbroker.path.setting.blocking}")
+	private String blockingSettingPath;	
 	
 	private ServerWebManager()
     {
@@ -136,6 +140,8 @@ public class ServerWebManager {
 		Config.setDeviceVersion(deviceVersion);
 		Config.setNoIPDevice(deviceName+"/"+deviceVersion);
 		
+		
+		Config.setBlockingSettingPath(blockingSettingPath);
 		Config.setModemSettingPath(modemSettingPath);
 		
 		Config.setFeederWSSettingPath(feederWSSettingPath);
@@ -623,6 +629,39 @@ public class ServerWebManager {
 			{
 				ConfigFeederWS.load(Config.getFeederWSSettingPath());
 				String list = ConfigFeederWS.toJSONObject().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/block-list/list")
+	public ResponseEntity<byte[]> handleBlockList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				ConfigBlocking.load(Config.getBlockingSettingPath());
+				String list = ConfigBlocking.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -1879,6 +1918,10 @@ public class ServerWebManager {
 				{
 					this.processNetworkSetting(requestBody);
 				}
+				if(path.equals("/block-list.html"))
+				{
+					this.processBlockList(requestBody);
+				}
 			}
 		} 
 		catch (NoUserRegisteredException e) 
@@ -1886,6 +1929,86 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+		}
+	}
+	
+	private void processBlockList(String requestBody) {
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		String msisdn = queryPairs.getOrDefault("msisdn", "").trim();
+		if(queryPairs.containsKey(JsonKey.DELETE))
+		{
+			ConfigBlocking.load(Config.getBlockingSettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigBlocking.remove(value);
+				}
+			}
+			ConfigBlocking.save(Config.getBlockingSettingPath());
+		}
+		if(queryPairs.containsKey(JsonKey.BLOCK))
+		{
+			ConfigBlocking.load(Config.getBlockingSettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					try 
+					{
+						ConfigBlocking.block(value);
+					} 
+					catch (GSMException e) 
+					{
+						/**
+						 * Do nothing
+						 */
+					}
+				}
+			}
+			ConfigBlocking.save(Config.getBlockingSettingPath());
+		}
+		if(queryPairs.containsKey(JsonKey.UNBLOCK))
+		{
+			ConfigBlocking.load(Config.getBlockingSettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					try 
+					{
+						ConfigBlocking.unblock(value);
+					} 
+					catch (GSMException e) 
+					{
+						/**
+						 * Do nothing
+						 */
+					}
+				}
+			}
+			ConfigBlocking.save(Config.getBlockingSettingPath());
+		}		
+		if(queryPairs.containsKey(JsonKey.ADD))
+		{
+			ConfigBlocking.load(Config.getBlockingSettingPath());
+			try 
+			{
+				ConfigBlocking.block(msisdn);
+			} 
+			catch (GSMException e) 
+			{
+				/**
+				 * Do nothing
+				 */
+			}
+			ConfigBlocking.save(Config.getBlockingSettingPath());
 		}
 	}
 	

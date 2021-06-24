@@ -46,7 +46,6 @@ public class SMSUtil {
 			catch (GSMException e) 
 			{
 				logger.error(e.getMessage());
-				//e.printStackTrace();
 			}
 			
 			SMSUtil.smsInstance.add(instance);
