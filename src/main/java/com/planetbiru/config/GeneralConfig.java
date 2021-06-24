@@ -4,11 +4,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.planetbiru.util.FileConfigUtil;
+import com.planetbiru.util.FileNotFoundException;
+import com.planetbiru.util.FileUtil;
+import com.planetbiru.util.Utility;
 
 public class GeneralConfig {
 	private Pattern mSection = Pattern.compile("\\s*\\[([^]]*)\\]\\s*");
@@ -16,7 +26,45 @@ public class GeneralConfig {
 	private Map <String, Map<String, String>> mEntries = new HashMap<>();
 
 	public GeneralConfig(String path) throws IOException {
-	    load(path);
+		
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
+		{
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = FileConfigUtil.fixFileName(dir + path);
+		
+		try 
+		{
+			byte[] data = FileUtil.readResource(fileName);
+			if(data != null)
+			{
+				String text = new String(data);
+				text = fixingRawData(text);
+				String[] lines = text.split("\\r?\\n");
+				List<String> list = Arrays.asList(lines);
+				this.load(list);
+				
+			}
+		} 
+		catch (FileNotFoundException | JSONException e) 
+		{
+			e.printStackTrace();
+			/**
+			 * Do nothing
+			 */
+		}
+		
+	   
+	}
+	
+	public static String fixingRawData(String result)
+	{
+		result = result.replace("\n", "\r\n");
+		result = result.replace("\r\r\n", "\r\n");
+		result = result.replace("\r", "\r\n");
+		result = result.replace("\r\n\n", "\r\n");
+		return result;
 	}
 
 	public GeneralConfig() {
@@ -37,6 +85,7 @@ public class GeneralConfig {
             } 
             else if (section != null) 
             {
+            	System.out.println(section);
                 m = mKeyValue.matcher(line);
                 if(m.matches()) 
                 {
@@ -44,6 +93,7 @@ public class GeneralConfig {
                     String value = m.group(2).trim();
                     if(mEntries != null && mEntries.containsKey(section))
                     {
+                    	System.out.println("MATCH ===========");
 	                    Map<String, String> kv = mEntries.get(section);
 	                    if (kv == null) 
 	                    {
@@ -52,6 +102,10 @@ public class GeneralConfig {
 	                    }
 	                    kv.put(key, value);
                     }
+                }
+                else
+                {
+                	System.out.println("NOT MATCH");
                 }
             }
 		}

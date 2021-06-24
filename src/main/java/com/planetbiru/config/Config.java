@@ -65,7 +65,8 @@ public class Config {
 	private static String afraidSettingPath = "";
 	private static String dynuSettingPath = "";
 	private static long waithModemReady = 10;
-	private static long maxWaitModemReady = 10000; 
+	private static long maxWaitModemReady = 10000;
+	private static String logDir = ""; 
 	
 	private Config()
 	{
@@ -633,6 +634,16 @@ public class Config {
 
 	public static void setMaxWaitModemReady(long maxWaitModemReady) {
 		Config.maxWaitModemReady = maxWaitModemReady;
+	}
+
+
+	public static String getLogDir() {
+		return logDir;
+	}
+
+
+	public static void setLogDir(String logDir) {
+		Config.logDir = logDir;
 	}
 
 
