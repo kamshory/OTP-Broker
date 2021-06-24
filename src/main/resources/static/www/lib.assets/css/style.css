@@ -591,3 +591,33 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
     border-top-right-radius:3px;
     border-bottom-right-radius:3px;
 }
+
+.filter-data{
+  padding: 4px 0;
+}
+@media screen and (max-width: 768px)
+{
+    .filter-data .form-control{
+        width: calc(100% - 90px);
+        display: inline-block;
+    }
+    .filter-data input[type="submit"]{
+        float: right;
+        width: 80px;
+    }
+}
+@media screen and (min-width: 768px){
+    .filter-data .form-control{
+        width: 240px;
+        display: inline-block;
+    }
+    .filter-data input[type="submit"]{
+        float: none;
+        width: 80px;
+        margin-top: -3px;
+    }
+}
+
+.btn-group-sm > .btn, .btn-sm {
+  padding: 2px 7px;
+}

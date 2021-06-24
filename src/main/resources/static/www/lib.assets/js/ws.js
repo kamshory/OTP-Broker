@@ -367,16 +367,11 @@ function createPagination()
 {
 	$('[data-pagination="true"][data-hide="false"]').each(function(index, element) {
         var thisPagination = $(this);
-		var self = thisPagination.attr('data-self-name');
 		var maxRecord = parseInt(thisPagination.attr('data-max-record') || '0');
 		var recordPerPage = parseInt(thisPagination.attr('data-record-per-page') || '10');
 		if(recordPerPage < 1)
 		{
 			recordPerPage = 1;
-		}
-		if(currentOffset < 0)
-		{
-			currentOffset = 0;
 		}
 		if(maxRecord < 0)
 		{
@@ -434,7 +429,6 @@ function createPagination()
 		{
 			// create firs
 			j = 0;
-            k = 1;
             offset = (j*recordPerPage);
             queryObject.offset = offset;
             arr3 = [];
@@ -453,7 +447,6 @@ function createPagination()
 		{
 			// create previous
 			j = firstPage+1;
-            k = firstPage+2;
             offset = (j*recordPerPage);
             queryObject.offset = offset;
             arr3 = [];
@@ -491,7 +484,6 @@ function createPagination()
 		{
 			// create previous
 			j = currentPage;
-            k = currentPage+1;
             offset = (j*recordPerPage);
             queryObject.offset = offset;
             arr3 = [];
@@ -508,7 +500,6 @@ function createPagination()
 		{
 			// create last
 			j = maxPage-1;
-            k = maxPage;
             offset = (j*recordPerPage);
             queryObject.offset = offset;
             arr3 = [];
@@ -524,9 +515,47 @@ function createPagination()
     });
 }
 
+function filterData(data, filterValue, filterByKey, attributeName)
+{
+    var unsorted = {};
+    for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+            if(filterValue != '')
+            {
+                if(filterByKey)
+                {
+                    if(key.indexOf(filterValue) > -1)
+                    {
+                        unsorted[key] = data[key];
+                    }
+                }
+                else 
+                {
+                    if(key == attributeName && data[attributeName].indexOf(filterValue))
+                    {
+                        unsorted[key] = data[key];
+                    }
+                }
+            }
+            else
+            {
+                unsorted[key] = data[key];
+            }
+        }
+    }
+    return unsorted;
+}
+
 $(document).ready(function(e){
     createUSBSymbol();
     $('body').append('<div class="notification-container"></div>');
+
+    $(document).on('change', 'thead input[type="checkbox"].check-all', function (e) {
+        var checked = $(this).prop('checked');
+        $(this).closest("table").find('tbody input[type="checkbox"].check-all').each(function (e2) {
+            $(this).prop('checked', checked);
+        });
+    });
     $(document).on('click', '.notification-close a', function(e2){
         $(this).closest('.notification-item').remove();
     });
