@@ -1,6 +1,6 @@
 package com.planetbiru;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.Map;
 import java.util.UUID;
 
@@ -122,6 +122,10 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.blocking}")
 	private String blockingSettingPath;	
 	
+	
+	@Value("${otpbroker.log.dir}")
+	private String logDir;	
+	
 	private ServerWebManager()
     {
     }
@@ -156,6 +160,8 @@ public class ServerWebManager {
 		Config.setDynuSettingPath(dynuSettingPath);
 		Config.setAfraidSettingPath(afraidSettingPath);
 		
+		Config.setLogDir(logDir);
+		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 		ConfigVendorCloudflare.load(Config.getCloudflareSettingPath());
 		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
@@ -165,16 +171,7 @@ public class ServerWebManager {
 		WebUserAccount.load(Config.getUserSettingPath());
 			
 		
-		try 
-		{
-			configSaved = new GeneralConfig(mimeSettingPath);
-		} 
-		catch (IOException e) 
-		{
-			/**
-			 * Do nothing	
-			 */
-		}
+		configSaved = new GeneralConfig(mimeSettingPath);
 	}
 	
 	@PostMapping(path="/api/device/**")
@@ -648,7 +645,81 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
+
+	@GetMapping(path="/log/list")
+	public ResponseEntity<byte[]> handleLogFile(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				File directory = new File(Config.getLogDir());
+				JSONArray list = FileUtil.listFile(directory);
+				responseBody = list.toString(4).getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	@GetMapping(path="/log/download/{path}")
+	public ResponseEntity<byte[]> handleDownloadLogFile(@RequestHeader HttpHeaders headers, @PathVariable(value="path") String path, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				String fullname = Config.getLogDir() + "/" + path;
+				fullname = FileConfigUtil.fixFileName(fullname);				
+				byte[] list = "".getBytes();
+				try 
+				{
+					list = FileUtil.readResource(fullname);
+					responseBody = list;
+					String contentType = this.getMIMEType(path);				
+					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
+				} 
+				catch (FileNotFoundException e) 
+				{
+					statusCode = HttpStatus.NOT_FOUND;
+				}
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
 	
 	
 	@GetMapping(path="/block-list/list")

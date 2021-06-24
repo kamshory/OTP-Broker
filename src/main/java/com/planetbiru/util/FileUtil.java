@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class FileUtil {
 	private FileUtil()
 	{
@@ -54,4 +57,37 @@ public class FileUtil {
 			throw new IOException(ex);
 		}
 	}
+	
+	public static JSONArray listFile(File directory)
+    {
+		JSONArray files = new JSONArray();
+	    File[] list = directory.listFiles();
+        if(list != null)
+        {
+	        for(File file : list)
+	        {
+	            if(file.isDirectory())
+	            {
+	            	JSONObject obj = new JSONObject();
+	            	JSONArray list2 = listFile(file);
+	            	obj.put("name", file.getName());
+	            	obj.put("type", "dir");
+	            	obj.put("child", list2);
+	            	JSONArray ja = new JSONArray();
+	            	ja.put(obj);
+	            	files.put(obj);
+	            	
+	            }
+	            else 
+	            {
+	            	JSONObject obj = new JSONObject();
+	            	obj.put("type", "file");
+	            	obj.put("name", file.getName());
+	            	obj.put("size", file.length());
+	            	files.put(obj);
+	            }
+	        }
+        }
+        return files;
+    }
 }

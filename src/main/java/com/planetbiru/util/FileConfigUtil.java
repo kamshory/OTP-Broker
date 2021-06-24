@@ -60,11 +60,15 @@ public class FileConfigUtil {
 		{
 			fileName = fileName.replace("/", "\\");
 			fileName = fileName.replace("\\\\", "\\");
+			fileName = fileName.replace("..\\", "");
+			fileName = fileName.replace("\\..", "");
 		}
 		else
 		{
 			fileName = fileName.replace("\\", "/");		
 			fileName = fileName.replace("//", "/");
+			fileName = fileName.replace("../", "");
+			fileName = fileName.replace("/..", "");
 		}
 		return fileName;
 	}

@@ -1,9 +1,13 @@
 package com.planetbiru;
 
+import java.io.File;
+
 import javax.annotation.PostConstruct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -15,6 +19,7 @@ import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
+import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.ProcessKiller;
 
 @SpringBootApplication
@@ -61,6 +66,11 @@ public class Application {
 	private static ConfigurableApplicationContext context;
 
 	public static void main(String[] args) {
+		String dir = "C:\\bitbucket\\OTP-Broker-New\\logs";
+		File file = new File(dir);
+		JSONArray list = FileUtil.listFile(file);
+		logger.info("FILES IN {} : {}", dir, list.toString(4));
+		
 		context = SpringApplication.run(Application.class);
 	}
 

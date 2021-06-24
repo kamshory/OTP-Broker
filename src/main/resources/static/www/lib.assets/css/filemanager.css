@@ -1,0 +1,82 @@
+.dir > ul{
+    margin: 0;
+}
+
+.dir ul li.expanded > ul{
+    display: block;
+}
+.dir ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+.dir ul li > ul{
+    display: none;
+    margin-left: 0px;
+    
+}
+.dir ul li{
+    padding-left: 20px;
+    position: relative;
+    margin-left: 0px;
+}
+.dir ul li:before{
+    content: '';
+    background-color:#ee6748;
+    position: absolute;
+    left: 0px;
+    top: 6px;
+    width: 15px;
+    height: 9px;
+    border-radius: 2px;
+}
+.dir ul li:after{
+    content: '';
+    background-color:#ee6748;
+    position: absolute;
+    left: 0px;
+    top: 4px;
+    width: 8px;
+    height: 4px;
+    border-radius: 2px;
+}
+.dir-select{
+    display: none;
+}
+@media screen and (min-width: 768px){
+    .file-manager {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 20px;
+    }
+    .file-manager .dir {
+        box-sizing: border-box;
+        border: 1px solid #DDDDDD;
+        background: white;
+        background-color: white;
+        height: calc( 100vh - 200px );
+        width: calc( 25% - 10px );
+        padding: 10px;
+        position: relative;
+        overflow-y: auto;
+    }
+    .file-manager .file {
+        box-sizing: border-box;
+        border: 1px solid #DDDDDD;
+        background: white;
+        background-color: white;
+        height: calc( 100vh - 200px );
+        width: calc( 75% - 10px );
+        padding: 10px;
+        position: relative;
+        overflow-y: auto;
+    }
+}
+@media screen and (max-width: 768px){
+    .file-manager .dir{
+        display: none;
+    }
+    .dir-select{
+        display: block;
+    }
+}
