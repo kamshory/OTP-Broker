@@ -553,3 +553,71 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
 .button-area button, .button-area input[type="button"], .button-area input[type="reset"], .button-area input[type="submit"]{
   margin-bottom: 5px;
 }
+
+[data-pagination="true"]{
+	height:42px;
+	display:block;
+	text-align:center;
+	padding:8px 0px;
+	width:100%;
+}
+[data-pagination="true"] a{
+	display:inline-block;
+	height:28px;
+	width:40px;
+	text-align:center;
+	box-sizing:border-box;
+	padding:4px 4px;
+	border:1px solid #DDDDDD;
+}
+[data-pagination="true"] a{
+    background-color:#F9F9F9;
+}
+[data-pagination="true"] a.page-selected{ 
+    background-color:#FFFFFF;
+}
+[data-pagination="true"] a{
+    border-right:none;
+}
+[data-pagination="true"] a:hover{
+    text-decoration: none;
+}
+[data-pagination="true"] a:first-child{
+    border-top-left-radius:3px;
+    border-bottom-left-radius:3px;
+}
+[data-pagination="true"] a:last-child{
+    border-right:1px solid #DDDDDD;
+    border-top-right-radius:3px;
+    border-bottom-right-radius:3px;
+}
+
+.filter-data{
+  padding: 4px 0;
+}
+@media screen and (max-width: 768px)
+{
+    .filter-data .form-control{
+        width: calc(100% - 90px);
+        display: inline-block;
+    }
+    .filter-data input[type="submit"]{
+        float: right;
+        width: 80px;
+    }
+}
+@media screen and (min-width: 768px){
+    .filter-data .form-control{
+        width: 240px;
+        display: inline-block;
+    }
+    .filter-data input[type="submit"]{
+        float: none;
+        width: 80px;
+        margin-top: -3px;
+    }
+}
+
+.btn-group-sm > .btn, .btn-sm {
+  padding: 2px 7px;
+}

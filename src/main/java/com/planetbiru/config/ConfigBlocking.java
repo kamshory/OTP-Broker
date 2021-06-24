@@ -2,8 +2,10 @@ package com.planetbiru.config;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -20,7 +22,7 @@ public class ConfigBlocking {
 	private static Logger logger = LogManager.getLogger(ConfigBlocking.class);
 	
 	private static String countryCode = "62";
-	private static Map<String, Boolean> blockList = new HashMap<>();
+	private static Map<String, Boolean> blockList = new LinkedHashMap<>();
 	
 	private ConfigBlocking()
 	{
@@ -90,7 +92,7 @@ public class ConfigBlocking {
 				String text = new String(data);
 				if(text.length() > 7)
 				{
-					ConfigBlocking.blockList = new HashMap<>();
+					ConfigBlocking.blockList = new LinkedHashMap<>();
 					
 					JSONObject json = new JSONObject(text);
 
@@ -182,4 +184,26 @@ public class ConfigBlocking {
 	public static void setCountryCode(String countryCode) {
 		ConfigBlocking.countryCode = countryCode;
 	}
+	public static String getOrderedList() 
+	{
+        Map<String, Boolean> map = new TreeMap<>(ConfigBlocking.blockList);
+        StringBuilder builder = new StringBuilder();
+        
+        builder.append("{");
+        int i = 0;
+        for (String sKey : map.keySet()) 
+        {
+        	String key = sKey.replaceAll("^\"|\"$", "");
+        	if(i > 0)
+        	{
+        		builder.append(",");
+        	}
+        	builder.append("\r\n\t\""+key+"\": ");
+        	builder.append(ConfigBlocking.blockList.get(sKey).toString());
+        	i++;
+        }
+        builder.append("\r\n}");
+		return builder.toString();
+	}
+	
 }

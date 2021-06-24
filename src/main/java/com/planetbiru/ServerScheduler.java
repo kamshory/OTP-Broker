@@ -130,7 +130,7 @@ public class ServerScheduler {
 			ServerWebSocketManager.broadcast(messageJSON.toString());
 		}
 	}
-	
+
 	private void amqpCheck()
 	{
 		boolean connected = ConfigFeederAMQP.echoTest();
@@ -164,7 +164,7 @@ public class ServerScheduler {
 			}	
 		}
 	}
-	
+
 	private boolean updateDNS(DDNSRecord ddnsRecord, String ddnsId) 
 	{
 		boolean update = false;

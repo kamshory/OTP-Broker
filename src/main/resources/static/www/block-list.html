@@ -84,15 +84,27 @@
             </div>
             <!--/.container-fluid -->
         </nav>
+        <style>
+            
+
+        </style>
         <div class="phone-page">
             <h3>Block List</h3>
+            <form action="block-list.html" method="get">
+                <div class="filter-data">
+                    <input type="text" name="q" placeholder="MSISDN" class="form-control">
+                    <input type="submit" value="Search" class="btn btn-success">
+                </div>    
+            </form>
             <form action="" method="post">
+                <div data-pagination="true" data-self-name="block-list.html" data-max-record="0" data-record-per-page="4" data-hide="false"></div>
                 <table class="row-table" border="1" data-file="ddns-record.html">
                     <thead>
                         <tr>
                             <td width="16"><input type="checkbox" class="check-all"></td>
+                            <td width="25">No</td>
                             <td>MSISDN</td>
-                            <td width="60" align="center">Blocked</td>
+                            <td width="60" align="center">Block</td>
                         </tr>
                     </thead>
 
@@ -100,6 +112,7 @@
 
                     </tbody>
                 </table>
+                <div data-pagination="true" data-self-name="block-list.html" data-max-record="0" data-record-per-page="4" data-hide="false"></div>
                 <div class="button-area">
                     <input type="button" class="btn btn-success" value="Add" onclick="window.location='block-list-add.html'">
                     <input type="submit" class="btn btn-warning" name="block" value="Block">
@@ -109,40 +122,57 @@
                 </div>
             </form>
             <script type="text/javascript">
-                $(document).ready(function (e1) {
-                    $.ajax({
-                        type: "GET",
-                        url: "block-list/list",
-                        dataType: "json",
-                        success: function (data) {
-                            var i = 0;
-                            for (const key in data) {
-                                if (data.hasOwnProperty(key)) {
-                                    i++;
-                                    var item = data[key];
-                                    var active = !item ? 'icon-cross' : 'icon-check';
-                                    $('.row-table tbody').append(
-                                        '<tr data-pk-id="' + key + '">\r\n' +
-                                        '	<td><input type="checkbox" class="check-all" name="id[]" value="' + key + '"></td>\r\n' +
-                                        '	<td>'+key+'</td>\r\n' +
-                                        '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
-                                        '</tr>\r\n'
-                                    );
-                                }
-                            }
-                        }
-                    });
-
-                    $(document).on('change', 'thead input[type="checkbox"].check-all', function (e) {
-                        var checked = $(this).prop('checked');
-                        $(this).closest("table").find('tbody input[type="checkbox"].check-all').each(function (e2) {
-                            $(this).prop('checked', checked);
-                        });
-                    });
+            var recordPerPage = 20;
+            var unsortedData = {};
+            var sortedData = {};
+            var q = '';
+            $(document).ready(function (e1) {
+                var urlParams = new URLSearchParams(window.location.search);
+                q = urlParams.get('q') || '';
+                $('[name="q"]').val(q);
+                var offset = Math.abs(parseInt(urlParams.get('offset') || '0'));
+                $('[data-pagination="true"]').attr('data-record-per-page', recordPerPage);
+                $.ajax({
+                    type: "GET",
+                    url: "block-list/list",
+                    dataType: "json",
+                    success: function (data) {
+                        unsortedData = filterData(data, q, true);
+                        console.log('unsortedData : ', unsortedData);
+                        sortedData = sortObject(unsortedData, true);
+                        renderData(sortedData);                           
+                    }
                 });
 
-
-
+                function renderData(dataToRender)
+                {
+                    var length = Object.size(dataToRender);
+                    $('[data-pagination="true"]').attr('data-max-record', length);
+                    createPagination();
+                    var i = 0;
+                    var j = 0;
+                    for (const key in dataToRender) {
+                        if (dataToRender.hasOwnProperty(key)) {
+                            if(i >= offset && j < recordPerPage)
+                            {
+                                var no = i + 1;
+                                var item = dataToRender[key];
+                                var active = !item ? 'icon-cross' : 'icon-check';
+                                $('.row-table tbody').append(
+                                    '<tr data-pk-id="' + key + '">\r\n' +
+                                    '	<td><input type="checkbox" class="check-all" name="id[]" value="' + key + '"></td>\r\n' +
+                                    '	<td align="right">'+no+'</td>\r\n' +
+                                    '	<td>'+key+'</td>\r\n' +
+                                    '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
+                                    '</tr>\r\n'
+                                );
+                                j++;
+                            }
+                            i++;
+                        }
+                    }
+                }
+            });
             </script>
         </div>
         <!-- /container -->

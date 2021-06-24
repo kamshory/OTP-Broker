@@ -649,6 +649,8 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	
+	
 	@GetMapping(path="/block-list/list")
 	public ResponseEntity<byte[]> handleBlockList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{

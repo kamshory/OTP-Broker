@@ -142,13 +142,6 @@
                             }
                         }
                     });
- 
-                    $(document).on('change', 'thead input[type="checkbox"].check-all', function(e){
-                        var checked = $(this).prop('checked');
-                        $(this).closest("table").find('tbody input[type="checkbox"].check-all').each(function(e2){
-                        $(this).prop('checked', checked);
-                        });
-                    });
                     initInlineEditor();
                 });
 

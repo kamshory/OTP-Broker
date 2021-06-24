@@ -36,9 +36,9 @@ public class ConstantString {
 	public static final String BLOCK_MSISDN                  = "block-msisdn";
 	public static final String UNBLOCK_MSISDN                = "unblock-msisdn";
 	public static final String SEND_SMS                      = "send-sms";
-	public static final String AUTHORIZATION = "Authorization";
-	public static final String ACCEPT = "Accept";
-	public static final String BEARER = "Bearer ";
+	public static final String AUTHORIZATION                 = "Authorization";
+	public static final String ACCEPT                        = "Accept";
+	public static final String BEARER                        = "Bearer ";
 	
 	private ConstantString()
 	{
