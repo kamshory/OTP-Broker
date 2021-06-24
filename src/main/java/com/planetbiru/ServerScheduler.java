@@ -43,7 +43,6 @@ public class ServerScheduler {
 	
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
-
 	
 	@Value("${otpbroker.cron.enable.ddns}")
 	private boolean ddnsUpdate;
@@ -72,7 +71,6 @@ public class ServerScheduler {
 	@Value("${otpbroker.path.setting.ddns.dynu}")
 	private String dynuSettingPath;
 
-	
 	@PostConstruct
 	public void init()
 	{
@@ -82,18 +80,15 @@ public class ServerScheduler {
 		Config.setCloudflareSettingPath(cloudflareSettingPath);
 		Config.setNoIPSettingPath(noIPSettingPath);
 		Config.setDynuSettingPath(dynuSettingPath);
-		Config.setAfraidSettingPath(afraidSettingPath);
-		
+		Config.setAfraidSettingPath(afraidSettingPath);	
 		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 
 		ConfigVendorCloudflare.load(Config.getCloudflareSettingPath());
 		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
 		ConfigVendorDynu.load(Config.getDynuSettingPath());
-		ConfigVendorAfraid.load(Config.getAfraidSettingPath());
-		
+		ConfigVendorAfraid.load(Config.getAfraidSettingPath());		
 	}
-	
 	
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
 	public void inspectDevice()
@@ -137,8 +132,7 @@ public class ServerScheduler {
 		boolean connected = ConfigFeederAMQP.echoTest();
 		ConfigFeederAMQP.setConnected(connected);	
 		ServerInfo.sendAMQPStatus(ConfigFeederAMQP.isConnected());
-	}
-	
+	}	
 		
 	@Scheduled(cron = "${otpbroker.cron.expression.ddns}")
 	public void updateDNS() 
@@ -162,10 +156,11 @@ public class ServerScheduler {
 			}
 			if(countUpdate > 0)
 			{
-				ConfigDDNS.save(ddnsSettingPath);
+				ConfigDDNS.save(Config.getDdnsSettingPath());
 			}	
 		}
 	}
+	
 	private boolean updateDNS(DDNSRecord ddnsRecord, String ddnsId) 
 	{
 		boolean update = false;
@@ -197,6 +192,5 @@ public class ServerScheduler {
 			logger.error(e.getMessage());
 		}
 		return update;	
-	}
-    
+	}   
 }

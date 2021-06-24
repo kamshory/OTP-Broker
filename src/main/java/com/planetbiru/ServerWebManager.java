@@ -126,6 +126,9 @@ public class ServerWebManager {
 	@PostConstruct
 	public void init()
 	{
+		/**
+		 * This configuration must be loaded first
+		 */
 		Config.setBaseDirConfig(baseDirConfig);
 
 		Config.setUserSettingPath(userSettingPath);

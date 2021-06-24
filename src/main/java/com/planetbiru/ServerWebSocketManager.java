@@ -46,6 +46,9 @@ public class ServerWebSocketManager {
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
+	@Value("${otpbroker.path.base.setting}")
+	private String baseDirConfig;
+
 	private Session session;
 	private String clientIP = "";
 	private Map<String, List<String>> requestHeader = new HashMap<>();
@@ -62,7 +65,12 @@ public class ServerWebSocketManager {
     @PostConstruct
     public void init()
     {
-    	Config.setUserSettingPath(userSettingPath);
+		/**
+		 * This configuration must be loaded first
+		 */
+		Config.setBaseDirConfig(baseDirConfig);
+
+		Config.setUserSettingPath(userSettingPath);
     	WebUserAccount.load(Config.getUserSettingPath());
     }
     

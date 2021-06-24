@@ -44,7 +44,21 @@ public class ClientReceiverAMQP {
 	
 	@Value("${otpbroker.rabbitmq.ssl}")
 	private boolean rabbitMQSSL;
+	
+	@Value("${otpbroker.path.base.setting}")
+	private String baseDirConfig;
 
+	@PostConstruct
+    private void init()
+    {
+		/**
+		 * This configuration must be loaded first
+		 */
+		Config.setBaseDirConfig(baseDirConfig);
+
+		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
+		ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
+    }	
 	
 	@Bean
 	MessageListenerContainer messageListenerContainer() {
@@ -85,12 +99,6 @@ public class ClientReceiverAMQP {
 		return new Queue(lQueue, false);
 	}
 
-	@PostConstruct
-    private void init()
-    {
-		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
-		ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
-    }	
 
 	@Bean
 	ConnectionFactory connectionFactory() {
