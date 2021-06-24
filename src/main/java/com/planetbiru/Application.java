@@ -61,7 +61,6 @@ public class Application {
 	private static ConfigurableApplicationContext context;
 
 	public static void main(String[] args) {
-		logger.info("public static void main(String[] args)");
 		context = SpringApplication.run(Application.class);
 	}
 
@@ -98,14 +97,12 @@ public class Application {
 		
 		Config.setDhcpSettingPathDefault(dhcpSettingPathDefault);
 		Config.setWlanSettingPathDefault(wlanSettingPathDefault);
-		Config.setEthernetSettingPathDefault(ethernetSettingPathDefault);		
-		
+		Config.setEthernetSettingPathDefault(ethernetSettingPathDefault);			
 		
 		Config.setOsWLANConfigPath(osWLANConfigPath);
 		Config.setOsSSIDKey(osSSIDKey);
 		Config.setOsEthernetConfigPath(osEthernetConfigPath);
 		Config.setOsDHCPConfigPath(osDHCPConfigPath);
-
 		
 		resetConfig();
 	}
