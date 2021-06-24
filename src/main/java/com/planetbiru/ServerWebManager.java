@@ -116,8 +116,7 @@ public class ServerWebManager {
 	private String modemSettingPath;
 	
 	@Value("${otpbroker.path.base.setting}")
-	private String baseDirConfig;
-	
+	private String baseDirConfig;	
 	
 	private ServerWebManager()
     {

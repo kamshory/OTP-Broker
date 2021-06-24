@@ -144,13 +144,11 @@ public class ProcessKiller {
 			catch (Throwable t)
 	        {
 				logger.error(t.getMessage());
-	            //t.printStackTrace();
 	        }
 		} 
 		catch (Exception e) 
 		{
 			logger.error(e.getMessage());
-		    //e.printStackTrace();
 		}		
 	}
 	private void killProcessWindow(String commandLine) {
@@ -206,7 +204,6 @@ public class ProcessKiller {
         	{
         		pid = processList.get(i);
 	            String commandLine2 = "taskkill /PID "+pid+" /F";
-		        System.out.println(commandLine2);
     			Runtime rt2 = Runtime.getRuntime();
 		        rt2.exec(commandLine2);
         	}
@@ -214,7 +211,6 @@ public class ProcessKiller {
 		catch (Throwable t)
         {
 			logger.error(t.getMessage());
-            //t.printStackTrace();
         }
 		
 	}

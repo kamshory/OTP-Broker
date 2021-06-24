@@ -74,7 +74,11 @@ public class ServerScheduler {
 	@PostConstruct
 	public void init()
 	{
+		/**
+		 * This configuration must be loaded first
+		 */
 		Config.setBaseDirConfig(baseDirConfig);
+
 		Config.setDdnsSettingPath(ddnsSettingPath);
 		
 		Config.setCloudflareSettingPath(cloudflareSettingPath);
@@ -94,7 +98,7 @@ public class ServerScheduler {
 	public void inspectDevice()
 	{
 		if(cronDeviceEnable)
-		{					
+		{
 			modemCheck();
 		}
 	}
