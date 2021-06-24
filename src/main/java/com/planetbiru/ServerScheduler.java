@@ -130,6 +130,7 @@ public class ServerScheduler {
 			ServerWebSocketManager.broadcast(messageJSON.toString());
 		}
 	}
+
 	
 	private void amqpCheck()
 	{

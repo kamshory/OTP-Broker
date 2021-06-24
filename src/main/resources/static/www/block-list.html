@@ -84,13 +84,19 @@
             </div>
             <!--/.container-fluid -->
         </nav>
+        <style>
+
+
+        </style>
         <div class="phone-page">
             <h3>Block List</h3>
             <form action="" method="post">
+                <div data-pagination="true" data-self-name="block-list.html" data-max-record="0" data-record-per-page="4" data-hide="false"></div>
                 <table class="row-table" border="1" data-file="ddns-record.html">
                     <thead>
                         <tr>
                             <td width="16"><input type="checkbox" class="check-all"></td>
+                            <td width="25">No</td>
                             <td>MSISDN</td>
                             <td width="60" align="center">Blocked</td>
                         </tr>
@@ -100,6 +106,7 @@
 
                     </tbody>
                 </table>
+                <div data-pagination="true" data-self-name="block-list.html" data-max-record="0" data-record-per-page="4" data-hide="false"></div>
                 <div class="button-area">
                     <input type="button" class="btn btn-success" value="Add" onclick="window.location='block-list-add.html'">
                     <input type="submit" class="btn btn-warning" name="block" value="Block">
@@ -110,24 +117,39 @@
             </form>
             <script type="text/javascript">
                 $(document).ready(function (e1) {
+                    var urlParams = new URLSearchParams(window.location.search);
+                    var offset = parseInt(urlParams.get('offset') || '0');
+                    var recordPerPage = 20;
+                    $('[data-pagination="true"]').attr('data-record-per-page', recordPerPage);
                     $.ajax({
                         type: "GET",
                         url: "block-list/list",
                         dataType: "json",
                         success: function (data) {
+                            var length = Object.size(data);
+                            $('[data-pagination="true"]').attr('data-max-record', length);
+                            createPagination();
+                            data = sortObject(data, true);
                             var i = 0;
+                            var j = 0;
                             for (const key in data) {
                                 if (data.hasOwnProperty(key)) {
+                                    if(i >= offset && j < recordPerPage)
+                                    {
+                                        var no = i + 1;
+                                        var item = data[key];
+                                        var active = !item ? 'icon-cross' : 'icon-check';
+                                        $('.row-table tbody').append(
+                                            '<tr data-pk-id="' + key + '">\r\n' +
+                                            '	<td><input type="checkbox" class="check-all" name="id[]" value="' + key + '"></td>\r\n' +
+                                            '	<td align="right">'+no+'</td>\r\n' +
+                                            '	<td>'+key+'</td>\r\n' +
+                                            '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
+                                            '</tr>\r\n'
+                                        );
+                                        j++;
+                                    }
                                     i++;
-                                    var item = data[key];
-                                    var active = !item ? 'icon-cross' : 'icon-check';
-                                    $('.row-table tbody').append(
-                                        '<tr data-pk-id="' + key + '">\r\n' +
-                                        '	<td><input type="checkbox" class="check-all" name="id[]" value="' + key + '"></td>\r\n' +
-                                        '	<td>'+key+'</td>\r\n' +
-                                        '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
-                                        '</tr>\r\n'
-                                    );
                                 }
                             }
                         }
@@ -140,9 +162,6 @@
                         });
                     });
                 });
-
-
-
             </script>
         </div>
         <!-- /container -->

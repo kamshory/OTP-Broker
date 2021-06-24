@@ -331,6 +331,199 @@ function updateDashboard()
     $('.service-amqp').addClass(isAMQPConnected?'connected':'disconnected');
 }
 
+function sortObject(unordered, sortArrays = false) {
+    if (!unordered || typeof unordered !== 'object') {
+        return unordered;
+    }
+  
+    if (Array.isArray(unordered)) {
+        const newArr = unordered.map((item) => sortObject(item, sortArrays));
+        if (sortArrays) {
+            newArr.sort();
+        }
+        return newArr;
+    }
+  
+    const ordered = {};
+
+    Object.keys(unordered)
+        .sort()
+        .forEach((key) => {
+        ordered[key] = sortObject(unordered[key], sortArrays);
+    });
+    return ordered;
+}
+
+Object.size = function(obj) {
+    var size = 0,
+      key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
+function createPagination()
+{
+	$('[data-pagination="true"][data-hide="false"]').each(function(index, element) {
+        var thisPagination = $(this);
+		var self = thisPagination.attr('data-self-name');
+		var maxRecord = parseInt(thisPagination.attr('data-max-record') || '0');
+		var recordPerPage = parseInt(thisPagination.attr('data-record-per-page') || '10');
+		if(recordPerPage < 1)
+		{
+			recordPerPage = 1;
+		}
+		if(currentOffset < 0)
+		{
+			currentOffset = 0;
+		}
+		if(maxRecord < 0)
+		{
+			maxRecord = 0;
+		}
+		var originalURL = document.location.toString();
+		var arr0 = originalURL.split('#');
+		originalURL = arr0[0];
+		var arr1 = originalURL.split('?');
+		originalURL = arr1[0];
+		var args = arr1[1] || '';
+		var argArray = args.split('&');
+		var queryObject = {};
+		for(var i in argArray)
+		{
+			var arr2 = argArray[i].split('=');
+			if(arr2[0] != '')
+			{
+				queryObject[arr2[0]] = arr2[1]; 
+			}
+		}
+		
+		var currentOffset = parseInt(queryObject.offset || '0');
+		
+		var numPage = Math.floor(maxRecord/recordPerPage);
+		if(maxRecord%recordPerPage)
+		{
+			numPage++;
+		}
+		
+		var currentPage = (currentOffset/recordPerPage)+1;
+		var maxPage = numPage;
+		var firstPage = currentPage-3;	
+		var lastPage = currentPage+2;	
+		
+		if(firstPage < 0)
+		{
+			firstPage = 0;
+		}
+		if(lastPage > maxPage)
+		{
+			lastPage = maxPage;
+		}
+		
+        var offset = 0;
+        var j;
+        var k;
+        var arr3 = [];
+        var args3 = "";
+        var l;
+        var finalURL;
+        var la;
+
+		if(firstPage > 1)
+		{
+			// create firs
+			j = 0;
+            k = 1;
+            offset = (j*recordPerPage);
+            queryObject.offset = offset;
+            arr3 = [];
+            for(l in queryObject)
+            {
+                arr3.push(l+'='+queryObject[l]);
+            }
+            args3 = arr3.join('&');
+            finalURL = originalURL + '?' + args3;
+            la = $('<a href="'+finalURL+'">&laquo;</a> ');
+            thisPagination.append(la);
+		}
+
+
+		if(firstPage > 0)
+		{
+			// create previous
+			j = firstPage+1;
+            k = firstPage+2;
+            offset = (j*recordPerPage);
+            queryObject.offset = offset;
+            arr3 = [];
+            for(l in queryObject)
+            {
+                arr3.push(l+'='+queryObject[l]);
+            }
+            args3 = arr3.join('&');
+            finalURL = originalURL + '?' + args3;
+            la = $('<a href="'+finalURL+'">&lt;</a> ');
+            thisPagination.append(la);
+		}
+		
+		for(j = firstPage, k=firstPage+1; j<lastPage; j++, k++)
+		{
+			offset = (j*recordPerPage);
+			queryObject.offset = offset;
+			arr3 = [];
+			for(l in queryObject)
+			{
+				arr3.push(l+'='+queryObject[l]);
+			}
+			args3 = arr3.join('&');
+			finalURL = originalURL + '?' + args3;
+			la = $('<a href="'+finalURL+'">'+k+'</a> ');
+			if(offset == currentOffset)
+			{
+				la.addClass('page-selected');
+			}
+			thisPagination.append(la);
+		}
+		
+
+		if(currentPage < maxPage-2)
+		{
+			// create previous
+			j = currentPage;
+            k = currentPage+1;
+            offset = (j*recordPerPage);
+            queryObject.offset = offset;
+            arr3 = [];
+            for(l in queryObject)
+            {
+                arr3.push(l+'='+queryObject[l]);
+            }
+            args3 = arr3.join('&');
+            finalURL = originalURL + '?' + args3;
+            la = $('<a href="'+finalURL+'">&gt;</a> ');
+            thisPagination.append(la);
+		}
+		if(currentPage < maxPage-3)
+		{
+			// create last
+			j = maxPage-1;
+            k = maxPage;
+            offset = (j*recordPerPage);
+            queryObject.offset = offset;
+            arr3 = [];
+            for(l in queryObject)
+            {
+                arr3.push(l+'='+queryObject[l]);
+            }
+            args3 = arr3.join('&');
+            finalURL = originalURL + '?' + args3;
+            la = $('<a href="'+finalURL+'">&raquo;</a> ');
+            thisPagination.append(la);
+		}
+    });
+}
+
 $(document).ready(function(e){
     createUSBSymbol();
     $('body').append('<div class="notification-container"></div>');
