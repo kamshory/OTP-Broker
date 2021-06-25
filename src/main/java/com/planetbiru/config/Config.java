@@ -66,7 +66,16 @@ public class Config {
 	private static long maxWaitModemReady = 10000;
 	private static String logDir = "";
 	private static long reconnectDelay = 10000;
-	private static String sessionFilePath = ""; 
+	private static String sessionFilePath = "";
+	
+	private static boolean sshEnable = false;
+	private static String sshUsername = "";
+	private static String sshPassword = "";
+	private static String sshHost = "";
+	private static int sshPort = 0;
+	private static long sshSleep = 10;
+	private static String rebootCommand = "";
+	private static String mimeSettingPath = ""; 
 	
 	private Config()
 	{
@@ -559,6 +568,70 @@ public class Config {
 
 	public static void setSessionFilePath(String sessionFilePath) {
 		Config.sessionFilePath = sessionFilePath;
+	}
+
+	public static boolean isSshEnable() {
+		return sshEnable;
+	}
+
+	public static void setSshEnable(boolean sshEnable) {
+		Config.sshEnable = sshEnable;
+	}
+
+	public static String getSshUsername() {
+		return sshUsername;
+	}
+
+	public static void setSshUsername(String sshUsername) {
+		Config.sshUsername = sshUsername;
+	}
+
+	public static String getSshPassword() {
+		return sshPassword;
+	}
+
+	public static void setSshPassword(String sshPassword) {
+		Config.sshPassword = sshPassword;
+	}
+
+	public static String getSshHost() {
+		return sshHost;
+	}
+
+	public static void setSshHost(String sshHost) {
+		Config.sshHost = sshHost;
+	}
+
+	public static int getSshPort() {
+		return sshPort;
+	}
+
+	public static void setSshPort(int sshPort) {
+		Config.sshPort = sshPort;
+	}
+
+	public static long getSshSleep() {
+		return sshSleep;
+	}
+
+	public static void setSshSleep(long sshSleep) {
+		Config.sshSleep = sshSleep;
+	}
+
+	public static String getRebootCommand() {
+		return rebootCommand;
+	}
+
+	public static void setRebootCommand(String rebootCommand) {
+		Config.rebootCommand = rebootCommand;
+	}
+
+	public static String getMimeSettingPath() {
+		return mimeSettingPath;
+	}
+
+	public static void setMimeSettingPath(String mimeSettingPath) {
+		Config.mimeSettingPath = mimeSettingPath;
 	}
 	
 	

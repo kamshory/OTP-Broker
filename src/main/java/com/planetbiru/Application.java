@@ -1,23 +1,18 @@
 package com.planetbiru;
 
-import java.io.File;
-
 import javax.annotation.PostConstruct;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ConfigurableApplicationContext;
-
+import com.jcraft.jsch.JSchException;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
-import com.planetbiru.util.ProcessKiller;
+import com.planetbiru.util.CommandLineExecutor;
 
 @SpringBootApplication
 @EnableAutoConfiguration
@@ -57,34 +52,31 @@ public class Application {
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
 
+	@Value("${otpbroker.ssh.username}")
+	private String sshUsername;
 
-	private static Logger logger = LogManager.getLogger(Application.class);
-	
-	private static ConfigurableApplicationContext context;
+	@Value("${otpbroker.ssh.password}")
+	private String sshPassword;
+
+	@Value("${otpbroker.ssh.host}")
+	private String sshHost;
+
+	@Value("${otpbroker.ssh.port}")
+	private int sshPort;
+
+	@Value("${otpbroker.ssh.sleep}")
+	private long sshSleep;
+
+	@Value("${otpbroker.ssh.enable}")
+	private boolean sshEnable;
+
+	@Value("${otpbroker.ssh.reboot.command}")
+	private String rebootCommand;
 
 	public static void main(String[] args) {
-		context = SpringApplication.run(Application.class);
+		SpringApplication.run(Application.class);
 	}
 
-	public static void stop()
-	{
-		ProcessKiller killer = new ProcessKiller("java.exe", true);
-		killer.stop();		
-	}
-	public static void restart() {
-	    Thread thread = new Thread(() -> {
-	        if(context != null)
-	        {
-	        	context.close();
-	        }
-	        context = SpringApplication.run(Application.class);
-	    });
-
-	    thread.setDaemon(false);	    
-	    thread.start();
-
-	}
-	
 	@PostConstruct
 	public void init()
 	{
@@ -105,6 +97,15 @@ public class Application {
 		Config.setOsSSIDKey(osSSIDKey);
 		Config.setOsEthernetConfigPath(osEthernetConfigPath);
 		Config.setOsDHCPConfigPath(osDHCPConfigPath);
+		
+		
+		Config.setSshUsername(sshUsername);
+		Config.setSshPassword(sshPassword);
+		Config.setSshHost(sshHost);
+		Config.setSshPort(sshPort);
+		Config.setSshSleep(sshSleep);
+		Config.setSshEnable(sshEnable);
+		Config.setRebootCommand(rebootCommand);
 		
 		resetConfig();
 	}
@@ -139,6 +140,36 @@ public class Application {
 	
 	private static boolean usbPluged() {
 		return false;
+	}
+
+	public static void reboot() 
+	{
+		if(Config.isSshEnable())
+		{
+			try 
+			{
+				CommandLineExecutor.execSSH(
+						Config.getSshUsername(), 
+						Config.getSshPassword(), 
+						Config.getSshHost(), 
+						Config.getSshPort(), 
+						Config.getRebootCommand(), 
+						Config.getSshSleep()
+						);
+			} 
+			catch (JSchException e) 
+			{
+				String[] command = new String[1];
+				command[0] = Config.getRebootCommand();
+				CommandLineExecutor.run(command);
+			}
+		}
+		else
+		{
+			String[] command = new String[1];
+			command[0] = Config.getRebootCommand();
+			CommandLineExecutor.run(command);
+		}
 	}
 	
 }

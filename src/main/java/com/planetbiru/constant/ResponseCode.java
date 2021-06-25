@@ -5,8 +5,9 @@ public class ResponseCode {
 	{
 		
 	}
-	public static final String SERIAL_PORT_NULL = "1000";
-	public static final String SUCCESS          = "0000";
-	public static final Object UNAUTHORIZED     = "1100";
+	public static final String SERIAL_PORT_NULL     = "1000";
+	public static final String SUCCESS              = "0000";
+	public static final String UNAUTHORIZED         = "1100";
+	public static final String NO_DEVICE_CONNECTED  = "1101";
 
 }

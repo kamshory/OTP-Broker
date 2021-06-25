@@ -61,7 +61,6 @@ public class ConfigSMS {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}
@@ -80,7 +79,6 @@ public class ConfigSMS {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	

@@ -65,7 +65,6 @@ import com.planetbiru.util.WebManagerTool;
 @RestController
 public class ServerWebManager {
 	
-	private GeneralConfig configSaved = new GeneralConfig();
 	private Logger logger = LogManager.getLogger(ServerWebManager.class);	
 	
 	@Value("${otpbroker.device.name}")
@@ -147,8 +146,7 @@ public class ServerWebManager {
 		Config.setDocumentRoot(documentRoot);
 		Config.setDeviceName(deviceName);
 		Config.setDeviceVersion(deviceVersion);
-		Config.setNoIPDevice(deviceName+"/"+deviceVersion);
-		
+		Config.setNoIPDevice(deviceName+"/"+deviceVersion);	
 		
 		Config.setBlockingSettingPath(blockingSettingPath);
 		Config.setModemSettingPath(modemSettingPath);
@@ -167,6 +165,8 @@ public class ServerWebManager {
 		Config.setDynuSettingPath(dynuSettingPath);
 		Config.setAfraidSettingPath(afraidSettingPath);
 		
+		Config.setMimeSettingPath(mimeSettingPath);
+		
 		Config.setLogDir(logDir);
 		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
@@ -175,10 +175,9 @@ public class ServerWebManager {
 		ConfigAPI.load(Config.getApiSettingPath());
 
 		Config.setPortName(portName);		
-		WebUserAccount.load(Config.getUserSettingPath());
-			
+		WebUserAccount.load(Config.getUserSettingPath());		
 		
-		configSaved = new GeneralConfig(mimeSettingPath);
+		GeneralConfig.load(Config.getMimeSettingPath());
 	}
 	
 	@PostMapping(path="/api/device/**")
@@ -201,7 +200,7 @@ public class ServerWebManager {
 					{
 						if(action.equals("connect"))
 						{
-							SMSUtil.connect(modemID);
+							SMSUtil.connect(modemID);						
 							ServerInfo.sendModemStatus(SMSUtil.isConnected());
 						}
 						else
@@ -491,7 +490,7 @@ public class ServerWebManager {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		byte[] responseBody = "".getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
-		Application.restart();
+		Application.reboot();
 		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}	
@@ -1909,7 +1908,7 @@ public class ServerWebManager {
 		{
 			String[] arr = fileName.split("\\.");
 			String ext = arr[arr.length - 1];
-			String lt = configSaved.getString("CACHE", ext, "0");
+			String lt = GeneralConfig.getString("CACHE", ext, "0");
 			lifetime = Utility.atoi(lt);
 		}
 		return lifetime;
@@ -3134,7 +3133,7 @@ public class ServerWebManager {
 	{
 		String[] arr = fileName.split("\\.");	
 		String ext = arr[arr.length - 1];
-		return configSaved.getString("MIME", ext, "");
+		return GeneralConfig.getString("MIME", ext, "");
 	}
 	
 	private String getBaseName(String fileName) 

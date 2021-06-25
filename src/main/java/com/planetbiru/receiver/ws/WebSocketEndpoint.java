@@ -70,7 +70,6 @@ public class WebSocketEndpoint extends Endpoint {
 		catch(JSONException e)
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	
@@ -86,7 +85,6 @@ public class WebSocketEndpoint extends Endpoint {
 			catch (GSMException e) 
 			{
 				logger.error(e.getMessage());
-				//e.printStackTrace();
 			}
 		}
 	}

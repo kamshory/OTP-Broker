@@ -78,14 +78,9 @@ public class ConfigDDNS {
 				}
 			}
 		} 
-		
-		
-		
-		
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}	
 	}	
 
@@ -122,7 +117,6 @@ public class ConfigDDNS {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	

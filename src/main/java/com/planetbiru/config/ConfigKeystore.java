@@ -77,7 +77,6 @@ public class ConfigKeystore {
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}	
@@ -104,7 +103,6 @@ public class ConfigKeystore {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	
@@ -184,10 +182,7 @@ public class ConfigKeystore {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}		
-		
-		
 	}
 
 	public static DataKeystore getActiveKeystore() throws KeyStoreException {

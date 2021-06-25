@@ -139,7 +139,6 @@ public class ConfigModem {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	

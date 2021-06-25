@@ -27,6 +27,7 @@ import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.GeneralConfig;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.user.WebUserAccount;
@@ -57,6 +58,9 @@ public class ServerWebSocketManager {
 	
 	@Value("${otpbroker.web.session.file.path}")
 	private String sessionFilePath;
+	
+	@Value("${otpbroker.path.setting.all}")
+	private String mimeSettingPath;	
 
 	private Session session;
 	private String clientIP = "";
@@ -82,8 +86,10 @@ public class ServerWebSocketManager {
 		Config.setSessionFilePath(sessionFilePath);
 		Config.setSessionName(sessionName);
 		Config.setSessionLifetime(sessionLifetime);
+		Config.setMimeSettingPath(mimeSettingPath);
 		
 		Config.setUserSettingPath(userSettingPath);
+		GeneralConfig.load(Config.getMimeSettingPath());
     	WebUserAccount.load(Config.getUserSettingPath());
     }
     

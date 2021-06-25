@@ -102,7 +102,6 @@ public class ConfigFeederAMQP {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	public static void load(String path)

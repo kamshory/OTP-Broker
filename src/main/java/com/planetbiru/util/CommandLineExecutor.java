@@ -1,8 +1,13 @@
 package com.planetbiru.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import com.planetbiru.util.OSUtil.OS;
 
 public class CommandLineExecutor {
@@ -71,5 +76,50 @@ public class CommandLineExecutor {
 		{
 			return command;
 		}
+	}
+	public static String execSSH(String username, String password, String host, int port, String command, long sleep) throws JSchException 
+	{
+		Session session = null;
+		ChannelExec channel = null;
+
+		String responseString = "";
+		try 
+		{
+			session = new JSch().getSession(username, host, port);
+			session.setPassword(password);
+			session.setConfig("StrictHostKeyChecking", "no");
+			session.connect();
+
+			channel = (ChannelExec) session.openChannel("exec");
+			channel.setCommand(command);
+			ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
+			channel.setOutputStream(responseStream);
+			channel.connect();
+
+			while (channel.isConnected()) 
+			{
+				try 
+				{
+					Thread.sleep(sleep);
+				} 
+				catch (InterruptedException e) 
+				{
+					Thread.currentThread().interrupt();
+				}
+			}
+			responseString = new String(responseStream.toByteArray());
+		} 
+		finally 
+		{
+			if (session != null) 
+			{
+				session.disconnect();
+			}
+			if (channel != null) 
+			{
+				channel.disconnect();
+			}
+		}
+		return responseString;
 	}
 }
