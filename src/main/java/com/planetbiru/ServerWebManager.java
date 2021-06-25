@@ -659,7 +659,7 @@ public class ServerWebManager {
 			{
 				File directory = new File(Config.getLogDir());
 				JSONArray list = FileUtil.listFile(directory);
-				responseBody = list.toString(4).getBytes();
+				responseBody = list.toString().getBytes();
 			}
 			else
 			{
@@ -678,9 +678,12 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	@GetMapping(path="/log/download/{path}")
-	public ResponseEntity<byte[]> handleDownloadLogFile(@RequestHeader HttpHeaders headers, @PathVariable(value="path") String path, HttpServletRequest request)
+	
+	@GetMapping(path="/log/download/**")
+	public ResponseEntity<byte[]> handleDownloadLogFile(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
+		String path = request.getServletPath();
+		path = path.substring("/log/download".length());
 		HttpHeaders responseHeaders = new HttpHeaders();
 		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
@@ -690,17 +693,20 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				String fullname = Config.getLogDir() + "/" + path;
-				fullname = FileConfigUtil.fixFileName(fullname);				
+				fullname = FileConfigUtil.fixFileName(fullname);	
 				byte[] list = "".getBytes();
 				try 
 				{
 					list = FileUtil.readResource(fullname);
 					responseBody = list;
-					String contentType = this.getMIMEType(path);				
+					String contentType = this.getMIMEType(path);		
+					String baseName = this.getBaseName(path);
 					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
+					responseHeaders.add("Content-disposition", "attachment; filename=\""+baseName+"\"");
 				} 
 				catch (FileNotFoundException e) 
 				{
+					e.printStackTrace();
 					statusCode = HttpStatus.NOT_FOUND;
 				}
 			}
@@ -720,7 +726,6 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
 	
 	@GetMapping(path="/block-list/list")
 	public ResponseEntity<byte[]> handleBlockList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -3125,7 +3130,20 @@ public class ServerWebManager {
 		String ext = arr[arr.length - 1];
 		return configSaved.getString("MIME", ext, "");
 	}
-
+	
+	private String getBaseName(String fileName) 
+	{
+		String[] arr = fileName.split("\\/");	
+		if(arr.length > 1)
+		{
+			return arr[arr.length - 1];
+		}
+		else
+		{
+			return fileName;
+		}
+	}
+	
 	private WebManagerContent updateContent(String fileName, HttpHeaders responseHeaders, byte[] responseBody, HttpStatus statusCode, CookieServer cookie) 
 	{
 		String contentType = this.getMIMEType(fileName);

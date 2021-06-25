@@ -73,10 +73,10 @@ public class FileUtil {
 	            	obj.put("name", file.getName());
 	            	obj.put("type", "dir");
 	            	obj.put("child", list2);
+	            	obj.put("modified", file.lastModified());
 	            	JSONArray ja = new JSONArray();
 	            	ja.put(obj);
 	            	files.put(obj);
-	            	
 	            }
 	            else 
 	            {
@@ -84,6 +84,7 @@ public class FileUtil {
 	            	obj.put("type", "file");
 	            	obj.put("name", file.getName());
 	            	obj.put("size", file.length());
+	            	obj.put("modified", file.lastModified());
 	            	files.put(obj);
 	            }
 	        }
@@ -91,3 +92,4 @@ public class FileUtil {
         return files;
     }
 }
+
