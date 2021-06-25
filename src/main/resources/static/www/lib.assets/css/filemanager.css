@@ -78,7 +78,7 @@
         border: 1px solid #DDDDDD;
         background: white;
         background-color: white;
-        height: calc( 100vh - 200px );
+        height: calc( 100vh - 160px );
         width: calc( 25% - 10px );
         padding: 10px;
         position: relative;
@@ -89,7 +89,7 @@
         border: 1px solid #DDDDDD;
         background: white;
         background-color: white;
-        height: calc( 100vh - 200px );
+        height: calc( 100vh - 160px );
         width: calc( 75% - 10px );
         padding: 10px;
         position: relative;
@@ -100,10 +100,17 @@
     .file-manager .dir{
         display: none;
     }
+    .file-manager .file{
+        height: calc( 100vh - 180px );
+        overflow: auto;
+    }
     .dir-select{
         display: block;
     }
     .file-modify{
         display: none;
     }
+}
+.file-manager .file table tbody td a{
+    display: block;
 }

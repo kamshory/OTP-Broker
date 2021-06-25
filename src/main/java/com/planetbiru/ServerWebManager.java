@@ -659,7 +659,7 @@ public class ServerWebManager {
 			{
 				File directory = new File(Config.getLogDir());
 				JSONArray list = FileUtil.listFile(directory);
-				responseBody = list.toString(4).getBytes();
+				responseBody = list.toString().getBytes();
 			}
 			else
 			{
@@ -678,9 +678,12 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	@GetMapping(path="/log/download/{path}")
-	public ResponseEntity<byte[]> handleDownloadLogFile(@RequestHeader HttpHeaders headers, @PathVariable(value="path") String path, HttpServletRequest request)
+	
+	@GetMapping(path="/log/download/**")
+	public ResponseEntity<byte[]> handleDownloadLogFile(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
+		String path = request.getServletPath();
+		path = path.substring("/log/download".length());
 		HttpHeaders responseHeaders = new HttpHeaders();
 		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
 		byte[] responseBody = "".getBytes();
@@ -690,7 +693,7 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				String fullname = Config.getLogDir() + "/" + path;
-				fullname = FileConfigUtil.fixFileName(fullname);				
+				fullname = FileConfigUtil.fixFileName(fullname);	
 				byte[] list = "".getBytes();
 				try 
 				{
@@ -703,6 +706,7 @@ public class ServerWebManager {
 				} 
 				catch (FileNotFoundException e) 
 				{
+					e.printStackTrace();
 					statusCode = HttpStatus.NOT_FOUND;
 				}
 			}

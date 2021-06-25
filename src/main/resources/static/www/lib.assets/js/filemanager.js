@@ -107,6 +107,8 @@ function renderFile(data, parentDir)
             $('.file-container table tbody').append(tr);
             no++;
         }
+        var dt;
+        var modified;
 
         for(i in data)
         {
@@ -120,9 +122,9 @@ function renderFile(data, parentDir)
             }
             if(data[i].type == 'dir')
             {
-                var dt = new Date();
+                dt = new Date();
                 dt.setTime(data[i].modified);
-                var modified = dt.toISOString();
+                modified = dt.toISOString();
                 modified = modified.substring(0, 19);
                 modified = modified.replace('T', ' ');
                 tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
@@ -149,12 +151,12 @@ function renderFile(data, parentDir)
             }
             if(data[i].type == 'file')
             {
-                var dt = new Date();
+                dt = new Date();
                 dt.setTime(data[i].modified);
-                var modified = dt.toISOString();
+                modified = dt.toISOString();
                 modified = modified.substring(0, 19);
                 modified = modified.replace('T', ' ');
-                var size = Math.floor(data[i].size/1024);
+                var size = Math.ceil(data[i].size/1024);
                 var pathDownload = 'log/download/'+path;
                 tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
                 '<td><span class="icon icon-file"></span></td>'+
