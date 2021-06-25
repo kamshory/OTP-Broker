@@ -123,7 +123,6 @@ public class WebSocketClient extends Thread
 				catch (IOException e) 
 				{
 					logger.error(e.getMessage());     
-					//e.printStackTrace();
 				}
 			}         
 		} 
@@ -220,7 +219,5 @@ public class WebSocketClient extends Thread
 	public void setWebSocketTool(WebSocketTool webSocketTool) {
 		this.webSocketTool = webSocketTool;
 	}
-	
-	
 	
 }
