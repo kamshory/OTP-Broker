@@ -22,6 +22,7 @@ import com.planetbiru.util.Utility;
 
 public class ConfigFeederAMQP {
 
+	private static String configPath = "";
 	private static Logger logger = LogManager.getLogger(ConfigFeederAMQP.class);
 	
 	private static boolean feederAmqpEnable = false;
@@ -37,6 +38,7 @@ public class ConfigFeederAMQP {
 	private static boolean loaded = false;
 	private static boolean connected = false;
 	private static ConnectionFactory factory;
+
 	
 	private ConfigFeederAMQP()
 	{
@@ -104,8 +106,13 @@ public class ConfigFeederAMQP {
 			logger.error(e.getMessage());
 		}
 	}
+	public static void save()
+	{
+		ConfigFeederAMQP.save(ConfigFeederAMQP.configPath );
+	}
 	public static void load(String path)
 	{
+		ConfigFeederAMQP.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{

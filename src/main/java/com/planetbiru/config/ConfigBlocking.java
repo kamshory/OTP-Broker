@@ -23,6 +23,8 @@ public class ConfigBlocking {
 	
 	private static String countryCode = "62";
 	private static Map<String, Boolean> blockList = new LinkedHashMap<>();
+
+	private static String configPath = "";
 	
 	private ConfigBlocking()
 	{
@@ -76,7 +78,7 @@ public class ConfigBlocking {
 	}
 	
 	public static void load(String path) {
-		
+		ConfigBlocking.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -111,7 +113,10 @@ public class ConfigBlocking {
 			logger.error(e.getMessage());
 		}	
 	}
-
+	public static void save()
+	{
+		ConfigBlocking.save(ConfigBlocking.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);

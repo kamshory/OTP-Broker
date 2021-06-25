@@ -1583,8 +1583,8 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigModem.load(Config.getModemSettingPath());
-				String list = ConfigModem.toJSONObject().toString();
-				responseBody = list.getBytes();
+				JSONObject modemInfo = ConfigModem.getStatus();				
+				responseBody = modemInfo.toString().getBytes();
 			}
 			else
 			{

@@ -13,7 +13,7 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigAPI {
-	
+	private static String configPath = "";
 	private static Logger logger = LogManager.getLogger(ConfigAPI.class);
 	private ConfigAPI()
 	{
@@ -29,6 +29,7 @@ public class ConfigAPI {
 	private static String unblockingPath = "/";
 	
 	public static void load(String path) {
+		ConfigAPI.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -73,9 +74,12 @@ public class ConfigAPI {
 		
 	}	
 
+	public static void save() {
+		ConfigAPI.save(ConfigAPI.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
-		save(path, config);
+		ConfigAPI.save(path, config);
 	}
 
 	public static void save(String path, JSONObject config) {		
@@ -85,7 +89,7 @@ public class ConfigAPI {
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = FileConfigUtil.fixFileName(dir + path);
-		prepareDir(fileName);
+		ConfigAPI.prepareDir(fileName);
 		
 		try 
 		{
@@ -118,12 +122,10 @@ public class ConfigAPI {
 	
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
-
 		config.put("httpPort", ConfigAPI.httpPort);
 		config.put("httpsPort", ConfigAPI.httpsPort);
 		config.put("httpEnable", ConfigAPI.httpEnable);
 		config.put("httpsEnable", ConfigAPI.httpsEnable);
-
 		config.put("messagePath", ConfigAPI.messagePath);
 		config.put("blockingPath", ConfigAPI.blockingPath);
 		config.put("unblockingPath", ConfigAPI.unblockingPath);
@@ -189,8 +191,5 @@ public class ConfigAPI {
 	public static JSONObject toJSONObject() {
 		return getJSONObject();
 	}
-	
-	
-	
 	
 }

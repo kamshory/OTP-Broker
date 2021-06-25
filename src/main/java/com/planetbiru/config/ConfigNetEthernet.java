@@ -22,7 +22,9 @@ public class ConfigNetEthernet {
 	private static String dns1 = "";
 	private static String dns2 = "";
 	
-	private static String configPath = "/etc/sysconfig/ifcfg-eth0";
+	private static String osConfigPath = "/etc/sysconfig/ifcfg-eth0";
+
+	private static String configPath = "";
 	
 	private ConfigNetEthernet()
 	{
@@ -30,6 +32,7 @@ public class ConfigNetEthernet {
 	}
 
 	public static void load(String path) {
+		ConfigNetEthernet.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -70,6 +73,10 @@ public class ConfigNetEthernet {
 		
 	}	
 
+	public static void save()
+	{
+		ConfigNetEthernet.save(ConfigNetEthernet.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);
@@ -131,7 +138,7 @@ public class ConfigNetEthernet {
 
 	public static void apply(String path)
 	{
-		ConfigNetEthernet.configPath = path;
+		ConfigNetEthernet.osConfigPath = path;
 		String uuid = "a5ae9a6c-3951-4e8a-b99d-a4ea5dc33bf1";
 		String format = "TYPE=\"Ethernet\"\r\n"
 				+ "BOOTPROTO=none\r\n"
@@ -159,7 +166,7 @@ public class ConfigNetEthernet {
 		logger.info("data : {}", data);
 		try 
 		{
-			FileConfigUtil.write(ConfigNetEthernet.configPath, data.getBytes());
+			FileConfigUtil.write(ConfigNetEthernet.osConfigPath, data.getBytes());
 		}
 		catch (IOException e) 
 		{
@@ -217,11 +224,11 @@ public class ConfigNetEthernet {
 	}
 
 	public static String getConfigPath() {
-		return configPath;
+		return osConfigPath;
 	}
 
 	public static void setConfigPath(String configPath) {
-		ConfigNetEthernet.configPath = configPath;
+		ConfigNetEthernet.osConfigPath = configPath;
 	}
 
 	public static JSONObject toJSONObject()

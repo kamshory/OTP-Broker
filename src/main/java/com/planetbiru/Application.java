@@ -96,8 +96,7 @@ public class Application {
 		Config.setOsWLANConfigPath(osWLANConfigPath);
 		Config.setOsSSIDKey(osSSIDKey);
 		Config.setOsEthernetConfigPath(osEthernetConfigPath);
-		Config.setOsDHCPConfigPath(osDHCPConfigPath);
-		
+		Config.setOsDHCPConfigPath(osDHCPConfigPath);		
 		
 		Config.setSshUsername(sshUsername);
 		Config.setSshPassword(sshPassword);

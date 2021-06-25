@@ -18,9 +18,9 @@ import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
 
 public class ConfigModem {
+	private static String configPath = "";
 	private static Logger logger = LogManager.getLogger(ConfigModem.class);
     private static Map<String, DataModem> modemData = new HashMap<>();
-	private static String configPath;
 	
 	private ConfigModem()
 	{
@@ -158,6 +158,18 @@ public class ConfigModem {
 		return json;
 	}
 	
+	public static JSONObject getStatus() {
+		JSONObject json = new JSONObject();
+		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
+		{
+			String id = entry.getKey();
+			JSONObject modem = ((DataModem) entry.getValue()).toJSONObject();
+			modem.put(JsonKey.CONNECTED, ConfigModem.getModemData(id).isConnected());
+			json.put(id, modem);
+		}
+		return json;
+	}
+	
 	public static String getConfigPath() {
 		return configPath;
 	}
@@ -187,6 +199,8 @@ public class ConfigModem {
 		modem.setConnected(connected);
 		ConfigModem.modemData.put(id, modem);		
 	}
+
+	
 
 	
 	

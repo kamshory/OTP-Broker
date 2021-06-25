@@ -26,6 +26,7 @@ import com.planetbiru.config.ConfigVendorCloudflare;
 import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.config.ConfigVendorDynu;
 import com.planetbiru.config.ConfigFeederAMQP;
+import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigVendorNoIP;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
@@ -114,6 +115,14 @@ public class ServerScheduler {
 	
 	private void modemCheck()
 	{
+		JSONArray serverInfo = new JSONArray();
+		JSONObject modem = new JSONObject();
+		modem.put(JsonKey.NAME, "otp_modem_connected");
+		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
+		modem.put(JsonKey.DATA, ConfigModem.getStatus());
+		serverInfo.put(modem);
+		ServerWebSocketManager.broadcast(serverInfo.toString(4));
+		
 		if(!SMSUtil.isConnected())
 		{	
 			String alert = ConstantString.MODEM_NOT_CONNECTED;
@@ -164,6 +173,7 @@ public class ServerScheduler {
 			}	
 		}
 	}
+	
 
 	private boolean updateDNS(DDNSRecord ddnsRecord, String ddnsId) 
 	{

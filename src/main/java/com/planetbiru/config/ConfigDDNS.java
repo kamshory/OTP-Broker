@@ -21,14 +21,14 @@ import com.planetbiru.util.Utility;
 public class ConfigDDNS {
 	private static Logger logger = LogManager.getLogger(ConfigDDNS.class);
 	private static Map<String, DDNSRecord> records = new HashMap<>();
-	private static String path = "";
+	private static String configPath = "";
 	private ConfigDDNS()
 	{
 		
 	}
 	
 	public static void load(String path) {
-		ConfigDDNS.path = path;
+		ConfigDDNS.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -83,7 +83,10 @@ public class ConfigDDNS {
 			logger.error(e.getMessage());
 		}	
 	}	
-
+	public static void save()
+	{
+		ConfigDDNS.save(ConfigDDNS.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);
@@ -167,10 +170,6 @@ public class ConfigDDNS {
 	public static void deleteRecord(String value) {
 		ConfigDDNS.records.remove(value);
 		
-	}
-
-	public static void save() {
-		ConfigDDNS.save(ConfigDDNS.path);		
 	}
 
 	public static void deactivate(String value) {

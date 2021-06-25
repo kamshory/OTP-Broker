@@ -13,6 +13,7 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigVendorNoIP {
+	private static String configPath = "";
 	private static Logger logger = LogManager.getLogger(ConfigVendorNoIP.class);
 	private ConfigVendorNoIP()
 	{
@@ -26,6 +27,7 @@ public class ConfigVendorNoIP {
 	private static String company = "";
 	
 	public static void load(String path) {
+		ConfigVendorNoIP.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -62,7 +64,10 @@ public class ConfigVendorNoIP {
 		}
 		
 	}	
-
+	public static void save() 
+	{
+		ConfigVendorNoIP.save(ConfigVendorNoIP.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);

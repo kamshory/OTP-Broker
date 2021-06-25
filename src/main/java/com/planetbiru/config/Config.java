@@ -634,10 +634,4 @@ public class Config {
 		Config.mimeSettingPath = mimeSettingPath;
 	}
 	
-	
-
-
-	
-	
-
 }

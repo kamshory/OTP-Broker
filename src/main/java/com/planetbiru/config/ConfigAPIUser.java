@@ -22,6 +22,7 @@ import com.planetbiru.util.Utility;
 public class ConfigAPIUser {
 
 	private static Map<String, User> users = new HashMap<>();
+	private static String configPath = "";
 	
 	private ConfigAPIUser()
 	{
@@ -64,6 +65,7 @@ public class ConfigAPIUser {
 	}
 	public static void load(String path)
 	{
+		ConfigAPIUser.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -93,7 +95,10 @@ public class ConfigAPIUser {
 			 */
 		}
 	}
-	
+	public static void save()
+	{
+		ConfigAPIUser.save(ConfigAPIUser.configPath);
+	}
 	public static void save(String path)
 	{
 		String dir = Utility.getBaseDir();
@@ -219,7 +224,4 @@ public class ConfigAPIUser {
 	{
 		return ConfigAPIUser.toJSONObject().toString();
 	}
-	
-	
-	
 }

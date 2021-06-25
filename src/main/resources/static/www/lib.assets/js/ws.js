@@ -209,7 +209,7 @@ function updateUSBColor(receivedJSON)
     for(var i in data)
     {
         var item = data[i];
-        if(item.name == 'modem_connected')
+        if(item.name == 'otp_modem_connected')
         {
             createUSBSymbol(item.value?'#328C54':'#D83A56');
         }
@@ -222,27 +222,27 @@ function updateServerInfo(receivedJSON)
     for(var i in data)
     {
         var item = data[i];
-        if(item.name == 'http_enable')
+        if(item.name == 'otp_http_enable')
         {
             setHTTPEnable(item.value);
         }
-        if(item.name == 'modem_connected')
+        if(item.name == 'otp_modem_connected')
         {
             setModemConnected(item.value);
         }
-        if(item.name == 'ws_enable')
+        if(item.name == 'otp_ws_enable')
         {
             setWSEnable(item.value);
         }
-        if(item.name == 'ws_connected')
+        if(item.name == 'otp_ws_connected')
         {
             setWSConnected(item.value);
         }
-        if(item.name == 'amqp_enable')
+        if(item.name == 'otp_amqp_enable')
         {
             setAMQPEnable(item.value);
         }
-        if(item.name == 'amqp_connected')
+        if(item.name == 'otp_amqp_connected')
         {
             setAMQPConnected(item.value);
         }

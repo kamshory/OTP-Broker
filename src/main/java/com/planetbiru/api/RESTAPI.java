@@ -28,6 +28,7 @@ public class RESTAPI {
 	{
 		
 	}
+	
 	public static JSONObject unauthorized(String requestBody) {
 		JSONObject requestJSON = new JSONObject();
 		String command = "";
@@ -42,6 +43,7 @@ public class RESTAPI {
 			 * Do nothing
 			 */
 		}
+		
 		JSONArray data = new JSONArray();
 		requestJSON.put(JsonKey.DATA, data);
 		requestJSON.put(JsonKey.COMMAND, command);
@@ -193,6 +195,7 @@ public class RESTAPI {
         	return "".getBytes();
         }
 	}
+	
 	public static JSONObject processRequest(String requestBody) {
 		JSONObject requestJSON = new JSONObject();
 		JSONObject responseJSON = new JSONObject();
@@ -235,15 +238,14 @@ public class RESTAPI {
 		}
 		return responseJSON;
 	}
+	
 	private static JSONObject sendEmail(String command, JSONObject data) {
 		JSONObject responseJSON = new JSONObject();
-	
 		MailUtil mailUtil = new MailUtil();
 		String to = data.optString("recipient", "");
 		String subject = data.optString("subject", "");
 		String message = data.optString("message", "");
 		String result = "";
-
 		try 
 		{
 			mailUtil.send(to, subject, message);
@@ -256,27 +258,25 @@ public class RESTAPI {
 			result = e.getMessage();
 			responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
 			responseJSON.put(JsonKey.MESSAGE, result);
-		}
-		
+		}	
 		responseJSON.put(JsonKey.COMMAND, command);
-		return responseJSON;
-		
+		return responseJSON;	
 	}
+	
 	private static JSONObject blockMSISDN( String command, String msisdn) throws GSMException {
 		ConfigBlocking.block(msisdn);
 		JSONObject responseJSON = new JSONObject();
 		responseJSON.put(JsonKey.COMMAND, command);
 		responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
-		return responseJSON;
-		
+		return responseJSON;	
 	}
+	
 	private static JSONObject unblockMSISDN(String command, String msisdn) throws GSMException {
 		ConfigBlocking.unblock(msisdn);
 		JSONObject responseJSON = new JSONObject();
 		responseJSON.put(JsonKey.COMMAND, command);
 		responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
-		return responseJSON;
-		
+		return responseJSON;		
 	}
 	
 }
