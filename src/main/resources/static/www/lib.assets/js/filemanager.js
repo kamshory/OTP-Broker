@@ -45,7 +45,7 @@ $(document).ready(function(e){
         }
         else
         {
-            $('.dir').find('li[data-path="'+path+'"]').addClass('expanded');
+            expandDir(path);
             renderFile(listFile(path), path);
         }
     });
@@ -57,11 +57,26 @@ $(document).ready(function(e){
         }
         else
         {
-            $('.dir').find('li[data-path="'+path+'"]').addClass('expanded');
+            
+            expandDir(path);
+            openDir(path);
             renderFile(listFile(path), path);
         }
     });
 });
+function expandDir(path)
+{
+    $('.dir').find('li[data-path="'+path+'"]').addClass('expanded');
+}
+function openDir(path)
+{
+    var paths = path.split('/');
+    while(paths.length > 0)
+    {
+        expandDir(paths.join('/'));
+        paths.pop();
+    }
+}
 function getParentDir(path)
 {
     var paths = path.split('/');
@@ -81,7 +96,12 @@ function renderFile(data, parentDir)
 
         if(parentDir != '')
         {
-            tr = $('<tr><td><input type="checkbox" disabled></td><td>'+no+'</td><td><a href="javascript:;">..</a></td><td></td><td>[DIR]</td></tr>');
+            tr = $('<tr><td><input type="checkbox" disabled></td>'+
+            '<td><span class="icon icon-dir"></span></td>'+
+            '<td><a href="javascript:;"><span class="updir">&larrhk;</span></a></td>'+
+            '<td></td>'+
+            '<td class="file-modify"></td>'+
+            '<td>[DIR]</td></tr>');
             tr.addClass('dir-item');
             tr.attr('data-path', getParentDir(parentDir));
             $('.file-container table tbody').append(tr);
@@ -100,7 +120,17 @@ function renderFile(data, parentDir)
             }
             if(data[i].type == 'dir')
             {
-                tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td><td>'+no+'</td><td><a href="javascript:;">'+data[i].name+'</a></td><td></td><td>[DIR]</td></tr>');
+                var dt = new Date();
+                dt.setTime(data[i].modified);
+                var modified = dt.toISOString();
+                modified = modified.substring(0, 19);
+                modified = modified.replace('T', ' ');
+                tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
+                '<td><span class="icon icon-dir"></span></td>'+
+                '<td><a href="javascript:;">'+data[i].name+'</a></td>'+
+                '<td></td>'+
+                '<td class="file-modify">'+modified+'</td>'+
+                '<td>[DIR]</td></tr>');
                 tr.addClass('dir-item');
                 tr.attr('data-path', path);
                 $('.file-container table tbody').append(tr);
@@ -119,8 +149,19 @@ function renderFile(data, parentDir)
             }
             if(data[i].type == 'file')
             {
+                var dt = new Date();
+                dt.setTime(data[i].modified);
+                var modified = dt.toISOString();
+                modified = modified.substring(0, 19);
+                modified = modified.replace('T', ' ');
                 var size = Math.floor(data[i].size/1024);
-                tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td><td>'+no+'</td><td><a href="javascript:;">'+data[i].name+'</a></td><td align="right">'+size+'</td><td>[FILE]</td></tr>');
+                var pathDownload = 'log/download/'+path;
+                tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
+                '<td><span class="icon icon-file"></span></td>'+
+                '<td><a href="'+pathDownload+'">'+data[i].name+'</a></td>'+
+                '<td align="right">'+size+'</td>'+
+                '<td class="file-modify">'+modified+'</td>'+
+                '<td>[FILE]</td></tr>');
                 tr.addClass('file-item');
                 tr.attr('data-path', path);
                 $('.file-container table tbody').append(tr);
@@ -200,11 +241,11 @@ function renderDirrectory(data, parentDir)
             }
             if(hashSubdir(data[i]))
             {
-                li = '<li data-name="'+data[i].name+'" data-path="'+path+'"><a href="javascript:;">'+data[i].name+'</a><ul>'+renderDirrectory(data[i].child, path)+'</ul></li>';
+                li = '<li data-name="'+data[i].name+'" data-path="'+path+'" class="icon icon-dir"><a href="javascript:;">'+data[i].name+'</a><ul>'+renderDirrectory(data[i].child, path)+'</ul></li>';
             }
             else
             {
-                li = '<li data-name="'+data[i].name+'" data-path="'+path+'"><a href="javascript:;">'+data[i].name+'</a></li>';
+                li = '<li data-name="'+data[i].name+'" data-path="'+path+'" class="icon icon-dir"><a href="javascript:;">'+data[i].name+'</a></li>';
             }
             list += li;
         }

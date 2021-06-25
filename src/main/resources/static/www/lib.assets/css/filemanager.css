@@ -20,7 +20,7 @@
     position: relative;
     margin-left: 0px;
 }
-.dir ul li:before{
+.icon.icon-dir:before{
     content: '';
     background-color:#ee6748;
     position: absolute;
@@ -30,18 +30,42 @@
     height: 9px;
     border-radius: 2px;
 }
-.dir ul li:after{
+.icon.icon-dir:after{
     content: '';
     background-color:#ee6748;
     position: absolute;
-    left: 0px;
+    left: 2px;
     top: 4px;
     width: 8px;
     height: 4px;
     border-radius: 2px;
 }
+.icon.icon-file:before{
+    content: '';
+    background-color:#FEFEFE;
+    position: absolute;
+    left: 1px;
+    top: 4px;
+    width: 12px;
+    height: 14px;
+    border: 1px solid #AAAAAA;
+}
+.icon.icon-file:after{
+    content: '';
+    background-color:transparent;
+    position: absolute;
+    left: 3px;
+    top: 9px;
+    width: 8px;
+    height: 4px;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+.updir{
+    overflow: hidden;
+}
 .dir-select{
-    display: none;
+    padding-bottom: 10px;;
 }
 @media screen and (min-width: 768px){
     .file-manager {
@@ -78,5 +102,8 @@
     }
     .dir-select{
         display: block;
+    }
+    .file-modify{
+        display: none;
     }
 }
