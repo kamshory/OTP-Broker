@@ -58,7 +58,6 @@ public class ConfigVendorCloudflare {
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}	
@@ -85,7 +84,6 @@ public class ConfigVendorCloudflare {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	
@@ -112,7 +110,6 @@ public class ConfigVendorCloudflare {
 	
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
-
 		config.put("endpoint", ConfigVendorCloudflare.getEndpoint());
 		config.put("accountId", ConfigVendorCloudflare.getAccountId());
 		config.put("authEmail", ConfigVendorCloudflare.getAuthEmail());

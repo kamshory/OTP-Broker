@@ -33,8 +33,7 @@ public class WebSocketTool extends Thread{
 		}
 		this.client = new WebSocketClient(this);
 		this.client.setStoped(false);
-		this.client.start();
-		
+		this.client.start();	
 	}
 }
 

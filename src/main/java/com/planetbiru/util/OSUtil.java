@@ -3,7 +3,7 @@ package com.planetbiru.util;
 public class OSUtil {     
     public enum OS {
         WINDOWS, LINUX, MAC, SOLARIS
-    };
+    }
 
 	private static OS os = null;
 	

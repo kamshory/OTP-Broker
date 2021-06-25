@@ -66,7 +66,6 @@ public class ConfigNetEthernet {
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}	
@@ -93,7 +92,6 @@ public class ConfigNetEthernet {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	
@@ -166,7 +164,6 @@ public class ConfigNetEthernet {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	
 	}

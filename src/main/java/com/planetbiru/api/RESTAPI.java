@@ -137,15 +137,17 @@ public class RESTAPI {
 		}	
 	}
 
-	public static void sendMessage(JSONObject data)
+	public static JSONObject sendMessage(String command, JSONObject data)
 	{
+		JSONObject responseJSON = new JSONObject();
 		if(data != null)
 		{
-			String receiver = data.optString(JsonKey.RECEIVER, "");
+			String receiver = data.optString(JsonKey.MSISDN, "");
 			String textMessage = data.optString(JsonKey.MESSAGE, "");
 			try 
 			{
 				SMSUtil.sendSMS(receiver, textMessage);
+				responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
 				
 			} 
 			catch (GSMException e) 
@@ -154,8 +156,12 @@ public class RESTAPI {
 				/**
 				 * Do nothing
 				 */
+				responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.NO_DEVICE_CONNECTED);
+				responseJSON.put("error", e.getMessage());
 			}
-		}		
+		}
+		responseJSON.put(JsonKey.COMMAND, command);
+		return responseJSON;		
 	}
 	
 	public static byte[] getRequestBody(HttpExchange httpExchange)
@@ -194,23 +200,22 @@ public class RESTAPI {
 		{
 			requestJSON = new JSONObject(requestBody);
 			String command = requestJSON.optString(JsonKey.COMMAND, "");
-			if(command.equals(ConstantString.SEND_MESSAGE))
+			if(command.equals(ConstantString.SEND_SMS))
 			{
 				JSONObject data = requestJSON.optJSONObject(JsonKey.DATA);
-				RESTAPI.sendMessage(data);		
-				responseJSON.put("response_code", ResponseCode.SUCCESS);
+				responseJSON = RESTAPI.sendMessage(command, data);		
 			}
 			else if(command.equals(ConstantString.SEND_MAIL))
 			{
 				JSONObject data = requestJSON.optJSONObject(JsonKey.DATA);
-				RESTAPI.sendEmail(data);					
+				responseJSON = RESTAPI.sendEmail(command, data);					
 			}
 			else if(command.equals(ConstantString.BLOCK_MSISDN))
 			{
 				JSONObject data = requestJSON.optJSONObject(JsonKey.DATA);
 				if(data != null)
 				{
-					RESTAPI.blockMSISDN(data.optString("msisdn", ""));					
+					responseJSON = RESTAPI.blockMSISDN(command, data.optString("msisdn", ""));					
 				}
 			}
 			else if(command.equals(ConstantString.UNBLOCK_MSISDN))
@@ -218,7 +223,7 @@ public class RESTAPI {
 				JSONObject data = requestJSON.optJSONObject(JsonKey.DATA);
 				if(data != null)
 				{
-					RESTAPI.unblockMSISDN(data.optString("msisdn", ""));					
+					responseJSON = RESTAPI.unblockMSISDN(command, data.optString("msisdn", ""));					
 				}
 			}
 		}
@@ -230,16 +235,47 @@ public class RESTAPI {
 		}
 		return responseJSON;
 	}
-	private static void sendEmail(JSONObject data) {
-		// TODO Auto-generated method stub
+	private static JSONObject sendEmail(String command, JSONObject data) {
+		JSONObject responseJSON = new JSONObject();
+	
+		MailUtil mailUtil = new MailUtil();
+		String to = data.optString("recipient", "");
+		String subject = data.optString("subject", "");
+		String message = data.optString("message", "");
+		String result = "";
+
+		try 
+		{
+			mailUtil.send(to, subject, message);
+			result = "The message was sent successfuly";
+			responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
+			responseJSON.put(JsonKey.MESSAGE, result);
+		} 
+		catch (MessagingException e) 
+		{
+			result = e.getMessage();
+			responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
+			responseJSON.put(JsonKey.MESSAGE, result);
+		}
+		
+		responseJSON.put(JsonKey.COMMAND, command);
+		return responseJSON;
 		
 	}
-	private static void blockMSISDN(String msisdn) throws GSMException {
+	private static JSONObject blockMSISDN( String command, String msisdn) throws GSMException {
 		ConfigBlocking.block(msisdn);
+		JSONObject responseJSON = new JSONObject();
+		responseJSON.put(JsonKey.COMMAND, command);
+		responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
+		return responseJSON;
 		
 	}
-	private static void unblockMSISDN(String msisdn) throws GSMException {
+	private static JSONObject unblockMSISDN(String command, String msisdn) throws GSMException {
 		ConfigBlocking.unblock(msisdn);
+		JSONObject responseJSON = new JSONObject();
+		responseJSON.put(JsonKey.COMMAND, command);
+		responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
+		return responseJSON;
 		
 	}
 	

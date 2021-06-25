@@ -60,7 +60,6 @@ public class DDNSUpdater extends Thread{
 		}
 		else if(this.ddnsRecord.getProvider().equals("noip"))
 		{
-			System.out.println("Executing update DDNS");
 			logger.info("Executing update DDNS");
 			DNSNoIP ddns = new DNSNoIP();
 			
@@ -80,7 +79,6 @@ public class DDNSUpdater extends Thread{
 		}
 		else if(this.ddnsRecord.getProvider().equals("afraid"))
 		{
-			System.out.println("Executing update DDNS");
 			logger.info("Executing update DDNS");
 			DNSAfraid ddns = new DNSAfraid();
 			
@@ -100,7 +98,6 @@ public class DDNSUpdater extends Thread{
 		}
 		else if(this.ddnsRecord.getProvider().equals("dynu"))
 		{
-			System.out.println("Executing update DDNS");
 			logger.info("Executing update DDNS");
 			DNSDynu ddns = new DNSDynu();
 			

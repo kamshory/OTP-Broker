@@ -111,7 +111,6 @@ public class ConfigEmail {
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}	
@@ -142,7 +141,6 @@ public class ConfigEmail {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	

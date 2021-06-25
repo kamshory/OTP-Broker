@@ -71,7 +71,6 @@ public class ConfigNetWLAN {
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}	
@@ -98,7 +97,6 @@ public class ConfigNetWLAN {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	
@@ -175,7 +173,6 @@ public class ConfigNetWLAN {
 				ConfigNetWLAN.dns1,
 				uuid
 				);
-		logger.info("data : {}", data);
 		try 
 		{
 			FileConfigUtil.write(ConfigNetWLAN.configPath, data.getBytes());
@@ -184,7 +181,6 @@ public class ConfigNetWLAN {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	
 	}

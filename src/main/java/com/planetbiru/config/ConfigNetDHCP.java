@@ -68,7 +68,6 @@ public class ConfigNetDHCP {
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}	
@@ -95,7 +94,6 @@ public class ConfigNetDHCP {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	}
 	
@@ -143,7 +141,6 @@ public class ConfigNetDHCP {
 	{
 		ConfigNetDHCP.configPath = path;
 		String data = ConfigNetDHCP.buildConfig();
-		logger.info("data : {}", data);
 		try 
 		{
 			FileConfigUtil.write(ConfigNetDHCP.configPath, data.getBytes());
@@ -151,7 +148,6 @@ public class ConfigNetDHCP {
 		catch (IOException e) 
 		{
 			logger.error(e.getMessage());
-			//e.printStackTrace();
 		}
 	
 	}

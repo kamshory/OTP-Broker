@@ -106,7 +106,9 @@ public class CookieItem {
 		} 
 		catch (EncoderException e) 
 		{
-			//e.printStackTrace();
+			/**
+			 * Do nothing
+			 */
 		}
 		builder.append(this.name+"="+encodedValue);
 		if(this.domain != null && !domain.isEmpty())

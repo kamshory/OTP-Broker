@@ -1151,7 +1151,6 @@ public class Utility {
 	        catch (UnsupportedEncodingException e) 
 	        {
 				logger.error(e.getMessage());
-				//e.printStackTrace();
 			}
 	        index++;
 	    }

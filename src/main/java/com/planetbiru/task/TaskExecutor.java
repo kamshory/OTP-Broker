@@ -14,14 +14,6 @@ public class TaskExecutor {
 		return new JSONObject();
 	}
 
-	protected void markJobStarted(String jobID, String currentTimeStr, String prevFireTimeStr,
-			String nextValidTimeAfterStr) {
-	}
-
-	protected void markJobFinishied(String jobID, String currentTimeStr, String prevFireTimeStr,
-			String nextValidTimeAfterStr) {
-	}
-	
 	public void sleep(long sleep)
 	{
 		try 
