@@ -79,6 +79,9 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.web.session.lifetime}")
 	private long sessionLifetime;
+	
+	@Value("${otpbroker.web.session.file.path}")
+	private String sessionFilePath;
 
 	@Value("${otpbroker.web.document.root}")
 	private String documentRoot;
@@ -126,6 +129,7 @@ public class ServerWebManager {
 	@Value("${otpbroker.log.dir}")
 	private String logDir;	
 	
+	
 	private ServerWebManager()
     {
     }
@@ -137,6 +141,7 @@ public class ServerWebManager {
 		 * This configuration must be loaded first
 		 */
 		Config.setBaseDirConfig(baseDirConfig);
+		
 
 		Config.setUserSettingPath(userSettingPath);
 		Config.setDocumentRoot(documentRoot);
@@ -151,6 +156,8 @@ public class ServerWebManager {
 		Config.setFeederWSSettingPath(feederWSSettingPath);
 		Config.setFeederWSSettingPath(feederWSSettingPath);
 		Config.setFeederAMQPSettingPath(feederAMQPSettingPath);
+
+		Config.setSessionFilePath(sessionFilePath);
 		Config.setSessionName(sessionName);
 		Config.setSessionLifetime(sessionLifetime);
 		
@@ -550,8 +557,7 @@ public class ServerWebManager {
 				responseBody = res.toString().getBytes();				
 			}
 			cookie.saveSessionData();
-			cookie.putToHeaders(responseHeaders);
-			
+			cookie.putToHeaders(responseHeaders);		
 		}
 		catch(NoUserRegisteredException e)
 		{

@@ -65,7 +65,8 @@ public class Config {
 	private static long waithModemReady = 10;
 	private static long maxWaitModemReady = 10000;
 	private static String logDir = "";
-	private static long reconnectDelay = 10000; 
+	private static long reconnectDelay = 10000;
+	private static String sessionFilePath = ""; 
 	
 	private Config()
 	{
@@ -550,6 +551,14 @@ public class Config {
 
 	public static void setReconnectDelay(long reconnectDelay) {
 		Config.reconnectDelay = reconnectDelay;
+	}
+
+	public static String getSessionFilePath() {
+		return sessionFilePath;
+	}
+
+	public static void setSessionFilePath(String sessionFilePath) {
+		Config.sessionFilePath = sessionFilePath;
 	}
 	
 	

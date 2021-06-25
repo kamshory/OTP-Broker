@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 import com.planetbiru.config.Config;
+import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
-import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
 
 public class CookieServer {
@@ -275,10 +275,10 @@ public class CookieServer {
 	}
 	
 	public void saveSessionData() {
-		String sessionFile = this.getSessionFile();
+		String fileName = FileConfigUtil.fixFileName(this.getSessionFile());
 		try 
 		{
-			File file = new File(sessionFile);
+			File file = new File(fileName);
 			String directory1 = file.getParent();
 			File file2 = new File(directory1);
 			String directory2 = file2.getParent();
@@ -295,7 +295,7 @@ public class CookieServer {
 				d1.mkdir();
 			}
 
-			FileUtil.write(sessionFile, this.getSessionData().toString().getBytes());
+			FileConfigUtil.write(fileName, this.getSessionData().toString().getBytes());
 		} 
 		catch (IOException e) 
 		{
@@ -309,10 +309,11 @@ public class CookieServer {
 		File dir = new File(this.getSessionDir());
 		this.clearFile(dir);
 		JSONObject jsonData = new JSONObject();
-		String sessionFile = this.getSessionFile();
+		String fileName = FileConfigUtil.fixFileName(this.getSessionFile());
+		
 		try 
 		{
-			byte[] data = FileUtil.readResource(sessionFile);
+			byte[] data = FileConfigUtil.read(fileName);
 			if(data != null)
 			{
 				String text = new String(data);
@@ -329,13 +330,11 @@ public class CookieServer {
 	}
 	
 	private String getSessionFile() {
-		String dir = Utility.getBaseDir();
-		return dir+"/static/session/"+this.sessionID;
+		return Utility.getBaseDir()+"/"+Config.getSessionFilePath()+"/"+this.sessionID;
 	}
 	
 	private String getSessionDir() {
-		String dir = Utility.getBaseDir();
-		return dir+"/static/session";
+		return Utility.getBaseDir()+"/"+Config.getSessionFilePath();
 	}
 	
 	public void setSessionValue(String sessionKey, Object sessionValue) {

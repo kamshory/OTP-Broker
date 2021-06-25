@@ -49,6 +49,15 @@ public class ServerWebSocketManager {
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
 
+	@Value("${otpbroker.web.session.name}")
+	private String sessionName;
+
+	@Value("${otpbroker.web.session.lifetime}")
+	private long sessionLifetime;
+	
+	@Value("${otpbroker.web.session.file.path}")
+	private String sessionFilePath;
+
 	private Session session;
 	private String clientIP = "";
 	private Map<String, List<String>> requestHeader = new HashMap<>();
@@ -69,7 +78,11 @@ public class ServerWebSocketManager {
 		 * This configuration must be loaded first
 		 */
 		Config.setBaseDirConfig(baseDirConfig);
-
+		
+		Config.setSessionFilePath(sessionFilePath);
+		Config.setSessionName(sessionName);
+		Config.setSessionLifetime(sessionLifetime);
+		
 		Config.setUserSettingPath(userSettingPath);
     	WebUserAccount.load(Config.getUserSettingPath());
     }
