@@ -1,8 +1,6 @@
 package com.planetbiru.config;
 
 public class Config {
-
-
 	private static String otpSalt = "IJUjhrfytR^&r7jkjojO";
 	private static String secretKey = "planetsecret";
 	private static String apiUsername = "planet";
@@ -66,40 +64,45 @@ public class Config {
 	private static String dynuSettingPath = "";
 	private static long waithModemReady = 10;
 	private static long maxWaitModemReady = 10000;
-	private static String logDir = ""; 
+	private static String logDir = "";
+	private static long reconnectDelay = 10000; 
 	
 	private Config()
 	{
 		
 	}
-	
-	
+
 	public static String getOtpSalt() {
 		return otpSalt;
 	}
+
 	public static void setOtpSalt(String otpSalt) {
 		Config.otpSalt = otpSalt;
 	}
-	public static String getApiUsername() {
-		return apiUsername;
-	}
-	public static void setApiUsername(String apiUsername) {
-		Config.apiUsername = apiUsername;
-	}
-	public static String getApiPassword() {
-		return apiPassword;
-	}
-	public static void setApiPassword(String apiPassword) {
-		Config.apiPassword = apiPassword;
-	}
+
 	public static String getSecretKey() {
 		return secretKey;
 	}
+
 	public static void setSecretKey(String secretKey) {
 		Config.secretKey = secretKey;
 	}
-	
-	
+
+	public static String getApiUsername() {
+		return apiUsername;
+	}
+
+	public static void setApiUsername(String apiUsername) {
+		Config.apiUsername = apiUsername;
+	}
+
+	public static String getApiPassword() {
+		return apiPassword;
+	}
+
+	public static void setApiPassword(String apiPassword) {
+		Config.apiPassword = apiPassword;
+	}
 
 	public static boolean isOtpViaWebSocket() {
 		return otpViaWebSocket;
@@ -117,28 +120,12 @@ public class Config {
 		Config.otpViaRabbitMQ = otpViaRabbitMQ;
 	}
 
-	public static long getReconnectDelay() {
-		return getFeederWSReconnectDelay();
+	public static long getFeederWSReconnectDelay() {
+		return feederWSReconnectDelay;
 	}
 
-	public static void setReconnectDelay(long reconnectDelay) {
-		Config.setFeederWSReconnectDelay(reconnectDelay);
-	}
-
-	public static String getPortName() {
-		return portName;
-	}
-
-	public static void setPortName(String portName) {
-		Config.portName = portName;
-	}
-
-	public static String getDefaultFile() {
-		return defaultFile;
-	}
-
-	public static void setDefaultFile(String efaultFile) {
-		Config.defaultFile = efaultFile;
+	public static void setFeederWSReconnectDelay(long feederWSReconnectDelay) {
+		Config.feederWSReconnectDelay = feederWSReconnectDelay;
 	}
 
 	public static String getWsClientUsername() {
@@ -157,101 +144,97 @@ public class Config {
 		Config.wsClientPassword = wsClientPassword;
 	}
 
+	public static String getPortName() {
+		return portName;
+	}
+
+	public static void setPortName(String portName) {
+		Config.portName = portName;
+	}
+
+	public static String getDefaultFile() {
+		return defaultFile;
+	}
+
+	public static void setDefaultFile(String defaultFile) {
+		Config.defaultFile = defaultFile;
+	}
 
 	public static boolean isProxyEnable() {
 		return proxyEnable;
 	}
 
-
 	public static void setProxyEnable(boolean proxyEnable) {
 		Config.proxyEnable = proxyEnable;
 	}
-
 
 	public static String getProxyHost() {
 		return proxyHost;
 	}
 
-
 	public static void setProxyHost(String proxyHost) {
 		Config.proxyHost = proxyHost;
 	}
-
 
 	public static int getProxyPort() {
 		return proxyPort;
 	}
 
-
 	public static void setProxyPort(int proxyPort) {
 		Config.proxyPort = proxyPort;
 	}
-
 
 	public static String getBaseDirConfig() {
 		return baseDirConfig;
 	}
 
-
 	public static void setBaseDirConfig(String baseDirConfig) {
 		Config.baseDirConfig = baseDirConfig;
 	}
-
 
 	public static String getSessionName() {
 		return sessionName;
 	}
 
-
 	public static void setSessionName(String sessionName) {
 		Config.sessionName = sessionName;
 	}
-
 
 	public static long getSessionLifetime() {
 		return sessionLifetime;
 	}
 
-
 	public static void setSessionLifetime(long sessionLifetime) {
 		Config.sessionLifetime = sessionLifetime;
 	}
-
 
 	public static String getEmailSettingPath() {
 		return emailSettingPath;
 	}
 
-
 	public static void setEmailSettingPath(String emailSettingPath) {
 		Config.emailSettingPath = emailSettingPath;
 	}
-
 
 	public static String getFeederAMQPSettingPath() {
 		return feederAMQPSettingPath;
 	}
 
-
 	public static void setFeederAMQPSettingPath(String feederAMQPSettingPath) {
 		Config.feederAMQPSettingPath = feederAMQPSettingPath;
 	}
-
 
 	public static String getFeederWSSettingPath() {
 		return feederWSSettingPath;
 	}
 
-
 	public static void setFeederWSSettingPath(String feederWSSettingPath) {
 		Config.feederWSSettingPath = feederWSSettingPath;
 	}
 
-
 	public static String getWlanSettingPath() {
 		return wlanSettingPath;
 	}
-
 
 	public static void setWlanSettingPath(String wlanSettingPath) {
 		Config.wlanSettingPath = wlanSettingPath;
@@ -261,391 +244,315 @@ public class Config {
 		return ddnsSettingPath;
 	}
 
-
 	public static void setDdnsSettingPath(String ddnsSettingPath) {
 		Config.ddnsSettingPath = ddnsSettingPath;
 	}
-
 
 	public static String getCloudflareSettingPath() {
 		return cloudflareSettingPath;
 	}
 
-
 	public static void setCloudflareSettingPath(String cloudflareSettingPath) {
 		Config.cloudflareSettingPath = cloudflareSettingPath;
 	}
-
 
 	public static String getApiSettingPath() {
 		return apiSettingPath;
 	}
 
-
 	public static void setApiSettingPath(String apiSettingPath) {
 		Config.apiSettingPath = apiSettingPath;
 	}
-
 
 	public static String getSmsSettingPath() {
 		return smsSettingPath;
 	}
 
-
 	public static void setSmsSettingPath(String smsSettingPath) {
 		Config.smsSettingPath = smsSettingPath;
 	}
-
 
 	public static String getDhcpSettingPath() {
 		return dhcpSettingPath;
 	}
 
-
 	public static void setDhcpSettingPath(String dhcpSettingPath) {
 		Config.dhcpSettingPath = dhcpSettingPath;
 	}
-
 
 	public static String getEthernetSettingPath() {
 		return ethernetSettingPath;
 	}
 
-
 	public static void setEthernetSettingPath(String ethernetSettingPath) {
 		Config.ethernetSettingPath = ethernetSettingPath;
 	}
-
 
 	public static String getModemSettingPath() {
 		return modemSettingPath;
 	}
 
-
 	public static void setModemSettingPath(String modemSettingPath) {
 		Config.modemSettingPath = modemSettingPath;
 	}
-
-
-	public static long getFeederWSReconnectDelay() {
-		return feederWSReconnectDelay;
-	}
-
-
-	public static void setFeederWSReconnectDelay(long feederWSReconnectDelay) {
-		Config.feederWSReconnectDelay = feederWSReconnectDelay;
-	}
-
 
 	public static long getFeederWSRecoonectDelay() {
 		return feederWSRecoonectDelay;
 	}
 
-
 	public static void setFeederWSRecoonectDelay(long feederWSRecoonectDelay) {
 		Config.feederWSRecoonectDelay = feederWSRecoonectDelay;
 	}
-
-
-	public static String getNoIPSettingPath() {
-		return noIPSettingPath;
-	}
-
-
-	public static void setNoIPSettingPath(String noIPSettingPath) {
-		Config.noIPSettingPath = noIPSettingPath;
-	}
-
 
 	public static String getNoIPDevice() {
 		return noIPDevice;
 	}
 
-
 	public static void setNoIPDevice(String noIPDevice) {
 		Config.noIPDevice = noIPDevice;
 	}
 
+	public static String getNoIPSettingPath() {
+		return noIPSettingPath;
+	}
+
+	public static void setNoIPSettingPath(String noIPSettingPath) {
+		Config.noIPSettingPath = noIPSettingPath;
+	}
 
 	public static String getDeviceName() {
 		return deviceName;
 	}
 
-
 	public static void setDeviceName(String deviceName) {
 		Config.deviceName = deviceName;
 	}
-
 
 	public static String getDeviceVersion() {
 		return deviceVersion;
 	}
 
-
 	public static void setDeviceVersion(String deviceVersion) {
 		Config.deviceVersion = deviceVersion;
 	}
-
 
 	public static String getKeystoreSettingPath() {
 		return keystoreSettingPath;
 	}
 
-
 	public static void setKeystoreSettingPath(String keystoreSettingPath) {
 		Config.keystoreSettingPath = keystoreSettingPath;
 	}
-
 
 	public static String getKeystoreDataSettingPath() {
 		return keystoreDataSettingPath;
 	}
 
-
 	public static void setKeystoreDataSettingPath(String keystoreDataSettingPath) {
 		Config.keystoreDataSettingPath = keystoreDataSettingPath;
 	}
-
-
-	public static String getDefaultSMTPHost() {
-		return defaultSMTPHost;
-	}
-
-
-	public static void setDefaultSMTPHost(String defaultSMTPHost) {
-		Config.defaultSMTPHost = defaultSMTPHost;
-	}
-
-
-	public static String getDefaultSMTPPort() {
-		return defaultSMTPPort;
-	}
-
-
-	public static void setDefaultSMTPPort(String defaultSMTPPort) {
-		Config.defaultSMTPPort = defaultSMTPPort;
-	}
-
-
-	public static String getDefaultSMTPUsername() {
-		return defaultSMTPUsername;
-	}
-
-
-	public static void setDefaultSMTPUsername(String defaultSMTPUsername) {
-		Config.defaultSMTPUsername = defaultSMTPUsername;
-	}
-
-
-	public static String getDefaultSMTPPassword() {
-		return defaultSMTPPassword;
-	}
-
-
-	public static void setDefaultSMTPPassword(String defaultSMTPPassword) {
-		Config.defaultSMTPPassword = defaultSMTPPassword;
-	}
-
-
-	public static String getDefaultSMTPAuth() {
-		return defaultSMTPAuth;
-	}
-
-
-	public static void setDefaultSMTPAuth(String defaultSMTPAuth) {
-		Config.defaultSMTPAuth = defaultSMTPAuth;
-	}
-
-
-	public static String getDefaultSMTPEnable() {
-		return defaultSMTPEnable;
-	}
-
-
-	public static void setDefaultSMTPEnable(String defaultSMTPEnable) {
-		Config.defaultSMTPEnable = defaultSMTPEnable;
-	}
-
-
-	public static String getDefaultStarttlsEnable() {
-		return defaultStarttlsEnable;
-	}
-
-
-	public static void setDefaultStarttlsEnable(String defaultStarttlsEnable) {
-		Config.defaultStarttlsEnable = defaultStarttlsEnable;
-	}
-
-
-	public static String getDefaultSMTPSSLEnable() {
-		return defaultSMTPSSLEnable;
-	}
-
-
-	public static void setDefaultSMTPSSLEnable(String defaultSMTPSSLEnable) {
-		Config.defaultSMTPSSLEnable = defaultSMTPSSLEnable;
-	}
-
 
 	public static String getBlockingSettingPath() {
 		return blockingSettingPath;
 	}
 
-
 	public static void setBlockingSettingPath(String blockingSettingPath) {
 		Config.blockingSettingPath = blockingSettingPath;
 	}
 
+	public static String getDefaultSMTPHost() {
+		return defaultSMTPHost;
+	}
+
+	public static void setDefaultSMTPHost(String defaultSMTPHost) {
+		Config.defaultSMTPHost = defaultSMTPHost;
+	}
+
+	public static String getDefaultSMTPPort() {
+		return defaultSMTPPort;
+	}
+
+	public static void setDefaultSMTPPort(String defaultSMTPPort) {
+		Config.defaultSMTPPort = defaultSMTPPort;
+	}
+
+	public static String getDefaultSMTPUsername() {
+		return defaultSMTPUsername;
+	}
+
+	public static void setDefaultSMTPUsername(String defaultSMTPUsername) {
+		Config.defaultSMTPUsername = defaultSMTPUsername;
+	}
+
+	public static String getDefaultSMTPPassword() {
+		return defaultSMTPPassword;
+	}
+
+	public static void setDefaultSMTPPassword(String defaultSMTPPassword) {
+		Config.defaultSMTPPassword = defaultSMTPPassword;
+	}
+
+	public static String getDefaultSMTPAuth() {
+		return defaultSMTPAuth;
+	}
+
+	public static void setDefaultSMTPAuth(String defaultSMTPAuth) {
+		Config.defaultSMTPAuth = defaultSMTPAuth;
+	}
+
+	public static String getDefaultSMTPEnable() {
+		return defaultSMTPEnable;
+	}
+
+	public static void setDefaultSMTPEnable(String defaultSMTPEnable) {
+		Config.defaultSMTPEnable = defaultSMTPEnable;
+	}
+
+	public static String getDefaultStarttlsEnable() {
+		return defaultStarttlsEnable;
+	}
+
+	public static void setDefaultStarttlsEnable(String defaultStarttlsEnable) {
+		Config.defaultStarttlsEnable = defaultStarttlsEnable;
+	}
+
+	public static String getDefaultSMTPSSLEnable() {
+		return defaultSMTPSSLEnable;
+	}
+
+	public static void setDefaultSMTPSSLEnable(String defaultSMTPSSLEnable) {
+		Config.defaultSMTPSSLEnable = defaultSMTPSSLEnable;
+	}
 
 	public static String getUserAPISettingPath() {
 		return userAPISettingPath;
 	}
 
-
 	public static void setUserAPISettingPath(String userAPISettingPath) {
 		Config.userAPISettingPath = userAPISettingPath;
 	}
-
 
 	public static String getDhcpSettingPathDefault() {
 		return dhcpSettingPathDefault;
 	}
 
-
 	public static void setDhcpSettingPathDefault(String dhcpSettingPathDefault) {
 		Config.dhcpSettingPathDefault = dhcpSettingPathDefault;
 	}
-
 
 	public static String getWlanSettingPathDefault() {
 		return wlanSettingPathDefault;
 	}
 
-
 	public static void setWlanSettingPathDefault(String wlanSettingPathDefault) {
 		Config.wlanSettingPathDefault = wlanSettingPathDefault;
 	}
-
 
 	public static String getEthernetSettingPathDefault() {
 		return ethernetSettingPathDefault;
 	}
 
-
 	public static void setEthernetSettingPathDefault(String ethernetSettingPathDefault) {
 		Config.ethernetSettingPathDefault = ethernetSettingPathDefault;
 	}
-
 
 	public static String getOsWLANConfigPath() {
 		return osWLANConfigPath;
 	}
 
-
 	public static void setOsWLANConfigPath(String osWLANConfigPath) {
 		Config.osWLANConfigPath = osWLANConfigPath;
 	}
-
 
 	public static String getOsSSIDKey() {
 		return osSSIDKey;
 	}
 
-
 	public static void setOsSSIDKey(String osSSIDKey) {
 		Config.osSSIDKey = osSSIDKey;
 	}
-
 
 	public static String getOsEthernetConfigPath() {
 		return osEthernetConfigPath;
 	}
 
-
 	public static void setOsEthernetConfigPath(String osEthernetConfigPath) {
 		Config.osEthernetConfigPath = osEthernetConfigPath;
 	}
-
 
 	public static String getOsDHCPConfigPath() {
 		return osDHCPConfigPath;
 	}
 
-
 	public static void setOsDHCPConfigPath(String osDHCPConfigPath) {
 		Config.osDHCPConfigPath = osDHCPConfigPath;
 	}
-
 
 	public static String getDocumentRoot() {
 		return documentRoot;
 	}
 
-
 	public static void setDocumentRoot(String documentRoot) {
 		Config.documentRoot = documentRoot;
 	}
-
 
 	public static String getUserSettingPath() {
 		return userSettingPath;
 	}
 
-
 	public static void setUserSettingPath(String userSettingPath) {
 		Config.userSettingPath = userSettingPath;
 	}
-
 
 	public static String getAfraidSettingPath() {
 		return afraidSettingPath;
 	}
 
-
 	public static void setAfraidSettingPath(String afraidSettingPath) {
 		Config.afraidSettingPath = afraidSettingPath;
 	}
-
 
 	public static String getDynuSettingPath() {
 		return dynuSettingPath;
 	}
 
-
 	public static void setDynuSettingPath(String dynuSettingPath) {
 		Config.dynuSettingPath = dynuSettingPath;
 	}
-
 
 	public static long getWaithModemReady() {
 		return waithModemReady;
 	}
 
-
 	public static void setWaithModemReady(long waithModemReady) {
 		Config.waithModemReady = waithModemReady;
 	}
-
 
 	public static long getMaxWaitModemReady() {
 		return maxWaitModemReady;
 	}
 
-
 	public static void setMaxWaitModemReady(long maxWaitModemReady) {
 		Config.maxWaitModemReady = maxWaitModemReady;
 	}
-
 
 	public static String getLogDir() {
 		return logDir;
 	}
 
-
 	public static void setLogDir(String logDir) {
 		Config.logDir = logDir;
 	}
 
+	public static long getReconnectDelay() {
+		return reconnectDelay;
+	}
+
+	public static void setReconnectDelay(long reconnectDelay) {
+		Config.reconnectDelay = reconnectDelay;
+	}
+	
+	
 
 
 	
