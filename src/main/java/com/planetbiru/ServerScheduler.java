@@ -169,7 +169,7 @@ public class ServerScheduler {
 			}
 			if(countUpdate > 0)
 			{
-				ConfigDDNS.save(Config.getDdnsSettingPath());
+				ConfigDDNS.save();
 			}	
 		}
 	}
