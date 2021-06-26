@@ -45,7 +45,9 @@ $(document).ready(function (e1) {
             data:{action:'connect', id:modemID},
             success:function(data)
             {
-
+                /**
+                do nothing
+                */
             }
         });
     });
@@ -58,7 +60,9 @@ $(document).ready(function (e1) {
             data:{action:'disconnect', id:modemID},
             success:function(data)
             {
-
+                /**
+                do nothing
+                */
             }
         });
     });
@@ -71,7 +75,6 @@ function updateModemUI(modemData)
         if(modemData.hasOwnProperty(i))
         {
             var id = i;
-            var name = modemData[i].name;
             $('.service-modem').find('[data-id="'+id+'"]').removeClass('disconnected');
             $('.service-modem').find('[data-id="'+id+'"]').removeClass('connected')
             if(modemData[i].connected)
