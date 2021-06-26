@@ -710,9 +710,10 @@ public class ServerWebManager {
 				{
 					list = FileUtil.readResource(fullname);
 					responseBody = list;
-					String contentType = this.getMIMEType(path);		
+					String contentType = this.getMIMEType(path);
 					String baseName = this.getBaseName(path);
 					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
+					System.out.println(baseName);
 					responseHeaders.add("Content-disposition", "attachment; filename=\""+baseName+"\"");
 				} 
 				catch (FileNotFoundException e) 

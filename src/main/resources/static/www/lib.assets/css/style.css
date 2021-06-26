@@ -289,7 +289,12 @@ button span.number{
     padding: 10px 12px;
     border: 1px solid #DDDDDD;
 }
-
+.input-select{
+  padding: 7px 5px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #DDDDDD;
+}
 .input-text, .input-phone-number, .text-message{
     padding: 5px 10px;
     width: 100%;
