@@ -201,12 +201,12 @@ public class ServerWebManager {
 						if(action.equals("connect"))
 						{
 							SMSUtil.connect(modemID);						
-							ServerInfo.sendModemStatus(SMSUtil.isConnected());
+							ServerInfo.sendModemStatus();
 						}
 						else
 						{
 							SMSUtil.disconnect(modemID);
-							ServerInfo.sendModemStatus(SMSUtil.isConnected());
+							ServerInfo.sendModemStatus();
 						} 
 					}
 					catch (GSMException e) 
@@ -232,7 +232,7 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		String responseBody = responseJSON.toString(4);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
-	}	
+	}
 	
 	@PostMapping(path="/api/email**")
 	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)

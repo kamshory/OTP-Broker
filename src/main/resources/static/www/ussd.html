@@ -24,30 +24,8 @@
       function handleIncommingMessage(message)
       {
         var modemData = getModemData();
-        buildModemMenu(modemData);
-      }      
-      function buildModemMenu(modemData)
-      {
-        var lastValue = $('#modem').val() || '';
-        $('#modem').empty();
-        for(var i in modemData)
-        {
-          if(modemData.hasOwnProperty(i))
-          {
-            var id = i;
-            var name = modemData[i].name;
-            var connectionType = modemData[i].connectionType;
-            var opt = $('<option />');
-            opt.attr('value', id);
-            opt.append(name+' ('+connectionType+')');
-            $('#modem').append(opt);
-          }
-        }
-        if(lastValue != '')
-        {
-          $('#modem').val(lastValue);
-        }
-      }    
+        buildModemMenu(modemData, '#modem');
+      }       
     </script>
   </head>
 
@@ -261,8 +239,6 @@
               $('.ussd-response').css({'display':'block'});
             }
           })
-
-          
         }
       }
     </script>

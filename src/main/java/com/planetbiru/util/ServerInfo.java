@@ -4,7 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.planetbiru.ServerWebSocketManager;
+import com.planetbiru.config.ConfigModem;
 import com.planetbiru.constant.JsonKey;
+import com.planetbiru.gsm.SMSUtil;
 
 public class ServerInfo {
 	
@@ -57,20 +59,18 @@ public class ServerInfo {
 		ServerWebSocketManager.broadcast(info.toString(4));
 	}
 
-	public static void sendModemStatus(boolean connected)
+	public static void sendModemStatus()
 	{
 		JSONArray data = new JSONArray();
-		JSONObject info = new JSONObject();
-		
-		JSONObject ws = new JSONObject();
-		ws.put(JsonKey.NAME, "modem_connected");
-		ws.put(JsonKey.VALUE, connected);
-		data.put(ws);
-		
-		info.put(JsonKey.COMMAND, "server-info");
-		info.put(JsonKey.DATA, data);
-	
-		ServerWebSocketManager.broadcast(info.toString(4));
+		JSONObject modem = new JSONObject();
+		modem.put(JsonKey.NAME, "otp-modem-connected");
+		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
+		modem.put(JsonKey.DATA, ConfigModem.getStatus());
+		data.put(modem);
+		JSONObject serverInfo = new JSONObject();
+		serverInfo.put(JsonKey.DATA, data);
+		serverInfo.put(JsonKey.COMMAND, "server-info");
+		ServerWebSocketManager.broadcast(serverInfo.toString());
 	}
 
 	public static String getInfo() {
