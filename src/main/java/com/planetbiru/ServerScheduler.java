@@ -92,7 +92,7 @@ public class ServerScheduler {
 		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
 		ConfigVendorDynu.load(Config.getDynuSettingPath());
 		ConfigVendorAfraid.load(Config.getAfraidSettingPath());		
-	}
+	}	
 	
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
 	public void inspectDevice()
@@ -114,16 +114,16 @@ public class ServerScheduler {
 	
 	private void modemCheck()
 	{
-		JSONArray serverInfo = new JSONArray();
+		JSONArray data = new JSONArray();
 		JSONObject modem = new JSONObject();
 		modem.put(JsonKey.NAME, "otp-modem-connected");
 		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
 		modem.put(JsonKey.DATA, ConfigModem.getStatus());
-		serverInfo.put(modem);
-		JSONObject xxx = new JSONObject();
-		xxx.put(JsonKey.DATA, serverInfo);
-		xxx.put(JsonKey.COMMAND, "server-info");
-		ServerWebSocketManager.broadcast(xxx.toString(4));
+		data.put(modem);
+		JSONObject serverInfo = new JSONObject();
+		serverInfo.put(JsonKey.DATA, data);
+		serverInfo.put(JsonKey.COMMAND, "server-info");
+		ServerWebSocketManager.broadcast(serverInfo.toString());
 	}
 
 	private void amqpCheck()

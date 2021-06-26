@@ -621,3 +621,6 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
 .btn-group-sm > .btn, .btn-sm {
   padding: 2px 7px;
 }
+.select-device{
+  padding-bottom: 10px;
+}

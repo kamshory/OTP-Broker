@@ -563,6 +563,28 @@ function filterData(data, filterValue, filterByKey, attributeName)
     }
     return unsorted;
 }
+function buildModemMenu(modemData, selector)
+{
+var lastValue = $(selector).val() || '';
+$(selector).empty();
+for(var i in modemData)
+{
+    if(modemData.hasOwnProperty(i))
+    {
+    var id = i;
+    var name = modemData[i].name;
+    var connectionType = modemData[i].connectionType;
+    var opt = $('<option />');
+    opt.attr('value', id);
+    opt.append(name+' ('+connectionType+')');
+    $(selector).append(opt);
+    }
+}
+if(lastValue != '')
+{
+    $(selector).val(lastValue);
+}
+}
 
 $(document).ready(function(e){
     createUSBSymbol();
