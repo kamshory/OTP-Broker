@@ -23,8 +23,31 @@
     <script>
       function handleIncommingMessage(message)
       {
-        console.log("handleIncommingMessage", message);     
+        var modemData = getModemData();
+        buildModemMenu(modemData);
       }      
+      function buildModemMenu(modemData)
+      {
+        var lastValue = $('#modem').val() || '';
+        $('#modem').empty();
+        for(var i in modemData)
+        {
+          if(modemData.hasOwnProperty(i))
+          {
+            var id = i;
+            var name = modemData[i].name;
+            var connectionType = modemData[i].connectionType;
+            var opt = $('<option />');
+            opt.attr('value', id);
+            opt.append(name+' ('+connectionType+')');
+            $('#modem').append(opt);
+          }
+        }
+        if(lastValue != '')
+        {
+          $('#modem').val(lastValue);
+        }
+      }
     </script>
   </head>
 
@@ -83,6 +106,11 @@
         <!--/.container-fluid -->
       </nav>
       <div class="phone-page">   
+
+        <div class="modem-select">
+          <select name="modem" id="modem" class="form-control"></select>
+        </div>
+
         <form action="sms.html" method="POST" onsubmit="return processForm(this)">
             <div class="receiver-area">
                 <div class="input-label">Receiver</div>
@@ -103,10 +131,11 @@
           {
             var receiver = $('#receiver').val();
             var message = $('#message').val();
+            var modem = $('#modem').val();
             $.ajax({
               'type':'POST',
               'url':'sms.html',
-              'data':{receiver:receiver, message:message, send:'send'},
+              'data':{receiver:receiver, message:message, modem:modem, send:'send'},
               success:function(data)
               {
                 $('#receiver').val('');

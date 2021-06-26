@@ -216,7 +216,26 @@ function updateUSBColor(receivedJSON)
         }
     }
 }
+function setModemData(modemData)
+{
+    var key = 'otp-modem-data';
+    window.localStorage.setItem(key, JSON.stringify(modemData));
+}
+function getModemData()
+{
+    var key = 'otp-modem-data';
+    var data = window.localStorage.getItem(key) || '{}';
+    var modemData = {};
+    try
+    {
+        modemData = JSON.parse(data);
+    }
+    catch(e)
+    {
 
+    }
+    return modemData;
+}
 function updateServerInfo(receivedJSON)
 {
     var data = receivedJSON.data;
@@ -230,6 +249,7 @@ function updateServerInfo(receivedJSON)
         if (item.name == 'otp-modem-connected')
         {
             setModemConnected(item.value);
+            setModemData(item.data);
         }
         if (item.name == 'otp-ws-enable')
         {

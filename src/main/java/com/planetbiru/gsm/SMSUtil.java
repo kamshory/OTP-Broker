@@ -201,6 +201,11 @@ public class SMSUtil {
 		}
 	}
 
+	public static String getModemName(String modemID) {
+		DataModem modemData = ConfigModem.getModemData(modemID);
+		return modemData.getName();
+	}
+
 }
 
 

@@ -163,12 +163,20 @@ public class ConfigModem {
 		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
 		{
 			String id = entry.getKey();
-			JSONObject modem = ((DataModem) entry.getValue()).toJSONObject();
+			JSONObject modem = new JSONObject();
+			modem.put("connected", entry.getValue().isConnected());
+			modem.put("name", entry.getValue().getName());
+			modem.put("imei", entry.getValue().getImei());
+			modem.put("active", entry.getValue().isActive());
+			modem.put("id", entry.getValue().getId());
+			modem.put("connectionType", entry.getValue().getConnectionType());
+			modem.put("smsCenter", entry.getValue().getSmsCenter());			
 			modem.put(JsonKey.CONNECTED, ConfigModem.getModemData(id).isConnected());
 			json.put(id, modem);
 		}
 		return json;
 	}
+	
 	
 	public static String getConfigPath() {
 		return configPath;

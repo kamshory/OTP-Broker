@@ -2643,17 +2643,18 @@ public class ServerWebManager {
 		{
 			String receiver = queryPairs.getOrDefault(JsonKey.RECEIVER, "").trim();			
 			String message = queryPairs.getOrDefault(JsonKey.MESSAGE, "").trim();	
+			String modemID = queryPairs.getOrDefault("modem", "").trim();	
 			if(!receiver.isEmpty() && !message.isEmpty())
 			{
 				try 
 				{
-					this.broardcastWebSocket("Sending a message to "+receiver);
-					SMSUtil.sendSMS(receiver, message);
+					SMSUtil.sendSMS(receiver, message, modemID);
+					String modemName = SMSUtil.getModemName(modemID);
+					this.broardcastWebSocket("Sending a message to "+receiver+" via "+modemName);
 				} 
 				catch (GSMException e) 
 				{
 					this.broardcastWebSocket(e.getMessage());
-					logger.error(e.getMessage());
 				}
 			}
 		}		
