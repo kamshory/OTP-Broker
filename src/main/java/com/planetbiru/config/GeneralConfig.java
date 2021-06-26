@@ -17,6 +17,7 @@ public class GeneralConfig {
 	private static Pattern mSection = Pattern.compile("\\s*\\[([^]]*)\\]\\s*");
 	private static Pattern mKeyValue = Pattern.compile("\\s*([^=]*)=(.*)");
 	private static Map <String, Map<String, String>> mEntries = new HashMap<>();
+	private static boolean loaded = false;
 
 	private GeneralConfig()
 	{
@@ -49,6 +50,7 @@ public class GeneralConfig {
 			 * Do nothing
 			 */
 		}
+		GeneralConfig.setLoaded(true);
 	}
 	
 	public static String fixingRawData(String result)
@@ -77,7 +79,7 @@ public class GeneralConfig {
                 {
                     String key = m.group(1).trim();
                     String value = m.group(2).trim();
-                    Map<String, String> kv = mEntries.getOrDefault(section, new HashMap<>());
+                    Map<String, String> kv = mEntries.get(section);
                     if (kv == null) 
                     {
                     	kv = new HashMap<>();
@@ -119,6 +121,12 @@ public class GeneralConfig {
 	        return defaultvalue;
 	    }
 	    return Double.parseDouble(kv.get(key));
+	}
+	public static boolean isLoaded() {
+		return loaded;
+	}
+	public static void setLoaded(boolean loaded) {
+		GeneralConfig.loaded = loaded;
 	}
 
 	

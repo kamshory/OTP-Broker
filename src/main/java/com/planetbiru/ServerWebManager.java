@@ -129,6 +129,10 @@ public class ServerWebManager {
 	private String logDir;	
 	
 	
+	@Value("${otpbroker.server.hmac}")
+	private String hmac;
+	
+	
 	private ServerWebManager()
     {
     }
@@ -178,6 +182,8 @@ public class ServerWebManager {
 		WebUserAccount.load(Config.getUserSettingPath());		
 		
 		GeneralConfig.load(Config.getMimeSettingPath());
+		
+		Config.setValidDevice(ServerInfo.cpuSerialNumberHmac().equals(hmac));
 	}
 	
 	@PostMapping(path="/api/device/**")
@@ -704,9 +710,10 @@ public class ServerWebManager {
 				{
 					list = FileUtil.readResource(fullname);
 					responseBody = list;
-					String contentType = this.getMIMEType(path);		
+					String contentType = this.getMIMEType(path);
 					String baseName = this.getBaseName(path);
 					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
+					System.out.println(baseName);
 					responseHeaders.add("Content-disposition", "attachment; filename=\""+baseName+"\"");
 				} 
 				catch (FileNotFoundException e) 
@@ -1837,8 +1844,15 @@ public class ServerWebManager {
 	
 	@GetMapping(path="/**")
 	public ResponseEntity<byte[]> handleDocumentRootGet(@RequestHeader HttpHeaders headers, HttpServletRequest request)
-	{		
-		return this.serveDocumentRoot(headers, request);
+	{
+		if(!Config.isValidDevice() && (request.getServletPath().contains(".html") || request.getServletPath().equals("/")))
+		{
+			return this.invalidDevice();
+		}
+		else
+		{
+			return this.serveDocumentRoot(headers, request);
+		}
 	}
 	
 	@PostMapping(path="/**")
@@ -1847,7 +1861,36 @@ public class ServerWebManager {
 		this.processFeedbackPost(headers, requestBody, request);
 		return this.serveDocumentRoot(headers, request);
 	}
-	
+
+	private ResponseEntity<byte[]> invalidDevice() {
+		String fileName = WebManagerTool.getFileName("/invalid-device.html");
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try 
+		{
+			responseBody = FileUtil.readResource(fileName);
+		} 
+		catch (FileNotFoundException e) 
+		{
+			statusCode = HttpStatus.NOT_FOUND;
+			if(fileName.endsWith(ConstantString.EXT_HTML))
+			{
+				try 
+				{
+					responseBody = FileUtil.readResource(WebManagerTool.getFileName("/404.html"));
+				} 
+				catch (FileNotFoundException e1) 
+				{
+					logger.error(e1.getMessage());
+				}
+			}
+		}
+		HttpHeaders responseHeaders = new HttpHeaders();
+		responseHeaders.add("Content-type", "text/html");
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+
+
 	public ResponseEntity<byte[]> serveDocumentRoot(HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();

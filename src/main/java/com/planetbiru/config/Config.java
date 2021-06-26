@@ -75,7 +75,9 @@ public class Config {
 	private static int sshPort = 0;
 	private static long sshSleep = 10;
 	private static String rebootCommand = "";
-	private static String mimeSettingPath = ""; 
+	private static String mimeSettingPath = "";
+	private static String cpuSecret = "83246832yr982fi2hfoi2h3f23yf9823yr98y";
+	private static boolean validDevice = false; 
 	
 	private Config()
 	{
@@ -632,6 +634,22 @@ public class Config {
 
 	public static void setMimeSettingPath(String mimeSettingPath) {
 		Config.mimeSettingPath = mimeSettingPath;
+	}
+
+	public static boolean isValidDevice() {
+		return validDevice;
+	}
+
+	public static void setValidDevice(boolean validDevice) {
+		Config.validDevice = validDevice;
+	}
+
+	public static String getCpuSecret() {
+		return cpuSecret;
+	}
+
+	public static void setCpuSecret(String cpuSecret) {
+		Config.cpuSecret = cpuSecret;
 	}
 	
 }

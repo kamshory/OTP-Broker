@@ -8,6 +8,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.planetbiru.config.Config;
 import com.planetbiru.util.OSUtil.OS;
 
 public class CommandLineExecutor {
@@ -77,7 +78,11 @@ public class CommandLineExecutor {
 			return command;
 		}
 	}
-	public static String execSSH(String username, String password, String host, int port, String command, long sleep) throws JSchException 
+	public static String execSSH(String command, long sleep) throws JSchException
+	{
+		return CommandLineExecutor.execSSH(command, sleep, Config.getSshHost(), Config.getSshPort(), Config.getSshUsername(), Config.getSshPassword());
+	}
+	public static String execSSH(String command, long sleep, String host, int port, String username, String password) throws JSchException 
 	{
 		Session session = null;
 		ChannelExec channel = null;
@@ -111,11 +116,11 @@ public class CommandLineExecutor {
 		} 
 		finally 
 		{
-			if (session != null) 
+			if(session != null) 
 			{
 				session.disconnect();
 			}
-			if (channel != null) 
+			if(channel != null) 
 			{
 				channel.disconnect();
 			}

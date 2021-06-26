@@ -1100,7 +1100,7 @@ public class Utility {
 	}
 
 	/**
-	 * hMac 256
+	 * hMac
 	 * @param algorithm Algorithm
 	 * @param data Data
 	 * @param secret Password
@@ -1109,12 +1109,12 @@ public class Utility {
 	 * @throws NoSuchAlgorithmException if algorithm not found
 	 * @throws InvalidKeyException if key is invalid
 	 */
-	public static byte[] hMac(String algorithm, String data, String secret) throws NoSuchAlgorithmException, InvalidKeyException
+	public static byte[] hMac(String algorithm, byte[] data, byte[] secret) throws NoSuchAlgorithmException, InvalidKeyException
 	{
-        SecretKeySpec keySpec = new SecretKeySpec(secret.getBytes(),"Hmac"+algorithm);
+        SecretKeySpec keySpec = new SecretKeySpec(secret,"Hmac"+algorithm);
         Mac mac =  Mac.getInstance("Hmac"+algorithm);
         mac.init(keySpec);
-        return mac.doFinal(data.getBytes());
+        return mac.doFinal(data);
     }
 	
 	public static String changeDateFormat(String oldDateString, String oldFormat, String newFormat) 
