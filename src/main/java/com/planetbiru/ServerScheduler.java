@@ -117,27 +117,14 @@ public class ServerScheduler {
 	{
 		JSONArray serverInfo = new JSONArray();
 		JSONObject modem = new JSONObject();
-		modem.put(JsonKey.NAME, "otp_modem_connected");
+		modem.put(JsonKey.NAME, "otp-modem-connected");
 		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
 		modem.put(JsonKey.DATA, ConfigModem.getStatus());
 		serverInfo.put(modem);
-		ServerWebSocketManager.broadcast(serverInfo.toString(4));
-		
-		if(!SMSUtil.isConnected())
-		{	
-			String alert = ConstantString.MODEM_NOT_CONNECTED;
-			JSONObject messageJSON = new JSONObject();
-			messageJSON.put(JsonKey.COMMAND, "broadcast-message");
-			JSONArray data = new JSONArray();
-			JSONObject itemData = new JSONObject();
-			String uuid = UUID.randomUUID().toString();
-			itemData.put(JsonKey.ID, uuid);
-			itemData.put(JsonKey.MESSAGE, alert);
-			itemData.put(JsonKey.DATE_TIME, Utility.now(ConstantString.ISO_DATE_TIME_FORMAT, ConstantString.UTC));
-			data.put(itemData);
-			messageJSON.put(JsonKey.DATA, data);		
-			ServerWebSocketManager.broadcast(messageJSON.toString());
-		}
+		JSONObject xxx = new JSONObject();
+		xxx.put(JsonKey.DATA, serverInfo);
+		xxx.put(JsonKey.COMMAND, "server-info");
+		ServerWebSocketManager.broadcast(xxx.toString(4));
 	}
 
 	private void amqpCheck()
@@ -173,7 +160,6 @@ public class ServerScheduler {
 			}	
 		}
 	}
-	
 
 	private boolean updateDNS(DDNSRecord ddnsRecord, String ddnsId) 
 	{

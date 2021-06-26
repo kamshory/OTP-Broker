@@ -145,32 +145,32 @@ public class ServerWebSocketManager {
 		JSONObject info = new JSONObject();
 		
 		JSONObject modem = new JSONObject();
-		modem.put(JsonKey.NAME, "otp_modem_connected");
+		modem.put(JsonKey.NAME, "otp-modem-connected");
 		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
 		modem.put(JsonKey.DATA, ConfigModem.getStatus());
 		data.put(modem);
 		JSONObject wsEnable = new JSONObject();
-		wsEnable.put(JsonKey.NAME, "otp_ws_enable");
+		wsEnable.put(JsonKey.NAME, "otp-ws-enable");
 		wsEnable.put(JsonKey.VALUE, ConfigFeederWS.isFeederWsEnable());
 		data.put(wsEnable);
 		
 		JSONObject wsConnected = new JSONObject();
-		wsConnected.put(JsonKey.NAME, "otp_ws_connected");
+		wsConnected.put(JsonKey.NAME, "otp-ws-connected");
 		wsConnected.put(JsonKey.VALUE, ConfigFeederWS.isConnected());
 		data.put(wsConnected);
 		
 		JSONObject amqpEnable = new JSONObject();
-		amqpEnable.put(JsonKey.NAME, "otp_amqp_enable");
+		amqpEnable.put(JsonKey.NAME, "otp-amqp-enable");
 		amqpEnable.put(JsonKey.VALUE, ConfigFeederAMQP.isFeederAmqpEnable());
 		data.put(amqpEnable);
 		
 		JSONObject amqpConnected = new JSONObject();
-		amqpConnected.put(JsonKey.NAME, "otp_amqp_connected");
+		amqpConnected.put(JsonKey.NAME, "otp-amqp-connected");
 		amqpConnected.put(JsonKey.VALUE, ConfigFeederAMQP.isConnected());
 		data.put(amqpConnected);
 		
 		JSONObject httpEnable = new JSONObject();
-		httpEnable.put(JsonKey.NAME, "otp_http_enable");
+		httpEnable.put(JsonKey.NAME, "otp-http-enable");
 		httpEnable.put(JsonKey.VALUE, ConfigAPI.isHttpEnable() || ConfigAPI.isHttpsEnable());
 		data.put(httpEnable);
 		
