@@ -265,6 +265,7 @@ public class RESTAPI {
 	
 	private static JSONObject blockMSISDN( String command, String msisdn) throws GSMException {
 		ConfigBlocking.block(msisdn);
+		ConfigBlocking.save();
 		JSONObject responseJSON = new JSONObject();
 		responseJSON.put(JsonKey.COMMAND, command);
 		responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
@@ -273,6 +274,7 @@ public class RESTAPI {
 	
 	private static JSONObject unblockMSISDN(String command, String msisdn) throws GSMException {
 		ConfigBlocking.unblock(msisdn);
+		ConfigBlocking.save();
 		JSONObject responseJSON = new JSONObject();
 		responseJSON.put(JsonKey.COMMAND, command);
 		responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);

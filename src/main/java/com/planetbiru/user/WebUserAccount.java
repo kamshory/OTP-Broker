@@ -22,6 +22,7 @@ import com.planetbiru.util.Utility;
 public class WebUserAccount {
 	private static Logger logger = LogManager.getLogger(WebUserAccount.class);
 	private static Map<String, User> users = new HashMap<>();
+	private static String configPath = "";
 
 	private WebUserAccount()
 	{
@@ -151,6 +152,7 @@ public class WebUserAccount {
 	
 	public static void load(String path)
 	{
+		WebUserAccount.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -182,15 +184,19 @@ public class WebUserAccount {
 		}
 	}
 	
-	public static void save(String path)
+	public static void save()
 	{
+		WebUserAccount.save(WebUserAccount.configPath);
+	}
+	
+	public static void save(String path)
+	{		
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = FileConfigUtil.fixFileName(dir + path);
-		logger.info("fileName : {}", fileName);
 		String userData = WebUserAccount.listAsString();
 		try 
 		{
