@@ -24,8 +24,10 @@ public class ConfigVendorAfraid {
 	private static String email = "";
 	private static String password = "";
 	private static String company = "";
+	private static String configPath = "";
 	
 	public static void load(String path) {
+		ConfigVendorAfraid.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -62,7 +64,10 @@ public class ConfigVendorAfraid {
 		}
 		
 	}	
-
+	public static void save()
+	{
+		ConfigVendorAfraid.save(ConfigVendorAfraid.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);

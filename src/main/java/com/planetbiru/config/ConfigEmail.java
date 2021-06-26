@@ -13,6 +13,7 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigEmail {
+	private static String configPath = "";
 	private static Logger logger = LogManager.getLogger(ConfigEmail.class);
 	private ConfigEmail()
 	{
@@ -72,6 +73,7 @@ public class ConfigEmail {
 	
 	
 	public static void load(String path) {
+		ConfigEmail.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -115,11 +117,9 @@ public class ConfigEmail {
 		
 	}	
 	
-	public static JSONObject toJSONObject()
-	{
-		return getJSONObject();
+	public static void save() {
+		ConfigEmail.save(ConfigEmail.configPath);
 	}
-
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);
@@ -144,6 +144,11 @@ public class ConfigEmail {
 		}
 	}
 	
+	public static JSONObject toJSONObject()
+	{
+		return getJSONObject();
+	}
+
 	private static void prepareDir(String fileName) {
 		File file = new File(fileName);
 		String directory1 = file.getParent();

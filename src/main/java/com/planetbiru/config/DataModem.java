@@ -15,6 +15,9 @@ public class DataModem {
 	private boolean connected = false;
 	private boolean active = false;
 
+	public DataModem() {
+	}
+	
 	public DataModem(JSONObject jsonObject) {
 		this.id = jsonObject.optString("id", "");
 		this.name = jsonObject.optString("name", "");
@@ -26,8 +29,6 @@ public class DataModem {
 		this.imei = jsonObject.optString("imei", "");
 		this.simCardPIN = jsonObject.optString("simCardPIN", "");
 		this.active = jsonObject.optBoolean("active", false);
-	}
-	public DataModem() {
 	}
 	
 	public JSONObject toJSONObject() {
@@ -44,36 +45,42 @@ public class DataModem {
 		jsonObject.put("active", this.active);
 		return jsonObject;
 	}
+	
 	public String getId() {
 		return id;
-	}
+	}	
 	public void setId(String id) {
 		this.id = id;
 	}
+	
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	public String getConnectionType() {
 		return connectionType;
 	}
 	public void setConnectionType(String connectionType) {
 		this.connectionType = connectionType;
 	}
+	
 	public String getSmsCenter() {
 		return smsCenter;
 	}
 	public void setSmsCenter(String smsCenter) {
 		this.smsCenter = smsCenter;
 	}
+	
 	public int getIncommingInterval() {
 		return incommingInterval;
 	}
 	public void setIncommingInterval(int incommingInterval) {
 		this.incommingInterval = incommingInterval;
 	}
+	
 	public int getTimeRange() {
 		return timeRange;
 	}
@@ -109,8 +116,7 @@ public class DataModem {
 	}
 	public void setActive(boolean active) {
 		this.active = active;
-	}
-	
+	}	
 }
 
 

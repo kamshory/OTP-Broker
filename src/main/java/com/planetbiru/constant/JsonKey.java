@@ -89,6 +89,7 @@ public class JsonKey {
 	public static final String BLOCK                         = "block";
 	public static final String UNBLOCK                       = "unblock";
 	public static final String MSISDN                        = "msisdn";
+	public static final String CONNECTED                     = "connected";
 	
 	private JsonKey()
 	{

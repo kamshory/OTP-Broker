@@ -27,10 +27,12 @@ public class ConfigNetWLAN {
 	private static String gateway = "";
 	private static String dns1 = "";
 	
-	private static String configPath = "/etc/sysconfig/network-scripts/ifcfg-wlan0";
-	private static String configPathWPAPSK = "/etc/sysconfig/network-scripts/keys-wlan0";
+	private static String osConfigPath = "/etc/sysconfig/network-scripts/ifcfg-wlan0";
+	private static String osConfigPathWPAPSK = "/etc/sysconfig/network-scripts/keys-wlan0";
+	private static String configPath = "";
 	
 	public static void load(String path) {
+		ConfigNetWLAN.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -74,7 +76,10 @@ public class ConfigNetWLAN {
 		}
 		
 	}	
-
+	public static void save()
+	{
+		ConfigNetWLAN.save(ConfigNetWLAN.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);
@@ -138,8 +143,8 @@ public class ConfigNetWLAN {
 
 	public static void apply(String path1, String path2)
 	{
-		ConfigNetWLAN.configPath = path1;
-		ConfigNetWLAN.configPathWPAPSK = path2;
+		ConfigNetWLAN.osConfigPath = path1;
+		ConfigNetWLAN.osConfigPathWPAPSK = path2;
 		String uuid = "605a8783-c38b-4351-8f28-e82f99fdd0c6";		
 		String format = "ESSID=\"%s\"\r\n"
 				+ "MODE=Ap\r\n"
@@ -175,8 +180,8 @@ public class ConfigNetWLAN {
 				);
 		try 
 		{
-			FileConfigUtil.write(ConfigNetWLAN.configPath, data.getBytes());
-			FileConfigUtil.write(ConfigNetWLAN.configPathWPAPSK, ConfigNetWLAN.key.getBytes());
+			FileConfigUtil.write(ConfigNetWLAN.osConfigPath, data.getBytes());
+			FileConfigUtil.write(ConfigNetWLAN.osConfigPathWPAPSK, ConfigNetWLAN.key.getBytes());
 		}
 		catch (IOException e) 
 		{
@@ -250,19 +255,19 @@ public class ConfigNetWLAN {
 	}
 
 	public static String getConfigPath() {
-		return configPath;
+		return osConfigPath;
 	}
 
 	public static void setConfigPath(String configPath) {
-		ConfigNetWLAN.configPath = configPath;
+		ConfigNetWLAN.osConfigPath = configPath;
 	}
 
 	public static String getConfigPathWPAPSK() {
-		return configPathWPAPSK;
+		return osConfigPathWPAPSK;
 	}
 
 	public static void setConfigPathWPAPSK(String configPathWPAPSK) {
-		ConfigNetWLAN.configPathWPAPSK = configPathWPAPSK;
+		ConfigNetWLAN.osConfigPathWPAPSK = configPathWPAPSK;
 	}
 
 	public static JSONObject toJSONObject()

@@ -44,6 +44,7 @@ function initWebSocket()
         console.log("WebSocket is not supported by your browser!");
     }
 }
+
 function connectWebSocket()
 {
     console.log("Connecting  to "+wsURL);
@@ -137,69 +138,69 @@ function setUSBColor(color)
 
 function setModemConnected(value)
 {
-    var key = 'otp_modem_connected';
+    var key = 'otp-modem-connected';
     window.localStorage.setItem(key, (value)?'1':'0');
 }
 function getModemConnected()
 {
-    var key = 'otp_modem_connected';
+    var key = 'otp-modem-connected';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
 function setWSConnected(value)
 {
-    var key = 'otp_ws_connected';
+    var key = 'otp-ws-connected';
     window.localStorage.setItem(key, (value)?'1':'0');
-    console.log('otp_ws_connected', value)
+    console.log('otp-ws-connected', value)
 }
 function getWSConnected()
 {
-    var key = 'otp_ws_connected';
+    var key = 'otp-ws-connected';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
 function setAMQPConnected(value)
 {
-    var key = 'otp_amqp_connected';
+    var key = 'otp-amqp-connected';
     window.localStorage.setItem(key, (value)?'1':'0');
 }
 function getAMQPConnected()
 {
-    var key = 'otp_amqp_connected';
+    var key = 'otp-amqp-connected';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
 function setWSEnable(value)
 {
-    var key = 'otp_ws_enable';
+    var key = 'otp-ws-enable';
     window.localStorage.setItem(key, (value)?'1':'0');
-    console.log('otp_ws_enable', value)
+    console.log('otp-ws-enable', value)
 }
 function getWSEnable()
 {
-    var key = 'otp_ws_enable';
+    var key = 'otp-ws-enable';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
 function setAMQPEnable(value)
 {
-    var key = 'otp_amqp_enable';
+    var key = 'otp-amqp-enable';
     window.localStorage.setItem(key, (value)?'1':'0');
 }
 function getAMQPEnable()
 {
-    var key = 'otp_amqp_enable';
+    var key = 'otp-amqp-enable';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
 function setHTTPEnable(value)
 {
-    var key = 'otp_http_enable';
+    var key = 'otp-http-enable';
     window.localStorage.setItem(key, (value)?'1':'0');
 }
 function getHTTPEnable()
 {
-    var key = 'otp_http_enable';
+    var key = 'otp-http-enable';
     var value = window.localStorage.getItem(key) || '';
     return value == '1';
 }
@@ -209,7 +210,7 @@ function updateUSBColor(receivedJSON)
     for(var i in data)
     {
         var item = data[i];
-        if(item.name == 'modem_connected')
+        if (item.name == 'otp-modem-connected')
         {
             createUSBSymbol(item.value?'#328C54':'#D83A56');
         }
@@ -222,27 +223,27 @@ function updateServerInfo(receivedJSON)
     for(var i in data)
     {
         var item = data[i];
-        if(item.name == 'http_enable')
+        if (item.name == 'otp-http-enable')
         {
             setHTTPEnable(item.value);
         }
-        if(item.name == 'modem_connected')
+        if (item.name == 'otp-modem-connected')
         {
             setModemConnected(item.value);
         }
-        if(item.name == 'ws_enable')
+        if (item.name == 'otp-ws-enable')
         {
             setWSEnable(item.value);
         }
-        if(item.name == 'ws_connected')
+        if (item.name == 'otp-ws-connected')
         {
             setWSConnected(item.value);
         }
-        if(item.name == 'amqp_enable')
+        if (item.name == 'otp-amqp-enable')
         {
             setAMQPEnable(item.value);
         }
-        if(item.name == 'amqp_connected')
+        if (item.name == 'otp-amqp-connected')
         {
             setAMQPConnected(item.value);
         }
@@ -250,20 +251,20 @@ function updateServerInfo(receivedJSON)
         {
             setFeeder(item.feeder);
         }
-    }
-    
+    } 
 }
 
 function setFeeder(feeder)
 {
-    var key = 'otp_feeder';
+    var key = 'otp-feeder';
     var value = (typeof feeder == 'object')?(JSON.stringify(feeder)):'{}';
     window.localStorage.setItem(key, value);
 
 }
+
 function getFeeder()
 {
-    var key = 'otp_feeder';
+    var key = 'otp-feeder';
     var raw = window.localStorage.getItem(key) || '{}';
     var value = {};
     try
@@ -296,7 +297,7 @@ function showNotif(message)
 }
 
 function updateDashboard()
-    {
+{
     var isModemConnected = getModemConnected();
     var isWSEmable = getWSEnable();
     var isWSConnected = getWSConnected();
@@ -334,18 +335,15 @@ function updateDashboard()
 function sortObject(unordered, sortArrays = false) {
     if (!unordered || typeof unordered !== 'object') {
         return unordered;
-    }
-  
+    } 
     if (Array.isArray(unordered)) {
         const newArr = unordered.map((item) => sortObject(item, sortArrays));
         if (sortArrays) {
             newArr.sort();
         }
         return newArr;
-    }
-  
+    } 
     const ordered = {};
-
     Object.keys(unordered)
         .sort()
         .forEach((key) => {
@@ -549,7 +547,6 @@ function filterData(data, filterValue, filterByKey, attributeName)
 $(document).ready(function(e){
     createUSBSymbol();
     $('body').append('<div class="notification-container"></div>');
-
     $(document).on('change', 'thead input[type="checkbox"].check-all', function (e) {
         var checked = $(this).prop('checked');
         $(this).closest("table").find('tbody input[type="checkbox"].check-all').each(function (e2) {
@@ -560,5 +557,4 @@ $(document).ready(function(e){
         $(this).closest('.notification-item').remove();
     });
     initWebSocket();
-
 });

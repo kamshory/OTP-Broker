@@ -27,6 +27,7 @@ import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.GeneralConfig;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.gsm.SMSUtil;
@@ -61,6 +62,10 @@ public class ServerWebSocketManager {
 	
 	@Value("${otpbroker.path.setting.all}")
 	private String mimeSettingPath;	
+	
+	@Value("${otpbroker.path.setting.modem}")
+	private String modemSettingPath;
+
 
 	private Session session;
 	private String clientIP = "";
@@ -89,6 +94,10 @@ public class ServerWebSocketManager {
 		Config.setMimeSettingPath(mimeSettingPath);
 		
 		Config.setUserSettingPath(userSettingPath);
+		
+		Config.setModemSettingPath(modemSettingPath);
+		
+		ConfigModem.load(Config.getModemSettingPath());
 		GeneralConfig.load(Config.getMimeSettingPath());
     	WebUserAccount.load(Config.getUserSettingPath());
     }
@@ -124,7 +133,6 @@ public class ServerWebSocketManager {
         	 */
 		}
 	}
-
 	
 	
     private String createSessionID() {
@@ -137,31 +145,32 @@ public class ServerWebSocketManager {
 		JSONObject info = new JSONObject();
 		
 		JSONObject modem = new JSONObject();
-		modem.put(JsonKey.NAME, "modem_connected");
+		modem.put(JsonKey.NAME, "otp-modem-connected");
 		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
+		modem.put(JsonKey.DATA, ConfigModem.getStatus());
 		data.put(modem);
 		JSONObject wsEnable = new JSONObject();
-		wsEnable.put(JsonKey.NAME, "ws_enable");
+		wsEnable.put(JsonKey.NAME, "otp-ws-enable");
 		wsEnable.put(JsonKey.VALUE, ConfigFeederWS.isFeederWsEnable());
 		data.put(wsEnable);
 		
 		JSONObject wsConnected = new JSONObject();
-		wsConnected.put(JsonKey.NAME, "ws_connected");
+		wsConnected.put(JsonKey.NAME, "otp-ws-connected");
 		wsConnected.put(JsonKey.VALUE, ConfigFeederWS.isConnected());
 		data.put(wsConnected);
 		
 		JSONObject amqpEnable = new JSONObject();
-		amqpEnable.put(JsonKey.NAME, "amqp_enable");
+		amqpEnable.put(JsonKey.NAME, "otp-amqp-enable");
 		amqpEnable.put(JsonKey.VALUE, ConfigFeederAMQP.isFeederAmqpEnable());
 		data.put(amqpEnable);
 		
 		JSONObject amqpConnected = new JSONObject();
-		amqpConnected.put(JsonKey.NAME, "amqp_connected");
+		amqpConnected.put(JsonKey.NAME, "otp-amqp-connected");
 		amqpConnected.put(JsonKey.VALUE, ConfigFeederAMQP.isConnected());
 		data.put(amqpConnected);
 		
 		JSONObject httpEnable = new JSONObject();
-		httpEnable.put(JsonKey.NAME, "http_enable");
+		httpEnable.put(JsonKey.NAME, "otp-http-enable");
 		httpEnable.put(JsonKey.VALUE, ConfigAPI.isHttpEnable() || ConfigAPI.isHttpsEnable());
 		data.put(httpEnable);
 		

@@ -23,8 +23,10 @@ public class ConfigVendorCloudflare {
 	private static String authEmail = "";
 	private static String authApiKey = "";
 	private static String authToken = "";
+	private static String configPath = "";
 	
 	public static void load(String path) {
+		ConfigVendorCloudflare.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -61,7 +63,10 @@ public class ConfigVendorCloudflare {
 		}
 		
 	}	
-
+	public static void save()
+	{
+		ConfigVendorCloudflare.save(ConfigVendorCloudflare.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);

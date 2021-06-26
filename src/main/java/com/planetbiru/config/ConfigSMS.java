@@ -14,6 +14,8 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigSMS {
+	private static String configPath = "";
+
 	private static Logger logger = LogManager.getLogger(ConfigSMS.class);
 	
 	private static String connectionType = "";
@@ -64,6 +66,10 @@ public class ConfigSMS {
 		}
 		
 	}
+	public static void save()
+	{
+		ConfigSMS.save(ConfigSMS.configPath);
+	}
 	public static void save(String path) {
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
@@ -84,6 +90,7 @@ public class ConfigSMS {
 	
 	public static void load(String path)
 	{
+		ConfigSMS.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{

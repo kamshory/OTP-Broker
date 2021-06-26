@@ -28,6 +28,8 @@ public class ConfigFeederWS {
 	private static long feederWsRefresh = 0;
 	
 	private static boolean connected = false;
+
+	private static String configPath = "";
 	
 	private ConfigFeederWS()
 	{
@@ -68,8 +70,13 @@ public class ConfigFeederWS {
 			logger.error(e.getMessage());
 		}
 	}
+	public static void save()
+	{
+		ConfigFeederWS.save(ConfigFeederWS.configPath);
+	}
 	public static void load(String path)
 	{
+		ConfigFeederWS.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{

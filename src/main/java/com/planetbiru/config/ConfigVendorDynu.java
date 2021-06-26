@@ -22,6 +22,8 @@ public class ConfigVendorDynu {
 	private static String password = "";
 	private static String apiKey = "";
 	private static String company = "";
+
+	private static String configPath = "";
 	
 	private ConfigVendorDynu()
 	{
@@ -29,6 +31,7 @@ public class ConfigVendorDynu {
 	}
 
 	public static void load(String path) {
+		ConfigVendorDynu.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -69,6 +72,11 @@ public class ConfigVendorDynu {
 		}
 		
 	}	
+	
+	public static void save()
+	{
+		ConfigVendorDynu.save(ConfigVendorDynu.configPath);
+	}
 
 	public static void save(String path) {
 		JSONObject config = getJSONObject();

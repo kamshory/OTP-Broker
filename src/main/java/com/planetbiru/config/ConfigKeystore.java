@@ -18,9 +18,11 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.Utility;
 
 public class ConfigKeystore {
+	private static String configPath = "";
 	private static Logger logger = LogManager.getLogger(ConfigKeystore.class);
 	
 	private static Map<String, DataKeystore> keystores = new HashMap<>();
+
 	
 	private ConfigKeystore()
 	{
@@ -44,7 +46,7 @@ public class ConfigKeystore {
 	}
 	
 	public static void load(String path) {
-		
+		ConfigKeystore.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -77,10 +79,13 @@ public class ConfigKeystore {
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-		}
-		
+		}	
 	}	
-
+	
+	public static void save()
+	{
+		ConfigKeystore.save(ConfigKeystore.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);

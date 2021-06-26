@@ -32,9 +32,11 @@ public class ConfigNetDHCP {
 	private static String maxLeaseTime = "";	
 	private static JSONArray ranges = new JSONArray();
 	
-	private static String configPath = "/etc/modem/modemd.conf";
+	private static String osConfigPath = "/etc/modem/modemd.conf";
+	private static String configPath = "";
 	
 	public static void load(String path) {
+		ConfigNetDHCP.configPath = path;
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -71,7 +73,10 @@ public class ConfigNetDHCP {
 		}
 		
 	}	
-
+	public static void save()
+	{
+		ConfigNetDHCP.save(ConfigNetDHCP.configPath);
+	}
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);
@@ -139,11 +144,11 @@ public class ConfigNetDHCP {
 
 	public static void apply(String path)
 	{
-		ConfigNetDHCP.configPath = path;
+		ConfigNetDHCP.osConfigPath = path;
 		String data = ConfigNetDHCP.buildConfig();
 		try 
 		{
-			FileConfigUtil.write(ConfigNetDHCP.configPath, data.getBytes());
+			FileConfigUtil.write(ConfigNetDHCP.osConfigPath, data.getBytes());
 		}
 		catch (IOException e) 
 		{
@@ -325,11 +330,11 @@ public class ConfigNetDHCP {
 	}
 
 	public static String getConfigPath() {
-		return configPath;
+		return osConfigPath;
 	}
 
-	public static void setConfigPath(String configPath) {
-		ConfigNetDHCP.configPath = configPath;
+	public static void setConfigPath(String path) {
+		ConfigNetDHCP.osConfigPath = path;
 	}
 
 	

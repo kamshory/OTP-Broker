@@ -542,7 +542,7 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(username, password))
 			{
 				WebUserAccount.updateLastActive(username);
-				WebUserAccount.save(Config.getUserSettingPath());
+				WebUserAccount.save();
 			    payload.put(JsonKey.NEXT_URL, next);
 			    res.put(JsonKey.CODE, 0);
 			    res.put(JsonKey.PAYLOAD, payload);
@@ -1424,7 +1424,7 @@ public class ServerWebManager {
 				jsonObject.put(JsonKey.ACTIVE, true);
 				
 				WebUserAccount.addUser(new User(jsonObject));		
-				WebUserAccount.save(Config.getUserSettingPath());				
+				WebUserAccount.save();				
 				
 				cookie.setSessionValue(JsonKey.USERNAME, username);
 				cookie.setSessionValue(JsonKey.PASSWORD, password);
@@ -1434,7 +1434,7 @@ public class ServerWebManager {
 					if(WebUserAccount.checkUserAuth(username, password))
 					{
 						WebUserAccount.updateLastActive(username);
-						WebUserAccount.save(Config.getUserSettingPath());
+						WebUserAccount.save();
 					}
 				}
 				catch(NoUserRegisteredException e)
@@ -1486,7 +1486,7 @@ public class ServerWebManager {
 				if(!username.isEmpty())
 				{
 					WebUserAccount.addUser(new User(jsonObject));		
-					WebUserAccount.save(Config.getUserSettingPath());
+					WebUserAccount.save();
 				}		    
 			}
 		}
@@ -1583,8 +1583,8 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigModem.load(Config.getModemSettingPath());
-				String list = ConfigModem.toJSONObject().toString();
-				responseBody = list.getBytes();
+				JSONObject modemInfo = ConfigModem.getStatus();				
+				responseBody = modemInfo.toString().getBytes();
 			}
 			else
 			{
@@ -1637,7 +1637,7 @@ public class ServerWebManager {
 				if(!username.isEmpty())
 				{
 					ConfigAPIUser.addUser(new User(jsonObject));		
-					ConfigAPIUser.save(Config.getUserAPISettingPath());
+					ConfigAPIUser.save();
 				}		    
 			}
 		}
@@ -1690,7 +1690,7 @@ public class ServerWebManager {
 					jsonObject.put(JsonKey.PASSWORD, password);
 				}
 				WebUserAccount.updateUser(new User(jsonObject));		
-				WebUserAccount.save(Config.getUserSettingPath());		    
+				WebUserAccount.save();		    
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -1743,7 +1743,7 @@ public class ServerWebManager {
 					jsonObject.put(JsonKey.PASSWORD, password);
 				}
 				ConfigAPIUser.updateUser(new User(jsonObject));		
-				ConfigAPIUser.save(Config.getUserAPISettingPath());	
+				ConfigAPIUser.save();	
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -1773,7 +1773,7 @@ public class ServerWebManager {
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);			
 			    String username = queryPairs.getOrDefault(JsonKey.USERNAME, "");	
 			    WebUserAccount.deleteUser(username);		
-				WebUserAccount.save(Config.getUserSettingPath());
+				WebUserAccount.save();
 			}
 		}
 		catch(NoUserRegisteredException e)
@@ -2030,7 +2030,7 @@ public class ServerWebManager {
 					ConfigBlocking.remove(value);
 				}
 			}
-			ConfigBlocking.save(Config.getBlockingSettingPath());
+			ConfigBlocking.save();
 		}
 		if(queryPairs.containsKey(JsonKey.BLOCK))
 		{
@@ -2053,7 +2053,7 @@ public class ServerWebManager {
 					}
 				}
 			}
-			ConfigBlocking.save(Config.getBlockingSettingPath());
+			ConfigBlocking.save();
 		}
 		if(queryPairs.containsKey(JsonKey.UNBLOCK))
 		{
@@ -2076,7 +2076,7 @@ public class ServerWebManager {
 					}
 				}
 			}
-			ConfigBlocking.save(Config.getBlockingSettingPath());
+			ConfigBlocking.save();
 		}		
 		if(queryPairs.containsKey(JsonKey.ADD))
 		{
@@ -2091,7 +2091,7 @@ public class ServerWebManager {
 				 * Do nothing
 				 */
 			}
-			ConfigBlocking.save(Config.getBlockingSettingPath());
+			ConfigBlocking.save();
 		}
 	}
 	
@@ -2109,7 +2109,7 @@ public class ServerWebManager {
 					ConfigKeystore.remove(value);
 				}
 			}
-			ConfigKeystore.save(Config.getKeystoreSettingPath());
+			ConfigKeystore.save();
 		}
 		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
@@ -2123,7 +2123,7 @@ public class ServerWebManager {
 					ConfigKeystore.deactivate(value);
 				}
 			}
-			ConfigKeystore.save(Config.getKeystoreSettingPath());
+			ConfigKeystore.save();
 		}
 		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
@@ -2137,7 +2137,7 @@ public class ServerWebManager {
 					ConfigKeystore.activate(value);
 				}
 			}
-			ConfigKeystore.save(Config.getKeystoreSettingPath());
+			ConfigKeystore.save();
 		}
 		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
@@ -2159,7 +2159,7 @@ public class ServerWebManager {
 				data.put(JsonKey.ACTIVE, active);
 				
 				ConfigKeystore.update(id, data);
-				ConfigKeystore.save(Config.getKeystoreSettingPath());
+				ConfigKeystore.save();
 			}
 		}
 		
@@ -2188,7 +2188,7 @@ public class ServerWebManager {
 				ConfigKeystore.writeFile(Config.getKeystoreDataSettingPath(), fn, binaryData);
 				ConfigKeystore.load(Config.getKeystoreSettingPath());
 				ConfigKeystore.add(data);
-				ConfigKeystore.save(Config.getKeystoreSettingPath());
+				ConfigKeystore.save();
 			}
 		}
 	}
@@ -2215,7 +2215,7 @@ public class ServerWebManager {
 			ConfigSMS.setTimeRange(lTimeRange);
 			ConfigSMS.setMaxPerTimeRange(lMaxPerTimeRange);
 			
-			ConfigSMS.save(Config.getSmsSettingPath());
+			ConfigSMS.save();
 		}	
 	}
 
@@ -2308,7 +2308,7 @@ public class ServerWebManager {
 			ConfigNetDHCP.setMaxLeaseTime(maxLeaseTime);
 			ConfigNetDHCP.setRanges(rangeList);
 			ConfigNetDHCP.setDomainNameServers(nsList);
-			ConfigNetDHCP.save(Config.getDhcpSettingPath());	
+			ConfigNetDHCP.save();	
 			ConfigNetDHCP.apply(Config.getOsDHCPConfigPath());
 		}
 		
@@ -2323,7 +2323,7 @@ public class ServerWebManager {
 			ConfigNetWLAN.setNetmask(queryPairs.getOrDefault("netmask", "").trim());
 			ConfigNetWLAN.setGateway(queryPairs.getOrDefault("gateway", "").trim());
 			ConfigNetWLAN.setDns1(queryPairs.getOrDefault("dns1", "").trim());
-			ConfigNetWLAN.save(Config.getWlanSettingPath());
+			ConfigNetWLAN.save();
 			ConfigNetWLAN.apply(Config.getOsWLANConfigPath(), Config.getOsSSIDKey());
 		}
 
@@ -2336,7 +2336,7 @@ public class ServerWebManager {
 			ConfigNetEthernet.setGateway(queryPairs.getOrDefault("gateway", "").trim());
 			ConfigNetEthernet.setDns1(queryPairs.getOrDefault("dns1", "").trim());
 			ConfigNetEthernet.setDns2(queryPairs.getOrDefault("dns2", "").trim());
-			ConfigNetEthernet.save(Config.getEthernetSettingPath());
+			ConfigNetEthernet.save();
 			ConfigNetEthernet.apply(Config.getOsEthernetConfigPath());
 		}
 	}
@@ -2357,7 +2357,7 @@ public class ServerWebManager {
 			ConfigVendorCloudflare.setAuthEmail(authEmail);
 			ConfigVendorCloudflare.setAuthApiKey(authApiKey);
 			ConfigVendorCloudflare.setAuthToken(authToken);
-			ConfigVendorCloudflare.save(Config.getCloudflareSettingPath());
+			ConfigVendorCloudflare.save();
 		}
 	}
 	
@@ -2380,7 +2380,7 @@ public class ServerWebManager {
 			}
 			ConfigVendorNoIP.setCompany(company);
 			ConfigVendorNoIP.setEmail(email);		
-			ConfigVendorNoIP.save(Config.getNoIPSettingPath());
+			ConfigVendorNoIP.save();
 		}
 	}
 	
@@ -2403,7 +2403,7 @@ public class ServerWebManager {
 			}
 			ConfigVendorAfraid.setCompany(company);
 			ConfigVendorAfraid.setEmail(email);		
-			ConfigVendorAfraid.save(Config.getAfraidSettingPath());
+			ConfigVendorAfraid.save();
 		}
 	}
 	
@@ -2430,7 +2430,7 @@ public class ServerWebManager {
 			}
 			ConfigVendorDynu.setCompany(company);
 			ConfigVendorDynu.setEmail(email);		
-			ConfigVendorDynu.save(Config.getDynuSettingPath());
+			ConfigVendorDynu.save();
 		}
 	}
 	
@@ -2483,7 +2483,7 @@ public class ServerWebManager {
 					ConfigModem.deleteRecord(value);
 				}
 			}
-			ConfigModem.save(Config.getModemSettingPath());
+			ConfigModem.save();
 		}
 		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
@@ -2496,7 +2496,7 @@ public class ServerWebManager {
 					ConfigModem.deactivate(value);
 				}
 			}
-			ConfigModem.save(Config.getModemSettingPath());
+			ConfigModem.save();
 		}
 		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
@@ -2509,7 +2509,7 @@ public class ServerWebManager {
 					ConfigModem.activate(value);
 				}
 			}
-			ConfigModem.save(Config.getModemSettingPath());
+			ConfigModem.save();
 		}
 		
 		if(queryPairs.containsKey(JsonKey.ADD))
@@ -2564,7 +2564,7 @@ public class ServerWebManager {
 		modem.setActive(active);
 
 		ConfigModem.update(id, modem);
-		ConfigModem.save(Config.getModemSettingPath());	
+		ConfigModem.save();	
 	}
 
 	private void processFeederSetting(String requestBody) {
@@ -2601,7 +2601,7 @@ public class ServerWebManager {
 			ConfigFeederWS.setFeederWsReconnectDelay(feederWsReconnectDelay);
 			ConfigFeederWS.setFeederWsRefresh(feederWsRefresh);		
 			
-			ConfigFeederWS.save(Config.getFeederWSSettingPath());
+			ConfigFeederWS.save();
 		}
 		
 		if(queryPairs.containsKey("save_feeder_amqp_setting"))
@@ -2633,7 +2633,7 @@ public class ServerWebManager {
 			ConfigFeederAMQP.setFeederAmqpTimeout(feederAmqpTimeout);
 			ConfigFeederAMQP.setFeederAmqpRefresh(feederAmqpRefresh);		
 
-			ConfigFeederAMQP.save(Config.getFeederAMQPSettingPath());			
+			ConfigFeederAMQP.save();			
 		}		
 	}
 	
@@ -2680,7 +2680,7 @@ public class ServerWebManager {
 					user.setPassword(password);
 				}
 				WebUserAccount.updateUser(user);
-				WebUserAccount.save(Config.getUserSettingPath());
+				WebUserAccount.save();
 			} 
 			catch (NoUserRegisteredException e) 
 			{
@@ -2708,7 +2708,7 @@ public class ServerWebManager {
 					WebUserAccount.deleteUser(value);
 				}
 			}
-			WebUserAccount.save(Config.getUserSettingPath());
+			WebUserAccount.save();
 		}
 		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
@@ -2733,7 +2733,7 @@ public class ServerWebManager {
 					}
 				}
 			}
-			WebUserAccount.save(Config.getUserSettingPath());
+			WebUserAccount.save();
 		}
 		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
@@ -2758,7 +2758,7 @@ public class ServerWebManager {
 					}
 				}
 			}
-			WebUserAccount.save(Config.getUserSettingPath());
+			WebUserAccount.save();
 		}
 		if(queryPairs.containsKey("block"))
 		{
@@ -2783,7 +2783,7 @@ public class ServerWebManager {
 					}
 				}
 			}
-			WebUserAccount.save(Config.getUserSettingPath());
+			WebUserAccount.save();
 			
 		}
 		if(queryPairs.containsKey("unblock"))
@@ -2809,7 +2809,7 @@ public class ServerWebManager {
 					}
 				}
 			}
-			WebUserAccount.save(Config.getUserSettingPath());
+			WebUserAccount.save();
 		}
 		if(queryPairs.containsKey("update-data"))
 		{
@@ -2831,7 +2831,7 @@ public class ServerWebManager {
 						user.setName(value);
 					}
 					WebUserAccount.updateUser(user);
-					WebUserAccount.save(Config.getUserSettingPath());
+					WebUserAccount.save();
 				} 
 				catch (NoUserRegisteredException e) 
 				{
@@ -2874,7 +2874,7 @@ public class ServerWebManager {
 					user.setBlocked(blocked);
 					user.setActive(active);
 					WebUserAccount.updateUser(user);
-					WebUserAccount.save(Config.getUserSettingPath());
+					WebUserAccount.save();
 				} 
 				catch (NoUserRegisteredException e) 
 				{
@@ -2898,7 +2898,7 @@ public class ServerWebManager {
 				String value = entry.getValue();
 				ConfigAPIUser.deleteUser(value);
 			}
-			ConfigAPIUser.save(Config.getUserAPISettingPath());
+			ConfigAPIUser.save();
 		}
 		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
 		{
@@ -2915,7 +2915,7 @@ public class ServerWebManager {
 					ConfigAPIUser.deactivate(value);
 				}
 			}
-			ConfigAPIUser.save(Config.getUserAPISettingPath());
+			ConfigAPIUser.save();
 		}
 		if(queryPairs.containsKey(JsonKey.ACTIVATE))
 		{
@@ -2932,7 +2932,7 @@ public class ServerWebManager {
 					ConfigAPIUser.activate(value);
 				}
 			}
-			ConfigAPIUser.save(Config.getUserAPISettingPath());
+			ConfigAPIUser.save();
 		}
 		if(queryPairs.containsKey("block"))
 		{
@@ -2949,7 +2949,7 @@ public class ServerWebManager {
 					ConfigAPIUser.block(value);
 				}
 			}
-			ConfigAPIUser.save(Config.getUserAPISettingPath());
+			ConfigAPIUser.save();
 			
 		}
 		if(queryPairs.containsKey("unblock"))
@@ -2967,7 +2967,7 @@ public class ServerWebManager {
 					ConfigAPIUser.unblock(value);
 				}
 			}
-			ConfigAPIUser.save(Config.getUserAPISettingPath());
+			ConfigAPIUser.save();
 		}
 		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
@@ -3000,7 +3000,8 @@ public class ServerWebManager {
 				}
 				user.setBlocked(blocked);
 				user.setActive(active);
-				ConfigAPIUser.save(Config.getUserAPISettingPath());
+				ConfigAPIUser.updateUser(user);
+				ConfigAPIUser.save();
 			}
 		}
 	}
