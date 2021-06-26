@@ -148,12 +148,12 @@ public class Application {
 			try 
 			{
 				CommandLineExecutor.execSSH(
-						Config.getSshUsername(), 
-						Config.getSshPassword(), 
+						Config.getRebootCommand(), 
+						Config.getSshSleep(),
 						Config.getSshHost(), 
 						Config.getSshPort(), 
-						Config.getRebootCommand(), 
-						Config.getSshSleep()
+						Config.getSshUsername(), 
+						Config.getSshPassword() 
 						);
 			} 
 			catch (JSchException e) 

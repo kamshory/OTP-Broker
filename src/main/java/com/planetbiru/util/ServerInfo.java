@@ -1,9 +1,14 @@
 package com.planetbiru.util;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.jcraft.jsch.JSchException;
 import com.planetbiru.ServerWebSocketManager;
+import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.gsm.SMSUtil;
@@ -27,7 +32,7 @@ public class ServerInfo {
 		JSONObject info = new JSONObject();
 		
 		JSONObject ws = new JSONObject();
-		ws.put(JsonKey.NAME, "ws_connected");
+		ws.put(JsonKey.NAME, "otp-ws-connected");
 		ws.put(JsonKey.VALUE, connected);
 		ws.put(JsonKey.MESSAGE, message);
 		data.put(ws);
@@ -49,7 +54,7 @@ public class ServerInfo {
 		JSONObject info = new JSONObject();
 		
 		JSONObject ws = new JSONObject();
-		ws.put(JsonKey.NAME, "amqp_connected");
+		ws.put(JsonKey.NAME, "otp-amqp-connected");
 		ws.put(JsonKey.VALUE, connected);
 		data.put(ws);
 		
@@ -75,7 +80,7 @@ public class ServerInfo {
 
 	public static String getInfo() {
 		JSONObject info = new JSONObject();
-		info.put("cpu", cpuInfo());
+		info.put("cpu", cpuTemperatureInfo());
 		info.put("storage", storageInfo());
 		info.put("memory", memoryInfo());
 		return info.toString(4);
@@ -83,10 +88,22 @@ public class ServerInfo {
 	
 	public static JSONObject memoryInfo()
 	{
-		
 		String result =   "              total        used        free      shared  buff/cache   available\r\n"
 						+ "Mem:        1877280      674068      211560       98540      991652      926216\r\n"
 						+ "Swap:       4194300      166400     4027900";
+		
+		String command = "free";
+		int sleep = 10;
+		try 
+		{
+			result = CommandLineExecutor.execSSH(command, sleep);
+		} 
+		catch (JSchException e) 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
 		
 		result = fixingRawData(result);
 
@@ -130,6 +147,53 @@ public class ServerInfo {
 		}
 		return info;
 	}
+	public static String cpuSerialNumber()
+	{
+		String serialNumber = "";
+		String result =   "Serial Number : 84363278468867";
+
+		/**
+		String command = "more /proc/cpuinfo | grep Serial";
+		int sleep = 10;
+		try 
+		{
+			result = CommandLineExecutor.execSSH(command, sleep);
+		} 
+		catch (JSchException e) 
+		{
+		}
+		*/
+		
+		result = fixingRawData(result);
+		
+		String[] arr = result.split("\r\n");
+		String str = arr[0];
+		if(str.contains(":"))
+		{
+			String[] arr2 = str.split("\\:", 2);
+			serialNumber = arr2[1].trim();		
+		}
+		
+		return serialNumber;
+	}
+	
+	public static String cpuSerialNumberHmac()
+	{
+		String serialNumber = ServerInfo.cpuSerialNumber();
+		String secret = Config.getCpuSecret();
+		String hMac = "";
+		try 
+		{
+			hMac = Utility.bytesToHex(Utility.hMac("sha512", serialNumber.getBytes(), secret.getBytes()));
+		} 
+		catch (InvalidKeyException | NoSuchAlgorithmException e) 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		return hMac;
+	}
 	
 	public static JSONObject storageInfo()
 	{
@@ -140,6 +204,20 @@ public class ServerInfo {
 						+ "tmpfs             938640        0    938640   0% /sys/fs/cgroup\r\n"
 						+ "/dev/vda1       41931756 24046252  17885504  58% /\r\n"
 						+ "tmpfs             187728        0    187728   0% /run/user/0";
+		
+		String command = "df -h";
+		int sleep = 10;
+		try 
+		{
+			result = CommandLineExecutor.execSSH(command, sleep);
+		} 
+		catch (JSchException e) 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+
 
 		result = fixingRawData(result);	
 		String[] lines = result.split("\r\n");	
@@ -175,13 +253,27 @@ public class ServerInfo {
 		return result;
 	}
 	
-	public static JSONObject cpuInfo()
+	public static JSONObject cpuTemperatureInfo()
 	{
 		String result =   "Adapter: ISA adapter\r\n"
 						+ "Core 0:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
 						+ "Core 1:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
 						+ "Core 2:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
 						+ "Core 3:       +47.0°C  (high = +98.0°C, crit = +98.0°C)";
+		
+		String command = "sensors";
+		int sleep = 10;
+		try 
+		{
+			result = CommandLineExecutor.execSSH(command, sleep);
+		} 
+		catch (JSchException e) 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+
 		
 		result = result.replace("°", "&deg;");
 		result = fixingRawData(result);
@@ -203,7 +295,20 @@ public class ServerInfo {
 						+ "\r\n"
 						+ "07:08:48 PM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle\r\n"
 						+ "07:08:48 PM  all   44.34    0.00    1.09    0.03    0.00    0.08    0.07    0.00    0.00   54.39";
-		
+
+		String command = "mpstat | grep all";
+		int sleep = 10;
+		try 
+		{
+			result = CommandLineExecutor.execSSH(command, sleep);
+		} 
+		catch (JSchException e) 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+
 		result = fixingRawData(result);
 		result = result.replace("\r\n\r\n", "\r\n");
 		
