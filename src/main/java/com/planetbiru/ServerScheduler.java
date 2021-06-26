@@ -92,7 +92,7 @@ public class ServerScheduler {
 		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
 		ConfigVendorDynu.load(Config.getDynuSettingPath());
 		ConfigVendorAfraid.load(Config.getAfraidSettingPath());		
-	}
+	}	
 	
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
 	public void inspectDevice()

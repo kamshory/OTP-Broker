@@ -23,7 +23,26 @@
     <script src="lib.assets/js/ws.js"></script>
     <script>
         function handleIncommingMessage(message) {
-            console.log("handleIncommingMessage", message);
+            var modemData = getModemData();
+            for(var i in modemData)
+            {
+                if(modemData.hasOwnProperty(i))
+                {
+                    var id = i;
+                    var name = modemData[i].name;
+                    $('.service-modem').find('[data-id="'+id+'"]').removeClass('disconnected');
+                    $('.service-modem').find('[data-id="'+id+'"]').removeClass('connected')
+                    if(modemData[i].connected)
+                    {
+                        $('.service-modem').find('[data-id="'+id+'"]').addClass('connected');
+                    }
+                    else
+                    {
+                        $('.service-modem').find('[data-id="'+id+'"]').addClass('disconnected');
+                    }
+                }
+            }
+            
         }
     </script>
 </head>
