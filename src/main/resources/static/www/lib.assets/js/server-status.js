@@ -24,8 +24,8 @@ function prepareTimeSelector()
     var maxDay = 7;
     for(var i = 0; i<maxDay; i++)
     {
-        var dif1 = now - ((i + 1) * oneday);
-        var dif2 = now - ((i + 0) * oneday);
+        var dif1 = now - ((i + 0) * oneday);
+        var dif2 = now - ((i - 1) * oneday);
         d.setTime(dif1);
         var str = days[d.getDay()] + ' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
         var option = '<option value="'+dif1+','+dif2+'">'+str+'</option>';

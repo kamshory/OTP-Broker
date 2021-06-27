@@ -67,7 +67,7 @@ public class ServerStatus {
 				if(text.length() > 7)
 				{
 					JSONArray buff = new JSONArray(text);
-					json = filter(buff, from, to);
+					json = ServerStatus.filter(buff, from, to);
 				}
 			}
 		}
@@ -80,6 +80,7 @@ public class ServerStatus {
 		return json;
 	}
 	
+	
 	private static JSONArray filter(JSONArray buff, long from, long to) {
 		JSONArray json = new JSONArray();
 		if(to == 0)
@@ -89,10 +90,14 @@ public class ServerStatus {
 		for(int i = 0; i<buff.length(); i++)
 		{
 			JSONObject jo = buff.getJSONObject(i);
-			if(jo != null && jo.optLong("datetime", 0) >= from && jo.optLong("datetime", 0) <= to)
+			if(jo != null)
 			{
-				json.put(jo);
-			}			
+				long datetime = jo.optLong("datetime", 0);
+				if(datetime >= from && datetime <= to)
+				{
+					json.put(jo);
+				}	
+			}
 		}
 		return json;
 	}

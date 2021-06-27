@@ -302,7 +302,7 @@ function showNotif(message)
     var html = '<div class="notification-item">\r\n'+
         '<div class="notification-wrapper">\r\n'+
         '  <div class="notification-close">\r\n'+
-        '    <a href="javascript:;">X</a>\r\n'+
+        '    <a href="javascript:;"></a>\r\n'+
         '  </div>\r\n'+
         '  <div class="notification-message">\r\n'+
         '    '+message+'\r\n'+
