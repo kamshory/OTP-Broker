@@ -1172,6 +1172,29 @@ public class Utility {
 	{
 		return "Basic " + Utility.base64Encode(username+":"+password);
 	}
+	public static long atol(String alpha) {
+		if(alpha == null)
+		{
+			return 0;
+		}
+		long value = 0;
+		try
+		{
+			alpha = alpha.replaceAll(ConstantString.FILTER_INTEGER, "");
+			if(alpha.isEmpty())
+			{
+				alpha = "0";
+			}
+			value = Long.parseLong(alpha);		
+		}
+		catch(NumberFormatException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		return value;
+	}
 	public static int atoi(String alpha) {
 		if(alpha == null)
 		{

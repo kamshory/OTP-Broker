@@ -59,6 +59,7 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.ServerInfo;
+import com.planetbiru.util.ServerStatus;
 import com.planetbiru.util.Utility;
 import com.planetbiru.util.WebManagerTool;
 
@@ -1017,6 +1018,71 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				responseBody = ServerInfo.getInfo().getBytes();	
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/server-status/get")
+	public ResponseEntity<byte[]> handleServerStatus(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				String timeStr = request.getParameter("time");
+				long from = 0;
+				long to = System.currentTimeMillis();
+				if(timeStr.equals("1h"))
+				{
+					from = System.currentTimeMillis() - 3600000;
+				}
+				else if(timeStr.equals("2h"))
+				{
+					from = System.currentTimeMillis() - (3600000 * 2);
+				}
+				else if(timeStr.equals("3h"))
+				{
+					from = System.currentTimeMillis() - (3600000 * 3);
+				}
+				else if(timeStr.equals("6h"))
+				{
+					from = System.currentTimeMillis() - (3600000 * 6);
+				}
+				else if(timeStr.equals("12h"))
+				{
+					from = System.currentTimeMillis() - (3600000 * 12);
+				}
+				else if(timeStr.equals("24h"))
+				{
+					from = System.currentTimeMillis() - (3600000 * 24);
+				}
+				else if(timeStr.contains(","))
+				{
+					String[] tm = timeStr.split(",");
+					from = Utility.atol(tm[0]);
+					to = Utility.atol(tm[1]);
+				}
+				responseBody = ServerStatus.load(from, to).toString(4).getBytes();	
 			}
 			else
 			{
