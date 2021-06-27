@@ -33,6 +33,7 @@ import com.planetbiru.ddns.DDNSUpdater;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.util.ServerInfo;
+import com.planetbiru.util.ServerStatus;
 import com.planetbiru.util.Utility;
 
 @EnableScheduling
@@ -71,6 +72,9 @@ public class ServerScheduler {
 	@Value("${otpbroker.path.setting.ddns.dynu}")
 	private String dynuSettingPath;
 
+	@Value("${otpbroker.path.setting.server.status}")
+	private String serverStatusSettingPath;
+
 	@PostConstruct
 	public void init()
 	{
@@ -92,7 +96,30 @@ public class ServerScheduler {
 		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
 		ConfigVendorDynu.load(Config.getDynuSettingPath());
 		ConfigVendorAfraid.load(Config.getAfraidSettingPath());		
-	}	
+		
+		ServerStatus.load(serverStatusSettingPath);
+	}
+	
+	@Scheduled(cron = "${otpbroker.cron.expression.server.status}")
+	public void updateServerStatus()
+	{
+		
+		JSONObject memory = ServerInfo.memoryInfo();
+		JSONObject cpu = ServerInfo.cpuUsage();
+		JSONObject storage = ServerInfo.storageInfo();
+
+		JSONObject data = new JSONObject();
+		data.put("datetime", System.currentTimeMillis());
+		data.put("storage", storage.optDouble("percentUsed", 0));
+		data.put("cpu", cpu.optDouble("percentUsed", 0));
+		data.put("ram", memory.optJSONObject("ram").optDouble("percentUsed", 0));
+		data.put("swap", memory.optJSONObject("swap").optDouble("percentUsed", 0));
+
+		ServerStatus.append(data);
+		ServerStatus.save();
+	}
+	
+		
 	
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
 	public void inspectDevice()
@@ -131,8 +158,8 @@ public class ServerScheduler {
 		boolean connected = ConfigFeederAMQP.echoTest();
 		ConfigFeederAMQP.setConnected(connected);	
 		ServerInfo.sendAMQPStatus(ConfigFeederAMQP.isConnected());
-	}	
-		
+	}
+	
 	@Scheduled(cron = "${otpbroker.cron.expression.ddns}")
 	public void updateDNS() 
 	{		
@@ -193,3 +220,4 @@ public class ServerScheduler {
 		return update;	
 	}   
 }
+

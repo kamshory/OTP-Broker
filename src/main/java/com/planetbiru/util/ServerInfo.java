@@ -20,6 +20,7 @@ public class ServerInfo {
 	private static final String FREE = "free";
 	private static final String RAM = "ram";
 	private static final String SWAP = "swap";
+	private static final String PERCENT_USED = "percentUsed";
 
 	private ServerInfo()
 	{
@@ -42,7 +43,6 @@ public class ServerInfo {
 	
 		ServerWebSocketManager.broadcast(info.toString(4));				
 	}
-	
 	
 	public static void sendWSStatus(boolean connected) {
 		ServerInfo.sendWSStatus(connected, "");		
@@ -80,9 +80,9 @@ public class ServerInfo {
 
 	public static String getInfo() {
 		JSONObject info = new JSONObject();
-		info.put("cpu", cpuTemperatureInfo());
-		info.put("storage", storageInfo());
-		info.put("memory", memoryInfo());
+		info.put("cpu", ServerInfo.cpuTemperatureInfo());
+		info.put("storage", ServerInfo.storageInfo());
+		info.put("memory", ServerInfo.memoryInfo());
 		return info.toString(4);
 	}
 	
@@ -118,13 +118,19 @@ public class ServerInfo {
 				String[] arr2 = lines[i].split(" ");
 				if(arr2.length >= 4)
 				{
-					String total = arr2[1];
-					String used = arr2[2];
-					String free = arr2[3];					
+					String totalStr = arr2[1];
+					String usedStr = arr2[2];
+					String freeStr = arr2[3];		
+					int total = Utility.atoi(totalStr);
+					int used = Utility.atoi(usedStr);
+					int free = Utility.atoi(freeStr);
+					float percentUsed  = 100 * ((float)used/(float)total);
 					JSONObject ram = new JSONObject();
-					ram.put(ServerInfo.TOTAL, Utility.atoi(total));
-					ram.put(ServerInfo.USED, Utility.atoi(used));
-					ram.put(ServerInfo.FREE, Utility.atoi(free));				
+					
+					ram.put(ServerInfo.TOTAL, total);
+					ram.put(ServerInfo.USED, used);
+					ram.put(ServerInfo.FREE, free);				
+					ram.put(ServerInfo.PERCENT_USED, percentUsed);				
 					info.put(ServerInfo.RAM, ram);
 				}
 			}
@@ -134,13 +140,19 @@ public class ServerInfo {
 				String[] arr2 = lines[i].split(" ");
 				if(arr2.length >= 4)
 				{
-					String total = arr2[1];
-					String used = arr2[2];
-					String free = arr2[3];
+					String totalStr = arr2[1];
+					String usedStr = arr2[2];
+					String freeStr = arr2[3];		
+					int total = Utility.atoi(totalStr);
+					int used = Utility.atoi(usedStr);
+					int free = Utility.atoi(freeStr);
+					float percentUsed  = 100 * ((float)used/(float)total);
 					JSONObject swap = new JSONObject();
-					swap.put(ServerInfo.TOTAL, Utility.atoi(total));
-					swap.put(ServerInfo.USED, Utility.atoi(used));
-					swap.put(ServerInfo.FREE, Utility.atoi(free));					
+					
+					swap.put(ServerInfo.TOTAL, total);
+					swap.put(ServerInfo.USED, used);
+					swap.put(ServerInfo.FREE, free);				
+					swap.put(ServerInfo.PERCENT_USED, percentUsed);				
 					info.put(ServerInfo.SWAP, swap);
 				}
 			}
@@ -237,7 +249,7 @@ public class ServerInfo {
 					info.put(ServerInfo.TOTAL, Utility.atoi(total));
 					info.put(ServerInfo.USED, Utility.atoi(used));
 					info.put("available", Utility.atoi(avail));
-					info.put("percentUsed", Utility.atof(percent));
+					info.put(ServerInfo.PERCENT_USED, Utility.atof(percent));
 				}
 			}
 		}	
@@ -342,6 +354,7 @@ public class ServerInfo {
 		double used = 100 - idle;
 		info.put("idle", idle);
 		info.put(ServerInfo.USED, used);
+		info.put(ServerInfo.PERCENT_USED, used);
 		return info;	
 	}
 
