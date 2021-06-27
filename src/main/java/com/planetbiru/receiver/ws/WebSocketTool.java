@@ -5,6 +5,7 @@ import com.planetbiru.config.ConfigFeederWS;
 public class WebSocketTool extends Thread{
 	private WebSocketClient client;
 	private long reconnectDelay = 10000;
+	private boolean stopend = false;
 	
 	public WebSocketTool(long reconnectDelay)
 	{
@@ -21,19 +22,28 @@ public class WebSocketTool extends Thread{
 			this.client.start();
 		}
 	}
+	
+	public void stopThread()
+	{
+		this.stopend = true;
+		this.client.stopThreade();
+	}
 
 	public void restartThread() {
-		try 
+		if(!this.stopend)
 		{
-			Thread.sleep(this.reconnectDelay);
-		} 
-		catch (InterruptedException e) 
-		{
-			Thread.currentThread().interrupt();
+			try 
+			{
+				Thread.sleep(this.reconnectDelay);
+			} 
+			catch (InterruptedException e) 
+			{
+				Thread.currentThread().interrupt();
+			}
+			this.client = new WebSocketClient(this);
+			this.client.setStoped(false);
+			this.client.start();	
 		}
-		this.client = new WebSocketClient(this);
-		this.client.setStoped(false);
-		this.client.start();	
 	}
 }
 

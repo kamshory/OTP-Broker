@@ -1,6 +1,7 @@
 package com.planetbiru;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,12 @@ public class ClientReceiverWS {
 		ConfigFeederWS.load(Config.getFeederWSSettingPath());
 		this.tool = new WebSocketTool(ConfigFeederWS.getFeederWsReconnectDelay());
 		this.tool.start();
+	}
+	
+	@PreDestroy
+	public void stopThread()
+	{
+		this.tool.stopThread();
 	}
 	
 }
