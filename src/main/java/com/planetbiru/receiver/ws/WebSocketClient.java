@@ -71,6 +71,10 @@ public class WebSocketClient extends Thread
 		}
 		while(!connected && !isStoped());
 	}
+	public void stopThreade()
+	{
+		this.stoped = true;
+	}
 	public static void sleep(long interval)
 	{
 		try 
