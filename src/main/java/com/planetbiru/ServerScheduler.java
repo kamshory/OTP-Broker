@@ -25,6 +25,7 @@ import com.planetbiru.config.ConfigVendorCloudflare;
 import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.config.ConfigVendorDynu;
 import com.planetbiru.config.ConfigFeederAMQP;
+import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigVendorNoIP;
 import com.planetbiru.constant.ConstantString;
@@ -103,23 +104,25 @@ public class ServerScheduler {
 	@Scheduled(cron = "${otpbroker.cron.expression.server.status}")
 	public void updateServerStatus()
 	{
+		JSONObject data = new JSONObject();
+		data.put("datetime", System.currentTimeMillis());
 		
 		JSONObject memory = ServerInfo.memoryInfo();
 		JSONObject cpu = ServerInfo.cpuUsage();
 		JSONObject storage = ServerInfo.storageInfo();
 
-		JSONObject data = new JSONObject();
-		data.put("datetime", System.currentTimeMillis());
 		data.put("storage", storage.optDouble("percentUsed", 0));
 		data.put("cpu", cpu.optDouble("percentUsed", 0));
 		data.put("ram", memory.optJSONObject("ram").optDouble("percentUsed", 0));
 		data.put("swap", memory.optJSONObject("swap").optDouble("percentUsed", 0));
+		data.put("modem", SMSUtil.isConnected());
+		data.put("ws", ConfigFeederWS.isConnected());
+		data.put("amqp", ConfigFeederAMQP.isConnected());
 
 		ServerStatus.append(data);
 		ServerStatus.save();
 	}
 	
-		
 	
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
 	public void inspectDevice()

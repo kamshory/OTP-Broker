@@ -294,6 +294,7 @@ button span.number{
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #DDDDDD;
+  background-color: #FFFFFF;
 }
 .input-text, .input-phone-number, .text-message{
     padding: 5px 10px;
@@ -469,16 +470,33 @@ border: 1px solid #DDDDDD;
 }
 .notification-close{
   float: right;
-  border: 1px solid #EEEEEE;
 }
 .notification-close a{
   padding: 2px;
-  width: 20px;
-  height: 20px;
   display: block;
   box-sizing: border-box;
   text-align: center;
-  columns: #555555;
+  color: #555555;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #EEEEEE;
+  position: relative;
+}
+.notification-close a::before{
+  content: "";
+  position: absolute;
+  border-left: 1px solid #999999;
+  transform: rotate(45deg);
+  width: 1px;
+  height: 14px;
+}
+.notification-close a::after{
+  content: "";
+  position: absolute;
+  border-left: 1px solid #999999;
+  transform: rotate(-45deg);
+  width: 1px;
+  height: 14px;
 }
 .notification-message{
   padding-left: 4px;
