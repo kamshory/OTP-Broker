@@ -123,7 +123,6 @@ public class ServerScheduler {
 		ServerStatus.save();
 	}
 	
-	
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
 	public void inspectDevice()
 	{

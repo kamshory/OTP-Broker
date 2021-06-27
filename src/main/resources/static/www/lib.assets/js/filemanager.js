@@ -17,8 +17,7 @@ $(document).ready(function(e){
                 opt.append(path);
                 opt.attr('value', path);
                 $('.select-path').append(opt);
-            })
-            
+            })       
         }
     });
     $(document).on('click', '.dir a', function(e2){
@@ -56,8 +55,7 @@ $(document).ready(function(e){
             renderFile(tree, '');
         }
         else
-        {
-            
+        {         
             expandDir(path);
             openDir(path);
             renderFile(listFile(path), path);
@@ -88,90 +86,107 @@ function renderFile(data, parentDir)
     if(typeof data != 'undefined')
     {
         $('.file-container table tbody').empty();
-
-        var tr = null;
-        var i;
         var no = 1;
-        var path;
-
+        no = renderRowParentDir(data, parentDir, no);
+        no = renderRowDir(data, parentDir, no);
+        no = renderRowFile(data, parentDir, no);      
+    }
+}
+function renderRowParentDir(data, parentDir, no)
+{
+    var tr;
+    if(parentDir != '')
+    {
+        tr = $('<tr><td><input type="checkbox" disabled></td>'+
+        '<td><span class="icon icon-dir"></span></td>'+
+        '<td><a href="javascript:;"><span class="updir">&larrhk;</span></a></td>'+
+        '<td></td>'+
+        '<td class="file-modify"></td>'+
+        '<td>[DIR]</td></tr>');
+        tr.addClass('dir-item');
+        tr.attr('data-path', getParentDir(parentDir));
+        $('.file-container table tbody').append(tr);
+        no++;
+    }
+    return no;
+}
+function renderRowDir(data, parentDir, no)
+{
+    var dt;
+    var i;
+    var path;
+    var modified;
+    var tr;
+    for(i in data)
+    {
         if(parentDir != '')
         {
-            tr = $('<tr><td><input type="checkbox" disabled></td>'+
+            path = parentDir+'/'+data[i].name;
+        }
+        else
+        {
+            path = data[i].name;
+        }
+        if(data[i].type == 'dir')
+        {
+            dt = new Date();
+            dt.setTime(data[i].modified);
+            modified = dt.toISOString();
+            modified = modified.substring(0, 19);
+            modified = modified.replace('T', ' ');
+            tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
             '<td><span class="icon icon-dir"></span></td>'+
-            '<td><a href="javascript:;"><span class="updir">&larrhk;</span></a></td>'+
+            '<td><a href="javascript:;">'+data[i].name+'</a></td>'+
             '<td></td>'+
-            '<td class="file-modify"></td>'+
+            '<td class="file-modify">'+modified+'</td>'+
             '<td>[DIR]</td></tr>');
             tr.addClass('dir-item');
-            tr.attr('data-path', getParentDir(parentDir));
+            tr.attr('data-path', path);
             $('.file-container table tbody').append(tr);
             no++;
         }
-        var dt;
-        var modified;
-
-        for(i in data)
+    }
+    return no;
+}
+function renderRowFile(data, parentDir, no)
+{
+    var dt;
+    var i;
+    var path;
+    var modified;
+    var tr;
+    for(i in data)
+    {
+        if(parentDir != '')
         {
-            if(parentDir != '')
-            {
-                path = parentDir+'/'+data[i].name;
-            }
-            else
-            {
-                path = data[i].name;
-            }
-            if(data[i].type == 'dir')
-            {
-                dt = new Date();
-                dt.setTime(data[i].modified);
-                modified = dt.toISOString();
-                modified = modified.substring(0, 19);
-                modified = modified.replace('T', ' ');
-                tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
-                '<td><span class="icon icon-dir"></span></td>'+
-                '<td><a href="javascript:;">'+data[i].name+'</a></td>'+
-                '<td></td>'+
-                '<td class="file-modify">'+modified+'</td>'+
-                '<td>[DIR]</td></tr>');
-                tr.addClass('dir-item');
-                tr.attr('data-path', path);
-                $('.file-container table tbody').append(tr);
-                no++;
-            }
+            path = parentDir+'/'+data[i].name;
         }
-        for(i in data)
+        else
         {
-            if(parentDir != '')
-            {
-                path = parentDir+'/'+data[i].name;
-            }
-            else
-            {
-                path = data[i].name;
-            }
-            if(data[i].type == 'file')
-            {
-                dt = new Date();
-                dt.setTime(data[i].modified);
-                modified = dt.toISOString();
-                modified = modified.substring(0, 19);
-                modified = modified.replace('T', ' ');
-                var size = Math.ceil(data[i].size/1024);
-                var pathDownload = 'log/download/'+path;
-                tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
-                '<td><span class="icon icon-file"></span></td>'+
-                '<td><a href="'+pathDownload+'">'+data[i].name+'</a></td>'+
-                '<td align="right">'+size+'</td>'+
-                '<td class="file-modify">'+modified+'</td>'+
-                '<td>[FILE]</td></tr>');
-                tr.addClass('file-item');
-                tr.attr('data-path', path);
-                $('.file-container table tbody').append(tr);
-                no++;
-            }
+            path = data[i].name;
+        }
+        if(data[i].type == 'file')
+        {
+            dt = new Date();
+            dt.setTime(data[i].modified);
+            modified = dt.toISOString();
+            modified = modified.substring(0, 19);
+            modified = modified.replace('T', ' ');
+            var size = Math.ceil(data[i].size/1024);
+            var pathDownload = 'log/download/'+path;
+            tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
+            '<td><span class="icon icon-file"></span></td>'+
+            '<td><a href="'+pathDownload+'">'+data[i].name+'</a></td>'+
+            '<td align="right">'+size+'</td>'+
+            '<td class="file-modify">'+modified+'</td>'+
+            '<td>[FILE]</td></tr>');
+            tr.addClass('file-item');
+            tr.attr('data-path', path);
+            $('.file-container table tbody').append(tr);
+            no++;
         }
     }
-
+    return no;
 }
 function listFile(path)
 {
