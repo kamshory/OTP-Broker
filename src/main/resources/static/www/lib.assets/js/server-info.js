@@ -3,6 +3,50 @@ $(document).ready(function(e){
     setInterval(function(e2){
       reloadData();
     }, 10000);
+  $(document).on('click', '.tile.restart a', function(e){
+    if(confirm('Are you sure you want to restart the service?'))
+    {
+      $.ajax({
+        url:'api/restart', 
+        type:'POST',
+        data:{'confirm':'yes'},
+        dataType:'json',
+        success:function(data){
+          console.log('DATA : '+JSON.stringify(data));
+        }
+      });
+    }
+  });
+
+  $(document).on('click', '.tile.cleaner a', function(e){
+    if(confirm('Are you sure you want to clean up the service?'))
+    {
+      $.ajax({
+        url:'api/cleanup', 
+        type:'POST',
+        data:{'confirm':'yes'},
+        dataType:'json',
+        success:function(data){
+          console.log('DATA : '+JSON.stringify(data));
+        }
+      });
+    }
+  });
+
+  $(document).on('click', '.tile.reboot a', function(e){
+  if(confirm('Are you sure you want to reboot the OS?'))
+  {
+    $.ajax({
+      url:'api/reboot', 
+      type:'POST',
+      data:{'confirm':'yes'},
+      dataType:'json',
+      success:function(data){
+        console.log('DATA : '+JSON.stringify(data));
+      }
+    });
+  }
+})
 });
   
 function loadData()

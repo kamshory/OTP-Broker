@@ -422,6 +422,11 @@ public class Utility {
 	    cal.add(Calendar.DATE, +2);
 	    return cal.getTime();		
 	}
+	public static Date stringToTime(String dateTime, String format) throws ParseException
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+	    return sdf.parse(dateTime);
+	}
 	/**
 	/**
 	 * Convert array byte to string contains hexadecimal number

@@ -1,6 +1,8 @@
 package com.planetbiru;
 
 import java.io.File;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -2168,6 +2170,10 @@ public class ServerWebManager {
 				{
 					this.processGeneralSetting(requestBody);
 				}
+				if(path.equals("/date-time-setting.html"))
+				{
+					this.processDateTimeSetting(requestBody);
+				}
 				if(path.equals("/cloudflare.html"))
 				{
 					this.processCloudflareSetting(requestBody);
@@ -2404,6 +2410,36 @@ public class ServerWebManager {
 			
 			ConfigSMS.save();
 		}	
+	}
+
+	private void processDateTimeSetting(String requestBody) {
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("save_date_time_setting"))
+		{
+			ConfigGeneral.load(Config.getGeneralSettingPath());
+			
+			String deviceTime = queryPairs.getOrDefault("device_time", "").trim();
+			String deviceTimeZone = queryPairs.getOrDefault("device_time_zone", "").trim();
+			String ntpServer = queryPairs.getOrDefault("ntp_server", "").trim();
+			String ntpUpdateInterval = queryPairs.getOrDefault("ntp_update_interval", "").trim();
+			
+			ConfigGeneral.setDeviceTimeZone(deviceTimeZone);
+			ConfigGeneral.setNtpServer(ntpServer);
+			ConfigGeneral.setNtpUpdateInterval(ntpUpdateInterval);
+
+			ConfigGeneral.save();
+			DeviceAPI.setTimeZone(deviceTimeZone);
+			try 
+			{
+				Date date = Utility.stringToTime(deviceTime, "yyyy-MM-dd HH:mm:ss");
+				DeviceAPI.setHardwareClock(date);
+			} 
+			catch (ParseException e) {
+				/**
+				 * Do nothing
+				 */
+			}
+		}
 	}
 
 	private void processGeneralSetting(String requestBody) {
