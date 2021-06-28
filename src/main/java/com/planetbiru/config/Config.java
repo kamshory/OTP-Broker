@@ -1,6 +1,7 @@
 package com.planetbiru.config;
 
 public class Config {
+	private static String generalSettingPath = "";
 	private static String otpSalt = "IJUjhrfytR^&r7jkjojO";
 	private static String secretKey = "planetsecret";
 	private static String apiUsername = "planet";
@@ -650,6 +651,14 @@ public class Config {
 
 	public static void setCpuSecret(String cpuSecret) {
 		Config.cpuSecret = cpuSecret;
+	}
+
+	public static String getGeneralSettingPath() {
+		return generalSettingPath;
+	}
+
+	public static void setGeneralSettingPath(String generalSettingPath) {
+		Config.generalSettingPath = generalSettingPath;
 	}
 	
 }

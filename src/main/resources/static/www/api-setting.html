@@ -53,6 +53,7 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                 <ul class="dropdown-menu">
+                  <li class=""><a href="general-setting.html">General Setting</a></li>
                   <li class=""><a href="admin.html">Administrator Setting</a></li>
                   <li class="active"><a href="api-setting.html">API Setting</a></li>
                   <li class=""><a href="api-user.html">API User</a></li>
@@ -138,7 +139,6 @@
                     url:"api-setting/get",
                     dataType:"json",
                     success:function(data){
-                      console.log(data)
                         $('input[name="http_port"]').val(data.httpPort);
                         $('input[name="https_port"]').val(data.httpsPort);
                         

@@ -320,28 +320,28 @@ button span.number{
     padding: 2px 0;
 }
 
-.two-cols-responsive{
+.config-table config-table-connection{
   table-layout: fixed;
   width: 100%;
 }
 @media screen and (max-width: 320px){
-  .two-cols-responsive tr td{
+  .config-table config-table-connection tr td{
     display: block;
     width: 100%;
     padding: 2px 0;
   }
-  .two-cols-responsive tr td:nth-child(1){
+  .config-table config-table-connection tr td:nth-child(1){
     font-weight: bold;
   }
-  .two-cols-responsive tr td:nth-child(1):empty{
+  .config-table config-table-connection tr td:nth-child(1):empty{
     display: none;
   }
 }
 @media screen and (min-width: 320px){
-  .two-cols-responsive tr td{
+  .config-table config-table-connection tr td{
     padding: 2px 0;
   }
-  .two-cols-responsive tr td:nth-child(1){
+  .config-table config-table-connection tr td:nth-child(1){
     width: 35%;
     max-width: 200px;
   }

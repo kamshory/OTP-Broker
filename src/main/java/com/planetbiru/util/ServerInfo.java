@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.jcraft.jsch.JSchException;
 import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigModem;
@@ -91,7 +90,7 @@ public class ServerInfo {
 		String result =   "              total        used        free      shared  buff/cache   available\r\n"
 						+ "Mem:        1877280      674068      211560       98540      991652      926216\r\n"
 						+ "Swap:       4194300      166400     4027900";
-		
+		/**
 		String command = "free";
 		int sleep = 10;
 		try 
@@ -100,10 +99,9 @@ public class ServerInfo {
 		} 
 		catch (JSchException e) 
 		{
-			/**
-			 * Do nothing
-			 */
+			
 		}
+		*/
 		
 		result = fixingRawData(result);
 
@@ -216,7 +214,7 @@ public class ServerInfo {
 						+ "tmpfs             938640        0    938640   0% /sys/fs/cgroup\r\n"
 						+ "/dev/vda1       41931756 24046252  17885504  58% /\r\n"
 						+ "tmpfs             187728        0    187728   0% /run/user/0";
-		
+		/**
 		String command = "df -h";
 		int sleep = 10;
 		try 
@@ -225,10 +223,9 @@ public class ServerInfo {
 		} 
 		catch (JSchException e) 
 		{
-			/**
-			 * Do nothing
-			 */
+			
 		}
+		*/
 
 
 		result = fixingRawData(result);	
@@ -273,6 +270,7 @@ public class ServerInfo {
 						+ "Core 2:       +48.0°C  (high = +98.0°C, crit = +98.0°C)\r\n"
 						+ "Core 3:       +47.0°C  (high = +98.0°C, crit = +98.0°C)";
 		
+		/**
 		String command = "sensors";
 		int sleep = 10;
 		try 
@@ -281,10 +279,9 @@ public class ServerInfo {
 		} 
 		catch (JSchException e) 
 		{
-			/**
-			 * Do nothing
-			 */
+			
 		}
+		*/
 
 		
 		result = result.replace("°", "&deg;");
@@ -308,6 +305,7 @@ public class ServerInfo {
 						+ "07:08:48 PM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle\r\n"
 						+ "07:08:48 PM  all   44.34    0.00    1.09    0.03    0.00    0.08    0.07    0.00    0.00   54.39";
 
+		/**
 		String command = "mpstat | grep all";
 		int sleep = 10;
 		try 
@@ -316,10 +314,9 @@ public class ServerInfo {
 		} 
 		catch (JSchException e) 
 		{
-			/**
-			 * Do nothing
-			 */
+			
 		}
+		*/
 
 		result = fixingRawData(result);
 		result = result.replace("\r\n\r\n", "\r\n");
@@ -448,9 +445,7 @@ public class ServerInfo {
 		}
 		return core;
 	}
-
 }
-
 
 
 
