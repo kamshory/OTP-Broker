@@ -47,8 +47,6 @@ import com.planetbiru.util.Utility;
 @Component
 public class ServerScheduler {
 
-	private static final String SERVER_NAME = "pool.ntp.org";
-
 	private Logger logger = LogManager.getLogger(ServerScheduler.class);
 	
 	@Value("${otpbroker.path.base.setting}")
@@ -143,7 +141,8 @@ public class ServerScheduler {
 	public void updateTime()
 	{
 		String cronExpression = ConfigGeneral.getNtpUpdateInterval();		
-		if(!cronExpression.isEmpty())
+		String ntpServer = ConfigGeneral.getNtpServer();		
+		if(!cronExpression.isEmpty() && !ntpServer.isEmpty())
 		{
 			CronExpression exp;		
 			try
@@ -166,7 +165,7 @@ public class ServerScheduler {
 				    InetAddress inetAddress;
 					try 
 					{
-						inetAddress = InetAddress.getByName(SERVER_NAME);
+						inetAddress = InetAddress.getByName(ntpServer);
 					    TimeInfo timeInfo = client.getTime(inetAddress);
 					    timeInfo.computeDetails();
 					    Long offset = Long.getLong("0");
