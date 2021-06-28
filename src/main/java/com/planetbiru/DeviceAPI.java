@@ -59,10 +59,9 @@ public class DeviceAPI {
 	     */
 	    client.setDefaultTimeout(10000);
 
-	    InetAddress inetAddress;
 		try 
 		{
-			inetAddress = InetAddress.getByName(ntpServer);
+			InetAddress inetAddress = InetAddress.getByName(ntpServer);
 		    TimeInfo timeInfo = client.getTime(inetAddress);
 		    timeInfo.computeDetails();
 		    Long offset = Long.getLong("0");
@@ -111,7 +110,7 @@ public class DeviceAPI {
 		DeviceAPI.exec(command3);		
 	}
 	
-	public static void updateHWClock(Date date)
+	public static void setHardwareClock(Date date)
 	{
 		String command = "hwclock --set --date \""+Utility.date("MM/dd/yyyy HH:mm:ss", date)+"\"";
 		DeviceAPI.exec(command);

@@ -647,3 +647,99 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
 .select-device{
   padding-bottom: 10px;
 }
+
+.tile-area{
+  padding-bottom: 10px;
+}
+.tile{
+    display: inline-block;
+    margin-bottom: 10px;
+    margin-right: 6px;
+}
+.tile-wrapper{
+    width: 96px;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    padding-top: 5px;
+    position: relative;
+    overflow: hidden;
+    background-color: #FFFFFF;
+}
+.tile-icon{
+    width: 64px;
+    height: 64px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    display: block;
+    margin: auto;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.setting .tile-icon{
+  background-image: url(../images/icon/setting.png);
+}
+.network .tile-icon{
+  background-image: url(../images/icon/network.png);
+}
+.reboot .tile-icon{
+  background-image: url(../images/icon/reboot.png);
+}
+.restart .tile-icon{
+  background-image: url(../images/icon/reboot.png);
+}
+.admin .tile-icon{
+  background-image: url(../images/icon/admin.png);
+}
+.api-user .tile-icon{
+  background-image: url(../images/icon/user.png);
+}
+.sms-setting .tile-icon{
+  background-image: url(../images/icon/sms.png);
+}
+.feeder .tile-icon{
+  background-image: url(../images/icon/sms.png);
+}
+.api .tile-icon{
+  background-image: url(../images/icon/sms.png);
+}
+.modem .tile-icon{
+  background-image: url(../images/icon/modem.png);
+}
+.block-list .tile-icon{
+  background-image: url(../images/icon/block-list.png);
+}
+.time .tile-icon{
+  background-image: url(../images/icon/time.png);
+}
+.log-file .tile-icon{
+  background-image: url(../images/icon/log-file.png);
+}
+.server-status .tile-icon{
+  background-image: url(../images/icon/server-status.png);
+}
+.cleaner .tile-icon{
+  background-image: url(../images/icon/brush.png);
+}
+.tile-icon > a{
+    width: 60px;
+    height: 60px;
+    display: block;
+    color: #555555;
+    text-decoration: none;
+}
+.tile-title{
+    text-align: center;
+    width: 80px;
+    margin: auto;
+    padding: 4px 0;
+    font-size: 11px;
+}
+.tile-title a{
+    color: #555555;
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
