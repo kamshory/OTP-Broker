@@ -114,18 +114,19 @@ public class SMSUtil {
 		}
 		int index = SMSUtil.getModemIndex();	
 		
+		SMSInstance instance = SMSUtil.smsInstance.get(index);
+
+		
+		instance.sendSMS(receiver, message);
+
 		/**
 		 * Begin
 		 */
-		SMSInstance instance = SMSUtil.smsInstance.get(index);
 		DataModem modemData = ConfigModem.getModemData(instance.getId());        
 		SMSUtil.sendTraffic(receiver, ste, modemData);
         /**
          * End
          */
-
-		
-		instance.sendSMS(receiver, message);
 		
 	}
 	private static void sendTraffic(String receiver, StackTraceElement ste)
