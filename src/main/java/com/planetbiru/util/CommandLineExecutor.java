@@ -18,7 +18,7 @@ public class CommandLineExecutor {
 		
 	}
 
-	public static CommandLineResult run(String command)
+	public static CommandLineResult exec(String command)
 	{	
 		CommandLineResult result = new CommandLineResult();
 		String line;
@@ -43,7 +43,7 @@ public class CommandLineExecutor {
         return result;
 	}
 	
-	public static CommandLineResult run(String[] command)
+	public static CommandLineResult exec(String[] command)
 	{	
 		CommandLineResult result = new CommandLineResult();
 		String line;
@@ -86,7 +86,6 @@ public class CommandLineExecutor {
 	{
 		Session session = null;
 		ChannelExec channel = null;
-
 		String responseString = "";
 		try 
 		{

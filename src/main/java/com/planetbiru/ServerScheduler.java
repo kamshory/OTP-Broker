@@ -1,7 +1,5 @@
 package com.planetbiru;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
@@ -9,9 +7,6 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.net.ntp.NTPUDPClient;
-import org.apache.commons.net.ntp.TimeInfo;
-import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.CronExpression;
@@ -46,7 +41,7 @@ import com.planetbiru.util.Utility;
 @EnableScheduling
 @Component
 public class ServerScheduler {
-
+	
 	private Logger logger = LogManager.getLogger(ServerScheduler.class);
 	
 	@Value("${otpbroker.path.base.setting}")
@@ -149,52 +144,12 @@ public class ServerScheduler {
 			{
 				exp = new CronExpression(cronExpression);
 				Date currentTime = new Date();
-				Date prevFireTime = exp.getPrevFireTime(currentTime);
 				Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
 	
-				String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
-				String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
-				String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
-				
 				if(currentTime.getTime() > ConfigGeneral.getNextValid().getTime())
 				{
-					NTPUDPClient client = new NTPUDPClient();
-				    // We want to timeout if a response takes longer than 10 seconds
-				    client.setDefaultTimeout(10000);
-			
-				    InetAddress inetAddress;
-					try 
-					{
-						inetAddress = InetAddress.getByName(ntpServer);
-					    TimeInfo timeInfo = client.getTime(inetAddress);
-					    timeInfo.computeDetails();
-					    Long offset = Long.getLong("0");
-						if (timeInfo.getOffset() != null) 
-					    {
-					        offset  = timeInfo.getOffset();
-					    }
-			
-					    // Calculate the remote server NTP time
-					    long currentTimeMils = System.currentTimeMillis();
-					    TimeStamp atomicNtpTime = TimeStamp.getNtpTime(currentTimeMils + offset);
-			
-					    Date date = new Date(atomicNtpTime.getTime());
-					    System.out.println("LOCAL DATE : "+Utility.date("yyyy-MM-dd HH:mm:ss.SSS", new Date()));
-					    System.out.println("NTP DATE   : "+Utility.date("yyyy-MM-dd HH:mm:ss.SSS", date));
-					
-					    /**
-					     * URL : https://www.thegeekstuff.com/2013/08/hwclock-examples/
-					     */
-					    String command = "hwclock --set --date \""+Utility.date("MM/dd/yyyy HH:mm:ss", date)+"\"";
-					    System.out.println("COMMAND : "+command);
-					    ConfigGeneral.setNextValid(nextValidTimeAfter);
-					} 
-					catch (IOException e) 
-					{
-						/**
-						 * 
-						 */
-					}
+					DeviceAPI.syncTime(ntpServer);
+				    ConfigGeneral.setNextValid(nextValidTimeAfter);
 				}
 			}
 			catch(ExpressionException | ParseException | JSONException e)
