@@ -7,12 +7,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import com.jcraft.jsch.JSchException;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
-import com.planetbiru.util.CommandLineExecutor;
 
 @SpringBootApplication
 @EnableAutoConfiguration
@@ -139,36 +137,6 @@ public class Application {
 	
 	private static boolean usbPluged() {
 		return false;
-	}
-
-	public static void reboot() 
-	{
-		if(Config.isSshEnable())
-		{
-			try 
-			{
-				CommandLineExecutor.execSSH(
-						Config.getRebootCommand(), 
-						Config.getSshSleep(),
-						Config.getSshHost(), 
-						Config.getSshPort(), 
-						Config.getSshUsername(), 
-						Config.getSshPassword() 
-						);
-			} 
-			catch (JSchException e) 
-			{
-				String[] command = new String[1];
-				command[0] = Config.getRebootCommand();
-				CommandLineExecutor.run(command);
-			}
-		}
-		else
-		{
-			String[] command = new String[1];
-			command[0] = Config.getRebootCommand();
-			CommandLineExecutor.run(command);
-		}
 	}
 	
 }

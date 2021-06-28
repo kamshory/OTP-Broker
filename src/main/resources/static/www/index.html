@@ -87,6 +87,246 @@
  
       <div class="phone-page">
 
+        <style>
+          .tile-area{
+            padding-bottom: 10px;
+          }
+          .tile{
+              display: inline-block;
+              margin-bottom: 10px;
+              margin-right: 6px;
+          }
+          .tile-wrapper{
+              width: 96px;
+              border: 1px solid #DDDDDD;
+              border-radius: 4px;
+              padding-top: 5px;
+              position: relative;
+              overflow: hidden;
+              background-color: #FFFFFF;
+          }
+          .tile-icon{
+              width: 64px;
+              height: 64px;
+              box-sizing: border-box;
+              border-radius: 5px;
+              display: block;
+              margin: auto;
+              background-size: contain;
+              background-position: center;
+              background-repeat: no-repeat;
+          }
+          .setting .tile-icon{
+            background-image: url(lib.assets/images/icon/setting.png);
+          }
+          .network .tile-icon{
+            background-image: url(lib.assets/images/icon/network.png);
+          }
+          .reboot .tile-icon{
+            background-image: url(lib.assets/images/icon/reboot.png);
+          }
+          .restart .tile-icon{
+            background-image: url(lib.assets/images/icon/reboot.png);
+          }
+          .admin .tile-icon{
+            background-image: url(lib.assets/images/icon/admin.png);
+          }
+          .api-user .tile-icon{
+            background-image: url(lib.assets/images/icon/user.png);
+          }
+          .sms-setting .tile-icon{
+            background-image: url(lib.assets/images/icon/sms.png);
+          }
+          .feeder .tile-icon{
+            background-image: url(lib.assets/images/icon/sms.png);
+          }
+          .api .tile-icon{
+            background-image: url(lib.assets/images/icon/sms.png);
+          }
+          .modem .tile-icon{
+            background-image: url(lib.assets/images/icon/modem.png);
+          }
+          .block-list .tile-icon{
+            background-image: url(lib.assets/images/icon/block-list.png);
+          }
+          .time .tile-icon{
+            background-image: url(lib.assets/images/icon/time.png);
+          }
+          .log-file .tile-icon{
+            background-image: url(lib.assets/images/icon/log-file.png);
+          }
+          .server-status .tile-icon{
+            background-image: url(lib.assets/images/icon/server-status.png);
+          }
+          .cleaner .tile-icon{
+            background-image: url(lib.assets/images/icon/brush.png);
+          }
+          .tile-icon > a{
+              width: 60px;
+              height: 60px;
+              display: block;
+              color: #555555;
+              text-decoration: none;
+          }
+          .tile-title{
+              text-align: center;
+              width: 80px;
+              margin: auto;
+              padding: 4px 0;
+              font-size: 11px;
+          }
+          .tile-title a{
+              color: #555555;
+              text-decoration: none;
+              display: block;
+              white-space: nowrap;
+              overflow-x: hidden;
+              text-overflow: ellipsis;
+          }
+      </style>
+
+        <div class="tile-area">
+          <div class="tile setting">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="general-setting.html"></a></div>
+            <div class="tile-title"><a href="general-setting.html">General Setting</a></div>
+          </div>
+          </div>
+          <div class="tile time">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="general-setting.html"></a></div>
+            <div class="tile-title"><a href="general-setting.html">Time Setting</a></div>
+          </div>
+          </div>
+          <div class="tile network">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="network-setting.html"></a></div>
+            <div class="tile-title"><a href="network-setting.html">Network Setting</a></div>
+          </div>
+          </div>
+          <div class="tile admin">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="admin.html"></a></div>
+            <div class="tile-title"><a href="admin.html">Admin Setting</a></div>
+          </div>
+          </div>
+          <div class="tile sms-setting">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="sms-setting.html"></a></div>
+            <div class="tile-title"><a href="sms-setting.html">SMS Setting</a></div>
+          </div>
+          </div>
+          <div class="tile feeder">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="feeder-setting.html"></a></div>
+            <div class="tile-title"><a href="feeder-setting.html">Feeder Setting</a></div>
+          </div>
+          </div>
+          <div class="tile api">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="api-setting.html"></a></div>
+            <div class="tile-title"><a href="api-setting.html">API Setting</a></div>
+          </div>
+          </div>
+          <div class="tile api-user">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="api-user.html"></a></div>
+            <div class="tile-title"><a href="api-user.html">API User</a></div>
+          </div>
+          </div>
+          <div class="tile block-list">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="block-list.html"></a></div>
+            <div class="tile-title"><a href="block-list.html">Block List</a></div>
+          </div>
+          </div>
+          <div class="tile modem">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="modem.html"></a></div>
+            <div class="tile-title"><a href="modem.html">Modem Setting</a></div>
+          </div>
+          </div>
+          <div class="tile server-status">
+            <div class="tile-wrapper">
+              <div class="tile-icon"><a href="server-status.html"></a></div>
+              <div class="tile-title"><a href="server-status.html">Server Status</a></div>
+            </div>
+          </div>
+          <div class="tile log-file">
+            <div class="tile-wrapper">
+              <div class="tile-icon"><a href="logs.html"></a></div>
+              <div class="tile-title"><a href="logs.html">Log File</a></div>
+            </div>
+          </div>
+          <div class="tile cleaner">
+            <div class="tile-wrapper">
+              <div class="tile-icon"><a href="javascript:;"></a></div>
+              <div class="tile-title"><a href="javascript:;">Clean Up</a></div>
+            </div>
+          </div>
+          <div class="tile restart">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="javascript:;"></a></div>
+            <div class="tile-title"><a href="javascript:;">Restart Service</a></div>
+          </div>
+          </div>
+          <div class="tile reboot">
+          <div class="tile-wrapper">
+            <div class="tile-icon"><a href="javascript:;"></a></div>
+            <div class="tile-title"><a href="javascript:;">Reboot OS</a></div>
+          </div>
+          </div>         
+        </div>
+
+        <script>
+          $(document).ready(function(){
+              $(document).on('click', '.tile.restart a', function(e){
+                if(confirm('Are you sure you want to restart the service?'))
+                {
+                $.ajax({
+                  url:'api/restart', 
+                  type:'POST',
+                  data:{'confirm':'yes'},
+                  dataType:'json',
+                  success:function(data){
+                    console.log('DATA : '+JSON.stringify(data));
+                  }
+                });
+              }
+              });
+
+              $(document).on('click', '.tile.cleaner a', function(e){
+                if(confirm('Are you sure you want to clean up the service?'))
+                {
+                $.ajax({
+                  url:'api/cleanup', 
+                  type:'POST',
+                  data:{'confirm':'yes'},
+                  dataType:'json',
+                  success:function(data){
+                    console.log('DATA : '+JSON.stringify(data));
+                  }
+                });
+              }
+              });
+ 
+              $(document).on('click', '.tile.reboot a', function(e){
+              if(confirm('Are you sure you want to reboot the OS?'))
+              {
+                $.ajax({
+                  url:'api/reboot', 
+                  type:'POST',
+                  data:{'confirm':'yes'},
+                  dataType:'json',
+                  success:function(data){
+                    console.log('DATA : '+JSON.stringify(data));
+                  }
+                });
+              }
+            })
+          });
+        </script>
+
         <div class="status-connection">
           <div class="service-wrapper">  
             <div class="service-item service-modem">
@@ -163,8 +403,6 @@
           </div>
         </div>
 
-        <div><a href="server-status.html">Server Status</a></div>
-        <div><a href="logs.html">Log Files</a></div>
         <script src="lib.assets/js/server-info.js"></script>
       </div>
     </div>

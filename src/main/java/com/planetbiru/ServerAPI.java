@@ -131,6 +131,9 @@ public class ServerAPI {
 	@Value("${otpbroker.path.setting.sms}")
 	private String smsSettingPath;
 
+	@Value("${otpbroker.ssh.restart.command}")
+	private String restartCommand;
+
 
 	@PostConstruct
 	public void init()
@@ -155,6 +158,7 @@ public class ServerAPI {
 		Config.setDefaultStarttlsEnable(defaultStarttlsEnable);
 		Config.setKeystoreDataSettingPath(keystoreDataSettingPath);
 		Config.setKeystoreSettingPath(keystoreSettingPath);
+		Config.setRestartCommand(restartCommand);
 
 		
 		this.loadConfigAPI();

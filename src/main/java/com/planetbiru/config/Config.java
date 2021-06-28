@@ -78,7 +78,9 @@ public class Config {
 	private static String rebootCommand = "";
 	private static String mimeSettingPath = "";
 	private static String cpuSecret = "83246832yr982fi2hfoi2h3f23yf9823yr98y";
-	private static boolean validDevice = false; 
+	private static boolean validDevice = false;
+	private static String restartCommand = "";
+	private static String cleanupCommand = ""; 
 	
 	private Config()
 	{
@@ -659,6 +661,22 @@ public class Config {
 
 	public static void setGeneralSettingPath(String generalSettingPath) {
 		Config.generalSettingPath = generalSettingPath;
+	}
+
+	public static String getRestartCommand() {
+		return restartCommand;
+	}
+
+	public static void setRestartCommand(String restartCommand) {
+		Config.restartCommand = restartCommand;
+	}
+
+	public static String getCleanupCommand() {
+		return cleanupCommand;
+	}
+
+	public static void setCleanupCommand(String cleanupCommand) {
+		Config.cleanupCommand = cleanupCommand;
 	}
 	
 }

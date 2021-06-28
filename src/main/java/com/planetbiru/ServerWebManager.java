@@ -47,6 +47,7 @@ import com.planetbiru.config.GeneralConfig;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
+import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
@@ -129,13 +130,19 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.blocking}")
 	private String blockingSettingPath;	
 	
-	
+	@Value("${otpbroker.ssh.restart.command}")
+	private String restartCommand;
+
+	@Value("${otpbroker.ssh.cleanup.command}")
+	private String cleanupCommand;
+
 	@Value("${otpbroker.log.dir}")
 	private String logDir;	
 	
 	
 	@Value("${otpbroker.server.hmac}")
 	private String hmac;
+	
 	
 	
 	private ServerWebManager()
@@ -174,7 +181,9 @@ public class ServerWebManager {
 		Config.setDynuSettingPath(dynuSettingPath);
 		Config.setAfraidSettingPath(afraidSettingPath);
 		Config.setGeneralSettingPath(generalSettingPath);
-
+		
+		Config.setRestartCommand(restartCommand);
+		Config.setCleanupCommand(cleanupCommand);
 		
 		Config.setMimeSettingPath(mimeSettingPath);
 		
@@ -411,7 +420,7 @@ public class ServerWebManager {
 		String userID = queryPairs.getOrDefault("userid", "");		
 		return this.sendTokenResetPassword(userID);
 	}
-	
+
 	@GetMapping(path="/send-token")
 	public ResponseEntity<byte[]> sendTokenResetPassword2(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{	
@@ -498,16 +507,42 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	@GetMapping(path="/restart")
-	public ResponseEntity<byte[]> restart(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	@PostMapping(path="/api/reboot")
+	public ResponseEntity<byte[]> reboot(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		byte[] responseBody = "".getBytes();
+		JSONObject jo = new JSONObject();
+		jo.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
+		byte[] responseBody = jo.toString().getBytes();
 		HttpStatus statusCode = HttpStatus.OK;
-		Application.reboot();
-		
+		DeviceAPI.reboot();		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
-	}	
+	}
+	
+	@PostMapping(path="/api/restart")
+	public ResponseEntity<byte[]> restart(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		JSONObject jo = new JSONObject();
+		jo.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
+		byte[] responseBody = jo.toString().getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		DeviceAPI.restart();		
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@PostMapping(path="/api/cleanup")
+	public ResponseEntity<byte[]> cleanup(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		JSONObject jo = new JSONObject();
+		jo.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
+		byte[] responseBody = jo.toString().getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		DeviceAPI.cleanup();		
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
 	
 	public void broardcastWebSocket(String message)
 	{
@@ -2388,6 +2423,7 @@ public class ServerWebManager {
 			ConfigGeneral.setNtpUpdateInterval(ntpUpdateInterval);
 
 			ConfigGeneral.save();
+			DeviceAPI.setTimeZone(deviceTimeZone);
 		}
 	}
 
