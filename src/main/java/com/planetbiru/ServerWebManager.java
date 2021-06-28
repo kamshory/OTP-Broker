@@ -35,6 +35,7 @@ import com.planetbiru.config.ConfigVendorDynu;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.ConfigGeneral;
 import com.planetbiru.config.ConfigKeystore;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigNetDHCP;
@@ -118,7 +119,10 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.path.setting.modem}")
 	private String modemSettingPath;
-	
+
+	@Value("${otpbroker.path.setting.general}")
+	private String generalSettingPath;
+
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
 	
@@ -169,6 +173,8 @@ public class ServerWebManager {
 		Config.setNoIPSettingPath(noIPSettingPath);
 		Config.setDynuSettingPath(dynuSettingPath);
 		Config.setAfraidSettingPath(afraidSettingPath);
+		Config.setGeneralSettingPath(generalSettingPath);
+
 		
 		Config.setMimeSettingPath(mimeSettingPath);
 		
@@ -177,6 +183,7 @@ public class ServerWebManager {
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 		ConfigVendorCloudflare.load(Config.getCloudflareSettingPath());
 		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
+		ConfigGeneral.load(Config.getGeneralSettingPath());
 		ConfigAPI.load(Config.getApiSettingPath());
 
 		Config.setPortName(portName);		
@@ -625,6 +632,38 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	@GetMapping(path="/gereral-setting/get")
+	public ResponseEntity<byte[]> handleGeneralSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				String list = ConfigGeneral.toJSONObject().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+
 	@GetMapping(path="/feeder-ws-setting/get")
 	public ResponseEntity<byte[]> handleFeederWSSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -2090,6 +2129,10 @@ public class ServerWebManager {
 				{
 					this.processAPISetting(requestBody);
 				}
+				if(path.equals("/general-setting.html"))
+				{
+					this.processGeneralSetting(requestBody);
+				}
 				if(path.equals("/cloudflare.html"))
 				{
 					this.processCloudflareSetting(requestBody);
@@ -2326,6 +2369,26 @@ public class ServerWebManager {
 			
 			ConfigSMS.save();
 		}	
+	}
+
+	private void processGeneralSetting(String requestBody) {
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("save_general_setting"))
+		{
+			ConfigGeneral.load(Config.getGeneralSettingPath());
+			
+			String deviceName2 = queryPairs.getOrDefault("device_name", "").trim();
+			String deviceTimeZone = queryPairs.getOrDefault("device_time_zone", "").trim();
+			String ntpServer = queryPairs.getOrDefault("ntp_server", "").trim();
+			String ntpUpdateInterval = queryPairs.getOrDefault("ntp_update_interval", "").trim();
+			
+			ConfigGeneral.setDeviceName(deviceName2);
+			ConfigGeneral.setDeviceTimeZone(deviceTimeZone);
+			ConfigGeneral.setNtpServer(ntpServer);
+			ConfigGeneral.setNtpUpdateInterval(ntpUpdateInterval);
+
+			ConfigGeneral.save();
+		}
 	}
 
 	private void processAPISetting(String requestBody) {

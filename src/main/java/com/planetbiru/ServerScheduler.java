@@ -1,5 +1,7 @@
 package com.planetbiru;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
@@ -7,6 +9,9 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.net.ntp.NTPUDPClient;
+import org.apache.commons.net.ntp.TimeInfo;
+import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.CronExpression;
@@ -26,6 +31,7 @@ import com.planetbiru.config.ConfigDDNS;
 import com.planetbiru.config.ConfigVendorDynu;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.ConfigGeneral;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigVendorNoIP;
 import com.planetbiru.constant.ConstantString;
@@ -41,6 +47,8 @@ import com.planetbiru.util.Utility;
 @Component
 public class ServerScheduler {
 
+	private static final String SERVER_NAME = "pool.ntp.org";
+
 	private Logger logger = LogManager.getLogger(ServerScheduler.class);
 	
 	@Value("${otpbroker.path.base.setting}")
@@ -48,6 +56,9 @@ public class ServerScheduler {
 	
 	@Value("${otpbroker.cron.enable.ddns}")
 	private boolean ddnsUpdate;
+	
+	@Value("${otpbroker.cron.enable.ntp}")
+	private boolean timeUpdate;
 
 	@Value("${otpbroker.cron.enable.device}")
 	private boolean cronDeviceEnable;
@@ -76,6 +87,9 @@ public class ServerScheduler {
 	@Value("${otpbroker.path.setting.server.status}")
 	private String serverStatusSettingPath;
 
+	@Value("${otpbroker.path.setting.general}")
+	private String generalSettingPath;
+
 	@PostConstruct
 	public void init()
 	{
@@ -90,6 +104,7 @@ public class ServerScheduler {
 		Config.setNoIPSettingPath(noIPSettingPath);
 		Config.setDynuSettingPath(dynuSettingPath);
 		Config.setAfraidSettingPath(afraidSettingPath);	
+		Config.setGeneralSettingPath(generalSettingPath);
 		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 
@@ -97,6 +112,7 @@ public class ServerScheduler {
 		ConfigVendorNoIP.load(Config.getNoIPSettingPath());
 		ConfigVendorDynu.load(Config.getDynuSettingPath());
 		ConfigVendorAfraid.load(Config.getAfraidSettingPath());		
+		ConfigGeneral.load(Config.getGeneralSettingPath());
 		
 		ServerStatus.load(serverStatusSettingPath);
 	}
@@ -121,6 +137,72 @@ public class ServerScheduler {
 
 		ServerStatus.append(data);
 		ServerStatus.save();
+	}
+	
+	
+	public void updateTime()
+	{
+		String cronExpression = ConfigGeneral.getNtpUpdateInterval();		
+		if(!cronExpression.isEmpty())
+		{
+			CronExpression exp;		
+			try
+			{
+				exp = new CronExpression(cronExpression);
+				Date currentTime = new Date();
+				Date prevFireTime = exp.getPrevFireTime(currentTime);
+				Date nextValidTimeAfter = exp.getNextValidTimeAfter(currentTime);
+	
+				String prevFireTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, prevFireTime);
+				String currentTimeStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, currentTime);
+				String nextValidTimeAfterStr = Utility.date(ConstantString.MYSQL_DATE_TIME_FORMAT_MS, nextValidTimeAfter);
+				
+				if(currentTime.getTime() > ConfigGeneral.getNextValid().getTime())
+				{
+					NTPUDPClient client = new NTPUDPClient();
+				    // We want to timeout if a response takes longer than 10 seconds
+				    client.setDefaultTimeout(10000);
+			
+				    InetAddress inetAddress;
+					try 
+					{
+						inetAddress = InetAddress.getByName(SERVER_NAME);
+					    TimeInfo timeInfo = client.getTime(inetAddress);
+					    timeInfo.computeDetails();
+					    Long offset = Long.getLong("0");
+						if (timeInfo.getOffset() != null) 
+					    {
+					        offset  = timeInfo.getOffset();
+					    }
+			
+					    // Calculate the remote server NTP time
+					    long currentTimeMils = System.currentTimeMillis();
+					    TimeStamp atomicNtpTime = TimeStamp.getNtpTime(currentTimeMils + offset);
+			
+					    Date date = new Date(atomicNtpTime.getTime());
+					    System.out.println("LOCAL DATE : "+Utility.date("yyyy-MM-dd HH:mm:ss.SSS", new Date()));
+					    System.out.println("NTP DATE   : "+Utility.date("yyyy-MM-dd HH:mm:ss.SSS", date));
+					
+					    /**
+					     * URL : https://www.thegeekstuff.com/2013/08/hwclock-examples/
+					     */
+					    String command = "hwclock --set --date \""+Utility.date("MM/dd/yyyy HH:mm:ss", date)+"\"";
+					    System.out.println("COMMAND : "+command);
+					    ConfigGeneral.setNextValid(nextValidTimeAfter);
+					} 
+					catch (IOException e) 
+					{
+						/**
+						 * 
+						 */
+					}
+				}
+			}
+			catch(ExpressionException | ParseException | JSONException e)
+			{
+				logger.error(e.getMessage());
+			}
+		}
 	}
 	
 	@Scheduled(cron = "${otpbroker.cron.expression.device}")
@@ -162,31 +244,40 @@ public class ServerScheduler {
 		ServerInfo.sendAMQPStatus(ConfigFeederAMQP.isConnected());
 	}
 	
-	@Scheduled(cron = "${otpbroker.cron.expression.ddns}")
-	public void updateDNS() 
-	{		
+	@Scheduled(cron = "${otpbroker.cron.expression.general}")
+	public void generalCronChecker() 
+	{
+		if(timeUpdate)
+		{
+			updateTime();
+		}		
 		if(ddnsUpdate)
 		{
-			int countUpdate = 0;	
-			Map<String, DDNSRecord> list = ConfigDDNS.getRecords();
-			for(Entry<String, DDNSRecord> set : list.entrySet())
+			updateDNS();
+		}
+	}
+	
+	private void updateDNS()
+	{
+		int countUpdate = 0;	
+		Map<String, DDNSRecord> list = ConfigDDNS.getRecords();
+		for(Entry<String, DDNSRecord> set : list.entrySet())
+		{
+			String ddnsId = set.getKey();
+			DDNSRecord ddnsRecord = set.getValue();
+			if(ddnsRecord.isActive())
 			{
-				String ddnsId = set.getKey();
-				DDNSRecord ddnsRecord = set.getValue();
-				if(ddnsRecord.isActive())
+				boolean update = updateDNS(ddnsRecord, ddnsId);
+				if(update)
 				{
-					boolean update = updateDNS(ddnsRecord, ddnsId);
-					if(update)
-					{
-						countUpdate++;
-					}
+					countUpdate++;
 				}
 			}
-			if(countUpdate > 0)
-			{
-				ConfigDDNS.save();
-			}	
 		}
+		if(countUpdate > 0)
+		{
+			ConfigDDNS.save();
+		}	
 	}
 
 	private boolean updateDNS(DDNSRecord ddnsRecord, String ddnsId) 
