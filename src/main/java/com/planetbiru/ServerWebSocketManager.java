@@ -1,6 +1,7 @@
 package com.planetbiru;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,9 @@ public class ServerWebSocketManager {
 	
 	private static Set<ServerWebSocketManager> listeners = new CopyOnWriteArraySet<>();
     
-    Random rand = new Random();  
+    private Random rand = new Random();  
+    
+    private String path = "";
     
     @PostConstruct
     public void init()
@@ -111,6 +114,13 @@ public class ServerWebSocketManager {
         Map<String, List<String>> responseHdr = (Map<String, List<String>>) config.getUserProperties().get("response_header");
         Map<String, List<String>> param = (Map<String, List<String>>) config.getUserProperties().get("parameter");       
         
+        List<String> path = param.getOrDefault("path", new ArrayList<>());
+        String pathStr = "";
+		if(!path.isEmpty())
+        {
+        	pathStr = path.get(0);
+        }
+	    this.path = pathStr;         
         this.requestHeader = requestHdr;
         this.responseHeader = responseHdr;
         this.parameter = param;
@@ -133,7 +143,6 @@ public class ServerWebSocketManager {
         	 */
 		}
 	}
-	
 	
     private String createSessionID() {
     	return Utility.sha1(""+System.currentTimeMillis()+rand.nextInt(1000000000));
@@ -177,9 +186,11 @@ public class ServerWebSocketManager {
 		info.put("command", "server-info");
 		info.put("data", data);
 		
-		try {
+		try 
+		{
 			this.sendMessage(info.toString(4));
-		} catch (JSONException | IOException e) {
+		} 
+		catch (JSONException | IOException e) {
 			/**
 			 * Do nothing
 			 */
@@ -231,6 +242,25 @@ public class ServerWebSocketManager {
             try 
             {
             	if(!listener.sessionID.equals(senderID))
+				{
+            		listener.sendMessage(message);
+				}
+			} 
+            catch (IOException e) 
+            {
+            	listeners.remove(listener);
+			}
+        }
+    }
+    
+    
+    public static void broadcast(String message, String senderID, String path) 
+    {
+        for (ServerWebSocketManager listener : listeners) 
+        {
+            try 
+            {
+            	if(!listener.sessionID.equals(senderID) && listener.path.endsWith(path))
 				{
             		listener.sendMessage(message);
 				}

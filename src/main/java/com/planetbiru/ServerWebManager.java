@@ -258,6 +258,7 @@ public class ServerWebManager {
 		String responseBody = responseJSON.toString(4);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
+
 	
 	@PostMapping(path="/api/email**")
 	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)

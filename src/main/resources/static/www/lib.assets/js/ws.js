@@ -1,7 +1,13 @@
 var hostName = location.hostname; 
 var portNumber = location.port;
 var scheme = location.protocol;
-var wsURL = createBaseURL(scheme, hostName, portNumber)+"/websocket/manager";
+var pathname = location.pathname
+if(pathname == "/" || pathname == "")
+{
+    pathname = "/index.html";
+}
+var wsURL = createBaseURL(scheme, hostName, portNumber)+"/websocket/manager?path="+encodeURIComponent(pathname);
+console.log(wsURL);
 var ws = null;
 var wsConnected = false;
 var connetionInterval = setTimeout('', 1000);
@@ -57,6 +63,7 @@ function connectWebSocket()
     };
     
     ws.onmessage = function (evt) { 
+        console.log(evt.data);
         var receivedRaw = evt.data;
         var receivedJSON = JSON.parse(receivedRaw);
         if(receivedJSON.command == "broadcast-message")
