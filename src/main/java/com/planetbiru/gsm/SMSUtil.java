@@ -6,9 +6,12 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
+import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.DataModem;
+import com.planetbiru.constant.JsonKey;
 
 public class SMSUtil {
 	
@@ -83,21 +86,84 @@ public class SMSUtil {
 	}
 	
 	public static void sendSMS(String receiver, String message, String modemID) throws GSMException {
+		StackTraceElement ste = Thread.currentThread().getStackTrace()[2];
 		if(SMSUtil.smsInstance.isEmpty())
 		{
+			SMSUtil.sendTraffic(receiver, ste);
 			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
-		}
+		}		
+		
+		/**
+		 * Begin
+		 */
+		DataModem modemData = ConfigModem.getModemData(modemID);
+		SMSUtil.sendTraffic(receiver, ste, modemData);
+        /**
+         * End
+         */
+		
 		SMSUtil.get(modemID).sendSMS(receiver, message);		
 	}
 	
 	public static void sendSMS(String receiver, String message) throws GSMException {
+		StackTraceElement ste = Thread.currentThread().getStackTrace()[2];      
 		if(SMSUtil.smsInstance.isEmpty())
 		{
+			SMSUtil.sendTraffic(receiver, ste);
 			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 		}
-		int index = SMSUtil.getModemIndex();
-		SMSUtil.smsInstance.get(index).sendSMS(receiver, message);
+		int index = SMSUtil.getModemIndex();	
 		
+		/**
+		 * Begin
+		 */
+		SMSInstance instance = SMSUtil.smsInstance.get(index);
+		DataModem modemData = ConfigModem.getModemData(instance.getId());        
+		SMSUtil.sendTraffic(receiver, ste, modemData);
+        /**
+         * End
+         */
+
+		
+		instance.sendSMS(receiver, message);
+		
+	}
+	private static void sendTraffic(String receiver, StackTraceElement ste)
+	{
+		String callerClass = ste.getClassName();
+        String callerMethod = ste.getMethodName();
+        
+        JSONObject monitor = new JSONObject();
+        JSONObject data = new JSONObject();
+        data.put("callerClass", callerClass);
+        data.put("callerMethod", callerMethod);
+        data.put("receiver", receiver);
+               
+        monitor.put(JsonKey.COMMAND, "sms-traffic");
+        monitor.put(JsonKey.DATA, data);      
+        ServerWebSocketManager.broadcast(monitor.toString(), "", "index.html");
+	}
+	private static void sendTraffic(String receiver, StackTraceElement ste, DataModem modemData)
+	{
+		String modemID = modemData.getId();
+		String modemName = modemData.getName();
+		String modemIMEI = modemData.getImei();
+
+		String callerClass = ste.getClassName();
+        String callerMethod = ste.getMethodName();
+        
+        JSONObject monitor = new JSONObject();
+        JSONObject data = new JSONObject();
+        data.put("modemID", modemID);
+        data.put("modemName", modemName);
+        data.put("modemIMEI", modemIMEI);
+        data.put("callerClass", callerClass);
+        data.put("callerMethod", callerMethod);
+        data.put("receiver", receiver);
+               
+        monitor.put(JsonKey.COMMAND, "sms-traffic");
+        monitor.put(JsonKey.DATA, data);      
+        ServerWebSocketManager.broadcast(monitor.toString(), "", "index.html");
 	}
 	public static String executeUSSD(String ussd, String modemID) throws GSMException {
 		if(smsInstance.isEmpty())

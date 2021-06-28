@@ -28,6 +28,7 @@ public class ServletAwareConfigurator extends ServerEndpointConfig.Configurator{
         serverEndpointConfig.getUserProperties().put("request_header", requestHeader);
         serverEndpointConfig.getUserProperties().put("response_header", responseHeader);
     }
+	
 
     @SuppressWarnings("unchecked")
 	private static < I, F > F getField(I instance, Class < F > fieldType) {
