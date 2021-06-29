@@ -65,6 +65,14 @@ public class SMSUtil {
 			if(instance.getId().equals(modemID))
 			{
 				instance.connect(modem.getConnectionType());
+				if(!instance.isClosed())
+				{
+					instance.setConnected(true);
+				}
+				else
+				{
+					instance.setConnected(false);
+				}
 			}
 		}
 		SMSUtil.updateConnectedDevice();
@@ -77,6 +85,7 @@ public class SMSUtil {
 			if(instance.getId().equals(modemID))
 			{
 				instance.disconnect();
+				instance.setConnected(false);
 			}
 		}
 		SMSUtil.updateConnectedDevice();

@@ -301,7 +301,6 @@ public class GSM {
     	this.setReady(false);
     	this.portName = portName;
     	logger.info("INIT port : {}", portName);
-    	System.out.println(portName);
    		setSerialPort(SerialPort.getCommPort(portName));
     	if(this.serialPort.openPort()) 
         {		
