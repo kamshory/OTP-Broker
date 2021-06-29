@@ -217,8 +217,6 @@ public class SMSUtil {
 	
 	public static boolean isConnected(String modemID)
 	{
-		System.out.println("IS CONNECTED "+modemID);
-		System.out.println("SIZE "+SMSUtil.smsInstance.size());
 		for(int i = 0; i < SMSUtil.smsInstance.size(); i++)
 		{
 			if(SMSUtil.smsInstance.get(i).getId().equals(modemID) && SMSUtil.smsInstance.get(i).isConnected())
