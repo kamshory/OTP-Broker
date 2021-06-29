@@ -19,7 +19,7 @@ public class GSM {
     private SerialPort serialPort;
     private String portName = "";
 
-	private boolean closed = true;
+	private boolean connected = false;
 
 	private boolean ready = false;    
     
@@ -99,7 +99,7 @@ public class GSM {
 //                return false;
             // turn off periodic status messages (RSSI status, etc.)
 //            executeAT("AT^CURC=0", 1);
-    		this.closed = false;
+    		this.connected = true;
     		this.setReady(true);
             return true;
         } 
@@ -109,10 +109,7 @@ public class GSM {
         	/**
         	 * Debug
         	 */
-        	this.closed = true;
-        	
-        	
-        	
+        	this.connected = false;
         	logger.info("FAILED....");
             return false;
         }
@@ -406,12 +403,13 @@ public class GSM {
         if(getSerialPort() != null)
         {
         	boolean cls = getSerialPort().closePort();
-        	this.closed = cls;
+        	this.connected = false;
         	return cls;
         }
         else
         {
-        	return true;
+           	this.connected = false;
+            return true;
         }
     }
 
@@ -423,12 +421,12 @@ public class GSM {
 		this.serialPort = serialPort;
 	}
 
-	public boolean isClosed() {
-		return closed;
+	public boolean isConnected() {
+		return connected;
 	}
 
-	public void setClosed(boolean closed) {
-		this.closed = closed;
+	public void setConnected(boolean connected) {
+		this.connected = connected;
 	}
 
 	public boolean isReady() {

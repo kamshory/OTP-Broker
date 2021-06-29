@@ -73,11 +73,11 @@ public class WebSocketEndpoint extends Endpoint {
 		}
 	}
 	
-	private void sendSMS(JSONObject dt) {
-		if(dt != null)
+	private void sendSMS(JSONObject data) {
+		if(data != null)
 		{
-			String receiver = dt.optString("receiver", "");
-			String textMessage = dt.optString("message", "");
+			String receiver = data.optString("receiver", "");
+			String textMessage = data.optString("message", "");
 			try 
 			{
 				this.sendSMS(receiver, textMessage);

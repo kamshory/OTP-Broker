@@ -41,10 +41,6 @@ public class SMSUtil {
 			try 
 			{
 				instance.connect(port);
-				if(!instance.isClosed())
-				{
-					instance.setConnected(true);
-				}
 				SMSUtil.smsInstance.add(instance);
 			} 
 			catch (GSMException e) 
@@ -65,14 +61,6 @@ public class SMSUtil {
 			if(instance.getId().equals(modemID))
 			{
 				instance.connect(modem.getConnectionType());
-				if(!instance.isClosed())
-				{
-					instance.setConnected(true);
-				}
-				else
-				{
-					instance.setConnected(false);
-				}
 			}
 		}
 		SMSUtil.updateConnectedDevice();
@@ -85,7 +73,6 @@ public class SMSUtil {
 			if(instance.getId().equals(modemID))
 			{
 				instance.disconnect();
-				instance.setConnected(false);
 			}
 		}
 		SMSUtil.updateConnectedDevice();

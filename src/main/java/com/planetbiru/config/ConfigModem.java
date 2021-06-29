@@ -41,38 +41,35 @@ public class ConfigModem {
 	
 	public static void load(String path)
 	{
-		if(ConfigModem.modemData.isEmpty())
+		ConfigModem.configPath = path;
+		String dir = Utility.getBaseDir();
+		if(dir.endsWith("/") && path.startsWith("/"))
 		{
-			ConfigModem.configPath = path;
-			String dir = Utility.getBaseDir();
-			if(dir.endsWith("/") && path.startsWith("/"))
+			dir = dir.substring(0, dir.length() - 1);
+		}
+		String fileName = FileConfigUtil.fixFileName(dir + path);
+		ConfigModem.prepareDir(fileName);
+		try 
+		{
+			byte[] data = FileUtil.readResource(fileName);
+			if(data != null)
 			{
-				dir = dir.substring(0, dir.length() - 1);
-			}
-			String fileName = FileConfigUtil.fixFileName(dir + path);
-			ConfigModem.prepareDir(fileName);
-			try 
-			{
-				byte[] data = FileUtil.readResource(fileName);
-				if(data != null)
-				{
-					String text = new String(data);
-					JSONObject jsonObject = new JSONObject(text);
-					Iterator<String> keys = jsonObject.keys();
-					while(keys.hasNext()) {
-					    String id = keys.next();
-					    JSONObject modem = jsonObject.optJSONObject(id);
-					    DataModem modemData = new DataModem(modem);
-					    ConfigModem.addDataModem(id, modemData);
-					}
+				String text = new String(data);
+				JSONObject jsonObject = new JSONObject(text);
+				Iterator<String> keys = jsonObject.keys();
+				while(keys.hasNext()) {
+				    String id = keys.next();
+				    JSONObject modem = jsonObject.optJSONObject(id);
+				    DataModem modemData = new DataModem(modem);
+				    ConfigModem.addDataModem(id, modemData);
 				}
-			} 
-			catch (FileNotFoundException | JSONException e) 
-			{
-				/**
-				 * Do nothing
-				 */
 			}
+		} 
+		catch (FileNotFoundException | JSONException e) 
+		{
+			/**
+			 * Do nothing
+			 */
 		}
 	}
 	
