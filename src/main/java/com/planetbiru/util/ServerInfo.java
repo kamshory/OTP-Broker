@@ -10,7 +10,7 @@ import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.gsm.GSMUtil;
 
 public class ServerInfo {
 	
@@ -68,7 +68,7 @@ public class ServerInfo {
 		JSONArray data = new JSONArray();
 		JSONObject modem = new JSONObject();
 		modem.put(JsonKey.NAME, "otp-modem-connected");
-		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
+		modem.put(JsonKey.VALUE, GSMUtil.isConnected());
 		modem.put(JsonKey.DATA, ConfigModem.getStatus());
 		data.put(modem);
 		JSONObject serverInfo = new JSONObject();

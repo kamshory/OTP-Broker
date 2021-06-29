@@ -53,8 +53,7 @@ import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
-import com.planetbiru.gsm.SMSUtil;
-import com.planetbiru.receiver.ws.WebManagerContent;
+import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.user.User;
 import com.planetbiru.user.WebUserAccount;
@@ -65,6 +64,7 @@ import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.ServerStatus;
 import com.planetbiru.util.Utility;
+import com.planetbiru.util.WebManagerContent;
 import com.planetbiru.util.WebManagerTool;
 
 @RestController
@@ -225,12 +225,12 @@ public class ServerWebManager {
 					{
 						if(action.equals("connect"))
 						{
-							SMSUtil.connect(modemID);						
+							GSMUtil.connect(modemID);						
 							ServerInfo.sendModemStatus();
 						}
 						else
 						{
-							SMSUtil.disconnect(modemID);
+							GSMUtil.disconnect(modemID);
 							ServerInfo.sendModemStatus();
 						} 
 					}
@@ -330,7 +330,7 @@ public class ServerWebManager {
 				String result = "";
 				try 
 				{
-					SMSUtil.sendSMS(receiver, message, modemID);
+					GSMUtil.sendSMS(receiver, message, modemID);
 					result = "The message was sent via device "+modemID;
 					response.put(JsonKey.SUCCESS, false);
 				} 
@@ -380,7 +380,7 @@ public class ServerWebManager {
 				{
 					try 
 					{
-						message = SMSUtil.executeUSSD(ussd, modemID);
+						message = GSMUtil.executeUSSD(ussd, modemID);
 						response.put(JsonKey.SUCCESS, true);		
 					} 
 					catch (GSMException e) 
@@ -474,7 +474,7 @@ public class ServerWebManager {
 					String message = "Username : "+user.getUsername()+"\r\nPassword : "+user.getPassword();
 					try 
 					{
-						SMSUtil.sendSMS(phone, message);
+						GSMUtil.sendSMS(phone, message);
 					} 
 					catch (GSMException e) 
 					{
@@ -2764,7 +2764,7 @@ public class ServerWebManager {
 		{
 			this.processModemUpdate(queryPairs, JsonKey.UPDATE);
 		}
-		SMSUtil.updateConnectedDevice();
+		GSMUtil.updateConnectedDevice();
 	}	
 	
 	private void processModemUpdate(Map<String, String> queryPairs, String action) {		
@@ -2904,8 +2904,8 @@ public class ServerWebManager {
 			{
 				try 
 				{
-					SMSUtil.sendSMS(receiver, message, modemID);
-					String modemName = SMSUtil.getModemName(modemID);
+					GSMUtil.sendSMS(receiver, message, modemID);
+					String modemName = GSMUtil.getModemName(modemID);
 					this.broardcastWebSocket("Sending a message to "+receiver+" via "+modemName);
 				} 
 				catch (GSMException e) 

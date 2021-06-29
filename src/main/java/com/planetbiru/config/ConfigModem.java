@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
@@ -150,7 +150,7 @@ public class ConfigModem {
 		JSONArray data = new JSONArray();
 		JSONObject modem = new JSONObject();
 		modem.put(JsonKey.NAME, "otp-modem-connected");
-		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
+		modem.put(JsonKey.VALUE, GSMUtil.isConnected());
 		modem.put(JsonKey.DATA, ConfigModem.getStatus());
 		data.put(modem);
 		JSONObject serverInfo = new JSONObject();
@@ -177,7 +177,7 @@ public class ConfigModem {
 		{
 			String id = entry.getKey();
 			JSONObject modem = new JSONObject();
-			modem.put("connected", SMSUtil.isConnected(id));
+			modem.put("connected", GSMUtil.isConnected(id));
 			modem.put("name", entry.getValue().getName());
 			modem.put("imei", entry.getValue().getImei());
 			modem.put("active", entry.getValue().isActive());

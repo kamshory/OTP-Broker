@@ -17,7 +17,7 @@ import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.gsm.GSMException;
-import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.Utility;
 import com.sun.net.httpserver.Headers;
@@ -149,7 +149,7 @@ public class RESTAPI {
 			String textMessage = data.optString(JsonKey.MESSAGE, "");
 			try 
 			{
-				jsonData = SMSUtil.sendSMS(receiver, textMessage);
+				jsonData = GSMUtil.sendSMS(receiver, textMessage);
 				responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
 				
 			} 

@@ -15,12 +15,10 @@ public class TaskManager {
 	public TaskManager(String jobName) {
 		this.load(jobName);
 	}
-
 	
 	public String getName() {
 		return name;
 	}
-
 
 	public void setName(String name) {
 		this.name = name;
@@ -61,7 +59,6 @@ public class TaskManager {
 		return lastSchedule;
 	}
 
-
 	public void setLastSchedule(String lastSchedule) {
 		this.lastSchedule = lastSchedule;
 	}
@@ -89,8 +86,7 @@ public class TaskManager {
 
 	public void load(String jobID) {
 		
-	}
-	
+	}	
 	
 	public boolean isStarted(String prevFireTimeStr, String resolution) 
 	{
