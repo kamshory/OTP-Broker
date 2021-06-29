@@ -261,13 +261,11 @@ public class ServerAPI {
 				catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException | UnrecoverableKeyException e) 
 				{
 					started = false;
-					logger.info(e.getMessage());
 				}			
 			} 
 			catch (KeyStoreException e2) 
 			{
 				started = false;
-				logger.error(e2.getMessage());
 			}
 			if(!started)
 			{
