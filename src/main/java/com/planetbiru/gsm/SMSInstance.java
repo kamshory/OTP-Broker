@@ -9,7 +9,6 @@ import com.planetbiru.constant.ConstantString;
 
 public class SMSInstance {
 	private GSM gsm;
-	private boolean connected = false;
 	private String id = "";
 	public SMSInstance(DataModem modem)
 	{
@@ -77,17 +76,9 @@ public class SMSInstance {
 		return this.gsm.executeUSSD(ussd);	
 	}
 	
-	public boolean isClosed()
+	public boolean isConnected()
 	{
-		return this.gsm.isClosed();
-	}
-	
-	public boolean isConnected() {
-		return connected;
-	}
-	
-	public void setConnected(boolean connected) {
-		this.connected = connected;
+		return this.gsm.isConnected();
 	}
 	
 	public String getId() {

@@ -19,7 +19,7 @@ public class GSM {
     private SerialPort serialPort;
     private String portName = "";
 
-	private boolean closed = true;
+	private boolean connected = false;
 
 	private boolean ready = false;    
     
@@ -33,6 +33,87 @@ public class GSM {
     	logger.info("Constructor GSM called");
     }  
    
+    /**
+     * Initialize the connection
+     *
+     * @param portName the port name
+     * @return true if port was opened successfully
+     */
+    public boolean connect(String portName) throws SerialPortInvalidPortException
+    {
+    	this.setReady(false);
+    	this.portName = portName;
+    	logger.info("INIT port : {}", portName);
+   		setSerialPort(SerialPort.getCommPort(portName));
+    	if(this.serialPort.openPort()) 
+        {		
+    		this.serialPort.addDataListener(new SerialPortDataListener() 
+            {
+                @Override
+                public int getListeningEvents() 
+                {
+                    return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
+                }
+
+                @Override
+                public void serialEvent(SerialPortEvent event) 
+                {
+                    byte[] msg = new byte[getSerialPort().bytesAvailable()];
+                    getSerialPort().readBytes(msg, msg.length);
+                    String result = new String(msg);
+                    onChangeStateSerial(result);
+                    
+                    
+                    //event.getEventType()
+                    
+                    /*
+                     * switch (event.getEventType()) {
+					  case SerialPortEvent.BI:
+					  case SerialPortEvent.OE:
+					  case SerialPortEvent.FE:
+					  case SerialPortEvent.PE:
+					  case SerialPortEvent.CD:
+					  case SerialPortEvent.CTS:
+					  case SerialPortEvent.DSR:
+					  case SerialPortEvent.RI:
+					  case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
+					    break;
+					  case SerialPortEvent.DATA_AVAILABLE:
+					    byte[] readBuffer = new byte[20];
+					
+					    try {
+					      while (inputStream.available() > 0) {
+					        int numBytes = inputStream.read(readBuffer);
+					      }   
+					      System.out.print(new String(readBuffer));
+					    } catch (IOException e) {
+					    }   
+					    break;
+					  }   
+                     */
+                }
+            });
+            // Prepare for USSD
+//            executeAT("AT^USSDMODE=0", 1);
+//            if (result.equals(""))
+//                return false;
+            // turn off periodic status messages (RSSI status, etc.)
+//            executeAT("AT^CURC=0", 1);
+    		this.connected = true;
+    		this.setReady(true);
+            return true;
+        } 
+        else 
+        {
+        	
+        	/**
+        	 * Debug
+        	 */
+        	this.connected = false;
+        	logger.info("FAILED....");
+            return false;
+        }
+    }
     /**
      * Execute AT command
      *
@@ -290,86 +371,7 @@ public class GSM {
         return result;
     }
 
-    /**
-     * Initialize the connection
-     *
-     * @param portName the port name
-     * @return true if port was opened successfully
-     */
-    public boolean connect(String portName) throws SerialPortInvalidPortException
-    {
-    	this.setReady(false);
-    	this.portName = portName;
-    	logger.info("INIT port : {}", portName);
-   		setSerialPort(SerialPort.getCommPort(portName));
-    	if(this.serialPort.openPort()) 
-        {		
-    		this.serialPort.addDataListener(new SerialPortDataListener() 
-            {
-                @Override
-                public int getListeningEvents() 
-                {
-                    return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
-                }
-
-                @Override
-                public void serialEvent(SerialPortEvent event) 
-                {
-                    byte[] msg = new byte[getSerialPort().bytesAvailable()];
-                    getSerialPort().readBytes(msg, msg.length);
-                    String result = new String(msg);
-                    onChangeStateSerial(result);
-                    
-                    
-                    //event.getEventType()
-                    
-                    /*
-                     * switch (event.getEventType()) {
-					  case SerialPortEvent.BI:
-					  case SerialPortEvent.OE:
-					  case SerialPortEvent.FE:
-					  case SerialPortEvent.PE:
-					  case SerialPortEvent.CD:
-					  case SerialPortEvent.CTS:
-					  case SerialPortEvent.DSR:
-					  case SerialPortEvent.RI:
-					  case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
-					    break;
-					  case SerialPortEvent.DATA_AVAILABLE:
-					    byte[] readBuffer = new byte[20];
-					
-					    try {
-					      while (inputStream.available() > 0) {
-					        int numBytes = inputStream.read(readBuffer);
-					      }   
-					      System.out.print(new String(readBuffer));
-					    } catch (IOException e) {
-					    }   
-					    break;
-					  }   
-                     */
-                }
-            });
-            // Prepare for USSD
-//            executeAT("AT^USSDMODE=0", 1);
-//            if (result.equals(""))
-//                return false;
-            // turn off periodic status messages (RSSI status, etc.)
-//            executeAT("AT^CURC=0", 1);
-    		this.closed = false;
-    		this.setReady(true);
-            return true;
-        } 
-        else 
-        {
-        	/**
-        	 * Debug
-        	 */
-        	this.closed = true;
-        	logger.info("FAILED....");
-            return false;
-        }
-    }
+    
     
     public void onChangeStateSerial(String message)
     {
@@ -401,12 +403,13 @@ public class GSM {
         if(getSerialPort() != null)
         {
         	boolean cls = getSerialPort().closePort();
-        	this.closed = cls;
+        	this.connected = false;
         	return cls;
         }
         else
         {
-        	return true;
+           	this.connected = false;
+            return true;
         }
     }
 
@@ -418,12 +421,12 @@ public class GSM {
 		this.serialPort = serialPort;
 	}
 
-	public boolean isClosed() {
-		return closed;
+	public boolean isConnected() {
+		return connected;
 	}
 
-	public void setClosed(boolean closed) {
-		this.closed = closed;
+	public void setConnected(boolean connected) {
+		this.connected = connected;
 	}
 
 	public boolean isReady() {

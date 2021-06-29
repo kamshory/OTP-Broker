@@ -727,6 +727,9 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
 .dns .tile-icon{
   background-image: url(../images/icon/dns.png);
 }
+.email .tile-icon{
+  background-image: url(../images/icon/email.png);
+}
 .tile-icon > a{
     width: 60px;
     height: 60px;

@@ -75,16 +75,21 @@ function updateModemUI(modemData)
         if(modemData.hasOwnProperty(i))
         {
             var id = i;
-            $('.service-modem').find('[data-id="'+id+'"]').removeClass('disconnected');
-            $('.service-modem').find('[data-id="'+id+'"]').removeClass('connected')
+            $('.service-modem').filter('[data-id="'+id+'"]').removeClass('disconnected');
+            $('.service-modem').filter('[data-id="'+id+'"]').removeClass('connected')
             if(modemData[i].connected)
             {
-                $('.service-modem').find('[data-id="'+id+'"]').addClass('connected');
+                $('.service-modem').filter('[data-id="'+id+'"]').addClass('connected');
             }
             else
             {
-                $('.service-modem').find('[data-id="'+id+'"]').addClass('disconnected');
+                $('.service-modem').filter('[data-id="'+id+'"]').addClass('disconnected');
             }
         }
     }   
+}
+
+function handleIncommingMessage(message) {
+    var modemData = getModemData();
+    updateModemUI(modemData);        
 }
