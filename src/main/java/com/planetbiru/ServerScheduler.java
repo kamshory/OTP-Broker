@@ -110,6 +110,7 @@ public class ServerScheduler {
 		ServerStatus.load(serverStatusSettingPath);
 	}
 	
+	
 	@Scheduled(cron = "${otpbroker.cron.expression.server.status}")
 	public void updateServerStatus()
 	{
@@ -154,7 +155,7 @@ public class ServerScheduler {
 			}
 			catch(ExpressionException | ParseException | JSONException e)
 			{
-				logger.error(e.getMessage());
+				logger.error("updateTime ERROR {} {}", e.getMessage(), cronExpression);
 			}
 		}
 	}
@@ -233,6 +234,7 @@ public class ServerScheduler {
 			ConfigDDNS.save();
 		}	
 	}
+	
 
 	private boolean updateDNS(DDNSRecord ddnsRecord, String ddnsId) 
 	{
@@ -262,7 +264,7 @@ public class ServerScheduler {
 		}
 		catch(ExpressionException | ParseException | JSONException e)
 		{
-			logger.error(e.getMessage());
+			logger.error("updateDNS ERROR {} {}", e.getMessage(), cronExpression);
 		}
 		return update;	
 	}   

@@ -8,8 +8,11 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.gsm.SMSUtil;
 import com.planetbiru.util.FileConfigUtil;
@@ -38,35 +41,38 @@ public class ConfigModem {
 	
 	public static void load(String path)
 	{
-		ConfigModem.configPath = path;
-		String dir = Utility.getBaseDir();
-		if(dir.endsWith("/") && path.startsWith("/"))
+		if(ConfigModem.modemData.isEmpty())
 		{
-			dir = dir.substring(0, dir.length() - 1);
-		}
-		String fileName = FileConfigUtil.fixFileName(dir + path);
-		ConfigModem.prepareDir(fileName);
-		try 
-		{
-			byte[] data = FileUtil.readResource(fileName);
-			if(data != null)
+			ConfigModem.configPath = path;
+			String dir = Utility.getBaseDir();
+			if(dir.endsWith("/") && path.startsWith("/"))
 			{
-				String text = new String(data);
-				JSONObject jsonObject = new JSONObject(text);
-				Iterator<String> keys = jsonObject.keys();
-				while(keys.hasNext()) {
-				    String id = keys.next();
-				    JSONObject modem = jsonObject.optJSONObject(id);
-				    DataModem modemData = new DataModem(modem);
-				    ConfigModem.addDataModem(id, modemData);
-				}
+				dir = dir.substring(0, dir.length() - 1);
 			}
-		} 
-		catch (FileNotFoundException | JSONException e) 
-		{
-			/**
-			 * Do nothing
-			 */
+			String fileName = FileConfigUtil.fixFileName(dir + path);
+			ConfigModem.prepareDir(fileName);
+			try 
+			{
+				byte[] data = FileUtil.readResource(fileName);
+				if(data != null)
+				{
+					String text = new String(data);
+					JSONObject jsonObject = new JSONObject(text);
+					Iterator<String> keys = jsonObject.keys();
+					while(keys.hasNext()) {
+					    String id = keys.next();
+					    JSONObject modem = jsonObject.optJSONObject(id);
+					    DataModem modemData = new DataModem(modem);
+					    ConfigModem.addDataModem(id, modemData);
+					}
+				}
+			} 
+			catch (FileNotFoundException | JSONException e) 
+			{
+				/**
+				 * Do nothing
+				 */
+			}
 		}
 	}
 	
@@ -109,7 +115,7 @@ public class ConfigModem {
 	public static void addDataModem(JSONObject jsonObject) 
 	{
 		DataModem modem = new DataModem(jsonObject);
-		ConfigModem.modemData.put(jsonObject.optString(JsonKey.USERNAME, ""), modem);
+		ConfigModem.modemData.put(jsonObject.optString(JsonKey.ID, ""), modem);
 	}
 	
 	
@@ -131,7 +137,7 @@ public class ConfigModem {
 			dir = dir.substring(0, dir.length() - 1);
 		}
 		String fileName = FileConfigUtil.fixFileName(dir + path);
-		prepareDir(fileName);		
+		ConfigModem.prepareDir(fileName);		
 		try 
 		{
 			FileConfigUtil.write(fileName, config.toString().getBytes());
@@ -143,7 +149,17 @@ public class ConfigModem {
 	}
 	
 	public static void save() {
-		save(ConfigModem.configPath, toJSONObject());		
+		ConfigModem.save(ConfigModem.configPath, toJSONObject());			
+		JSONArray data = new JSONArray();
+		JSONObject modem = new JSONObject();
+		modem.put(JsonKey.NAME, "otp-modem-connected");
+		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
+		modem.put(JsonKey.DATA, ConfigModem.getStatus());
+		data.put(modem);
+		JSONObject serverInfo = new JSONObject();
+		serverInfo.put(JsonKey.DATA, data);
+		serverInfo.put(JsonKey.COMMAND, "server-info");
+		ServerWebSocketManager.broadcast(serverInfo.toString());
 	}
 	
 	public static JSONObject toJSONObject()
@@ -164,14 +180,13 @@ public class ConfigModem {
 		{
 			String id = entry.getKey();
 			JSONObject modem = new JSONObject();
-			modem.put("connected", entry.getValue().isConnected());
+			modem.put("connected", SMSUtil.isConnected(id));
 			modem.put("name", entry.getValue().getName());
 			modem.put("imei", entry.getValue().getImei());
 			modem.put("active", entry.getValue().isActive());
-			modem.put("id", entry.getValue().getId());
+			modem.put("id", id);
 			modem.put("connectionType", entry.getValue().getConnectionType());
-			modem.put("smsCenter", entry.getValue().getSmsCenter());			
-			modem.put(JsonKey.CONNECTED, ConfigModem.getModemData(id).isConnected());
+			modem.put("smsCenter", entry.getValue().getSmsCenter());
 			json.put(id, modem);
 		}
 		return json;
@@ -203,8 +218,6 @@ public class ConfigModem {
 	}
 	
 	public static void update(String id, DataModem modem) {
-		boolean connected = SMSUtil.isConnected(id);
-		modem.setConnected(connected);
 		ConfigModem.modemData.put(id, modem);		
 	}
 

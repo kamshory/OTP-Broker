@@ -30,6 +30,7 @@ import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigBlocking;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigKeystore;
+import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataKeystore;
 import com.planetbiru.gsm.SMSUtil;
@@ -134,6 +135,9 @@ public class ServerAPI {
 	@Value("${otpbroker.ssh.restart.command}")
 	private String restartCommand;
 
+	@Value("${otpbroker.path.setting.modem}")
+	private String modemSettingPath;
+
 
 	@PostConstruct
 	public void init()
@@ -159,12 +163,12 @@ public class ServerAPI {
 		Config.setKeystoreDataSettingPath(keystoreDataSettingPath);
 		Config.setKeystoreSettingPath(keystoreSettingPath);
 		Config.setRestartCommand(restartCommand);
+		Config.setModemSettingPath(modemSettingPath);
 
 		
 		this.loadConfigAPI();
 		this.loadConfigEmail();
 
-		SMSUtil.init();	
 		this.initHttp();
 		this.initHttps();
 		
@@ -173,6 +177,10 @@ public class ServerAPI {
 		
 		ConfigBlocking.setCountryCode(ConfigSMS.getCountryCode());
 		ConfigBlocking.load(Config.getBlockingSettingPath());
+
+		ConfigModem.load(Config.getModemSettingPath());
+		SMSUtil.init();	
+
 		
 	}
 	

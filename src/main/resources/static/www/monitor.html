@@ -21,11 +21,7 @@
     <script src="lib.assets/js/jquery.min.js"></script>
     <script src="lib.assets/js/bootstrap.js"></script>
     <script src="lib.assets/js/ws.js"></script>
-    <script>
-        function handleIncommingMessage(message) {
-            console.log("handleIncommingMessage", message);
-        }
-    </script>
+    
 </head>
 
 <body>
@@ -85,14 +81,14 @@
             <!--/.container-fluid -->
         </nav>
         <style>
-            .monitor svg{
+            #monitor svg{
                 margin: auto;
                 width: 282px;
                 display: block;
             }
         </style>
         <div class="phone-page">
-            <div class="monitor">
+            <div id="monitor">
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="282px" height="480px" viewBox="-0.5 -0.5 282 480" content="">
                     <defs/>
                     <g>
@@ -117,47 +113,55 @@
                         </g>
 
                         <rect x="1" y="273" width="260" height="160" fill="#229933" stroke="#000000" pointer-events="none"/>
-                        <rect x="41" y="320" width="50" height="50" fill="#111111" stroke="#000000" pointer-events="none"/>
-                        <rect x="140" y="320" width="70" height="70" fill="#111111" stroke="#000000" pointer-events="none"/>
-                        <rect pointer-events="none" x="41" y="390" height="45" width="50" fill="#F8F8F8" stroke="#888888"></rect>
-
-                        <g>
-                            <rect x="26" y="261" width="30" height="30" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <rect x="19" y="161" width="44" height="110" rx="4" ry="4" fill="#f5f5f5" stroke="#000000" pointer-events="none"/>
-                            <rect x="31.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <rect x="44.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <g transform="translate(-0.5 -0.5)rotate(-90 28 238)"><text x="0" y="256" fill="#555555">Huawei COM2</text></g>
-                        </g>
-
-                        <g>
-                            <rect x="86" y="261" width="30" height="30" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <rect x="79" y="161" width="44" height="110" rx="4" ry="4" fill="#f5f5f5" stroke="#000000" pointer-events="none"/>
-                            <rect x="91.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <rect x="104.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <g transform="translate(-0.5 -0.5)rotate(-90 88 238)"><text x="60" y="256" fill="#555555">Huawei COM2</text></g>
-                        </g>
-
-                        <g>
-                            <rect x="146" y="261" width="30" height="30" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <rect x="139" y="161" width="44" height="110" rx="4" ry="4" fill="#f5f5f5" stroke="#000000" pointer-events="none"/>
-                            <rect x="151.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <rect x="164.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <g transform="translate(-0.5 -0.5)rotate(-90 148 238)"><text x="120" y="256" fill="#555555">Huawei COM2</text></g>
-                        </g>
-
-                        <g>
-                            <rect x="206" y="261" width="30" height="30" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <rect x="199" y="161" width="44" height="110" rx="4" ry="4" fill="#f5f5f5" stroke="#000000" pointer-events="none"/>
-                            <rect x="211.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <rect x="224.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>
-                            <g transform="translate(-0.5 -0.5)rotate(-90 208 238)"><text x="180" y="256" fill="#555555">Huawei COM2</text></g>
-                        </g>
-
-                        <rect x="1" y="448" width="80" height="30" fill="#ffffff" stroke="#000000" pointer-events="all"/>
-                    
-                        <rect x="91" y="448" width="80" height="30" fill="#ffffff" stroke="#000000" pointer-events="all"/>
                         
+                        <line x1="10" y1="282" x2="250" y2="282" stroke="#053310" />
+                        <line x1="10" y1="330" x2="10" y2="280" stroke="#053310" />
+                        <line x1="40" y1="330" x2="10" y2="330" stroke="#053310" />
+                        
+                        <line x1="88" y1="330" x2="140" y2="330" stroke="#053310" />
+                        <line x1="88" y1="335" x2="140" y2="335" stroke="#053310" />
+                        <line x1="88" y1="340" x2="140" y2="340" stroke="#053310" />
+                        <line x1="88" y1="345" x2="140" y2="345" stroke="#053310" />
+                        <line x1="88" y1="350" x2="220" y2="350" stroke="#053310" />
+                        <line x1="88" y1="355" x2="215" y2="355" stroke="#053310" />
+                        <line x1="220" y1="390" x2="220" y2="350" stroke="#053310" />
+                        <line x1="215" y1="390" x2="215" y2="355" stroke="#053310" />
+                        
+                        <g id="battery">
+                        <circle cx="220" cy="390" r="32" stroke="#777777" stroke-width="1" fill="#d3d3d3" />
+                        <text x="220" y="390" dominant-baseline="middle" text-anchor="middle" text-anchor="middle" font-family="Tahoma" font-size="10px">Lithium Ion</text>
+                        </g>
+
+                        <rect x="38" y="320" width="50" height="50" fill="#111111" stroke="#000000" pointer-events="none"/>
+                        <rect x="110" y="320" width="70" height="70" fill="#111111" stroke="#000000" pointer-events="none"/>
+                        <rect x="38" y="390" height="45" width="50" fill="#F8F8F8" stroke="#888888" pointer-events="none"></rect>
+
+                        <line x1="48" y1="390" x2="48" y2="368" stroke="#053310" />
+                        <line x1="58" y1="390" x2="58" y2="368" stroke="#053310" />
+                        <line x1="68" y1="390" x2="68" y2="368" stroke="#053310" />
+                        <line x1="78" y1="390" x2="78" y2="368" stroke="#053310" />
+ 
+                        <g id="modem">
+                            
+    
+                            
+    
+                            
+    
+                            
+                        </g>
+                        
+
+                        <rect x="1" y="448" width="80" height="30" fill="#ffffff" stroke="#000000" pointer-events="all"/>                    
+                        <rect x="91" y="448" width="80" height="30" fill="#ffffff" stroke="#000000" pointer-events="all"/>
                         <rect x="181" y="448" width="80" height="30" fill="#ffffff" stroke="#000000" pointer-events="all"/>
+                    
+                        <circle cx="11" cy="282" r="5" stroke="#ff8c00" stroke-width="2" fill="#ffffff" />
+                        <circle cx="251" cy="282" r="5" stroke="#ff8c00" stroke-width="2" fill="#ffffff" />
+                        <circle cx="11" cy="424" r="5" stroke="#ff8c00" stroke-width="2" fill="#ffffff" />
+                        <circle cx="251" cy="424" r="5" stroke="#ff8c00" stroke-width="2" fill="#ffffff" />
+                        
+
                     </g>
 
                     <switch>
@@ -169,6 +173,213 @@
                 </svg>
             </div>
         </div>
+        
+        <style>
+        #ledbody0, #ledbody1, #ledbody2, #ledbody3, #ledbody4 
+        {
+            animation: change 0.1s infinite alternate;
+        }
+        @keyframes change {
+            0%{
+                fill: #eeeeee;
+                opacity: 1;
+            }
+                
+            50%{
+                fill: #ff0000;
+                opacity: 1;
+            }
+            100%{
+                fill: #eeeeee;
+                opacity: 1;
+            }
+        }
+        </style>
+
+        <script>
+            var mon = false;
+            function handleIncommingMessage(message) {
+                var jsonData = JSON.parse(message);
+
+                var command = jsonData.command;
+                if(command == 'sms-traffic')
+                {
+                    var modemID = jsonData.data.modemID;
+                    mon = true;
+                    setModemActive(modemID, true);
+                    setTimeout(() => {
+                        setModemActive(modemID, false);
+                        mon = false;
+                    }, 2000);
+                }
+                if(command == 'broadcast-message')
+                {
+
+                }
+                else if(command == 'server-info')
+                {
+                    if(mon)
+                    {
+                        setTimeout(() => {
+                            buildModemData();
+                        }, 2000);                       
+                    }
+                    else
+                    {
+                        buildModemData();
+                    }
+                }
+
+                
+ 
+
+            }
+        </script>
+        <script>
+            function buildModemData()
+            {
+                var selector = 'svg g#modem';
+                $(selector).empty();
+                var index = 0;
+
+                var modemData = getModemData();
+                for(var i in modemData)
+                {
+                    if(modemData.hasOwnProperty(i))
+                    {
+                        var id = i;
+                        var name = modemData[i].name;
+                        if(modemData[i].active)
+                        {
+                            addModem(selector, index++, modemData[i]);
+                        }
+                    }
+                }
+                $('#monitor').html($('#monitor').html())
+            }
+            $(document).ready(function(e){
+                buildModemData();
+            });
+
+            function addModem(selector, index, data)
+            {
+                var id = data.id;
+                var name = data.name;
+                var connected = data.connected;
+                var html = '';
+                if(index == 0)
+                {
+                    html = '<g id="'+id+'">\r\n'+
+                            '   <line x1="48" y1="320" x2="48" y2="280" stroke="#053310" />\r\n'+
+                            '   <rect x="26" y="261" width="30" height="30" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '   <rect x="19" y="161" width="44" height="110" rx="4" ry="4" fill="#f5f5f5" stroke="#555555" pointer-events="none"/>\r\n'+
+                            '   <rect x="31.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '   <rect x="44.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '   <g transform="translate(-0.5 -0.5)rotate(-90 28 238)"><text x="0" y="256" fill="#555555">'+name+'</text></g>\r\n'+
+                            '   <g data-name="led" fill="none" fill-rule="evenodd" display="none">\r\n'+
+                            '   <rect id="ledbody'+index+'" x="20" y="170" width="4" height="10" fill="#000000" />\r\n'+
+                            '   <animate xlink:href="#ledbody'+index+'" attributeType="auto" attributeName="fill"/>\r\n'+
+                            '   <animate attributeType="CSS" attributeName="opacity" from="1" to="0" dur="0.1s" repeatCount="indefinite" />\r\n'+
+                            '   </g>\r\n';
+                            if(!connected)
+                            {
+                                html += '   <line x1="26" y1="180" x2="56" y2="260" stroke="#ee0000" />\r\n'+
+                            '   <line x1="56" y1="180" x2="26" y2="260" stroke="#ee0000" />\r\n';
+                            }
+                            html +=
+                            '</g>\r\n';
+                }
+                if(index == 1)
+                {
+                    html = '<g id="'+id+'">\r\n'+
+                            '    <line x1="108" y1="300" x2="108" y2="280" stroke="#053310" />\r\n'+
+                            '    <line x1="58" y1="300" x2="108" y2="300" stroke="#053310" />\r\n'+
+                            '    <line x1="58" y1="320" x2="58" y2="300" stroke="#053310" />\r\n'+
+                            '    <rect x="86" y="261" width="30" height="30" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <rect x="79" y="161" width="44" height="110" rx="4" ry="4" fill="#f5f5f5" stroke="#555555" pointer-events="none"/>\r\n'+
+                            '    <rect x="91.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <rect x="104.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <g transform="translate(-0.5 -0.5)rotate(-90 88 238)"><text x="60" y="256" fill="#555555">'+name+'</text></g>\r\n'+
+                            '   <g data-name="led" fill="none" fill-rule="evenodd" display="none">\r\n'+
+                            '   <rect id="ledbody'+index+'" x="80" y="170" width="4" height="10" fill="#000000" />\r\n'+
+                            '   <animate xlink:href="#ledbody'+index+'" attributeType="auto" attributeName="fill"/>\r\n'+
+                            '   <animate attributeType="CSS" attributeName="opacity" from="1" to="0" dur="0.1s" repeatCount="indefinite" />\r\n'+
+                            '   </g>\r\n';
+                            if(!connected)
+                            {
+                            html += '   <line x1="86" y1="180" x2="116" y2="260" stroke="#ee0000" />\r\n'+
+                            '   <line x1="116" y1="180" x2="86" y2="260" stroke="#ee0000" />\r\n';
+                            }
+                            html += '</g>\r\n';
+                }
+                if(index == 2)
+                {
+                    html = '<g id="'+id+'">\r\n'+
+                            '    <line x1="168" y1="305" x2="168" y2="280" stroke="#053310" />\r\n'+
+                            '    <line x1="68" y1="305" x2="168" y2="305" stroke="#053310" />\r\n'+
+                            '    <line x1="68" y1="320" x2="68" y2="305" stroke="#053310" />\r\n'+
+                            '    <rect x="146" y="261" width="30" height="30" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <rect x="139" y="161" width="44" height="110" rx="4" ry="4" fill="#f5f5f5" stroke="#555555" pointer-events="none"/>\r\n'+
+                            '    <rect x="151.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <rect x="164.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <g transform="translate(-0.5 -0.5)rotate(-90 148 238)"><text x="120" y="256" fill="#555555">'+name+'</text></g>\r\n'+
+                            '   <g data-name="led" fill="none" fill-rule="evenodd" display="none">\r\n'+
+                            '   <rect id="ledbody'+index+'" x="140" y="170" width="4" height="10" fill="#000000" />\r\n'+
+                            '   <animate xlink:href="#ledbody'+index+'" attributeType="auto" attributeName="fill"/>\r\n'+
+                            '   <animate attributeType="CSS" attributeName="opacity" from="1" to="0" dur="0.1s" repeatCount="indefinite" />\r\n'+
+                            '   </g>\r\n';
+                            if(!connected)
+                            {
+                            html += 
+                            '   <line x1="146" y1="180" x2="176" y2="260" stroke="#ee0000" />\r\n'+
+                            '   <line x1="176" y1="180" x2="146" y2="260" stroke="#ee0000" />\r\n';
+                            }
+                            html += '</g>\r\n';
+                }
+                if(index == 3)
+                {
+                    html = '<g id="'+id+'">\r\n'+
+                            '    <line x1="228" y1="310" x2="228" y2="280" stroke="#053310" />\r\n'+
+                            '    <line x1="78" y1="310" x2="228" y2="310" stroke="#053310" />\r\n'+
+                            '    <line x1="78" y1="320" x2="78" y2="310" stroke="#053310" />\r\n'+
+                            '    <rect x="206" y="261" width="30" height="30" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <rect x="199" y="161" width="44" height="110" rx="4" ry="4" fill="#f5f5f5" stroke="#555555" pointer-events="none"/>\r\n'+
+                            '    <rect x="211.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <rect x="224.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
+                            '    <g transform="translate(-0.5 -0.5)rotate(-90 208 238)"><text x="180" y="256" fill="#555555">'+name+'</text></g>\r\n'+
+                            '   <g data-name="led" fill="none" fill-rule="evenodd" display="none">\r\n'+
+                            '   <rect id="ledbody'+index+'" x="200" y="170" width="4" height="10" fill="#000000" />\r\n'+
+                            '   <animate xlink:href="#ledbody'+index+'" attributeType="auto" attributeName="fill"/>\r\n'+
+                            '   <animate attributeType="CSS" attributeName="opacity" from="1" to="0" dur="0.1s" repeatCount="indefinite" />\r\n'+
+                            '   </g>\r\n';
+                            if(!connected)
+                            {
+                            html += 
+                            '   <line x1="206" y1="180" x2="236" y2="260" stroke="#ee0000" />\r\n'+
+                            '   <line x1="236" y1="180" x2="206" y2="260" stroke="#ee0000" />\r\n';
+                            }
+                            html += 
+                            '</g>\r\n';
+                }
+                $(selector).append(html);
+                
+            }
+            function setModemActive(id, status)
+                {
+                    var selector = 'svg g#modem g#'+id;
+                    if(status)
+                    {
+                        $(selector).find('line').attr('stroke', '#f80000');
+                        $(selector).find('[data-name="led"]').attr('display', '');
+                    }
+                    else
+                    {
+                        $(selector).find('line').attr('stroke', '#053310');
+                        $(selector).find('[data-name="led"]').attr('display', 'none');
+                    }
+                }
+
+        </script>
         <!-- /container -->
     </div>
 </body>

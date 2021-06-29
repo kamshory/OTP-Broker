@@ -4,17 +4,19 @@ import java.util.List;
 
 import com.fazecast.jSerialComm.SerialPortInvalidPortException;
 import com.planetbiru.config.Config;
+import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 
 public class SMSInstance {
 	private GSM gsm;
 	private boolean connected = false;
 	private String id = "";
-	public SMSInstance()
+	public SMSInstance(DataModem modem)
 	{
 		/**
 		 * Constructor
 		 */
+		this.id = modem.getId();
 		this.gsm = new GSM();
 	}
 	public boolean connect(String port) throws GSMException 

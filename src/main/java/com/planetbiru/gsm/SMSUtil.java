@@ -37,20 +37,20 @@ public class SMSUtil {
 		{
 			DataModem modem = entry.getValue();
 			String port = modem.getConnectionType();			
-			SMSInstance instance = new SMSInstance();
-			try {
+			SMSInstance instance = new SMSInstance(modem);
+			try 
+			{
 				instance.connect(port);
 				if(!instance.isClosed())
 				{
 					instance.setConnected(true);
-					modem.setConnected(true);
 				}
+				SMSUtil.smsInstance.add(instance);
 			} 
 			catch (GSMException e) 
 			{
 				logger.error(e.getMessage());
 			}			
-			SMSUtil.smsInstance.add(instance);
 		}
 		SMSUtil.initialized = true;
 		SMSUtil.updateConnectedDevice();
@@ -65,7 +65,6 @@ public class SMSUtil {
 			if(instance.getId().equals(modemID))
 			{
 				instance.connect(modem.getConnectionType());
-				ConfigModem.getModemData(modemID).setConnected(instance.isConnected());
 			}
 		}
 		SMSUtil.updateConnectedDevice();
@@ -78,7 +77,6 @@ public class SMSUtil {
 			if(instance.getId().equals(modemID))
 			{
 				instance.disconnect();
-				ConfigModem.getModemData(modemID).setConnected(instance.isConnected());
 			}
 		}
 		SMSUtil.updateConnectedDevice();
@@ -129,6 +127,7 @@ public class SMSUtil {
          */
 		
 	}
+	
 	private static void sendTraffic(String receiver, StackTraceElement ste)
 	{
 		String callerClass = ste.getClassName();
@@ -142,7 +141,7 @@ public class SMSUtil {
                
         monitor.put(JsonKey.COMMAND, "sms-traffic");
         monitor.put(JsonKey.DATA, data);      
-        ServerWebSocketManager.broadcast(monitor.toString(), "", "index.html");
+        ServerWebSocketManager.broadcast(monitor.toString(), "", "monitor.html");
 	}
 	private static void sendTraffic(String receiver, StackTraceElement ste, DataModem modemData)
 	{
@@ -164,7 +163,7 @@ public class SMSUtil {
                
         monitor.put(JsonKey.COMMAND, "sms-traffic");
         monitor.put(JsonKey.DATA, data);      
-        ServerWebSocketManager.broadcast(monitor.toString(), "", "index.html");
+        ServerWebSocketManager.broadcast(monitor.toString(), "", "monitor.html");
 	}
 	public static String executeUSSD(String ussd, String modemID) throws GSMException {
 		if(smsInstance.isEmpty())
@@ -206,11 +205,9 @@ public class SMSUtil {
 	public static int countConnected()
 	{
 		int connected = 0;
-		Map<String, DataModem> modemData = ConfigModem.getModemData();	
-		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
+		for(int i = 0; i < SMSUtil.smsInstance.size(); i++)
 		{
-			DataModem modem = entry.getValue();
-			if(modem.isConnected())
+			if(SMSUtil.smsInstance.get(i).isConnected())
 			{
 				connected++;
 			}
@@ -220,11 +217,11 @@ public class SMSUtil {
 	
 	public static boolean isConnected(String modemID)
 	{
-		Map<String, DataModem> modemData = ConfigModem.getModemData();	
-		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
+		System.out.println("IS CONNECTED "+modemID);
+		System.out.println("SIZE "+SMSUtil.smsInstance.size());
+		for(int i = 0; i < SMSUtil.smsInstance.size(); i++)
 		{
-			DataModem modem = entry.getValue();
-			if(modem.isConnected() && modem.getId().equals(modemID))
+			if(SMSUtil.smsInstance.get(i).getId().equals(modemID) && SMSUtil.smsInstance.get(i).isConnected())
 			{
 				return true;
 			}

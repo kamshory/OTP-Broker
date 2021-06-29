@@ -259,7 +259,6 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 
-	
 	@PostMapping(path="/api/email**")
 	public ResponseEntity<String> sendEmail(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
 	{		
@@ -2785,10 +2784,17 @@ public class ServerWebManager {
 		String maxPerTimeRangeS = queryPairs.getOrDefault("maxPer_time_range", "0").trim();
 		int maxPerTimeRange = Utility.atoi(maxPerTimeRangeS);
 
+		String baudRateS = queryPairs.getOrDefault("baud_rate", "0").trim();
+		int baudRate = Utility.atoi(baudRateS);
+
 		String imei = queryPairs.getOrDefault("imei", "").trim();
 		String name = queryPairs.getOrDefault("name", "").trim();
 		String simCardPIN = queryPairs.getOrDefault("sim_card_pin", "").trim();
-			
+
+		String parityBit = queryPairs.getOrDefault("parity_bit", "").trim();
+		String startBits = queryPairs.getOrDefault("start_bits", "").trim();
+		String stopBits = queryPairs.getOrDefault("stop_bits", "").trim();
+
 		DataModem modem = ConfigModem.getModemData(id);
 		if(action.equals(JsonKey.ADD) || id.isEmpty())
 		{
@@ -2806,11 +2812,16 @@ public class ServerWebManager {
 		{
 			modem.setSimCardPIN(simCardPIN);
 		}
+		modem.setBaudRate(baudRate);
+		modem.setParityBit(parityBit);
+		modem.setStartBits(startBits);
+		modem.setStopBits(stopBits);
 		modem.setActive(active);
 
 		ConfigModem.update(id, modem);
 		ConfigModem.save();	
 	}
+	
 
 	private void processFeederSetting(String requestBody) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);

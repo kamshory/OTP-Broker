@@ -12,7 +12,10 @@ public class DataModem {
 	private int maxPerTimeRange = 0;
 	private String imei = "";
 	private String simCardPIN = "";
-	private boolean connected = false;
+	private int baudRate = 9600;
+	private String parityBit = "";
+	private String startBits = "";
+	private String stopBits = "";
 	private boolean active = false;
 
 	public DataModem() {
@@ -28,6 +31,10 @@ public class DataModem {
 		this.maxPerTimeRange = jsonObject.optInt("maxPerTimeRange", 0);
 		this.imei = jsonObject.optString("imei", "");
 		this.simCardPIN = jsonObject.optString("simCardPIN", "");
+		this.baudRate = jsonObject.optInt("baudRate", 0);
+		this.parityBit = jsonObject.optString("parityBit", "");
+		this.startBits = jsonObject.optString("startBits", "");
+		this.stopBits = jsonObject.optString("stopBits", "");
 		this.active = jsonObject.optBoolean("active", false);
 	}
 	
@@ -42,6 +49,10 @@ public class DataModem {
 		jsonObject.put("maxPerTimeRange", this.maxPerTimeRange);
 		jsonObject.put("imei", this.imei);
 		jsonObject.put("simCardPIN", this.simCardPIN);
+		jsonObject.put("baudRate", this.baudRate);
+		jsonObject.put("parityBit", this.parityBit);
+		jsonObject.put("startBits", this.startBits);
+		jsonObject.put("stopBits", this.stopBits);
 		jsonObject.put("active", this.active);
 		return jsonObject;
 	}
@@ -105,18 +116,45 @@ public class DataModem {
 	public void setSimCardPIN(String simCardPIN) {
 		this.simCardPIN = simCardPIN;
 	}
-	public boolean isConnected() {
-		return connected;
-	}
-	public void setConnected(boolean connected) {
-		this.connected = connected;
-	}
 	public boolean isActive() {
 		return active;
 	}
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public int getBaudRate() {
+		return baudRate;
+	}
+
+	public void setBaudRate(int baudRate) {
+		this.baudRate = baudRate;
+	}
+
+	public String getParityBit() {
+		return parityBit;
+	}
+
+	public void setParityBit(String parityBit) {
+		this.parityBit = parityBit;
+	}
+
+	public String getStartBits() {
+		return startBits;
+	}
+
+	public void setStartBits(String startBits) {
+		this.startBits = startBits;
+	}
+
+	public String getStopBits() {
+		return stopBits;
+	}
+
+	public void setStopBits(String stopBits) {
+		this.stopBits = stopBits;
 	}	
+	
 }
 
 

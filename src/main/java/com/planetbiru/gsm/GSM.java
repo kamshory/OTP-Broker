@@ -304,8 +304,7 @@ public class GSM {
     	System.out.println(portName);
    		setSerialPort(SerialPort.getCommPort(portName));
     	if(this.serialPort.openPort()) 
-        {
-    		
+        {		
     		this.serialPort.addDataListener(new SerialPortDataListener() 
             {
                 @Override
@@ -364,7 +363,11 @@ public class GSM {
         } 
         else 
         {
-        	System.out.println("FAILED....");
+        	/**
+        	 * Debug
+        	 */
+        	this.closed = true;
+        	logger.info("FAILED....");
             return false;
         }
     }
