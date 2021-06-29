@@ -82,7 +82,9 @@ public class CookieServer {
 		} 
 		catch (IOException e) 
 		{
-			logger.error(e.getMessage());
+			/**
+			 * Do nothing
+			 */
 		}
 	}
 	private void parseCookie(String rawCookie) {
@@ -102,7 +104,9 @@ public class CookieServer {
 	        }
 	        catch (DecoderException e) 
 	        {
-				logger.error(e.getMessage());
+	        	/**
+				 * Do nothing
+				 */
 	        }
 	        CookieItem cookie = new CookieItem(cookieName, cookieValue);
 	        list.put(cookieName, cookie);
@@ -127,8 +131,7 @@ public class CookieServer {
 			for(int i = 0; i<rawCookies.size(); i++)
 			{
 				String rawCookie = rawCookies.get(i);
-				String[] rawCookieParams = rawCookie.split("\\; ");
-				
+				String[] rawCookieParams = rawCookie.split("\\; ");				
 				for(int j = 0; j<rawCookieParams.length; j++)
 				{
 					String cookiePair = rawCookieParams[j];
@@ -141,7 +144,9 @@ public class CookieServer {
 			        }
 			        catch (DecoderException e) 
 			        {
-						logger.error(e.getMessage());
+			        	/**
+						 * Do nothing
+						 */
 			        }
 			        CookieItem cookie = new CookieItem(cookieName, cookieValue);
 			        list.put(cookieName, cookie);
@@ -181,7 +186,7 @@ public class CookieServer {
 			String key = entry.getKey();
 			if(key.equals(name))
 			{
-				((CookieItem) entry.getValue()).setDomain(domain);
+				entry.getValue().setDomain(domain);
 			}
 		}
 	}
@@ -191,7 +196,7 @@ public class CookieServer {
 			String key = entry.getKey();
 			if(key.equals(name))
 			{
-				((CookieItem) entry.getValue()).setPath(path);
+				entry.getValue().setPath(path);
 			}
 		}
 	}
@@ -201,7 +206,7 @@ public class CookieServer {
 			String key = entry.getKey();
 			if(key.equals(name))
 			{
-				((CookieItem) entry.getValue()).setExpires(expires);
+				entry.getValue().setExpires(expires);
 			}
 		}
 	}
@@ -212,7 +217,7 @@ public class CookieServer {
 			String key = entry.getKey();
 			if(key.equals(name))
 			{
-				((CookieItem) entry.getValue()).setSecure(secure);
+				entry.getValue().setSecure(secure);
 			}
 		}
 	}
@@ -223,7 +228,7 @@ public class CookieServer {
 			String key = entry.getKey();
 			if(key.equals(name))
 			{
-				((CookieItem) entry.getValue()).setHttpOnly(httpOnly);
+				entry.getValue().setHttpOnly(httpOnly);
 			}
 		}
 	}
@@ -234,7 +239,7 @@ public class CookieServer {
 			if(key.equals(this.sessionName))
 			{
 				Date expirationDate = new Date(System.currentTimeMillis() + this.sessionLifetime);
-				((CookieItem) entry.getValue()).setExpires(expirationDate);
+				entry.getValue().setExpires(expirationDate);
 			}
 			responseHeaders.add("Set-Cookie", ((CookieItem) entry.getValue()).toString());
 		}
@@ -309,8 +314,7 @@ public class CookieServer {
 		File dir = new File(this.getSessionDir());
 		this.clearFile(dir);
 		JSONObject jsonData = new JSONObject();
-		String fileName = FileConfigUtil.fixFileName(this.getSessionFile());
-		
+		String fileName = FileConfigUtil.fixFileName(this.getSessionFile());		
 		try 
 		{
 			byte[] data = FileConfigUtil.read(fileName);

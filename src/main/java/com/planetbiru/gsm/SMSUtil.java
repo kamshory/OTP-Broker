@@ -24,7 +24,6 @@ public class SMSUtil {
 	private static List<SMSInstance> smsInstance = new ArrayList<>();
 	private static List<Integer> connectedDevices = new ArrayList<>();
 	private static int cnt = -1;
-	
 	private static Map<String, String> callerType = new HashMap<>();
 
 	private SMSUtil()
@@ -263,7 +262,7 @@ public class SMSUtil {
 	}
 	
 	public static void updateConnectedDevice() {
-		SMSUtil.updateConnection();
+		SMSUtil.reindexInstantce();
 		List<Integer> connectedDev = new ArrayList<>();
 		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)
 		{
@@ -305,7 +304,7 @@ public class SMSUtil {
 		SMSUtil.callerType = callerType;
 	}
 
-	public static void updateConnection() {
+	private static void reindexInstantce() {
 		for(int i = 0; i < SMSUtil.smsInstance.size(); i++)
 		{
 			if(SMSUtil.smsInstance.get(i).isConnected() && !ConfigModem.getModemData(SMSUtil.smsInstance.get(i).getId()).isActive())

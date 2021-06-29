@@ -131,10 +131,7 @@ public class CookieItem {
 		if(this.httpOnly)
 		{
 			builder.append("; HttpOnly");
-		}
-		
+		}	
 		return builder.toString();
 	}
-
-	
 }
