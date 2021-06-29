@@ -1263,4 +1263,13 @@ public class Utility {
 			return Utility.getResourceDir();
 		}
 	}
+	public static String getClassName(String className) 
+	{
+		String extension = className;
+		int index = className.lastIndexOf('.');
+		if (index > 0) {
+		      extension = className.substring(index + 1);
+		}
+		return extension;
+	}
 }

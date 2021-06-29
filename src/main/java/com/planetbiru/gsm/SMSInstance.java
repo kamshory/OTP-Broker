@@ -45,7 +45,6 @@ public class SMSInstance {
 		this.waitUntilReady();
 		return this.gsm.sendSMS(receiver, message);
 	}
-	
 	private void waitUntilReady() {
 		long maxWaith = Config.getMaxWaitModemReady();
 		long ellapsed = 0;

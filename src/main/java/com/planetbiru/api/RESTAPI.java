@@ -142,13 +142,14 @@ public class RESTAPI {
 	public static JSONObject sendMessage(String command, JSONObject data)
 	{
 		JSONObject responseJSON = new JSONObject();
+		JSONObject jsonData = new JSONObject();
 		if(data != null)
 		{
 			String receiver = data.optString(JsonKey.MSISDN, "");
 			String textMessage = data.optString(JsonKey.MESSAGE, "");
 			try 
 			{
-				SMSUtil.sendSMS(receiver, textMessage);
+				jsonData = SMSUtil.sendSMS(receiver, textMessage);
 				responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
 				
 			} 
@@ -163,6 +164,7 @@ public class RESTAPI {
 			}
 		}
 		responseJSON.put(JsonKey.COMMAND, command);
+		responseJSON.put(JsonKey.DATA, jsonData);
 		return responseJSON;		
 	}
 	

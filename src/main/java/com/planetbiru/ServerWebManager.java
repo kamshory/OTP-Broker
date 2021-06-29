@@ -2763,9 +2763,9 @@ public class ServerWebManager {
 		if(queryPairs.containsKey(JsonKey.UPDATE))
 		{
 			this.processModemUpdate(queryPairs, JsonKey.UPDATE);
-		}	
-	}
-	
+		}
+		SMSUtil.updateConnectedDevice();
+	}	
 	
 	private void processModemUpdate(Map<String, String> queryPairs, String action) {		
 		
