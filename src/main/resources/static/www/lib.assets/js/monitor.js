@@ -5,10 +5,12 @@ function handleIncommingMessage(message) {
     if(command == 'sms-traffic')
     {
         var modemID = jsonData.data.modemID;
+        var senderType = jsonData.data.senderType;
+        
         mon = true;
-        setModemActive(modemID, true);
+        setModemActive(modemID, senderType, true);
         setTimeout(() => {
-            setModemActive(modemID, false);
+            setModemActive(modemID, senderType, false);
             mon = false;
         }, 2000);
     }
@@ -71,6 +73,7 @@ function addModem(selector, index, data)
                 '   <rect x="31.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
                 '   <rect x="44.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
                 '   <g transform="translate(-0.5 -0.5)rotate(-90 28 238)"><text x="0" y="256" fill="#555555">'+name+'</text></g>\r\n'+
+                '   <rect x="20" y="170" width="4" height="10" fill="#cccccc" />\r\n'+
                 '   <g data-name="led" fill="none" fill-rule="evenodd" display="none">\r\n'+
                 '   <rect id="ledbody'+index+'" x="20" y="170" width="4" height="10" fill="#000000" />\r\n'+
                 '   <animate xlink:href="#ledbody'+index+'" attributeType="auto" attributeName="fill"/>\r\n'+
@@ -95,6 +98,7 @@ function addModem(selector, index, data)
                 '    <rect x="91.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
                 '    <rect x="104.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
                 '    <g transform="translate(-0.5 -0.5)rotate(-90 88 238)"><text x="60" y="256" fill="#555555">'+name+'</text></g>\r\n'+
+                '   <rect x="80" y="170" width="4" height="10" fill="#cccccc" />\r\n'+
                 '   <g data-name="led" fill="none" fill-rule="evenodd" display="none">\r\n'+
                 '   <rect id="ledbody'+index+'" x="80" y="170" width="4" height="10" fill="#000000" />\r\n'+
                 '   <animate xlink:href="#ledbody'+index+'" attributeType="auto" attributeName="fill"/>\r\n'+
@@ -118,6 +122,7 @@ function addModem(selector, index, data)
                 '    <rect x="151.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
                 '    <rect x="164.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
                 '    <g transform="translate(-0.5 -0.5)rotate(-90 148 238)"><text x="120" y="256" fill="#555555">'+name+'</text></g>\r\n'+
+                '   <rect x="140" y="170" width="4" height="10" fill="#cccccc" />\r\n'+
                 '   <g data-name="led" fill="none" fill-rule="evenodd" display="none">\r\n'+
                 '   <rect id="ledbody'+index+'" x="140" y="170" width="4" height="10" fill="#000000" />\r\n'+
                 '   <animate xlink:href="#ledbody'+index+'" attributeType="auto" attributeName="fill"/>\r\n'+
@@ -142,6 +147,7 @@ function addModem(selector, index, data)
                 '    <rect x="211.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
                 '    <rect x="224.5" y="279" width="5" height="5" fill="#ffffff" stroke="#000000" pointer-events="none"/>\r\n'+
                 '    <g transform="translate(-0.5 -0.5)rotate(-90 208 238)"><text x="180" y="256" fill="#555555">'+name+'</text></g>\r\n'+
+                '   <rect x="200" y="170" width="4" height="10" fill="#cccccc" />\r\n'+
                 '   <g data-name="led" fill="none" fill-rule="evenodd" display="none">\r\n'+
                 '   <rect id="ledbody'+index+'" x="200" y="170" width="4" height="10" fill="#000000" />\r\n'+
                 '   <animate xlink:href="#ledbody'+index+'" attributeType="auto" attributeName="fill"/>\r\n'+
@@ -159,17 +165,23 @@ function addModem(selector, index, data)
     $(selector).append(html);
     
 }
-function setModemActive(id, status)
+function setModemActive(id, senderType, status)
     {
         var selector = 'svg g#modem g#'+id;
         if(status)
         {
             $(selector).find('line').attr('stroke', '#f80000');
             $(selector).find('[data-name="led"]').attr('display', '');
+            $('#'+senderType).find('text').attr('fill', 'red');
+            $('#'+senderType).find('rect').attr('stroke', 'red');
+            $('#'+senderType).find('line').attr('stroke', 'red');
         }
         else
         {
             $(selector).find('line').attr('stroke', '#053310');
             $(selector).find('[data-name="led"]').attr('display', 'none');
+            $('#'+senderType).find('text').attr('fill', 'black');
+            $('#'+senderType).find('rect').attr('stroke', 'black');
+            $('#'+senderType).find('line').attr('stroke', 'black');
         }
     }

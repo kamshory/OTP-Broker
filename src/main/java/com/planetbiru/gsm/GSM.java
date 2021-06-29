@@ -17,10 +17,7 @@ public class GSM {
 	private static final Logger logger = LogManager.getLogger(GSM.class);
 
     private SerialPort serialPort;
-    private String portName = "";
-
-	private boolean connected = false;
-
+    private boolean connected = false;
 	private boolean ready = false;    
     
     private static String[] smsStorage = new String[]{
@@ -42,7 +39,6 @@ public class GSM {
     public boolean connect(String portName) throws SerialPortInvalidPortException
     {
     	this.setReady(false);
-    	this.portName = portName;
     	logger.info("INIT port : {}", portName);
    		setSerialPort(SerialPort.getCommPort(portName));
     	if(this.serialPort.openPort()) 
@@ -100,16 +96,16 @@ public class GSM {
             // turn off periodic status messages (RSSI status, etc.)
 //            executeAT("AT^CURC=0", 1);
     		this.connected = true;
-    		this.setReady(true);
+    		this.ready = true;
             return true;
         } 
         else 
-        {
-        	
+        {       	
         	/**
         	 * Debug
         	 */
-        	this.connected = false;
+        	this.connected = true;
+        	this.ready = true;
         	logger.info("FAILED....");
             return false;
         }
@@ -308,7 +304,6 @@ public class GSM {
     	String result = "";
     	recipient = recipient.trim();
     	message = message.trim();
-    	System.out.println("Send SMS to "+recipient+" "+message+" port "+this.getSerialPort().toString()+" "+this.portName);
     	String result1 = executeAT("ATE0", 1);
     	if(result1.isEmpty())
     	{
@@ -370,9 +365,7 @@ public class GSM {
     	this.setReady(true);
         return result;
     }
-
-    
-    
+ 
     public void onChangeStateSerial(String message)
     {
     	logger.info("Receive Message {}", message);

@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import com.planetbiru.api.HandlerAPIBlocking;
 import com.planetbiru.api.HandlerAPIMessage;
 import com.planetbiru.api.HandlerAPIUnblocking;
+import com.planetbiru.api.RESTAPI;
 import com.planetbiru.config.ConfigAPIUser;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigAPI;
@@ -34,7 +35,10 @@ import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataKeystore;
 import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.receiver.amqp.RabbitMQReceiver;
+import com.planetbiru.receiver.ws.WebSocketEndpoint;
 import com.planetbiru.util.ServiceHTTP;
+import com.planetbiru.util.Utility;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsServer;
@@ -180,6 +184,11 @@ public class ServerAPI {
 
 		ConfigModem.load(Config.getModemSettingPath());
 		SMSUtil.init();	
+		
+		SMSUtil.getCallerType().put(Utility.getClassName(RabbitMQReceiver.class.toString()), "amqp");
+		SMSUtil.getCallerType().put(Utility.getClassName(WebSocketEndpoint.class.toString()), "ws");
+		SMSUtil.getCallerType().put(Utility.getClassName(RESTAPI.class.toString()), "rest");
+
 
 		
 	}

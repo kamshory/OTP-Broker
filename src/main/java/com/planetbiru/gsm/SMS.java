@@ -1,5 +1,7 @@
 package com.planetbiru.gsm;
 
+import org.json.JSONObject;
+
 public class SMS {
     private int id;
     private String storage;
@@ -9,6 +11,20 @@ public class SMS {
     private String date;
     private String time;
     private String content;
+    
+    public JSONObject toJSONObject()
+    {
+    	JSONObject json = new JSONObject();
+       	json.put("id", this.id);
+       	json.put("storage", this.storage);
+       	json.put("status", this.status);
+       	json.put("phoneNumber", this.phoneNumber);
+       	json.put("phoneName", this.phoneName);
+       	json.put("date", this.date);
+       	json.put("time", this.time);
+       	json.put("content", this.content);
+       	return json;
+    }
 
     public int getId() {
         return id;

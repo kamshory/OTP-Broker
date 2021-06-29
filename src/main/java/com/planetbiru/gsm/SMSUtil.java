@@ -1,17 +1,20 @@
 package com.planetbiru.gsm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.JsonKey;
+import com.planetbiru.util.Utility;
 
 public class SMSUtil {
 	
@@ -21,6 +24,8 @@ public class SMSUtil {
 	private static List<SMSInstance> smsInstance = new ArrayList<>();
 	private static List<Integer> connectedDevices = new ArrayList<>();
 	private static int cnt = -1;
+	
+	private static Map<String, String> callerType = new HashMap<>();
 
 	private SMSUtil()
 	{
@@ -79,7 +84,23 @@ public class SMSUtil {
 		
 	}
 	
-	public static void sendSMS(String receiver, String message, String modemID) throws GSMException {
+	public static List<SMS> readSMS(String modemID) throws GSMException
+	{
+		return SMSUtil.get(modemID).readSMS();
+	}
+	
+	public static JSONArray readSMSJSON(String modemID) throws GSMException
+	{
+		JSONArray arr = new JSONArray();
+		List<SMS> sms = SMSUtil.get(modemID).readSMS();
+		for(int i = 0; i<sms.size(); i++)
+		{
+			arr.put(sms.get(i).toJSONObject());
+		}
+		return arr;
+	}
+	
+	public static JSONObject sendSMS(String receiver, String message, String modemID) throws GSMException {
 		StackTraceElement ste = Thread.currentThread().getStackTrace()[2];
 		if(SMSUtil.smsInstance.isEmpty())
 		{
@@ -96,10 +117,15 @@ public class SMSUtil {
          * End
          */
 		
-		SMSUtil.get(modemID).sendSMS(receiver, message);		
+		String result = SMSUtil.get(modemID).sendSMS(receiver, message);	
+		
+		JSONObject jo = new JSONObject();
+		jo.put("modemID", modemData.getId());
+		jo.put("result", result);
+		return jo;
 	}
 	
-	public static void sendSMS(String receiver, String message) throws GSMException {
+	public static JSONObject sendSMS(String receiver, String message) throws GSMException {
 		StackTraceElement ste = Thread.currentThread().getStackTrace()[2];      
 		if(SMSUtil.smsInstance.isEmpty())
 		{
@@ -111,7 +137,7 @@ public class SMSUtil {
 		SMSInstance instance = SMSUtil.smsInstance.get(index);
 
 		
-		instance.sendSMS(receiver, message);
+		String result = instance.sendSMS(receiver, message);
 
 		/**
 		 * Begin
@@ -121,24 +147,26 @@ public class SMSUtil {
         /**
          * End
          */
+		JSONObject jo = new JSONObject();
+		jo.put("modemID", modemData.getId());
+		jo.put("result", result);
+		return jo;
 		
 	}
 	
 	private static void sendTraffic(String receiver, StackTraceElement ste)
 	{
 		String callerClass = ste.getClassName();
-        String callerMethod = ste.getMethodName();
-        
         JSONObject monitor = new JSONObject();
         JSONObject data = new JSONObject();
-        data.put("callerClass", callerClass);
-        data.put("callerMethod", callerMethod);
+        data.put("senderType", SMSUtil.getSenderType(callerClass));
         data.put("receiver", receiver);
                
         monitor.put(JsonKey.COMMAND, "sms-traffic");
         monitor.put(JsonKey.DATA, data);      
         ServerWebSocketManager.broadcast(monitor.toString(), "", "monitor.html");
 	}
+	
 	private static void sendTraffic(String receiver, StackTraceElement ste, DataModem modemData)
 	{
 		String modemID = modemData.getId();
@@ -146,23 +174,25 @@ public class SMSUtil {
 		String modemIMEI = modemData.getImei();
 
 		String callerClass = ste.getClassName();
-        String callerMethod = ste.getMethodName();
-        
         JSONObject monitor = new JSONObject();
         JSONObject data = new JSONObject();
         data.put("modemID", modemID);
         data.put("modemName", modemName);
         data.put("modemIMEI", modemIMEI);
-        data.put("callerClass", callerClass);
-        data.put("callerMethod", callerMethod);
+        data.put("senderType", SMSUtil.getSenderType(callerClass));
         data.put("receiver", receiver);
-               
         monitor.put(JsonKey.COMMAND, "sms-traffic");
         monitor.put(JsonKey.DATA, data);      
         ServerWebSocketManager.broadcast(monitor.toString(), "", "monitor.html");
 	}
+	
+	private static String getSenderType(String callerClass) {
+		String key = Utility.getClassName(callerClass);
+		return SMSUtil.getCallerType().getOrDefault(key, "");
+	}
+
 	public static String executeUSSD(String ussd, String modemID) throws GSMException {
-		if(smsInstance.isEmpty())
+		if(SMSUtil.smsInstance.isEmpty())
 		{
 			throw new GSMException(SMSUtil.NO_DEVICE_CONNECTED);
 		}
@@ -232,7 +262,8 @@ public class SMSUtil {
 		return SMSUtil.smsInstance.get(index).isConnected();
 	}
 	
-	private static void updateConnectedDevice() {
+	public static void updateConnectedDevice() {
+		SMSUtil.updateConnection();
 		List<Integer> connectedDev = new ArrayList<>();
 		for(int i = 0; i<SMSUtil.smsInstance.size(); i++)
 		{
@@ -243,13 +274,15 @@ public class SMSUtil {
 		}
 		SMSUtil.connectedDevices = connectedDev;
 	}
+	
+	
 	private static int getModemIndex() throws GSMException {
 		SMSUtil.cnt++;
-		if(SMSUtil.cnt > SMSUtil.countConnected())
+		if(SMSUtil.cnt >= SMSUtil.countConnected())
 		{
 			SMSUtil.cnt = 0;
 		}
-		if(SMSUtil.connectedDevices.contains(SMSUtil.cnt))
+		if(!SMSUtil.connectedDevices.isEmpty() && SMSUtil.connectedDevices.size() >= (SMSUtil.cnt -1))
 		{
 			return SMSUtil.connectedDevices.get(SMSUtil.cnt);
 		}
@@ -264,6 +297,32 @@ public class SMSUtil {
 		return modemData.getName();
 	}
 
+	public static Map<String, String> getCallerType() {
+		return callerType;
+	}
+
+	public static void setCallerType(Map<String, String> callerType) {
+		SMSUtil.callerType = callerType;
+	}
+
+	public static void updateConnection() {
+		for(int i = 0; i < SMSUtil.smsInstance.size(); i++)
+		{
+			if(SMSUtil.smsInstance.get(i).isConnected() && !ConfigModem.getModemData(SMSUtil.smsInstance.get(i).getId()).isActive())
+			{
+				try 
+				{
+					SMSUtil.smsInstance.get(i).disconnect();
+				} 
+				catch (GSMException e) 
+				{
+					/**
+					 * Do nothing
+					 */
+				}
+			}
+		}		
+	}
 }
 
 
