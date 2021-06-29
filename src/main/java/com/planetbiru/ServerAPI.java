@@ -34,7 +34,7 @@ import com.planetbiru.config.ConfigKeystore;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataKeystore;
-import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.receiver.amqp.RabbitMQReceiver;
 import com.planetbiru.receiver.ws.WebSocketEndpoint;
 import com.planetbiru.util.ServiceHTTP;
@@ -183,11 +183,11 @@ public class ServerAPI {
 		ConfigBlocking.load(Config.getBlockingSettingPath());
 
 		ConfigModem.load(Config.getModemSettingPath());
-		SMSUtil.init();	
+		GSMUtil.init();	
 		
-		SMSUtil.getCallerType().put(Utility.getClassName(RabbitMQReceiver.class.toString()), "amqp");
-		SMSUtil.getCallerType().put(Utility.getClassName(WebSocketEndpoint.class.toString()), "ws");
-		SMSUtil.getCallerType().put(Utility.getClassName(RESTAPI.class.toString()), "rest");
+		GSMUtil.getCallerType().put(Utility.getClassName(RabbitMQReceiver.class.toString()), "amqp");
+		GSMUtil.getCallerType().put(Utility.getClassName(WebSocketEndpoint.class.toString()), "ws");
+		GSMUtil.getCallerType().put(Utility.getClassName(RESTAPI.class.toString()), "rest");
 
 
 		

@@ -7,10 +7,10 @@ import com.planetbiru.config.Config;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 
-public class SMSInstance {
+public class GSMInstance {
 	private GSM gsm;
 	private String id = "";
-	public SMSInstance(DataModem modem)
+	public GSMInstance(DataModem modem)
 	{
 		/**
 		 * Constructor

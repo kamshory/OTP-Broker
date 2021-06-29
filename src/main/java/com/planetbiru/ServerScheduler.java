@@ -32,7 +32,7 @@ import com.planetbiru.config.ConfigVendorNoIP;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.ddns.DDNSUpdater;
-import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.ServerStatus;
@@ -125,7 +125,7 @@ public class ServerScheduler {
 		data.put("cpu", cpu.optDouble("percentUsed", 0));
 		data.put("ram", memory.optJSONObject("ram").optDouble("percentUsed", 0));
 		data.put("swap", memory.optJSONObject("swap").optDouble("percentUsed", 0));
-		data.put("modem", SMSUtil.isConnected());
+		data.put("modem", GSMUtil.isConnected());
 		data.put("ws", ConfigFeederWS.isConnected());
 		data.put("amqp", ConfigFeederAMQP.isConnected());
 
@@ -183,7 +183,7 @@ public class ServerScheduler {
 		JSONArray data = new JSONArray();
 		JSONObject modem = new JSONObject();
 		modem.put(JsonKey.NAME, "otp-modem-connected");
-		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
+		modem.put(JsonKey.VALUE, GSMUtil.isConnected());
 		modem.put(JsonKey.DATA, ConfigModem.getStatus());
 		data.put(modem);
 		JSONObject serverInfo = new JSONObject();

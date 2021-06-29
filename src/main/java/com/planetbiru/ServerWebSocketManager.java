@@ -31,7 +31,7 @@ import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.GeneralConfig;
 import com.planetbiru.constant.JsonKey;
-import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.util.Utility;
@@ -155,7 +155,7 @@ public class ServerWebSocketManager {
 		
 		JSONObject modem = new JSONObject();
 		modem.put(JsonKey.NAME, "otp-modem-connected");
-		modem.put(JsonKey.VALUE, SMSUtil.isConnected());
+		modem.put(JsonKey.VALUE, GSMUtil.isConnected());
 		modem.put(JsonKey.DATA, ConfigModem.getStatus());
 		data.put(modem);
 		JSONObject wsEnable = new JSONObject();

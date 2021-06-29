@@ -15,7 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.planetbiru.gsm.GSMException;
-import com.planetbiru.gsm.SMSUtil;
+import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.util.ServerInfo;
 
 public class WebSocketEndpoint extends Endpoint {
@@ -89,7 +89,7 @@ public class WebSocketEndpoint extends Endpoint {
 		}
 	}
 	private void sendSMS(String receiver, String textMessage) throws GSMException {
-		SMSUtil.sendSMS(receiver, textMessage);
+		GSMUtil.sendSMS(receiver, textMessage);
 		
 	}
 	private void login() throws IOException {

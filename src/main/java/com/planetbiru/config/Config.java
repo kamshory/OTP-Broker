@@ -80,7 +80,8 @@ public class Config {
 	private static String cpuSecret = "83246832yr982fi2hfoi2h3f23yf9823yr98y";
 	private static boolean validDevice = false;
 	private static String restartCommand = "";
-	private static String cleanupCommand = ""; 
+	private static String cleanupCommand = "";
+	public static boolean showTraffic = true; 
 	
 	private Config()
 	{

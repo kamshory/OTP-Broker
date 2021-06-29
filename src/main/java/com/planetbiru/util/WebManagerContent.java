@@ -1,4 +1,4 @@
-package com.planetbiru.receiver.ws;
+package com.planetbiru.util;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
