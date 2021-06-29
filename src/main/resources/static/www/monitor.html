@@ -86,6 +86,25 @@
                 width: 282px;
                 display: block;
             }
+            #ledbody0, #ledbody1, #ledbody2, #ledbody3, #ledbody4 
+            {
+                animation: change 0.1s infinite alternate;
+            }
+            @keyframes change {
+                0%{
+                    fill: #eeeeee;
+                    opacity: 1;
+                }
+                    
+                50%{
+                    fill: #ff0000;
+                    opacity: 1;
+                }
+                100%{
+                    fill: #eeeeee;
+                    opacity: 1;
+                }
+            }
         </style>
         <div class="phone-page">
             <div id="monitor">
@@ -180,27 +199,7 @@
                 </svg>
             </div>
         </div>      
-        <style>
-        #ledbody0, #ledbody1, #ledbody2, #ledbody3, #ledbody4 
-        {
-            animation: change 0.1s infinite alternate;
-        }
-        @keyframes change {
-            0%{
-                fill: #eeeeee;
-                opacity: 1;
-            }
-                
-            50%{
-                fill: #ff0000;
-                opacity: 1;
-            }
-            100%{
-                fill: #eeeeee;
-                opacity: 1;
-            }
-        }
-        </style>
+        
 
         <script src="lib.assets/js/monitor.js"></script>
         <!-- /container -->
