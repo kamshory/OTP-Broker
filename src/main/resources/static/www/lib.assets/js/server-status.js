@@ -28,7 +28,15 @@ function prepareTimeSelector()
         var dif2 = now - ((i - 1) * oneday);
         d.setTime(dif1);
         var str = days[d.getDay()] + ' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
-        var option = '<option value="'+dif1+','+dif2+'">'+str+'</option>';
+        var option = '';
+        if(i > 0)
+        {
+            option = '<option value="'+dif1+','+dif2+'">'+str+'</option>';
+        }
+        else
+        {
+            option = '<option data-reload-data="true" value="'+dif1+','+dif2+'">'+str+'</option>';
+        }
         $('#time').append(option);
     }
 }

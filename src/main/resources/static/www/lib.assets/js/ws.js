@@ -7,7 +7,6 @@ if(pathname == "/" || pathname == "")
     pathname = "/index.html";
 }
 var wsURL = createBaseURL(scheme, hostName, portNumber)+"/websocket/manager?path="+encodeURIComponent(pathname);
-console.log(wsURL);
 var ws = null;
 var wsConnected = false;
 var connetionInterval = setTimeout('', 1000);
@@ -53,13 +52,11 @@ function initWebSocket()
 
 function connectWebSocket()
 {
-    console.log("Connecting  to "+wsURL);
     wsConnected = false;
     ws = new WebSocket(wsURL);
         
     ws.onopen = function() {	   
         wsConnected = true;
-        console.log("Connected");
     };
     
     ws.onmessage = function (evt) { 
@@ -86,7 +83,6 @@ function connectWebSocket()
     
     ws.onclose = function() { 	   
         wsConnected = false;
-        console.log("Connection is closed..."); 
         clearTimeout(connectWebSocket);
         connetionInterval = setTimeout(function(){
             connectWebSocket();
@@ -98,7 +94,6 @@ function connectWebSocket()
     };
     ws.onError = function()
     {
-        console.log("An error. occured.."); 
         wsConnected = false;
         clearTimeout(connectWebSocket);
         connetionInterval = setTimeout(function(){

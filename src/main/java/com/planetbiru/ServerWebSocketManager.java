@@ -188,15 +188,16 @@ public class ServerWebSocketManager {
 		
 		try 
 		{
-			this.sendMessage(info.toString(4));
+			this.sendMessage(info.toString());
 		} 
-		catch (JSONException | IOException e) {
+		catch (JSONException | IOException e) 
+		{
 			/**
 			 * Do nothing
 			 */
 		}
-		
 	}
+	
 
 	public JSONObject createWelcomeMessage() 
 	{
