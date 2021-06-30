@@ -107,6 +107,7 @@ public class Application {
 		resetConfig();
 	}
 	
+	
 	private static void resetConfig() 
 	{
 		if(usbPluged())
