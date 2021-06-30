@@ -613,7 +613,9 @@ public class Utility {
 	    for (String pair : pairs) 
 	    {
 	        int idx = pair.indexOf('=');
-	        queryPairs.put(URLDecoder.decode(pair.substring(0, idx), ConstantString.UTF8), URLDecoder.decode(pair.substring(idx + 1), ConstantString.UTF8));
+	        String key = URLDecoder.decode(pair.substring(0, idx), ConstantString.UTF8);
+	        String value = URLDecoder.decode(pair.substring(idx + 1), ConstantString.UTF8);
+	        queryPairs.put(key, value);
 	    }
 	    return queryPairs;
 	}
@@ -1147,17 +1149,21 @@ public class Utility {
 		int index = 0;
 	    for (String pair : pairs) 
 	    {
-	        int idx = pair.indexOf("=");
-	        try 
-	        {
-	        	String key = Utility.fixURLEncodeKey(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), index);
-				queryPairs.put(key, URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
-			} 
-	        catch (UnsupportedEncodingException e) 
-	        {
-				logger.error(e.getMessage());
-			}
-	        index++;
+	    	if(pair.contains("="))
+	    	{
+		        int idx = pair.indexOf("=");
+		        try 
+		        {
+		        	String key = Utility.fixURLEncodeKey(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), index);
+		        	String value = URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
+					queryPairs.put(key, value);
+				} 
+		        catch (UnsupportedEncodingException e) 
+		        {
+					logger.error(e.getMessage());
+				}
+		        index++;
+	    	}
 	    }
 		return queryPairs;
 	}
