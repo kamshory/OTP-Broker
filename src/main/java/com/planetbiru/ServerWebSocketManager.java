@@ -196,8 +196,7 @@ public class ServerWebSocketManager {
 			 * Do nothing
 			 */
 		}
-	}
-	
+	}	
 
 	public JSONObject createWelcomeMessage() 
 	{

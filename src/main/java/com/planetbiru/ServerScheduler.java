@@ -173,7 +173,8 @@ public class ServerScheduler {
 	public void inspectAMQP()
 	{
 		if(cronAMQPEnable && ConfigFeederAMQP.isFeederAmqpEnable())
-		{					
+		{
+			logger.info("amqpCheck");
 			amqpCheck();
 		}
 	}
