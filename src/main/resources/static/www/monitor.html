@@ -61,6 +61,7 @@
                                 <li class=""><a href="modem.html">Modem</a></li>
                                 <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li class=""><a href="network-setting.html">Network Setting</a></li>
+				  <li class=""><a href="firewall.html">Firewall</a></li>
                                 <li class=""><a href="keystore.html">Keystore</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="dropdown-header">DDNS Setting</li>
@@ -105,6 +106,24 @@
                     opacity: 1;
                 }
             }
+            #phoneled{
+                animation:blink 0.1s infinite alternate;
+            }
+            @keyframes blink {
+                0%{
+                    fill: #ffffff;
+                    opacity: 1;
+                }
+                    
+                50%{
+                    fill: #ff0000;
+                    opacity: 1;
+                }
+                100%{
+                    fill: #ffffff;
+                    opacity: 1;
+                }
+            }
         </style>
         <div class="phone-page">
             <div id="monitor">
@@ -123,6 +142,9 @@
                         <path d="M 196 64.8 C 196 62.7 197.65 61 199.7 61 L 212.34 61 C 214.37 61.02 216 62.72 216 64.8 L 216 97.2 C 216 99.28 214.37 100.98 212.34 101 L 199.7 101 C 197.65 101 196 99.3 196 97.2 Z" fill="#cccccc" stroke="#6881b3" stroke-miterlimit="10" pointer-events="all"/>
                         <path d="M 196.78 64.6 L 196.78 97.4 L 215.22 97.45 L 215.22 64.6 Z" fill="#ffffff" stroke="none" pointer-events="all"/>
                         <rect x="203.59" y="98.52" width="4.79" height="1.44" rx="0.72" ry="0.72" fill="#ffffff" stroke="none" pointer-events="all"/>
+                        <rect id="phoneled" x="203.59" y="98.52" width="4.79" height="1.44" rx="0.72" ry="0.72" fill="#ffffff" stroke="none" pointer-events="all" display="none" />
+                        <animate xlink:href="#phoneled" attributeType="auto" attributeName="fill"/>
+                        <animate attributeType="CSS" attributeName="fill" from="#ff0000" to="#ffffff" dur="0.1s" repeatCount="indefinite" />
                         </g>
 
                         <g>

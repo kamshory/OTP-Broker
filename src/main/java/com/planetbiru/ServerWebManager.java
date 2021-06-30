@@ -37,6 +37,7 @@ import com.planetbiru.config.ConfigVendorDynu;
 import com.planetbiru.config.ConfigEmail;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
+import com.planetbiru.config.ConfigFirewall;
 import com.planetbiru.config.ConfigGeneral;
 import com.planetbiru.config.ConfigKeystore;
 import com.planetbiru.config.ConfigModem;
@@ -131,7 +132,10 @@ public class ServerWebManager {
 	
 	@Value("${otpbroker.path.setting.blocking}")
 	private String blockingSettingPath;	
-	
+
+	@Value("${otpbroker.path.setting.firewall}")
+	private String firewallSettingPath;
+
 	@Value("${otpbroker.ssh.restart.command}")
 	private String restartCommand;
 
@@ -141,11 +145,14 @@ public class ServerWebManager {
 	@Value("${otpbroker.log.dir}")
 	private String logDir;	
 	
-	
 	@Value("${otpbroker.server.hmac}")
 	private String hmac;
 	
-	
+	@Value("${server.port}")
+	private int portManager;
+
+	@Value("${otpbroker.show.trafic}")
+	private boolean showTraffic;
 	
 	private ServerWebManager()
     {
@@ -157,8 +164,7 @@ public class ServerWebManager {
 		/**
 		 * This configuration must be loaded first
 		 */
-		Config.setBaseDirConfig(baseDirConfig);
-		
+		Config.setBaseDirConfig(baseDirConfig);		
 
 		Config.setUserSettingPath(userSettingPath);
 		Config.setDocumentRoot(documentRoot);
@@ -190,6 +196,10 @@ public class ServerWebManager {
 		Config.setMimeSettingPath(mimeSettingPath);
 		
 		Config.setLogDir(logDir);
+		Config.setShowTraffic(showTraffic);
+		
+		Config.setPortManager(portManager);
+		Config.setFirewallSettingPath(firewallSettingPath);
 		
 		ConfigDDNS.load(Config.getDdnsSettingPath());
 		ConfigVendorCloudflare.load(Config.getCloudflareSettingPath());
@@ -1686,6 +1696,37 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	@GetMapping(path="/firewall/list")
+	public ResponseEntity<byte[]> handleFirewallList(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				ConfigFirewall.load(Config.getFirewallSettingPath());
+				String list = ConfigFirewall.getRecords().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
 	@GetMapping(path="/modem/detail/{id}")
 	public ResponseEntity<byte[]> handleModemGet(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
 	{
@@ -1708,9 +1749,6 @@ public class ServerWebManager {
 		}
 		catch(NoUserRegisteredException e)
 		{
-			/**
-			 * Do nothing
-			 */
 			statusCode = HttpStatus.UNAUTHORIZED;
 		}
 		cookie.saveSessionData();
@@ -1742,9 +1780,6 @@ public class ServerWebManager {
 		}
 		catch(NoUserRegisteredException e)
 		{
-			/**
-			 * Do nothing
-			 */
 			statusCode = HttpStatus.UNAUTHORIZED;
 		}
 		cookie.saveSessionData();
@@ -2198,6 +2233,10 @@ public class ServerWebManager {
 				{
 					this.processBlockList(requestBody);
 				}
+				if(path.equals("/firewall.html"))
+				{
+					this.processFirewall(requestBody);
+				}
 			}
 		} 
 		catch (NoUserRegisteredException e) 
@@ -2205,6 +2244,61 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+		}
+	}
+	
+	private void processFirewall(String requestBody) {
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		String portStr = queryPairs.getOrDefault("port", "0").trim();
+		int port = Utility.atoi(portStr);
+		String protocol = queryPairs.getOrDefault("protocol", "tcp").trim();
+		if(queryPairs.containsKey(JsonKey.DELETE))
+		{
+			ConfigFirewall.load(Config.getFirewallSettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigFirewall.remove(value);
+				}
+			}
+			ConfigFirewall.save();
+		}
+		if(queryPairs.containsKey(JsonKey.ACTIVATE))
+		{
+			ConfigFirewall.load(Config.getFirewallSettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigFirewall.activate(value);
+				}
+			}
+			ConfigFirewall.save();
+		}
+		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
+		{
+			ConfigFirewall.load(Config.getFirewallSettingPath());
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigFirewall.deactivate(value);
+				}
+			}
+			ConfigFirewall.save();
+		}		
+		if(queryPairs.containsKey(JsonKey.ADD))
+		{
+			ConfigFirewall.load(Config.getFirewallSettingPath());
+			ConfigFirewall.add(port, protocol);
+			ConfigFirewall.save();
 		}
 	}
 	
@@ -2821,8 +2915,8 @@ public class ServerWebManager {
 		ConfigModem.update(id, modem);
 		ConfigModem.save();	
 	}
-	
 
+	
 	private void processFeederSetting(String requestBody) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		if(queryPairs.containsKey("save_feeder_ws_setting"))

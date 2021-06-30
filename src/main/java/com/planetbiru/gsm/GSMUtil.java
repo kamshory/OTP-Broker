@@ -118,7 +118,7 @@ public class GSMUtil {
 			throw new GSMException(GSMUtil.NO_DEVICE_CONNECTED);
 		}				
 		DataModem modemData = ConfigModem.getModemData(modemID);
-		if(Config.showTraffic)
+		if(Config.isShowTraffic())
 		{
 			GSMUtil.sendTraffic(receiver, ste, modemData);
 		}		
@@ -141,7 +141,7 @@ public class GSMUtil {
 		GSMInstance instance = GSMUtil.gsmInstance.get(index);
 		String result = instance.sendSMS(receiver, message);
 		DataModem modemData = ConfigModem.getModemData(instance.getId());        
-		if(Config.showTraffic)
+		if(Config.isShowTraffic())
 		{
 			GSMUtil.sendTraffic(receiver, ste, modemData);
 		}
