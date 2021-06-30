@@ -65,7 +65,7 @@
                                 <li class=""><a href="modem.html">Modem</a></li>
                                 <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li class=""><a href="network-setting.html">Network Setting</a></li>
-				  <li class=""><a href="firewall.html">Firewall</a></li>
+				                <li class=""><a href="firewall.html">Firewall</a></li>
                                 <li class=""><a href="keystore.html">Keystore</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="dropdown-header">DDNS Setting</li>
@@ -88,24 +88,20 @@
         <div class="phone-page">
             <script src="lib.assets/js/moment.min.js"></script>
             <script src="lib.assets/js/Chart.min.js"></script>
-            <script type="text/javascript" src="lib.assets/js/server-status.js">
-               
-                
-                
-                </script>
-                <div class="select-device">
-                    <select name="time" id="time" class="input-select">
-                        <option value="1h">1 Hour</option>
-                        <option value="2h">2 Hours</option>
-                        <option value="3h">3 Hours</option>
-                        <option value="6h">6 Hours</option>
-                        <option value="12h">12 Hours</option>
-                        <option value="24h">24 Hours</option>
-                    </select>
-                </div>
-                <div class="chart-container" style="position: relative;"></div>
-                    <canvas id="canvas"></canvas>
-                </div>
+            <script type="text/javascript" src="lib.assets/js/server-status.js"></script>
+            <div class="select-device">
+                <select name="time" id="time" class="input-select">
+                    <option data-reload-data="true" value="1h">1 Hour</option>
+                    <option data-reload-data="true" value="2h">2 Hours</option>
+                    <option data-reload-data="true" value="3h">3 Hours</option>
+                    <option data-reload-data="true" value="6h">6 Hours</option>
+                    <option data-reload-data="true" value="12h">12 Hours</option>
+                    <option data-reload-data="true" value="24h">24 Hours</option>
+                </select>
+            </div>
+            <div class="chart-container" style="position: relative;"></div>
+                <canvas id="canvas"></canvas>
+            </div>
         </div>
         <!-- /container -->
     </div>

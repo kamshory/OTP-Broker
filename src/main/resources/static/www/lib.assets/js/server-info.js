@@ -2,7 +2,7 @@ $(document).ready(function(e){
     loadData();
     setInterval(function(e2){
       reloadData();
-    }, 10000);
+    }, 30000);
   $(document).on('click', '.tile.restart a', function(e){
     if(confirm('Are you sure you want to restart the service?'))
     {

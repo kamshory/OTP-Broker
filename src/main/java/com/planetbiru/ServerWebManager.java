@@ -236,13 +236,12 @@ public class ServerWebManager {
 						if(action.equals("connect"))
 						{
 							GSMUtil.connect(modemID);						
-							ServerInfo.sendModemStatus();
 						}
 						else
 						{
 							GSMUtil.disconnect(modemID);
-							ServerInfo.sendModemStatus();
 						} 
+						ServerInfo.sendModemStatus();
 					}
 					catch (GSMException e) 
 					{
