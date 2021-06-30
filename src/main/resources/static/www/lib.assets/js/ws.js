@@ -607,3 +607,38 @@ $(document).ready(function(e){
     });
     initWebSocket();
 });
+
+function dateFormat(today)
+{
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+    var hh = today.getHours();
+    var ii = today.getMinutes();
+    var ss = today.getSeconds();
+    if(dd < 10)
+    {
+        dd = '0'+dd;
+    }
+    if(mm < 10)
+    {
+        mm = '0'+mm;
+    }
+
+    if(hh < 10)
+    {
+        hh = '0'+hh;
+    }
+    if(ii < 10)
+    {
+        ii = '0'+ii;
+    }
+    if(ss < 10)
+    {
+        ss = '0'+ss;
+    }
+
+    var yyyy = today.getFullYear();
+
+    var str = yyyy + '-' + mm + '-' + dd + ' '+hh + ':' + ii + ':' + ss;
+    return str;
+}

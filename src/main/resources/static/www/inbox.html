@@ -61,7 +61,7 @@
                                 <li class=""><a href="api-user.html">API User</a></li>
                                 <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
                                 <li class=""><a href="sms-setting.html">SMS Setting</a></li>
-                                <li class="active"><a href="block-list.html">Block List</a></li>
+                                <li class=""><a href="block-list.html">Block List</a></li>
                                 <li class=""><a href="modem.html">Modem</a></li>
                                 <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li class=""><a href="network-setting.html">Network Setting</a></li>
@@ -82,35 +82,103 @@
                         <li><a href="logout.html">Logout</a></li>
                     </ul>
                 </div>
-
             </div>
             <!--/.container-fluid -->
         </nav>
+        <style>
+            .message-item{
+                border: 1px solid #f0e18e;
+                padding: 12px 16px;
+                background: #fffadb;
+                position: relative;
+                border-radius: 7px;
+                box-sizing: border-box;
+            }
+            .message-item-wrapper{
+                padding-bottom: 10px;
+            }
+            .message-sender{
+                font-weight:bold;
+                float:left;
+
+            }
+            .message-date-time{
+                text-align:right;
+            }
+            .message-message{
+                padding-top:4px;
+            }
+            .message-item-selected{
+                background: #fdf0a6;
+                border: 1px solid #e5d683;
+                box-shadow:inset 0px 0px 2px #e5d683;
+            }
+            .button-area{
+                padding-bottom:10px;
+            }
+        </style>
         <div class="phone-page">
-            <h3>Block List</h3>
-            <form action="block-list.html" method="post">
-                <table class="config-table config-table-connection">
-                    <tbody>                      
-                        <tr>
-                            <td>MSISDN</td>
-                            <td><input type="text" class="form-control" name="msisdn" value=""></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="config-table config-table-connection">
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td>
-                                <input type="submit" class="btn btn-success" name="add" value="Save"
-                                    onclick="return confirm('Are you sure you want to save this record')">
-                                <input type="button" class="btn btn-primary" value="Cancel"
-                                    onclick="window.location='block-list.html'">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </form>
+            <div class="inbox">
+                <div class="button-area">
+                <input type="button" class="load-sms btn btn-primary" value="Load">
+                <input type="button" class="check-all-sms btn btn-success" value="Check All">
+                <input type="button" class="uncheck-all-sms btn btn-success" value="Uncheck All">
+                <input type="button" class="delete-sms btn btn-danger" value="Delete">
+                </div>
+                <div class="message-list">
+                    <div class="message-item">
+                        <div class="message-item-wrapper">
+                            <div class="message-sender">628126668888</div>
+                            <div class="message-date-time">2021-01-11 01:02</div>
+                            <div class="message-action"></div>
+                            <div class="message-message">OTP Saya tidak bisa digunakan...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                $(document).ready(function(e){
+                    $('.message-item').contextmenu(function(e2) {
+                        if(!$(this).hasClass('message-item-selected'))
+                        {
+                            $(this).addClass('message-item-selected');
+                        }
+                        else
+                        {
+                            $(this).removeClass('message-item-selected');
+                        }
+                    });
+                    $(document).on('dblclick', '.message-item', function(e2){
+                        if(!$(this).hasClass('message-item-selected'))
+                        {
+                            $(this).addClass('message-item-selected');
+                        }
+                        else
+                        {
+                            $(this).removeClass('message-item-selected');
+                        }
+                    });
+                    $(document).on('click', '.check-all-sms', function(e2){
+                        $('.message-item').each(function(e3){
+                            if(!$(this).hasClass('message-item-selected'))
+                            {
+                                $(this).addClass('message-item-selected');
+                            }
+                        })
+                    });
+                    $(document).on('click', '.uncheck-all-sms', function(e2){
+                        $('.message-item').each(function(e3){
+                            $(this).removeClass('message-item-selected');
+                        })
+                    });
+                    $(document).on('click', '.delete-sms', function(e2){
+                        $('.message-item-selected').each(function(e3){
+                            $(this).remove();
+                        })
+                    });
+                });
+            </script>
         </div>
         <!-- /container -->
     </div>

@@ -35,7 +35,7 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <span class="usb-device-symbol"></span>
+			<span class="usb-device-symbol"></span>
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                         aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
@@ -48,38 +48,37 @@
 
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li class=""><a href="./">Home</a></li>
-                        <li class=""><a href="ussd.html">USSD</a></li>
-                        <li class=""><a href="sms.html">SMS</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li class=""><a href="general-setting.html">General Setting</a></li>
-                                <li class=""><a href="admin.html">Administrator Setting</a></li>
-                                <li class=""><a href="api-setting.html">API Setting</a></li>
-                                <li class=""><a href="api-user.html">API User</a></li>
-                                <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
-                                <li class=""><a href="sms-setting.html">SMS Setting</a></li>
-                                <li class="active"><a href="block-list.html">Block List</a></li>
-                                <li class=""><a href="modem.html">Modem</a></li>
-                                <li class=""><a href="email-setting.html">Email Setting</a></li>
-                                <li class=""><a href="network-setting.html">Network Setting</a></li>
+                      <li class=""><a href="./">Home</a></li>
+                      <li class=""><a href="ussd.html">USSD</a></li>
+                      <li class=""><a href="sms.html">SMS</a></li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                        <li class=""><a href="general-setting.html">General Setting</a></li>
+                          <li class=""><a href="admin.html">Administrator Setting</a></li>
+                          <li class=""><a href="api-setting.html">API Setting</a></li>
+                          <li class=""><a href="api-user.html">API User</a></li>
+                          <li class=""><a href="feeder-setting.html">Feeder Setting</a></li>
+                          <li class=""><a href="sms-setting.html">SMS Setting</a></li>
+                          <li class=""><a href="block-list.html">Block List</a></li>
+                          <li class=""><a href="modem.html">Modem</a></li>
+                          <li class=""><a href="email-setting.html">Email Setting</a></li>
+                          <li class=""><a href="network-setting.html">Network Setting</a></li>
 				  <li class=""><a href="firewall.html">Firewall</a></li>
-                                <li class=""><a href="keystore.html">Keystore</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li class="dropdown-header">DDNS Setting</li>
-                                <li class=""><a href="ddns-record.html">DDNS Record</a></li>
-                                <li class=""><a href="cloudflare.html">Cloudflare Account</a></li>
-                                <li class=""><a href="noip.html">No IP Account</a></li>
-                                <li class=""><a href="dynu.html">Dynu Account</a></li>
-                                <li class=""><a href="afraid.html">Afraid Account</a></li>
-                            </ul>
-                        </li>
+                          <li class=""><a href="keystore.html">Keystore</a></li>
+                          <li role="separator" class="divider"></li>
+                          <li class="dropdown-header">DDNS Setting</li>
+                          <li class="active"><a href="ddns-record.html">DDNS Record</a></li>
+                          <li class=""><a href="cloudflare.html">Cloudflare Account</a></li>
+                          <li class=""><a href="noip.html">No IP Account</a></li>
+                          <li class=""><a href="dynu.html">Dynu Account</a></li>
+                          <li class=""><a href="afraid.html">Afraid Account</a></li>
+                        </ul>
+                      </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li class=""><a href="account.html">Account</a></li>
-                        <li><a href="logout.html">Logout</a></li>
+                      <li class=""><a href="account.html">Account</a></li>
+                      <li><a href="logout.html">Logout</a></li>
                     </ul>
                 </div>
 
@@ -87,15 +86,22 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>Block List</h3>
-            <form action="block-list.html" method="post">
+            <h3>Firewall</h3>
+            <form action="firewall.html" method="post">
                 <table class="config-table config-table-connection">
-                    <tbody>                      
+                    <tbody>
                         <tr>
-                            <td>MSISDN</td>
-                            <td><input type="text" class="form-control" name="msisdn" value=""></td>
+                            <td>Port</td>
+                            <td><input type="number" min="1" max="65535" class="form-control" name="port" value=""></td>
+                            </tr>
+                        <tr>
+                        <td>Protocol</td>
+                        <td><select name="protocol" id="protocol" class="form-control">
+                            <option value="tcp">TCP</option>
+                            <option value="udp">UDP</option>
+                        </select></td>
                         </tr>
-                    </tbody>
+                        </tbody>
                 </table>
                 <table class="config-table config-table-connection">
                     <tbody>
@@ -105,7 +111,7 @@
                                 <input type="submit" class="btn btn-success" name="add" value="Save"
                                     onclick="return confirm('Are you sure you want to save this record')">
                                 <input type="button" class="btn btn-primary" value="Cancel"
-                                    onclick="window.location='block-list.html'">
+                                    onclick="window.location='ddns-record.html'">
                             </td>
                         </tr>
                     </tbody>

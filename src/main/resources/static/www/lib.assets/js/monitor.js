@@ -172,6 +172,7 @@ function setModemActive(id, senderType, status)
         {
             $(selector).find('line').attr('stroke', '#f80000');
             $(selector).find('[data-name="led"]').attr('display', '');
+            $('#phoneled').attr('display', '');
             $('#'+senderType).find('text').attr('fill', 'red');
             $('#'+senderType).find('rect').attr('stroke', 'red');
             $('#'+senderType).find('line').attr('stroke', 'red');
@@ -180,6 +181,7 @@ function setModemActive(id, senderType, status)
         {
             $(selector).find('line').attr('stroke', '#053310');
             $(selector).find('[data-name="led"]').attr('display', 'none');
+            $('#phoneled').attr('display', 'none');
             $('#'+senderType).find('text').attr('fill', 'black');
             $('#'+senderType).find('rect').attr('stroke', 'black');
             $('#'+senderType).find('line').attr('stroke', 'black');

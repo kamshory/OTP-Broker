@@ -35,7 +35,7 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <span class="usb-device-symbol"></span>
+			<span class="usb-device-symbol"></span>
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                         aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
@@ -50,7 +50,7 @@
                     <ul class="nav navbar-nav">
                       <li class=""><a href="./">Home</a></li>
                       <li class=""><a href="ussd.html">USSD</a></li>
-                      <li class="active"><a href="sms.html">SMS</a></li>
+                      <li class=""><a href="sms.html">SMS</a></li>
                       <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                         <ul class="dropdown-menu">
@@ -64,7 +64,7 @@
                           <li class=""><a href="modem.html">Modem</a></li>
                           <li class=""><a href="email-setting.html">Email Setting</a></li>
                           <li class=""><a href="network-setting.html">Network Setting</a></li>
-				  <li class=""><a href="firewall.html">Firewall</a></li>
+				        <li class="active"><a href="firewall.html">Firewall</a></li>
                           <li class=""><a href="keystore.html">Keystore</a></li>
                           <li role="separator" class="divider"></li>
                           <li class="dropdown-header">DDNS Setting</li>
@@ -86,45 +86,64 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <form action="sms.html" method="POST" onsubmit="return processForm(this)">
-                <div class="receiver-area">
-                    <div class="input-label">Receiver</div>
-                    <input type="email" name="recipient" id="recipient" class="input-text">
-                </div>
+            <h3>Firewall</h3>
+            <form action="" method="post">
+                <table class="row-table" border="1" data-file="ddns-record.html">
+                    <thead>
+                        <tr>
+                            <td width="16"><input type="checkbox" class="check-all"></td>
+                            <td>Port</td>
+                            <td>Protocol</td>
+                            <td>Last Update</td>
+                            <td width="60" align="center">Open</td>
+                        </tr>
+                    </thead>
 
-                <div class="receiver-area">
-                    <div class="input-label">Subject</div>
-                    <input type="text" name="subject" id="subject" class="input-text">
-                </div>
+                    <tbody>
 
-                <div class="message-area">
-                    <div class="input-label">Message</div>
-                    <textarea class="text-message" name="message" id="message" cols="30" rows="10"
-                        maxlength="150"></textarea>
-                </div>
-                <div class="text-right">
-                    <input type="reset" class="btn btn-default" value="Reset">
-                    <input type="submit" class="btn btn-success" value="Send" name="send">
+                    </tbody>
+                </table>
+                <div class="button-area">
+                    <input type="button" class="btn btn-success" value="Add" onclick="window.location='firewall-add.html'">
+                    <input type="submit" class="btn btn-primary" name="activate" value="Open">
+                    <input type="submit" class="btn btn-warning" name="deactivate" value="Close">
+                    <input type="submit" class="btn btn-danger" name="delete" value="Delete"
+                    onclick="return confirm('Are you sure you want to delete this record?')">
                 </div>
             </form>
-            <script>
-                function processForm(obj) {
-                    var recipient = $('#recipient').val();
-                    var subject = $('#subject').val();
-                    var message = $('#message').val();
+            <script type="text/javascript">
+                $(document).ready(function (e1) {
                     $.ajax({
-                        'type': 'POST',
-                        'url': 'api/email/',
-                        'data': { recipient: recipient, subject:subject, message: message, send: 'send' },
+                        type: "GET",
+                        url: "firewall/list",
+                        dataType: "json",
                         success: function (data) {
-                            console.log(data);
-                            //$('#recipient').val('');
-                            //$('#subject').val('');
-                            //$('#message').val('');
+                            var i = 0;
+                            for (const key in data) {
+                                if (data.hasOwnProperty(key)) {
+                                    i++;
+                                    var item = data[key];
+                                    var active = !item.active ? 'icon-cross' : 'icon-check';
+                                    var update = new Date();
+                                    update.setTime(item.lastUpdate);
+                                    var lastUpdate = dateFormat(update);
+                                    $('.row-table tbody').append(
+                                        '<tr data-pk-id="' + item.id + '">\r\n' +
+                                        '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +
+                                        '	<td>' + item.port + '</td>\r\n' +
+                                        '	<td>' + item.protocol + '</td>\r\n' +
+                                        '	<td>' + lastUpdate + '</td>\r\n' +
+                                        '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
+                                        '</tr>\r\n'
+                                    );                                    
+                                }
+                            }
                         }
                     });
-                    return false;
-                }
+                });
+
+
+                
             </script>
         </div>
         <!-- /container -->

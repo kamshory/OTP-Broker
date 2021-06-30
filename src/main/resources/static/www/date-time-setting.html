@@ -65,6 +65,7 @@
                                 <li class=""><a href="modem.html">Modem</a></li>
                                 <li class=""><a href="email-setting.html">Email Setting</a></li>
                                 <li class=""><a href="network-setting.html">Network Setting</a></li>
+				  <li class=""><a href="firewall.html">Firewall</a></li>
                                 <li class=""><a href="keystore.html">Keystore</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="dropdown-header">DDNS Setting</li>
@@ -751,40 +752,10 @@
                             $('[name="ntp_update_interval"]').val(data.ntpUpdateInterval);
                         }
                     });
+                    
                     setInterval(function(e2){
                         var today = new Date();
-                        
-
-                        var dd = today.getDate();
-                        var mm = today.getMonth() + 1;
-                        var hh = today.getHours();
-                        var ii = today.getMinutes();
-                        var ss = today.getSeconds();
-                        if(dd < 10)
-                        {
-                            dd = '0'+dd;
-                        }
-                        if(mm < 10)
-                        {
-                            mm = '0'+mm;
-                        }
-
-                        if(hh < 10)
-                        {
-                            hh = '0'+hh;
-                        }
-                        if(ii < 10)
-                        {
-                            ii = '0'+ii;
-                        }
-                        if(ss < 10)
-                        {
-                            ss = '0'+ss;
-                        }
-
-                        var yyyy = today.getFullYear();
-
-                        var str = yyyy + '-' + mm + '-' + dd + ' '+hh + ':' + ii + ':' + ss;
+                        var str = dateFormat(today);                     
 
                         $('[name="device_time"]').val(str);
                     }, 1000);

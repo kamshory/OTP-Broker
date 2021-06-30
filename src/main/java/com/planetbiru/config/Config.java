@@ -81,7 +81,9 @@ public class Config {
 	private static boolean validDevice = false;
 	private static String restartCommand = "";
 	private static String cleanupCommand = "";
-	public static boolean showTraffic = true; 
+	private static boolean showTraffic = true;
+	private static int portManager = 8888;
+	private static String firewallSettingPath = ""; 
 	
 	private Config()
 	{
@@ -678,6 +680,30 @@ public class Config {
 
 	public static void setCleanupCommand(String cleanupCommand) {
 		Config.cleanupCommand = cleanupCommand;
+	}
+
+	public static int getPortManager() {
+		return portManager;
+	}
+
+	public static void setPortManager(int portManager) {
+		Config.portManager = portManager;
+	}
+
+	public static String getFirewallSettingPath() {
+		return firewallSettingPath;
+	}
+
+	public static void setFirewallSettingPath(String firewallSettingPath) {
+		Config.firewallSettingPath = firewallSettingPath;
+	}
+
+	public static boolean isShowTraffic() {
+		return showTraffic;
+	}
+
+	public static void setShowTraffic(boolean showTraffic) {
+		Config.showTraffic = showTraffic;
 	}
 	
 }

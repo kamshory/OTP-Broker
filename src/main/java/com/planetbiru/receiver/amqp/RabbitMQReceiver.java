@@ -17,6 +17,7 @@ import com.planetbiru.gsm.GSMUtil;
 public class RabbitMQReceiver implements MessageListener{
 	private Logger logger = LogManager.getLogger(RabbitMQReceiver.class);
 	private CountDownLatch latch = new CountDownLatch(1);
+	
 	public void onMessage(Message messageRaw) 
 	{
 		if(messageRaw != null && messageRaw.getBody() != null)
