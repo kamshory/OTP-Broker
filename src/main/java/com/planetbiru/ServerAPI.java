@@ -141,7 +141,9 @@ public class ServerAPI {
 
 	@Value("${otpbroker.path.setting.modem}")
 	private String modemSettingPath;
-
+	
+	@Value("${otpbroker.debug.modem}")
+	private boolean debugModem;
 
 	@PostConstruct
 	public void init()
@@ -168,6 +170,7 @@ public class ServerAPI {
 		Config.setKeystoreSettingPath(keystoreSettingPath);
 		Config.setRestartCommand(restartCommand);
 		Config.setModemSettingPath(modemSettingPath);
+		Config.setDebugModem(debugModem);
 
 		
 		this.loadConfigAPI();

@@ -83,7 +83,8 @@ public class Config {
 	private static String cleanupCommand = "";
 	private static boolean showTraffic = true;
 	private static int portManager = 8888;
-	private static String firewallSettingPath = ""; 
+	private static String firewallSettingPath = "";
+	private static boolean debugModem = true; 
 	
 	private Config()
 	{
@@ -704,6 +705,14 @@ public class Config {
 
 	public static void setShowTraffic(boolean showTraffic) {
 		Config.showTraffic = showTraffic;
+	}
+
+	public static boolean isDebugModem() {
+		return debugModem;
+	}
+
+	public static void setDebugModem(boolean debugModem) {
+		Config.debugModem = debugModem;
 	}
 	
 }

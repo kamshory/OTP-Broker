@@ -6,6 +6,7 @@ import com.fazecast.jSerialComm.SerialPortEvent;
 import com.fazecast.jSerialComm.SerialPortInvalidPortException;
 import com.google.common.base.Splitter;
 import com.google.common.primitives.Longs;
+import com.planetbiru.config.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,12 +106,18 @@ public class GSM {
 	        } 
 	        else 
 	        {       	
-	        	/**
-	        	 * Debug
-	        	 */
-	        	this.connected = true;
-	        	this.ready = true;
-	            open = true;
+	        	if(Config.isDebugModem())
+	        	{
+		        	this.connected = true;
+		        	this.ready = true;
+		            open = true;
+	        	}
+	        	else
+	        	{
+	        		this.connected = false;
+		        	this.ready = false;
+		            open = false;
+	        	}
 	        	logger.info("FAILED....");
 	        }
     	}
