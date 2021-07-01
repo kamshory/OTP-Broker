@@ -34,6 +34,164 @@ OTP Broker menjawab semua tantangan di atas. Dengan perangkat yang sangat murah,
 
 OTP Broker adalah server untuk mengirimkan SMS melalui protokol HTTP, WebSocket dan Message Broker. Pengguna dapat memasang OTP Broker pada server dengan IP address statis yang diapat diakses oleh klien yang akan mengirimkan SMS. Selain itu, pengguna juga dapat memasang OTP Broker pada server dengan IP address dinamis. Server ini kemudian mengakses sebuah server websocket atau server RabbitMQ. OTP Broker bertindak sebagai consumer yang akan mengirimkan semua SMS yang diterimanya.
 
+# Feature
+
+## Multiple Device
+
+Modem adalah daftar modem yang terpasang pada OTP Broker. Modem diberi nama berdasarkan merek dan model perangkat serta koneksi yang digunakan. Modem dapat diaktifkan dan dinonaktirkan kapan saja. Modem yang tidak aktif tidak akan digunakan untuk mengirimkan SMS meskipun secara fisik terpasang pada OTP Broker dan menerima aliran daya.
+
+OTP Broker dapat menggunakan beberapa modem sekaligus. Pengiriman SMS akan menggunakan algoritma Round-Robin di mana semua modem yang aktif akan digunakan secara bergilir.
+
+## Prefix-Based Routing
+
+Dalam kenyataannya, efisiensi biaya menjadi hal yang sangat penting bagi pengguna. Biaya pengiriman SMS harus dapat ditekan semaksimal mungkin. Operator telekomunikasi biasannya menerapkan biaya yang lebih rendah saat mengirim SMS ke nomor pelanggan dari operator telekomunikasi yang sama. Sebaliknya, biaya pengiriman SMS akan lebih tinggi saat mengirim SMS ke nomor pelanggan dari operator lain.
+
+OTP Broker memungkinkan pengguna mengatur pengiriman SMS. Sebagai contoh: pengguna menggunakan 4 modem dengan 4 SIM card yang berbeda dari operator telekomunikasi yang berbeda. 
+
+1. Modem 1 dengan SIM Card dari Operator Telekomunikasi 1
+2. Modem 2 dengan SIM Card dari Operator Telekomunikasi 2
+3. Modem 3 dengan SIM Card dari Operator Telekomunikasi 3
+4. Modem 4 dengan SIM Card dari Operator Telekomunikasi 4
+
+Operator Telekomunikasi 1 menerapkan biaya Rp 50 untuk nomor dengan prefix 0871 dan 0872 dan menerapkan biaya Rp 350 untuk nomor selain itu.
+Operator Telekomunikasi 2 menerapkan biaya Rp 100 untuk nomor dengan prefix 0835, 0856, dan 0837 dan menerapkan biaya Rp 350 untuk nomor selain itu.
+Operator Telekomunikasi 3 menerapkan biaya Rp 60 untuk nomor dengan prefix 0845 dan menerapkan biaya Rp 250 untuk nomor selain itu.
+Operator Telekomunikasi 4 menerapkan biaya Rp 90 untuk nomor dengan prefix 0848 dan 0849 dan menerapkan biaya Rp 200 untuk nomor selain itu.
+
+Dari kasus di atas, biaya paling rendah untuk operator lain adalah Rp 200. Pengguna dapat mengatur modem 4 sebagai modem default. Semua SMS selain dari prefix 0871, 0872, 0835, 0856, 0837 dan 0845 akan menggunakan modem ini dan dikirim melalui Operator Telekomunikasi 4. Semua SMS untuk nomor dengan prefix 0871 dan 0872 menggunakan modem 1 dan dikirim melalui Operator Telekomunikasi 1. Semua SMS untuk nomor dengan prefix 0835, 0856, dan 0837 menggunakan modem 2 dan dikirim melalui Operator Telekomunikasi 2. Semua SMS untuk nomor dengan prefix 0845 menggunakan modem 3 dan dikirim melalui Operator Telekomunikasi 3. Dengan demikian, biaya pengiriman SMS akan dapat ditekan. 
+
+Pengguna dapat menggunakan 2 atau lebih SIM Card dari satu operator yang sama. Modem akan digunakan secara bergantian dengan algoritma Round-Robin saat OTP Broker mengirimkan SMS ke nomor dengan prefix yang sama.
+
+Biaya pengiriman SMS akan lebih murah lagi ketika pengguna memanfaatkan promo dari operator telekomunikasi yang bersangkutan. Beberapa operator akan menerapkan biaya pengiriman SMS yang sangat rendah setelah pengguna mengirimkan beberapa SMS dengan ketentuan tertentu.
+
+Pengaturan prefix menggunakan MSISDN atau IMSI. Dengan demikian, pada contoh di atas, saat pengguna di Indonesia mengatur prefix 0871, maka yang tersimpan adalah 62871. Dengan demikian, pengguna harus menggunakan panjang prefix 5 alih-alih 4.
+
+## USSD Support
+
+OTP Broker memungkinkan pengguna melakukan perintah USSD pada masing-masing modem. Perintah USSD tentu saja tergantung dari masing-masing operator seluler yang digunakan pada masing-masing SIM card yang terpasang pada masing-masing modem.
+
+## Manual SMS
+
+Manual SMS digunakan untuk menguji apakah masing-masing modem dapat mengirimkan SMS.
+
+## Administrator Setting
+
+Administrator Setting adalah menu untuk melakukan konfigurasi administrator. Perangkat OTP Broker baru belum memiliki administrator. Pengguna harus memuat administrator terlebih dahulu sebelum menggunakannya. Silakan masuk ke akses poin OTP Broker sesuai dengan SSID dan password yang tertera pada brosur dan pindai QR Code pada brosur menggunakan smartphone.
+
+Alamat bawaan dari web manajemen adalah http://192.168.0.11:8888 
+
+**Username**
+Username adalah pengenal administrator saat login ke OTP Broker
+
+**Password**
+Username adalah pengaman administrator saat login ke OTP Broker
+
+**Phone Number**
+Phone number dapat digunakan jika administrator lupa password. Password akan dikirim melalui SMS. Tentu saja ini baru bisa dilakukan ketika OTP Broker telah terkonfigurasi dengan benar.
+
+**Email**
+Email dapat digunakan jika administrator lupa password. Password akan dikirim melalui email. Tentu saja ini baru bisa dilakukan ketika OTP Broker telah terkonfigurasi dengan benar.
+
+## API Setting
+
+API Setting adalah konfigurasi REST API untuk mengirimkan SMS.
+1. **HTTP Port** adalah port server untuk HTTP
+2. **Enable HTTP** adalah pengaturan untuk mengaktifkan atau menonaktifkan port HTTP
+3. **HTTPS Port** adalah port server untuk HTTPS
+4. **Enable HTTPS** adalah pengaturan untuk mengaktifkan atau menonaktifkan port HTTPS
+5. **Message Path** adalah path untuk mengirimkan SMS dan email
+6. **Blocking Path** adalah path untuk memblokir nomor telepon agar OTP Broker tidak mengirimkan SMS ke nomor tersebut
+7. **Unblocking Path** adalah path untuk membuka blokir nomor telepon agar OTP Broker dapat kembali mengirimkan SMS ke nomor tersebut
+
+## API User
+
+API User adalah akun pengirim SMS melalui REST API.
+
+**Username**
+Username adalah pengenal pengirim saat mengirimkan SMS ke OTP Broker
+
+**Password**
+Username adalah pengaman pengirim saat mengirimkan SMS ke OTP Broker
+
+**Phone Number**
+Phone number adalah informasi kontak berupa nomor telepon dari pengguna API
+
+**Email**
+Email adalah informasi kontak berupa alamat email dari pengguna API
+
+## Feeder Setting
+
+OTP Broker memberikan pilihan apabila perangkat ini dipasang pada jaringan internet mobile atau pada jaringan di mana perangkat pengirim tidak mungkin dapat menjangkau alamat dari OTP Broker.
+
+OTP Broker menyediakan 2 cara agar OTP Broker dapat menerima pesan yang akan dikirimkan melalui SMS yaitu dengan RabbitMQ dan WSMessageBroker.
+
+## SMS Setting
+
+SMS Setting adalah konfigurasi pengiriman SMS oleh OTP Broker.
+
+## Blocking List
+
+Bloking list adalah daftar nomor telepon yang diblokir. Nomor yang diblokir tidak akan menerima SMS dari modem manapun. Daftar ini dapat ditambah dan diputihkanmelalui REST API, RabbitMQ dan WebSocket. Daftar ini juga dapat secara manual ditambah, diputihkan, atau dihapus melalui web admin.
+
+## Multiple Email Account
+
+OTP Broker mendukung multiple email account. Email account adalah konfigurasi yang berisi alamat SMTP Server, port SMTP server, username, password, dan konfigurasi lainnya.
+
+SMTP Server digunakan untuk mengirimkan OTP ke alamat email dan dapat digunakan untuk melakukan reset password.
+
+## DDNS Record
+
+DDNS Record adalah data untuk melakukan pengaturan DNS secara dinamis. DDNS atau Dymanic Domain Name Server adalah sebuah mekanisme pengaturan DNS yang dilakukan secara berulang-ulang disebabkan karena alamat IP publik dari server yang selalu berubah-ubah.
+
+OTP Broker menyediakan pengaturan DDNS menggunakan vendor DDNS. Beberapa vendor DDNS yang didukung adalah sebagai berikut:
+
+1. Cloudflare - https://www.cloudflare.com/
+2. NoIP - https://www.noip.com/
+3. Dynu Dyn DNS - https://www.dynu.com/
+4. Free DNS Afraid - https://freedns.afraid.org/
+
+## Network Setting 
+
+Network Setting adalah konfigurasi untuk mengatur jaringan dari OTP Broker. OTP Broker dilengkapi dengan akses poin sehingga dapat diakses langsung menggunakan laptop atau handphone tanpa harus memasangnya ke jaringan kabel. Hal ini akan memudahkan pengguna karena konfigurasi jaringan LAN pengguna berbeda-beda. Pengguna cukup mengatur alamat IP pada jaringan ethernet sesuai dengan konfigurasi jaringan LAN yang digunakan.
+
+### DHCP
+
+Konfigurasi DHCP akan mengatur DHCP pada akses poin OTP Broker.
+
+### Wireless LAN
+
+Konfigurasi Wireless LAN akan mengatur alamat IP pada jaringan wireless OTP Broker. Alamat IP bawaan dari OTP Broker adalah 192.168.0.11
+
+### Ethernet
+
+Konfigurasi Ethernet akan mengatur alamat IP ethernet pada OTP Broker.
+
+## Firewall
+
+OTP Broker dapat membuka dan mentutup port dari sistem operasi yang digunakan oleh SMS Broker. Penutupan port ini akan membuat firewall di lapis sistem operasi. Dalam hal ini, apabila port ditutup, maka equest tidak akan sampai masuk ke aplikasi.
+
+## Monitor
+
+Monitor dapat digunakan untuk melihat aktivitas modem yang terpasang di OTP Broker. Pada saat OTP Broker mengirimkan SMS, OTP Broker akan menunjukkan dari mana request SMS masuk dan modem mana yang digunakan.  Selain itu, status dari modem akan ditunjukkan sehingga akan terlihat modem mana saja yang terhubung dengan benar.
+
+## Cloudflare
+
+Modul Cloudflare adalah modul untuk mengatur akun Cloudflare yang digunakan.
+
+## NoIP
+
+Modul NoIP adalah modul untuk mengatur akun NoIP yang digunakan.
+
+## Dynu
+
+Modul Dynu adalah modul untuk mengatur akun Dynu Dyn DNS yang digunakan.
+
+## Afraid
+
+Modul Afraid adalah modul untuk mengatur akun Free DNS Afraid yang digunakan.
+
+# Topology
+
 Baik WebSocket maupun Message Broker menggunakan sebuah channel yang dapat diseting dari kedua sisi (pengirim dan penerima).
 
 Untuk menggunakan WebSocket, silakan gunakan library WSMessageBrocker dengan link https://github.com/kamshory/WSMessageBrocker atau anda dapat membuatnya sendiri. 
@@ -42,7 +200,7 @@ Untuk menggunakan Message Broker, silakan gunakan RabbitMQ dengan link https://w
 
 ![OTP Broker Topology](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology.png)
 
-## Sekenario 1 - OTP Broker Dapat Diakses App Server
+### Sekenario 1 - OTP Broker Dapat Diakses App Server
 
 Pada skenario ini, App Server dapat langsung mengirimkan OTP ke OTP Broker melalui HTTP.
 
@@ -56,7 +214,7 @@ Pengguna dapat menggunakan sebuah domain murah dan menggunakan Dynamic Domain Na
 4. Domain yang name servernya dapat diatur
 5. Layanan Dynamic DNS (gratis maupun berbayar)
 
-### REST API
+**1. REST API**
 
 **Send SMS Request**
 
@@ -167,7 +325,7 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 | `data`.subject | String | Subjek email |
 | `data`.message| String | Pesan email|
 
-## Sekenario 2 - OTP Broker Tidak Dapat Diakses App Server
+### Sekenario 2 - OTP Broker Tidak Dapat Diakses App Server
 
 Pada skenario ini, App Server dapat mengirimkan OTP ke RabbitMQ Server atau WSMessageBroker. WSMessageBroker menggunakan protokol WebSoket dan Basic Authentication. Baik App Server maupun OTP Broker bertindak sebagai client dari WSMessageBroker.
 
@@ -183,7 +341,7 @@ Pada skenario ini, pengguna tidak memerlukan IP public. Pengguna hanya memerluka
 2. Koneksi internet (tidak memerlukan IP public dan port forwarding)
 3. Server RabbitMQ atau WSMessageBroker
 
-### RabbitMQ
+**1. RabbitMQ**
 
 **Send SMS Request**
 
@@ -241,7 +399,7 @@ Pada skenario ini, pengguna tidak memerlukan IP public. Pengguna hanya memerluka
 | data | Objek | Data untuk OTP Broker | 
 | `data`.msisdn | String | Nomor MSISDN yang akan dibuka blokir |
 
-### WSMessageBroker
+**2. WSMessageBroker**
 
 **Send SMS Request**
 
@@ -322,126 +480,8 @@ Pada skenario ini, pengguna tidak memerlukan IP public. Pengguna hanya memerluka
 
 Server WSMessageBroker berbasis menggunakan protokol WebSocket dan PHP. Silakan download WSMessageBroker di https://github.com/kamshory/WSMessageBrocker 
 
-# Feature
-
-## Multiple Device
-
-OTP Broker dapat menggunakan beberapa modem sekaligus. Pengiriman SMS akan menggunakan algoritma Round-Robin di mana semua modem yang aktif akan digunakan secara bergilir.
-
-## USSD Support
-
-OTP Broker memungkinkan pengguna melakukan perintah USSD pada masing-masing modem. Perintah USSD tentu saja tergantung dari masing-masing operator seluler yang digunakan pada masing-masing SIM card yang terpasang pada masing-masing modem.
-
-## Manual SMS
-
-Manual SMS digunakan untuk menguji apakah masing-masing modem dapat mengirimkan SMS.
-
-## Administrator Setting
-
-Administrator Setting adalah menu untuk melakukan konfigurasi administrator. Perangkat OTP Broker baru belum memiliki administrator. Pengguna harus memuat administrator terlebih dahulu sebelum menggunakannya. Silakan masuk ke akses poin OTP Broker sesuai dengan SSID dan password yang tertera pada brosur dan pindai QR Code pada brosur menggunakan smartphone.
-
-Alamat bawaan dari web manajemen adalah http://192.168.0.11:8888 
-
-**Username**
-Username adalah pengenal administrator saat login ke OTP Broker
-
-**Password**
-Username adalah pengaman administrator saat login ke OTP Broker
-
-**Phone Number**
-Phone number dapat digunakan jika administrator lupa password. Password akan dikirim melalui SMS. Tentu saja ini baru bisa dilakukan ketika OTP Broker telah terkonfigurasi dengan benar.
-
-**Email**
-Email dapat digunakan jika administrator lupa password. Password akan dikirim melalui email. Tentu saja ini baru bisa dilakukan ketika OTP Broker telah terkonfigurasi dengan benar.
-
-## API Setting
-
-API Setting adalah konfigurasi REST API untuk mengirimkan SMS.
-1. **HTTP Port** adalah port server untuk HTTP
-2. **Enable HTTP** adalah pengaturan untuk mengaktifkan atau menonaktifkan port HTTP
-3. **HTTPS Port** adalah port server untuk HTTPS
-4. **Enable HTTPS** adalah pengaturan untuk mengaktifkan atau menonaktifkan port HTTPS
-5. **Message Path** adalah path untuk mengirimkan SMS dan email
-6. **Blocking Path** adalah path untuk memblokir nomor telepon agar OTP Broker tidak mengirimkan SMS ke nomor tersebut
-7. **Unblocking Path** adalah path untuk membuka blokir nomor telepon agar OTP Broker dapat kembali mengirimkan SMS ke nomor tersebut
-
-## API User
-
-API User adalah akun pengirim SMS melalui REST API.
-
-**Username**
-Username adalah pengenal pengirim saat mengirimkan SMS ke OTP Broker
-
-**Password**
-Username adalah pengaman pengirim saat mengirimkan SMS ke OTP Broker
-
-**Phone Number**
-Phone number adalah informasi kontak berupa nomor telepon dari pengguna API
-
-**Email**
-Email adalah informasi kontak berupa alamat email dari pengguna API
-
-## Feeder Setting
-
-OTP Broker memberikan pilihan apabila perangkat ini dipasang pada jaringan internet mobile atau pada jaringan di mana perangkat pengirim tidak mungkin dapat menjangkau alamat dari OTP Broker.
-
-OTP Broker menyediakan 2 cara agar OTP Broker dapat menerima pesan yang akan dikirimkan melalui SMS yaitu dengan RabbitMQ dan WSMessageBroker.
-
-## SMS Setting
-
-SMS Setting adalah konfigurasi pengiriman SMS oleh OTP Broker.
-
-## Modem
-
-Modem adalah daftar modem yang terpasang pada OTP Broker. Modem diberi nama berdasarkan merek dan model perangkat serta koneksi yang digunakan. Modem dapat diaktifkan dan dinonaktirkan kapan saja. Modem yang tidak aktif tidak akan digunakan untuk mengirimkan SMS meskipun secara fisik terpasang pada OTP Broker dan menerima aliran daya.
 
 
-## Email Setting
-
-Email Setting adalah konfigurasi SMTP untuk mengirimkan password apabila pengguna lupa. Reset password dapat menggunakan username maupun alamat email.
-
-## DDNS Record
-
-DDNS Record adalah data untuk melakukan pengaturan DNS secara dinamis. DDNS atau Dymanic Domain Name Server adalah sebuah mekanisme pengaturan DNS yang dilakukan secara berulang-ulang disebabkan karena alamat IP publik dari server yang selalu berubah-ubah.
-
-OTP Broker menyediakan pengaturan DDNS menggunakan vendor DDNS. Beberapa vendor DDNS yang didukung adalah sebagai berikut:
-
-1. Cloudflare - https://www.cloudflare.com/
-2. NoIP - https://www.noip.com/
-3. Dynu Dyn DNS - https://www.dynu.com/
-4. Free DNS Afraid - https://freedns.afraid.org/
-
-## Network Setting 
-
-Network Setting adalah konfigurasi untuk mengatur jaringan dari OTP Broker. OTP Broker dilengkapi dengan akses poin sehingga dapat diakses langsung menggunakan laptop atau handphone tanpa harus memasangnya ke jaringan kabel. Hal ini akan memudahkan pengguna karena konfigurasi jaringan LAN pengguna berbeda-beda. Pengguna cukup mengatur alamat IP pada jaringan ethernet sesuai dengan konfigurasi jaringan LAN yang digunakan.
-
-### DHCP
-
-Konfigurasi DHCP akan mengatur DHCP pada akses poin OTP Broker.
-
-### Wireless LAN
-
-Konfigurasi Wireless LAN akan mengatur alamat IP pada jaringan wireless OTP Broker. Alamat IP bawaan dari OTP Broker adalah 192.168.0.11
-
-### Ethernet
-
-Konfigurasi Ethernet akan mengatur alamat IP ethernet pada OTP Broker.
-
-## Cloudflare
-
-Modul Cloudflare adalah modul untuk mengatur akun Cloudflare yang digunakan.
-
-## NoIP
-
-Modul NoIP adalah modul untuk mengatur akun NoIP yang digunakan.
-
-## Dynu
-
-Modul Dynu adalah modul untuk mengatur akun Dynu Dyn DNS yang digunakan.
-
-## Afraid
-
-Modul Afraid adalah modul untuk mengatur akun Free DNS Afraid yang digunakan.
 
 
 ## Pengujian Modul
@@ -527,3 +567,5 @@ Modul Afraid adalah modul untuk mengatur akun Free DNS Afraid yang digunakan.
 **No IP**
 
 1. Update : OK
+
+
