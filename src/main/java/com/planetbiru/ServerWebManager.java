@@ -108,9 +108,6 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.user}")
 	private String userSettingPath;
 
-	@Value("${otpbroker.device.connection.type}")
-	private String portName;
-	
 	@Value("${otpbroker.path.setting.ddns}")
 	private String ddnsSettingPath;
 	
@@ -212,7 +209,6 @@ public class ServerWebManager {
 		ConfigGeneral.load(Config.getGeneralSettingPath());
 		ConfigAPI.load(Config.getApiSettingPath());
 
-		Config.setPortName(portName);		
 		WebUserAccount.load(Config.getUserSettingPath());		
 		
 		PropertyLoader.load(Config.getMimeSettingPath());
