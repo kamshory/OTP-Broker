@@ -8,6 +8,7 @@ $(document).ready(function (e1) {
                 if (data.hasOwnProperty(key)) {
                     var item = data[key];
                     var active = !item.active ? 'icon-cross' : 'icon-check';
+                    var def = !item.defaultModem ? 'icon-cross' : 'icon-check';
                     var cls = '';
                     cls += (item.active?' enable':' disable');
                     cls += (item.connected?' connected':' disconnected');
@@ -28,6 +29,7 @@ $(document).ready(function (e1) {
                         '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +
                         '	<td><a href="modem-update.html?id=' + encodeURIComponent(item.id) + '">' + item.name + '</a></td>\r\n' +
                         '	<td><a href="modem-update.html?id=' + encodeURIComponent(item.id) + '">' + item.connectionType + '</a></td>\r\n' +
+                        '	<td align="center"><span class="icon ' + def + '"></span></td>\r\n' +
                         '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
                         '</tr>\r\n'
                     );
@@ -41,7 +43,7 @@ $(document).ready(function (e1) {
         $.ajax({
             url:'api/device/',
             type:'POST',
-            dataType:'jaosn',
+            dataType: 'json',
             data:{action:'connect', id:modemID},
             success:function(data)
             {
@@ -56,7 +58,7 @@ $(document).ready(function (e1) {
         $.ajax({
             url:'api/device/',
             type:'POST',
-            dataType:'jaosn',
+            dataType: 'json',
             data:{action:'disconnect', id:modemID},
             success:function(data)
             {

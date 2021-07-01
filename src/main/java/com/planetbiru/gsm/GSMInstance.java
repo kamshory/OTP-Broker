@@ -18,7 +18,7 @@ public class GSMInstance {
 		this.id = modem.getId();
 		this.gsm = new GSM();
 	}
-	public boolean connect(String port) throws GSMException 
+	public boolean connect(String port) throws GSMException, InvalidPortException 
 	{
 		try
 		{

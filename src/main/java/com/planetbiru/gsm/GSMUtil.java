@@ -35,10 +35,13 @@ public class GSMUtil {
 	private static boolean initialized = false;
 	private static List<GSMInstance> gsmInstance = new ArrayList<>();
 	private static List<Integer> connectedDevices = new ArrayList<>();
+	private static List<Integer> connectedDefaultDevices = new ArrayList<>();
 	private static int counter = -1;
+	private static int defaultCcounter = -1;
 	private static Map<String, String> callerType = new HashMap<>();
 	private static boolean hasPrefix = false;
 	private static Map<String, ModemRouter> modemRouterList = new HashMap<>();
+	private static boolean hasDefaultModem = false;
 
 	private GSMUtil()
 	{
@@ -61,7 +64,7 @@ public class GSMUtil {
 				instance.connect(port);
 				GSMUtil.gsmInstance.add(instance);
 			} 
-			catch (GSMException e) 
+			catch (GSMException | InvalidPortException e) 
 			{
 				logger.error(e.getMessage());
 			}			
@@ -70,7 +73,7 @@ public class GSMUtil {
 		GSMUtil.updateConnectedDevice();
 	}
 
-	public static void connect(String modemID) throws GSMException
+	public static void connect(String modemID) throws GSMException, InvalidPortException
 	{
 		DataModem modem = ConfigModem.getModemData(modemID);
 		for(int i = 0; i<GSMUtil.gsmInstance.size(); i++)
@@ -161,7 +164,6 @@ public class GSMUtil {
 		
 		String result = instance.sendSMS(receiver, message);
 		DataModem modemData = ConfigModem.getModemData(instance.getId());      
-		System.out.println(modemData.getName());
 		if(Config.isShowTraffic())
 		{
 			GSMUtil.sendTraffic(receiver, ste, modemData);
@@ -298,6 +300,7 @@ public class GSMUtil {
 		GSMUtil.reindexInstantce();
 		GSMUtil.hasPrefix = false;
 		List<Integer> connectedDev = new ArrayList<>();
+		List<Integer> connectedDefaultDev = new ArrayList<>();
 		GSMUtil.modemRouterList = new HashMap<>();
 		for(int i = 0; i<GSMUtil.gsmInstance.size(); i++)
 		{
@@ -306,6 +309,10 @@ public class GSMUtil {
 				connectedDev.add(i);
 				String modemID = GSMUtil.gsmInstance.get(i).getId();
 				DataModem modemData = ConfigModem.getModemData(modemID);
+				if(modemData.isDefaultModem())
+				{
+					connectedDefaultDev.add(i);
+				}
 				if(modemData.getRecipientPrefix().length() > 0)
 				{
 					List<String> prefixes = modemData.getRecipientPrefixList();
@@ -315,6 +322,7 @@ public class GSMUtil {
 			}
 		}
 		GSMUtil.connectedDevices = connectedDev;
+		GSMUtil.connectedDefaultDevices = connectedDefaultDev;
 	}
 	
 	private static void addRecipientPrefix(List<String> prefixes, int index) {
@@ -344,6 +352,10 @@ public class GSMUtil {
 			catch (GSMException | InvalidGSMRouterException e) {
 				return GSMUtil.getModemIndex();
 			}
+		}
+		else if(GSMUtil.hasDefaultModem)
+		{
+			return GSMUtil.getModemIndexDefault();
 		}
 		else
 		{
@@ -405,6 +417,22 @@ public class GSMUtil {
 		if(!GSMUtil.connectedDevices.isEmpty() && GSMUtil.connectedDevices.size() >= (GSMUtil.counter -1))
 		{
 			return GSMUtil.connectedDevices.get(GSMUtil.counter);
+		}
+		else
+		{
+			throw new GSMException(GSMUtil.NO_DEVICE_CONNECTED);
+		}
+	}
+	
+	private static int getModemIndexDefault() throws GSMException {
+		GSMUtil.defaultCcounter++;
+		if(GSMUtil.defaultCcounter >= GSMUtil.countConnected())
+		{
+			GSMUtil.defaultCcounter = 0;
+		}
+		if(!GSMUtil.connectedDefaultDevices.isEmpty() && GSMUtil.connectedDefaultDevices.size() >= (GSMUtil.defaultCcounter -1))
+		{
+			return GSMUtil.connectedDefaultDevices.get(GSMUtil.defaultCcounter);
 		}
 		else
 		{

@@ -107,8 +107,8 @@
                             <td><input type="tel" class="form-control" name="imei" value=""></td>
                         </tr>
                         <tr>
-                            <td>ICCID</td>
-                            <td><input type="text" class="form-control" name="iccid" value=""></td>
+                            <td>MSISDN</td>
+                            <td><input type="text" class="form-control" name="msisdn" value=""></td>
                         </tr>
                         <tr>
                             <td>IMSI</td>
@@ -127,7 +127,7 @@
                             <td><input type="number" class="form-control" name="baud_rate"></td>
                         </tr>
                         <tr>
-                            <td>Raity Bit</td>
+                            <td>Parity Bit</td>
                             <td><select name="parity_bit" class="form-control">
                                 <option value="N">Nome</option>
                                 <option value="O">Odd</option>
@@ -143,6 +143,10 @@
                         <tr>
                             <td>Stop Bits</td>
                             <td><input type="text" class="form-control" name="stop_bits"></td>
+                        </tr>
+                        <tr>
+                            <td>Default Modem</td>
+                            <td><label><input type="checkbox" name="default_modem" value="1"> Yes</label></td>
                         </tr>
                         <tr>
                             <td>Active</td>
@@ -181,13 +185,14 @@
                                 $('input[name="connection_type"]').val(data.connectionType);
                                 $('input[name="sms_center"]').val(data.smsCenter);
                                 $('input[name="imei"]').val(data.imei);
-                                $('input[name="iccid"]').val(data.iccid);
+                                $('input[name="msisdn"]').val(data.msisdn);
                                 $('input[name="imsi"]').val(data.imsi);
                                 $('[name="recipient_prefix"]').val(data.recipientPrefix);
                                 $('input[name="baud_rate"]').val(data.baudRate);
                                 $('[name="parity_bit"]').val(data.parityBit);
                                 $('input[name="start_bits"]').val(data.startBits);
                                 $('input[name="stop_bits"]').val(data.stopBits);
+                                $('input[name="default_modem"]').prop('checked', data.defaultModem);
                                 $('input[name="active"]').prop('checked', data.active);
                             }
                         });
