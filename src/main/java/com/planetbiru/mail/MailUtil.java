@@ -6,14 +6,19 @@ import java.util.List;
 import javax.mail.MessagingException;
 
 import com.planetbiru.config.ConfigEmail;
+import com.planetbiru.config.DataEmail;
 
 public class MailUtil {
 	private static int counter = -1;
 	private static List<Integer> activeAccounts = new ArrayList<>();
-
-	public void send(String receiver, String subject, String message) throws MessagingException {
+	private MailUtil()
+	{
+		
+	}
+	public static void send(String receiver, String subject, String message) throws MessagingException {
 		int index = MailUtil.getIndex();
-		ConfigEmail.getAccounts().get(index).send(receiver, subject, message);
+		DataEmail mailer = ConfigEmail.getAccounts().get(index);
+		mailer.send(receiver, subject, message);
 	}
 
 	private static int getIndex() {

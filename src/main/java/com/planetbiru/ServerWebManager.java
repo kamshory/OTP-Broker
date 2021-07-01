@@ -282,7 +282,6 @@ public class ServerWebManager {
 			{
 				ConfigEmail.load(Config.getEmailSettingPath());
 				Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);		
-				MailUtil mailUtil = new MailUtil();
 				String to = queryPairs.getOrDefault("recipient", "").trim();
 				String subject = queryPairs.getOrDefault("subject", "").trim();
 				String message = queryPairs.getOrDefault(JsonKey.MESSAGE, "").trim();
@@ -290,7 +289,7 @@ public class ServerWebManager {
 
 				try 
 				{
-					mailUtil.send(to, subject, message);
+					MailUtil.send(to, subject, message);
 					result = "The message was sent successfuly";
 					response.put(JsonKey.SUCCESS, true);
 				} 
@@ -467,10 +466,9 @@ public class ServerWebManager {
 				{
 					String message = "Username : "+user.getUsername()+"\r\nPassword : "+user.getPassword();
 					ConfigEmail.load(Config.getEmailSettingPath());
-					MailUtil senEmail = new MailUtil();
 					try 
 					{
-						senEmail.send(email, "Account Information", message);
+						MailUtil.send(email, "Account Information", message);
 					} 
 					catch (MessagingException e) 
 					{

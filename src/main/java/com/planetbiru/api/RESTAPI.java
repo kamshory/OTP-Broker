@@ -95,7 +95,7 @@ public class RESTAPI {
 		{
 			requestJSON = new JSONObject(requestBody);
 			String command = requestJSON.optString(JsonKey.COMMAND, "");
-			if(command.equals(ConstantString.SEND_SMS))
+			if(command.equals(ConstantString.SEND_EMAIL))
 			{
 				JSONArray data = requestJSON.optJSONArray(JsonKey.DATA);
 				if(data != null && !data.isEmpty())
@@ -127,8 +127,7 @@ public class RESTAPI {
 			String subject = data.optString(JsonKey.SUBJECT, "");
 			try 
 			{
-				MailUtil mailUtil = new MailUtil();
-				mailUtil.send(receiver, subject, textMessage);
+				MailUtil.send(receiver, subject, textMessage);
 			} 
 			catch (MessagingException e) 
 			{
@@ -243,14 +242,13 @@ public class RESTAPI {
 	
 	private static JSONObject sendEmail(String command, JSONObject data) {
 		JSONObject responseJSON = new JSONObject();
-		MailUtil mailUtil = new MailUtil();
 		String to = data.optString("recipient", "");
 		String subject = data.optString("subject", "");
 		String message = data.optString("message", "");
 		String result = "";
 		try 
 		{
-			mailUtil.send(to, subject, message);
+			MailUtil.send(to, subject, message);
 			result = "The message was sent successfuly";
 			responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
 			responseJSON.put(JsonKey.MESSAGE, result);

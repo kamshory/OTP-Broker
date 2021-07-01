@@ -138,6 +138,35 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 | data | Objek | Data untuk OTP Broker | 
 | `data`.msisdn | String | Nomor MSISDN yang akan dibuka blokir |
 
+**Send SMS Request**
+
+```http
+POST /api/mail HTTP/1.1
+Host: sub.domain.tld
+Connection: close
+User-agent: KSPS
+Content-type: application/json
+Content-length: 142
+Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+{
+	"command":"send-mail",
+	"data":{
+		"recipient": "admin@domain.tld",
+		"subject": "Reset Password",
+		"message": "OTP Anda adalah 1234"
+	}
+}
+```
+
+| Parameter | Tipe | Deskripsi |
+| --------- | ---- | ----------|
+| command | String | Perintah ke OTP Broker |
+| data | Objek | Data untuk OTP Broker | 
+| `data`.recipient | String | Alamat email penerima |
+| `data`.subject | String | Subjek email |
+| `data`.message| String | Pesan email|
+
 ## Sekenario 2 - OTP Broker Tidak Dapat Diakses App Server
 
 Pada skenario ini, App Server dapat mengirimkan OTP ke RabbitMQ Server atau WSMessageBroker. WSMessageBroker menggunakan protokol WebSoket dan Basic Authentication. Baik App Server maupun OTP Broker bertindak sebagai client dari WSMessageBroker.
@@ -498,5 +527,3 @@ Modul Afraid adalah modul untuk mengatur akun Free DNS Afraid yang digunakan.
 **No IP**
 
 1. Update : OK
-
-
