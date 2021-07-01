@@ -4,16 +4,7 @@ public class Config {
 	private static String generalSettingPath = "";
 	private static String otpSalt = "IJUjhrfytR^&r7jkjojO";
 	private static String secretKey = "planetsecret";
-	private static String apiUsername = "planet";
-	private static String apiPassword = "planetpass";
 	
-	private static boolean otpViaWebSocket = true;
-	private static boolean otpViaRabbitMQ = true;
-	private static long feederWSReconnectDelay = 5000;
-
-	private static String wsClientUsername = "qa";
-	private static String wsClientPassword = "4lt0@1234";
-	private static String portName = "usbtty";
 	private static String defaultFile = "/index.html";
 	
 	private static boolean proxyEnable = false;
@@ -107,69 +98,7 @@ public class Config {
 		Config.secretKey = secretKey;
 	}
 
-	public static String getApiUsername() {
-		return apiUsername;
-	}
-
-	public static void setApiUsername(String apiUsername) {
-		Config.apiUsername = apiUsername;
-	}
-
-	public static String getApiPassword() {
-		return apiPassword;
-	}
-
-	public static void setApiPassword(String apiPassword) {
-		Config.apiPassword = apiPassword;
-	}
-
-	public static boolean isOtpViaWebSocket() {
-		return otpViaWebSocket;
-	}
-
-	public static void setOtpViaWebSocket(boolean otpViaWebSocket) {
-		Config.otpViaWebSocket = otpViaWebSocket;
-	}
-
-	public static boolean isOtpViaRabbitMQ() {
-		return otpViaRabbitMQ;
-	}
-
-	public static void setOtpViaRabbitMQ(boolean otpViaRabbitMQ) {
-		Config.otpViaRabbitMQ = otpViaRabbitMQ;
-	}
-
-	public static long getFeederWSReconnectDelay() {
-		return feederWSReconnectDelay;
-	}
-
-	public static void setFeederWSReconnectDelay(long feederWSReconnectDelay) {
-		Config.feederWSReconnectDelay = feederWSReconnectDelay;
-	}
-
-	public static String getWsClientUsername() {
-		return wsClientUsername;
-	}
-
-	public static void setWsClientUsername(String wsClientUsername) {
-		Config.wsClientUsername = wsClientUsername;
-	}
-
-	public static String getWsClientPassword() {
-		return wsClientPassword;
-	}
-
-	public static void setWsClientPassword(String wsClientPassword) {
-		Config.wsClientPassword = wsClientPassword;
-	}
-
-	public static String getPortName() {
-		return portName;
-	}
-
-	public static void setPortName(String portName) {
-		Config.portName = portName;
-	}
+	
 
 	public static String getDefaultFile() {
 		return defaultFile;

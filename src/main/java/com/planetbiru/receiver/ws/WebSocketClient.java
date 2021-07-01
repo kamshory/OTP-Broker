@@ -101,7 +101,7 @@ public class WebSocketClient extends Thread
 			    @Override
 			    public void beforeRequest(Map<String, List<String>> headers) 
 			    {
-			        headers.put("Authorization", Utility.asList(Utility.basicAuth(Config.getWsClientUsername(), Config.getWsClientPassword())));
+			        headers.put("Authorization", Utility.asList(Utility.basicAuth(ConfigFeederWS.getFeederWsUsername(), ConfigFeederWS.getFeederWsPassword())));
 			    }
 			});
 			ClientEndpointConfig clientConfig = configBuilder.build();

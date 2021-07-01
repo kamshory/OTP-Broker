@@ -36,8 +36,6 @@ public class ConfigDDNS {
 		}
 		String fileName = FileConfigUtil.fixFileName(dir + path);
 		prepareDir(fileName);	
-		
-		
 		try 
 		{
 			byte[] data = FileConfigUtil.read(fileName);		
@@ -73,8 +71,7 @@ public class ConfigDDNS {
 							DDNSRecord rec = new DDNSRecord(lID, lZone, lRecordName, type, lProxied, lTTL, lForceCreateZone, lProvider, lActive, lcronExpression, nextValid, lastUpdate);
 							ConfigDDNS.getRecords().put(lID, rec);
 					    }
-					}
-					
+					}				
 				}
 			}
 		} 
@@ -103,8 +100,7 @@ public class ConfigDDNS {
 		return jo;
 	}
 
-	public static void save(String path, JSONObject config) {
-		
+	public static void save(String path, JSONObject config) {	
 		String dir = Utility.getBaseDir();
 		if(dir.endsWith("/") && path.startsWith("/"))
 		{
@@ -201,7 +197,4 @@ public class ConfigDDNS {
 	{
 		return getJSONObject();
 	}
-	
-	
-
 }
