@@ -435,13 +435,6 @@ public class ServerWebManager {
 		return this.sendTokenResetPassword(userID);
 	}
 
-	@GetMapping(path="/send-token")
-	public ResponseEntity<byte[]> sendTokenResetPassword2(@RequestHeader HttpHeaders headers, HttpServletRequest request)
-	{	
-		String userID = request.getParameter("userid");
-		return this.sendTokenResetPassword(userID);
-	}	
-	
 	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
 		byte[] responseBody = "".getBytes();
 		HttpHeaders responseHeaders = new HttpHeaders();
