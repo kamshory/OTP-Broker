@@ -184,6 +184,7 @@ public class ConfigModem {
 			modem.put("id", id);
 			modem.put("connectionType", entry.getValue().getConnectionType());
 			modem.put("smsCenter", entry.getValue().getSmsCenter());
+			modem.put("defaultModem", entry.getValue().isDefaultModem());
 			json.put(id, modem);
 		}
 		return json;
