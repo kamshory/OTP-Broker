@@ -2888,7 +2888,7 @@ public class ServerWebManager {
 			dataEmail.setStartTLS(startTLS);
 			dataEmail.setActive(active);
 			
-			ConfigEmail.add(dataEmail);
+			ConfigEmail.put(dataEmail);
 			ConfigEmail.save();
 		}
 		if(queryPairs.containsKey("add"))
