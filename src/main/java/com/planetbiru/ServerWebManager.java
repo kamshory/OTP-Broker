@@ -549,7 +549,6 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	
 	public void broardcastWebSocket(String message)
 	{
 		JSONObject messageJSON = new JSONObject();
@@ -794,12 +793,10 @@ public class ServerWebManager {
 					String contentType = this.getMIMEType(path);
 					String baseName = this.getBaseName(path);
 					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
-					System.out.println(baseName);
 					responseHeaders.add("Content-disposition", "attachment; filename=\""+baseName+"\"");
 				} 
 				catch (FileNotFoundException e) 
 				{
-					e.printStackTrace();
 					statusCode = HttpStatus.NOT_FOUND;
 				}
 			}
