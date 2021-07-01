@@ -72,11 +72,11 @@ OTP Broker memungkinkan pengguna melakukan perintah USSD pada masing-masing mode
 
 ## Manual SMS
 
-Manual SMS digunakan untuk menguji apakah masing-masing modem dapat mengirimkan SMS.
+Manual SMS digunakan untuk menguji apakah masing-masing modem dapat mengirimkan SMS. 
 
 ## Administrator Setting
 
-Administrator Setting adalah menu untuk melakukan konfigurasi administrator. Perangkat OTP Broker baru belum memiliki administrator. Pengguna harus memuat administrator terlebih dahulu sebelum menggunakannya. Silakan masuk ke akses poin OTP Broker sesuai dengan SSID dan password yang tertera pada brosur dan pindai QR Code pada brosur menggunakan smartphone.
+Administrator Setting adalah menu untuk melakukan konfigurasi administrator. Perangkat OTP Broker baru belum memiliki administrator. Pengguna harus membuat administrator terlebih dahulu sebelum menggunakannya. Silakan masuk ke akses poin OTP Broker sesuai dengan SSID dan password yang tertera pada brosur dan pindai QR Code pada brosur menggunakan smartphone.
 
 Alamat bawaan dari web manajemen adalah http://192.168.0.11:8888 
 
@@ -189,6 +189,40 @@ Modul Dynu adalah modul untuk mengatur akun Dynu Dyn DNS yang digunakan.
 ## Afraid
 
 Modul Afraid adalah modul untuk mengatur akun Free DNS Afraid yang digunakan.
+
+## Reset Device
+
+Pada kasus pengguna tidak dapat mengakses web administrator, baik karena lupa password, atau karena konfigurasi jaringan yang kacau, pengguna dapat melakukan reset device. Reset device dilakukan dengan menancapkan sebuah flash disk yang berisi file sebagai berikut:
+
+`/optb/reset.txt`
+
+Nama direktori, nama file dan ekstensi harus ditulis dengan benar dalam huruf kecil (lower case). File `/optb/reset.txt` harus beriksi tesk sebagai berikut:
+
+```txt
+????????????????
+```
+
+Reset device akan melakukan hal-hal sebagai berikut:
+
+1. Mengembalikan konfigurasi DHCP ke awal
+2. Mengembalikan konfigurasi Wireless LAN ke awal
+3. Mengembalikan konfigurasi LAN ke awal
+4. Menghapus semua akun administrator
+
+Untuk melakukan reset device, lakukan langkah-langkah sebagai berikut:
+
+1. Persiapkan sebuah flash disk dengan file seperti dijelaskan di atas
+2. Cabut semua modem yang terpasang pada perangkat
+3. Pasang flash disk di sembarang port USB perangkat
+4. Cabut catu daya (power supplay) ke perangkat
+5. Pasang kembali catu daya (power supplay) ke perangkat
+6. Tunggu hingga 10 menit
+7. Cabut flash disk dari perangkat
+8. Pasang kembali catu daya (power supplay) ke perangkat
+9. Masuk ke akses poin dengan SSID dan password seperti tertera pada brosur menggunakan smartphone atau PC
+10. Buka halaman 192.168.0.8888 dengan browser menggunakan smartphone atau PC yang telah terhubung ke akses poin di atas
+11. Login ke halaman yang disediakan
+12. Buat administrator baru untuk perangkat
 
 # Topology
 
