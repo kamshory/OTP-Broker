@@ -9,5 +9,6 @@ public class ResponseCode {
 	public static final String SUCCESS              = "0000";
 	public static final String UNAUTHORIZED         = "1100";
 	public static final String NO_DEVICE_CONNECTED  = "1101";
+	public static final String FAILED               = "1102";
 
 }

@@ -13,13 +13,13 @@ import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
 
-public class GeneralConfig {
+public class PropertyLoader {
 	private static Pattern mSection = Pattern.compile("\\s*\\[([^]]*)\\]\\s*");
 	private static Pattern mKeyValue = Pattern.compile("\\s*([^=]*)=(.*)");
 	private static Map <String, Map<String, String>> mEntries = new HashMap<>();
 	private static boolean loaded = false;
 
-	private GeneralConfig()
+	private PropertyLoader()
 	{
 		
 	}
@@ -40,7 +40,7 @@ public class GeneralConfig {
 				text = fixingRawData(text);
 				String[] lines = text.split("\\r?\\n");
 				List<String> list = Arrays.asList(lines);
-				GeneralConfig.load(list);
+				PropertyLoader.load(list);
 				
 			}
 		} 
@@ -50,7 +50,7 @@ public class GeneralConfig {
 			 * Do nothing
 			 */
 		}
-		GeneralConfig.setLoaded(true);
+		PropertyLoader.setLoaded(true);
 	}
 	
 	public static String fixingRawData(String result)
@@ -126,7 +126,7 @@ public class GeneralConfig {
 		return loaded;
 	}
 	public static void setLoaded(boolean loaded) {
-		GeneralConfig.loaded = loaded;
+		PropertyLoader.loaded = loaded;
 	}
 
 	

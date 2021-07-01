@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigModem;
+import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.util.Utility;
@@ -30,11 +31,14 @@ public class GSMUtil {
 	private static final String SMS_TRAFFIC = "sms-traffic";
 	
 	private static Logger logger = LogManager.getLogger(GSMUtil.class);
+	
 	private static boolean initialized = false;
 	private static List<GSMInstance> gsmInstance = new ArrayList<>();
 	private static List<Integer> connectedDevices = new ArrayList<>();
 	private static int counter = -1;
 	private static Map<String, String> callerType = new HashMap<>();
+	private static boolean hasPrefix = false;
+	private static Map<String, ModemRouter> modemRouterList = new HashMap<>();
 
 	private GSMUtil()
 	{
@@ -81,7 +85,6 @@ public class GSMUtil {
 	}
 	public static void disconnect(String modemID) throws GSMException 
 	{
-
 		for(int i = 0; i<GSMUtil.gsmInstance.size(); i++)
 		{
 			GSMInstance instance =  GSMUtil.gsmInstance.get(i);
@@ -109,6 +112,14 @@ public class GSMUtil {
 		return arr;
 	}
 	
+	/**
+	 * Send SMS with modem ID
+	 * @param receiver
+	 * @param message
+	 * @param modemID
+	 * @return
+	 * @throws GSMException
+	 */
 	public static JSONObject sendSMS(String receiver, String message, String modemID) throws GSMException 
 	{
 		StackTraceElement ste = Thread.currentThread().getStackTrace()[2];
@@ -129,6 +140,13 @@ public class GSMUtil {
 		return response;
 	}
 	
+	/**
+	 * Send SMS without modem ID
+	 * @param receiver
+	 * @param message
+	 * @return
+	 * @throws GSMException
+	 */
 	public static JSONObject sendSMS(String receiver, String message) throws GSMException 
 	{
 		StackTraceElement ste = Thread.currentThread().getStackTrace()[2];      
@@ -137,10 +155,13 @@ public class GSMUtil {
 			GSMUtil.sendTraffic(receiver, ste);
 			throw new GSMException(GSMUtil.NO_DEVICE_CONNECTED);
 		}
-		int index = GSMUtil.getModemIndex();		
+		int index = GSMUtil.getModemIndex(receiver);		
 		GSMInstance instance = GSMUtil.gsmInstance.get(index);
+		
+		
 		String result = instance.sendSMS(receiver, message);
-		DataModem modemData = ConfigModem.getModemData(instance.getId());        
+		DataModem modemData = ConfigModem.getModemData(instance.getId());      
+		System.out.println(modemData.getName());
 		if(Config.isShowTraffic())
 		{
 			GSMUtil.sendTraffic(receiver, ste, modemData);
@@ -263,19 +284,118 @@ public class GSMUtil {
 		return GSMUtil.gsmInstance.get(index).isConnected();
 	}
 	
+	public static boolean isHasPrefix(int index)
+	{
+		if(GSMUtil.gsmInstance.isEmpty())
+		{
+			return false;
+		}
+		String modemID = GSMUtil.gsmInstance.get(index).getId();
+		return ConfigModem.getModemData(modemID).getRecipientPrefix().length() > 0;
+	}
+	
 	public static void updateConnectedDevice() {
 		GSMUtil.reindexInstantce();
+		GSMUtil.hasPrefix = false;
 		List<Integer> connectedDev = new ArrayList<>();
+		GSMUtil.modemRouterList = new HashMap<>();
 		for(int i = 0; i<GSMUtil.gsmInstance.size(); i++)
 		{
 			if(GSMUtil.isConnected(i))
 			{
 				connectedDev.add(i);
+				String modemID = GSMUtil.gsmInstance.get(i).getId();
+				DataModem modemData = ConfigModem.getModemData(modemID);
+				if(modemData.getRecipientPrefix().length() > 0)
+				{
+					List<String> prefixes = modemData.getRecipientPrefixList();
+					GSMUtil.addRecipientPrefix(prefixes, i);
+					GSMUtil.hasPrefix = true;
+				}
 			}
 		}
 		GSMUtil.connectedDevices = connectedDev;
 	}
 	
+	private static void addRecipientPrefix(List<String> prefixes, int index) {
+		for(int i = 0; i<prefixes.size(); i++)
+		{
+			String prefix = prefixes.get(i);
+			if(GSMUtil.modemRouterList.containsKey(prefix))
+			{
+				ModemRouter route = GSMUtil.modemRouterList.getOrDefault(prefix, new ModemRouter());
+				route.addIndex(index);
+			}
+			else
+			{
+				GSMUtil.modemRouterList.put(prefix, new ModemRouter(index));
+			}
+		}
+		
+	}
+
+	private static int getModemIndex(String receiver) throws GSMException {
+		if(GSMUtil.hasPrefix)
+		{
+			try 
+			{
+				return GSMUtil.getRouterIndex(receiver);
+			} 
+			catch (GSMException | InvalidGSMRouterException e) {
+				return GSMUtil.getModemIndex();
+			}
+		}
+		else
+		{
+			return GSMUtil.getModemIndex();
+		}
+	}
+
+	private static int getRouterIndex(String receiver) throws GSMException, InvalidGSMRouterException {
+		String prefix = GSMUtil.getPrefix(receiver);
+		if(GSMUtil.modemRouterList.containsKey(prefix))
+		{
+			try 
+			{
+				return GSMUtil.modemRouterList.get(prefix).getIndex();
+			} 
+			catch (InvalidGSMRouterException e) 
+			{
+				return GSMUtil.getModemIndex();
+			}
+		}
+		else
+		{
+			return GSMUtil.getModemIndex();
+		}
+	}
+
+	private static String getPrefix(String receiver) throws InvalidGSMRouterException 
+	{
+		int length = ConfigSMS.getRecipientPrefixLength();
+		if(length <= 0)
+		{
+			throw new InvalidGSMRouterException("Recipient prefix length must be greater than zero");
+		}
+		if(receiver.isEmpty())
+		{
+			throw new InvalidGSMRouterException("Recipient can not be empty");
+		}
+		String recv;
+		try {
+			recv = Utility.canonicalMSISDN(receiver);
+		} 
+		catch (GSMException e) 
+		{
+			throw new InvalidGSMRouterException(e.getMessage());
+		}
+		if(recv.length() >= length)
+		{
+			return recv.substring(0, length);
+		}
+		return recv;
+	}
+
 	private static int getModemIndex() throws GSMException {
 		GSMUtil.counter++;
 		if(GSMUtil.counter >= GSMUtil.countConnected())

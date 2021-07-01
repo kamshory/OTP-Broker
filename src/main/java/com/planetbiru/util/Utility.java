@@ -30,7 +30,9 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigBlocking;
 import com.planetbiru.constant.ConstantString;
+import com.planetbiru.gsm.GSMException;
 
 public class Utility {
 
@@ -1253,6 +1255,23 @@ public class Utility {
 			 */
 		}
 		return value;
+	}
+	public static String canonicalMSISDN(String msisdn) throws GSMException
+	{
+		if(msisdn.isEmpty())
+		{
+			throw new GSMException("MSISDN can not be null or empty");
+		}
+		msisdn = msisdn.trim();
+		if(msisdn.startsWith("+"))
+		{
+			msisdn = msisdn.substring(1);
+		}
+		if(msisdn.startsWith("0"))
+		{
+			msisdn = ConfigBlocking.getCountryCode() + msisdn.substring(1);
+		}
+		return msisdn;
 	}
 	public static String getResourceDir()
 	{

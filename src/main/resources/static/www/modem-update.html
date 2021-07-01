@@ -107,6 +107,18 @@
                             <td><input type="tel" class="form-control" name="imei" value=""></td>
                         </tr>
                         <tr>
+                            <td>ICCID</td>
+                            <td><input type="text" class="form-control" name="iccid" value=""></td>
+                        </tr>
+                        <tr>
+                            <td>IMSI</td>
+                            <td><input type="text" class="form-control" name="imsi" value=""></td>
+                        </tr>
+                        <tr>
+                            <td>Recipient Prefix</td>
+                            <td><textarea class="form-control" name="recipient_prefix"></textarea></td>
+                        </tr>
+                        <tr>
                             <td>SIM Card PIN</td>
                             <td><input type="password" class="form-control" name="sim_card_pin"></td>
                         </tr>
@@ -169,6 +181,9 @@
                                 $('input[name="connection_type"]').val(data.connectionType);
                                 $('input[name="sms_center"]').val(data.smsCenter);
                                 $('input[name="imei"]').val(data.imei);
+                                $('input[name="iccid"]').val(data.iccid);
+                                $('input[name="imsi"]').val(data.imsi);
+                                $('[name="recipient_prefix"]').val(data.recipientPrefix);
                                 $('input[name="baud_rate"]').val(data.baudRate);
                                 $('[name="parity_bit"]').val(data.parityBit);
                                 $('input[name="start_bits"]').val(data.startBits);

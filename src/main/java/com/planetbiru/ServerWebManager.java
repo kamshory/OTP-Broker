@@ -2,7 +2,9 @@ package com.planetbiru;
 
 import java.io.File;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -47,7 +49,7 @@ import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigVendorNoIP;
 import com.planetbiru.config.DataEmail;
 import com.planetbiru.config.ConfigSMS;
-import com.planetbiru.config.GeneralConfig;
+import com.planetbiru.config.PropertyLoader;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.constant.JsonKey;
@@ -57,6 +59,7 @@ import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.mail.MailUtil;
+import com.planetbiru.mail.NoEmailAccountException;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.user.User;
 import com.planetbiru.user.WebUserAccount;
@@ -211,7 +214,7 @@ public class ServerWebManager {
 		Config.setPortName(portName);		
 		WebUserAccount.load(Config.getUserSettingPath());		
 		
-		GeneralConfig.load(Config.getMimeSettingPath());
+		PropertyLoader.load(Config.getMimeSettingPath());
 		
 		Config.setValidDevice(ServerInfo.cpuSerialNumberHmac().equals(hmac));
 	}
@@ -293,7 +296,7 @@ public class ServerWebManager {
 					result = "The message was sent successfuly";
 					response.put(JsonKey.SUCCESS, true);
 				} 
-				catch (MessagingException e) 
+				catch (MessagingException | NoEmailAccountException e) 
 				{
 					result = e.getMessage();
 					this.broardcastWebSocket(result);
@@ -470,7 +473,7 @@ public class ServerWebManager {
 					{
 						MailUtil.send(email, "Account Information", message);
 					} 
-					catch (MessagingException e) 
+					catch (MessagingException | NoEmailAccountException e) 
 					{
 						/**
 						 * Do nothing
@@ -2163,7 +2166,7 @@ public class ServerWebManager {
 		{
 			String[] arr = fileName.split("\\.");
 			String ext = arr[arr.length - 1];
-			String lt = GeneralConfig.getString("CACHE", ext, "0");
+			String lt = PropertyLoader.getString("CACHE", ext, "0");
 			lifetime = Utility.atoi(lt);
 		}
 		return lifetime;
@@ -2530,12 +2533,16 @@ public class ServerWebManager {
 			String v3 = queryPairs.getOrDefault("max_per_time_range", "0").trim();
 			int lMaxPerTimeRange = Utility.atoi(v3);
 			String countryCode = queryPairs.getOrDefault("country_code", "").trim();
+			String prefix = queryPairs.getOrDefault("recipient_prefix_length", "0").trim();
+			int recipientPrefixLength = Utility.atoi(prefix);
+
 			
 			ConfigSMS.setCountryCode(countryCode);
 			ConfigSMS.setSendIncommingSMS(lSendIncommingSMS);
 			ConfigSMS.setIncommingInterval(lIncommingInterval);
 			ConfigSMS.setTimeRange(lTimeRange);
 			ConfigSMS.setMaxPerTimeRange(lMaxPerTimeRange);
+			ConfigSMS.setRecipientPrefixLength(recipientPrefixLength);
 			
 			ConfigSMS.save();
 		}	
@@ -3000,7 +3007,43 @@ public class ServerWebManager {
 		int baudRate = Utility.atoi(baudRateS);
 
 		String imei = queryPairs.getOrDefault("imei", "").trim();
+		String iccid = queryPairs.getOrDefault("iccid", "").trim();
+		String imsi = queryPairs.getOrDefault("imsi", "").trim();
 		String name = queryPairs.getOrDefault("name", "").trim();
+		String recipientPrefix = queryPairs.getOrDefault("recipient_prefix", "").trim();
+		
+		/**
+		 * Fixing recipientPrefix
+		 */
+		if(!recipientPrefix.isEmpty())
+		{
+			recipientPrefix = recipientPrefix.replace("\n", "\r\n");
+			recipientPrefix = recipientPrefix.replace("\r\r\n", "\r\n");
+			recipientPrefix = recipientPrefix.replace("\r", "\r\n");
+			recipientPrefix = recipientPrefix.replace("\r\n\n", "\r\n");
+			recipientPrefix = recipientPrefix.replace(" ", "");
+			String[] arr = recipientPrefix.split(",");
+			List<String> pref = new ArrayList<>();
+			for(int i = 0; i<arr.length; i++)
+			{
+				if(!arr[i].isEmpty())
+				{
+					try 
+					{
+						pref.add(Utility.canonicalMSISDN(arr[i]));
+					} 
+					catch (GSMException e) 
+					{
+						/**
+						 * Do nothing
+						 */
+					}
+					
+				}
+			}
+			recipientPrefix = String.join(",", pref);
+		}	
+		
 		String simCardPIN = queryPairs.getOrDefault("sim_card_pin", "").trim();
 
 		String parityBit = queryPairs.getOrDefault("parity_bit", "").trim();
@@ -3020,6 +3063,9 @@ public class ServerWebManager {
 		modem.setTimeRange(timeRange);
 		modem.setMaxPerTimeRange(maxPerTimeRange);
 		modem.setImei(imei);
+		modem.setIccid(iccid);
+		modem.setImsi(imsi);
+		modem.setRecipientPrefix(recipientPrefix);
 		if(!simCardPIN.isEmpty())
 		{
 			modem.setSimCardPIN(simCardPIN);
@@ -3603,7 +3649,7 @@ public class ServerWebManager {
 	{
 		String[] arr = fileName.split("\\.");	
 		String ext = arr[arr.length - 1];
-		return GeneralConfig.getString("MIME", ext, "");
+		return PropertyLoader.getString("MIME", ext, "");
 	}
 	
 	private String getBaseName(String fileName) 

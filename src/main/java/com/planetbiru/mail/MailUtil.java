@@ -15,7 +15,11 @@ public class MailUtil {
 	{
 		
 	}
-	public static void send(String receiver, String subject, String message) throws MessagingException {
+	public static void send(String receiver, String subject, String message) throws MessagingException, NoEmailAccountException {
+		if(activeAccounts.isEmpty())
+		{
+			throw new NoEmailAccountException("No email account active");
+		}
 		int index = MailUtil.getIndex();
 		DataEmail mailer = ConfigEmail.getAccounts().get(index);
 		mailer.send(receiver, subject, message);

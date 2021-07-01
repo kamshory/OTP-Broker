@@ -90,6 +90,7 @@ public class JsonKey {
 	public static final String UNBLOCK                       = "unblock";
 	public static final String MSISDN                        = "msisdn";
 	public static final String CONNECTED                     = "connected";
+	public static final String RECIPIENT_PREFIX_LENGTH       = "recipientPrefixLength";
 	
 	private JsonKey()
 	{
