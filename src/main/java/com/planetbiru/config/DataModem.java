@@ -23,6 +23,7 @@ public class DataModem {
 	private String parityBit = "";
 	private String startBits = "";
 	private String stopBits = "";
+	private boolean defaultModem = false;
 	private boolean active = false;
 
 	public DataModem() {
@@ -46,6 +47,7 @@ public class DataModem {
 		this.parityBit = jsonObject.optString("parityBit", "");
 		this.startBits = jsonObject.optString("startBits", "");
 		this.stopBits = jsonObject.optString("stopBits", "");
+		this.defaultModem = jsonObject.optBoolean("defaultModem", false);
 		this.active = jsonObject.optBoolean("active", false);
 	}
 	
@@ -68,6 +70,7 @@ public class DataModem {
 		jsonObject.put("parityBit", this.parityBit);
 		jsonObject.put("startBits", this.startBits);
 		jsonObject.put("stopBits", this.stopBits);
+		jsonObject.put("defaultModem", this.defaultModem);
 		jsonObject.put("active", this.active);
 		return jsonObject;
 	}
@@ -198,6 +201,14 @@ public class DataModem {
 
 	public void setStopBits(String stopBits) {
 		this.stopBits = stopBits;
+	}
+
+	public boolean isDefaultModem() {
+		return defaultModem;
+	}
+
+	public void setDefaultModem(boolean defaultModem) {
+		this.defaultModem = defaultModem;
 	}
 
 	public boolean isActive() {

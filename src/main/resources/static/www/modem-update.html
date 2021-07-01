@@ -145,6 +145,10 @@
                             <td><input type="text" class="form-control" name="stop_bits"></td>
                         </tr>
                         <tr>
+                            <td>Default Modem</td>
+                            <td><label><input type="checkbox" name="default_modem" value="1"> Yes</label></td>
+                        </tr>
+                        <tr>
                             <td>Active</td>
                             <td><label><input type="checkbox" name="active" value="1"> Yes</label></td>
                         </tr>
@@ -188,6 +192,7 @@
                                 $('[name="parity_bit"]').val(data.parityBit);
                                 $('input[name="start_bits"]').val(data.startBits);
                                 $('input[name="stop_bits"]').val(data.stopBits);
+                                $('input[name="default_modem"]').prop('checked', data.defaultModem);
                                 $('input[name="active"]').prop('checked', data.active);
                             }
                         });

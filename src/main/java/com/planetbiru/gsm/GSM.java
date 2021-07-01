@@ -18,8 +18,7 @@ public class GSM {
 
     private SerialPort serialPort;
     private boolean connected = false;
-	private boolean ready = false;    
-    
+	private boolean ready = false;   
     private static String[] smsStorage = new String[]{
     		"MT", 
     		"SM"
@@ -35,80 +34,91 @@ public class GSM {
      *
      * @param portName the port name
      * @return true if port was opened successfully
+     * @throws GSMException 
      */
-    public boolean connect(String portName) throws SerialPortInvalidPortException
+    public boolean connect(String portName) throws InvalidPortException
     {
     	this.setReady(false);
+    	boolean open = false;
     	logger.info("INIT port : {}", portName);
-   		setSerialPort(SerialPort.getCommPort(portName));
-    	if(this.serialPort.openPort()) 
-        {		
-    		this.serialPort.addDataListener(new SerialPortDataListener() 
-            {
-                @Override
-                public int getListeningEvents() 
-                {
-                    return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
-                }
-
-                @Override
-                public void serialEvent(SerialPortEvent event) 
-                {
-                    byte[] msg = new byte[getSerialPort().bytesAvailable()];
-                    getSerialPort().readBytes(msg, msg.length);
-                    String result = new String(msg);
-                    onChangeStateSerial(result);
-                    
-                    
-                    //event.getEventType()
-                    
-                    /*
-                     * switch (event.getEventType()) {
-					  case SerialPortEvent.BI:
-					  case SerialPortEvent.OE:
-					  case SerialPortEvent.FE:
-					  case SerialPortEvent.PE:
-					  case SerialPortEvent.CD:
-					  case SerialPortEvent.CTS:
-					  case SerialPortEvent.DSR:
-					  case SerialPortEvent.RI:
-					  case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
-					    break;
-					  case SerialPortEvent.DATA_AVAILABLE:
-					    byte[] readBuffer = new byte[20];
-					
-					    try {
-					      while (inputStream.available() > 0) {
-					        int numBytes = inputStream.read(readBuffer);
-					      }   
-					      System.out.print(new String(readBuffer));
-					    } catch (IOException e) {
-					    }   
-					    break;
-					  }   
-                     */
-                }
-            });
-            // Prepare for USSD
-//            executeAT("AT^USSDMODE=0", 1);
-//            if (result.equals(""))
-//                return false;
-            // turn off periodic status messages (RSSI status, etc.)
-//            executeAT("AT^CURC=0", 1);
-    		this.connected = true;
-    		this.ready = true;
-            return true;
-        } 
-        else 
-        {       	
-        	/**
-        	 * Debug
-        	 */
-        	this.connected = true;
-        	this.ready = true;
-        	logger.info("FAILED....");
-            return false;
-        }
+    	try
+    	{
+	   		setSerialPort(SerialPort.getCommPort(portName));
+	    	open = this.serialPort.openPort();
+	        if(open)
+	    	{		
+	    		this.serialPort.addDataListener(new SerialPortDataListener() 
+	            {
+	                @Override
+	                public int getListeningEvents() 
+	                {
+	                    return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
+	                }
+	
+	                @Override
+	                public void serialEvent(SerialPortEvent event) 
+	                {
+	                    byte[] msg = new byte[getSerialPort().bytesAvailable()];
+	                    getSerialPort().readBytes(msg, msg.length);
+	                    String result = new String(msg);
+	                    onChangeStateSerial(result);
+	                    
+	                    
+	                    //event.getEventType()
+	                    
+	                    /*
+	                     * switch (event.getEventType()) {
+						  case SerialPortEvent.BI:
+						  case SerialPortEvent.OE:
+						  case SerialPortEvent.FE:
+						  case SerialPortEvent.PE:
+						  case SerialPortEvent.CD:
+						  case SerialPortEvent.CTS:
+						  case SerialPortEvent.DSR:
+						  case SerialPortEvent.RI:
+						  case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
+						    break;
+						  case SerialPortEvent.DATA_AVAILABLE:
+						    byte[] readBuffer = new byte[20];
+						
+						    try {
+						      while (inputStream.available() > 0) {
+						        int numBytes = inputStream.read(readBuffer);
+						      }   
+						      System.out.print(new String(readBuffer));
+						    } catch (IOException e) {
+						    }   
+						    break;
+						  }   
+	                     */
+	                }
+	            });
+	            // Prepare for USSD
+	//            executeAT("AT^USSDMODE=0", 1);
+	//            if (result.equals(""))
+	//                return false;
+	            // turn off periodic status messages (RSSI status, etc.)
+	//            executeAT("AT^CURC=0", 1);
+	    		this.connected = true;
+	    		this.ready = true;
+	    		open = true;
+	        } 
+	        else 
+	        {       	
+	        	/**
+	        	 * Debug
+	        	 */
+	        	this.connected = true;
+	        	this.ready = true;
+	            open = true;
+	        	logger.info("FAILED....");
+	        }
+    	}
+    	catch(SerialPortInvalidPortException e)
+    	{
+    		throw new InvalidPortException(e);
+    	}
+    	return open;
     }
     /**
      * Execute AT command

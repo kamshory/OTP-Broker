@@ -58,6 +58,7 @@ import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.GSMUtil;
+import com.planetbiru.gsm.InvalidPortException;
 import com.planetbiru.mail.MailUtil;
 import com.planetbiru.mail.NoEmailAccountException;
 import com.planetbiru.user.NoUserRegisteredException;
@@ -247,11 +248,12 @@ public class ServerWebManager {
 						} 
 						ServerInfo.sendModemStatus();
 					}
-					catch (GSMException e) 
+					catch (GSMException | InvalidPortException e) 
 					{
 						/**
 						 * 
 						 */
+						this.broardcastWebSocket(e.getMessage());
 					}
 				}
 			} 
@@ -2980,7 +2982,8 @@ public class ServerWebManager {
 		
 		String id = queryPairs.getOrDefault("id", "").trim();		
 		String connectionType = queryPairs.getOrDefault("connection_type", "").trim();
-		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");		
+		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");	
+		boolean defaultModem = queryPairs.getOrDefault("default_modem", "").trim().equals("1");
 
 		String smsCenter = queryPairs.getOrDefault("sms_center", "").trim();		
 		
@@ -3064,6 +3067,7 @@ public class ServerWebManager {
 		modem.setParityBit(parityBit);
 		modem.setStartBits(startBits);
 		modem.setStopBits(stopBits);
+		modem.setDefaultModem(defaultModem);
 		modem.setActive(active);
 
 		ConfigModem.update(id, modem);
