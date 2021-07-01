@@ -435,13 +435,6 @@ public class ServerWebManager {
 		return this.sendTokenResetPassword(userID);
 	}
 
-	@GetMapping(path="/send-token")
-	public ResponseEntity<byte[]> sendTokenResetPassword2(@RequestHeader HttpHeaders headers, HttpServletRequest request)
-	{	
-		String userID = request.getParameter("userid");
-		return this.sendTokenResetPassword(userID);
-	}	
-	
 	private ResponseEntity<byte[]> sendTokenResetPassword(String userID) {
 		byte[] responseBody = "".getBytes();
 		HttpHeaders responseHeaders = new HttpHeaders();
@@ -555,7 +548,6 @@ public class ServerWebManager {
 		DeviceAPI.cleanup();		
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
 	
 	public void broardcastWebSocket(String message)
 	{
@@ -801,12 +793,10 @@ public class ServerWebManager {
 					String contentType = this.getMIMEType(path);
 					String baseName = this.getBaseName(path);
 					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
-					System.out.println(baseName);
 					responseHeaders.add("Content-disposition", "attachment; filename=\""+baseName+"\"");
 				} 
 				catch (FileNotFoundException e) 
 				{
-					e.printStackTrace();
 					statusCode = HttpStatus.NOT_FOUND;
 				}
 			}
