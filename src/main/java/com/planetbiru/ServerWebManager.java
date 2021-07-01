@@ -45,6 +45,7 @@ import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigVendorNoIP;
+import com.planetbiru.config.DataEmail;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.GeneralConfig;
 import com.planetbiru.config.DataModem;
@@ -55,13 +56,13 @@ import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.GSMUtil;
+import com.planetbiru.mail.MailUtil;
 import com.planetbiru.user.NoUserRegisteredException;
 import com.planetbiru.user.User;
 import com.planetbiru.user.WebUserAccount;
 import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
 import com.planetbiru.util.FileUtil;
-import com.planetbiru.util.MailUtil;
 import com.planetbiru.util.ServerInfo;
 import com.planetbiru.util.ServerStatus;
 import com.planetbiru.util.Utility;
@@ -957,8 +958,11 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	@GetMapping(path="/email-setting/get")
-	public ResponseEntity<byte[]> handleEmailSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	
+	
+	
+	@GetMapping(path="/email-account/list")
+	public ResponseEntity<byte[]> handleEmailAccount(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
 		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
@@ -969,7 +973,41 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				ConfigEmail.load(Config.getEmailSettingPath());				
-				responseBody = ConfigEmail.toJSONObject().toString().getBytes();
+				responseBody = ConfigEmail.toJSONArray().toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+			statusCode = HttpStatus.UNAUTHORIZED;
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	
+	@GetMapping(path="/email-account/detail/{id}")
+	public ResponseEntity<byte[]> handleEmailAccountDetail(@RequestHeader HttpHeaders headers, @PathVariable(value=JsonKey.ID) String id, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				ConfigEmail.load(Config.getEmailSettingPath());				
+				responseBody = ConfigEmail.getAccount(id).toString().getBytes();
 			}
 			else
 			{
@@ -2188,9 +2226,9 @@ public class ServerWebManager {
 				{
 					this.processModemSetting(requestBody);
 				}
-				if(path.equals("/email-setting.html"))
+				if(path.equals("/email-account.html"))
 				{
-					this.processEmailSetting(requestBody);
+					this.processEmailAccount(requestBody);
 				}
 				if(path.equals("/sms.html"))
 				{
@@ -2771,39 +2809,122 @@ public class ServerWebManager {
 		}
 	}
 	
-	private void processEmailSetting(String requestBody) {
+	private void processEmailAccount(String requestBody) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
-		if(queryPairs.containsKey("save_email_setting"))
+		if(queryPairs.containsKey(JsonKey.DELETE))
+		{
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigEmail.deleteRecord(value);
+				}
+			}
+			ConfigEmail.save();
+		}
+		if(queryPairs.containsKey(JsonKey.DEACTIVATE))
+		{
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigEmail.deactivate(value);
+				}
+			}
+			ConfigEmail.save();
+		}
+		if(queryPairs.containsKey(JsonKey.ACTIVATE))
+		{
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					ConfigEmail.activate(value);
+				}
+			}
+			ConfigEmail.save();
+		}
+		if(queryPairs.containsKey("update"))
 		{
 			ConfigEmail.load(Config.getEmailSettingPath());
-			boolean lMailAuth = queryPairs.getOrDefault("mail_auth", "").trim().equals("1");
-			String lMailHost = queryPairs.getOrDefault("smtp_host", "").trim();
+			
+			String id = queryPairs.getOrDefault("id", "").trim();
+			
+			DataEmail dataEmail = ConfigEmail.getAccount(id);
+			if(dataEmail == null)
+			{
+				dataEmail = new DataEmail();
+			}
+			
+			
+			boolean auth = queryPairs.getOrDefault("mail_auth", "").trim().equals("1");
+			String host = queryPairs.getOrDefault("smtp_host", "").trim();
 	
 			String v1 = queryPairs.getOrDefault("smtp_port", "0").trim();
-			int lMailPort = Utility.atoi(v1);
-			String lMailSenderAddress = queryPairs.getOrDefault("sender_address", "").trim();
-			String lMailSenderPassword = queryPairs.getOrDefault("sender_password", "").trim();
-			if(lMailSenderPassword.isEmpty())
+			int port = Utility.atoi(v1);
+			String senderAddress = queryPairs.getOrDefault("sender_address", "").trim();
+			String senderPassword = queryPairs.getOrDefault("sender_password", "").trim();
+			if(senderPassword.isEmpty())
 			{
-				lMailSenderPassword = ConfigEmail.getMailSenderPassword();
+				senderPassword = dataEmail.getSenderPassword();
 			}
-			boolean lMailSSL = queryPairs.getOrDefault("ssl", "").trim().equals("1");
-			boolean lMailStartTLS = queryPairs.getOrDefault("start_tls", "").trim().equals("1");
+			boolean ssl = queryPairs.getOrDefault("ssl", "").trim().equals("1");
+			boolean startTLS = queryPairs.getOrDefault("start_tls", "").trim().equals("1");
 			boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
 			
-			JSONObject config = new JSONObject();
+			dataEmail.setId(id);
+			dataEmail.setAuth(auth);;
+			dataEmail.setHost(host);
+			dataEmail.setPort(port);
+			dataEmail.setSenderAddress(senderAddress);
+			dataEmail.setSenderPassword(senderPassword);
+			dataEmail.setSsl(ssl);
+			dataEmail.setStartTLS(startTLS);
+			dataEmail.setActive(active);
 			
-			config.put("mailAuth", lMailAuth);
-			config.put("mailHost", lMailHost);
-			config.put("mailPort", lMailPort);
-			config.put("mailSenderAddress", lMailSenderAddress);
-			config.put("mailSenderPassword", lMailSenderPassword);
-			config.put("mailSSL", lMailSSL);
-			config.put("mailStartTLS", lMailStartTLS);
-			config.put("mailActive", active);
+			ConfigEmail.add(dataEmail);
+			ConfigEmail.save();
+		}
+		if(queryPairs.containsKey("add"))
+		{
+			ConfigEmail.load(Config.getEmailSettingPath());
 			
-			ConfigEmail.save(Config.getEmailSettingPath(), config);
-		}	
+			String id = Utility.md5(System.nanoTime()+"");
+			
+			DataEmail dataEmail = new DataEmail();
+			
+			boolean auth = queryPairs.getOrDefault("mail_auth", "").trim().equals("1");
+			String host = queryPairs.getOrDefault("smtp_host", "").trim();
+	
+			String v1 = queryPairs.getOrDefault("smtp_port", "0").trim();
+			int port = Utility.atoi(v1);
+			String senderAddress = queryPairs.getOrDefault("sender_address", "").trim();
+			String senderPassword = queryPairs.getOrDefault("sender_password", "").trim();
+
+			boolean ssl = queryPairs.getOrDefault("ssl", "").trim().equals("1");
+			boolean startTLS = queryPairs.getOrDefault("start_tls", "").trim().equals("1");
+			boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");
+			
+			dataEmail.setId(id);
+			dataEmail.setAuth(auth);;
+			dataEmail.setHost(host);
+			dataEmail.setPort(port);
+			dataEmail.setSenderAddress(senderAddress);
+			dataEmail.setSenderPassword(senderPassword);
+			dataEmail.setSsl(ssl);
+			dataEmail.setStartTLS(startTLS);
+			dataEmail.setActive(active);
+		
+			ConfigEmail.add(dataEmail);
+			ConfigEmail.save();
+		}
+		
 	}
 	
 	private void processModemSetting(String requestBody) {

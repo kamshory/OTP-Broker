@@ -18,7 +18,7 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.GSMUtil;
-import com.planetbiru.util.MailUtil;
+import com.planetbiru.mail.MailUtil;
 import com.planetbiru.util.Utility;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
