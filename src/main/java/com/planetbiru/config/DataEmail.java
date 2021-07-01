@@ -1,4 +1,4 @@
-package com.planetbiru.util;
+package com.planetbiru.config;
 
 import java.io.IOException;
 import java.util.Date;
@@ -17,64 +17,96 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import com.planetbiru.config.Config;
-import com.planetbiru.config.ConfigEmail;
+import org.json.JSONObject;
 
-public class MailUtil {
-	private Session session;
-	private String smtpHost = "smtp.gmail.com";
-	private int smtpPort = 587;
-    private String smtpUser = "";
-    private String smtpPassword = "";
-    private boolean mailAuth = false;
-    private boolean ssl = false;
-    private boolean starttls = true;   
-    private boolean debug = false;
-    private boolean active = false;
-    
-    public MailUtil(String smtpHost, int smtpPort, String smtpUser, String smtpPassword, boolean ssl, boolean starttls, boolean debug)
-    {
-    	this.smtpHost = smtpHost;
-    	this.smtpPort = smtpPort;
-    	this.smtpUser = smtpUser;
-    	this.smtpPassword = smtpPassword;
-    	this.ssl = ssl;
-    	this.starttls = starttls;
-    	this.debug = debug;
-    	this.mailAuth = true;
-    	this.active = true;
-    	this.init();
-    }   
-    
-	public MailUtil() {
-		this.smtpHost = ConfigEmail.getMailHost();
-    	this.smtpPort = ConfigEmail.getMailPort();
-    	this.smtpUser = ConfigEmail.getMailSenderAddress();
-    	this.smtpPassword = ConfigEmail.getMailSenderPassword();
-    	this.ssl = ConfigEmail.isMailSSL();
-    	this.starttls = ConfigEmail.isMailStartTLS();
-    	this.mailAuth = ConfigEmail.getMailAuth();
-    	this.active = ConfigEmail.isMailActive();
-    	this.init();
+import com.planetbiru.util.Utility;
+
+public class DataEmail {
+	private String id = "";
+	private String senderAddress = "";
+	private String senderPassword;
+	private String senderName = "";
+	private boolean auth = true;	
+	private String host = "";
+	private int port = 587;
+	private boolean startTLS = true;
+	private boolean ssl = false;
+	private boolean active = true;
+	private Session session = null;
+	private boolean debug = false;
+	
+	
+	public DataEmail(String id, String senderAddress, String senderPassword, String senderName, boolean auth, String host, int port, boolean startTLS, boolean ssl, boolean active)
+	{
+		if(id.isEmpty())
+		{
+			id = Utility.md5(System.nanoTime()+"");
+		}
+		this.id = id;
+		this.senderAddress = senderAddress;
+		this.senderPassword = senderPassword;
+		this.senderName = senderName;
+		this.auth = auth;
+		this.host = host;
+		this.port = port;
+		this.startTLS = startTLS;
+		this.ssl = ssl;
+		this.active = active;
 	}
-
+	
+	public void set(DataEmail newData) {
+		this.id = newData.id;
+		this.senderAddress = newData.senderAddress;
+		this.senderPassword = newData.senderPassword;
+		this.senderName = newData.senderName;
+		this.auth = newData.auth;
+		this.host = newData.host;
+		this.port = newData.port;
+		this.startTLS = newData.startTLS;
+		this.ssl = newData.ssl;
+		this.active = newData.active;
+	}
+	
+	public DataEmail() {
+		/**
+		 * Do nothing
+		 */
+	}
+	public String toString()
+	{
+		return this.toJSONObject().toString();
+	}
+	public JSONObject toJSONObject() {
+		JSONObject config = new JSONObject();
+		config.put("id", this.id);
+		config.put("auth", this.auth);
+		config.put("host", this.host);
+		config.put("port", this.port);
+		config.put("senderAddress", this.senderAddress);
+		config.put("senderPassword", this.senderPassword);
+		config.put("ssl", this.ssl);
+		config.put("startTLS", this.startTLS);
+		config.put("active", this.active);
+		return config;
+	}
+	
 	public void init()
 	{
 		Properties properties = new Properties();
  		if(this.active)
         {
- 			properties.put("mail.smtp.auth", Boolean.toString(this.mailAuth));
-	        if(this.starttls)
+ 			properties.put("mail.smtp.auth", Boolean.toString(this.auth));
+	        if(this.startTLS)
  			{
-	        	properties.put("mail.smtp.starttls.enable", Boolean.toString(this.starttls));
+	        	properties.put("mail.smtp.starttls.enable", Boolean.toString(this.startTLS));
  			}
 	        if(this.ssl)
  			{
 	        	properties.put("mail.smtp.ssl.enable", Boolean.toString(this.ssl));
  			}
- 			properties.put("mail.smtp.host", this.smtpHost);
- 			properties.put("mail.smtp.port", Integer.toString(this.smtpPort));	
-	        properties.put("mail.smtp.socketFactory.port", this.smtpPort+"");
+ 			properties.put("mail.smtp.host", this.host);
+ 			properties.put("mail.smtp.port", Integer.toString(this.port));	
+	        properties.put("mail.smtp.socketFactory.port", this.port+"");
         }
         else
         {
@@ -89,12 +121,12 @@ public class MailUtil {
 	        {
 	        	properties.put("mail.smtp.starttls.enable", Config.getDefaultStarttlsEnable());        
 	        }
-	        this.smtpUser = Config.getDefaultSMTPUsername();
-	        this.smtpPassword = Config.getDefaultSMTPPassword();     
+	        this.senderAddress = Config.getDefaultSMTPUsername();
+	        this.senderPassword = Config.getDefaultSMTPPassword();     
         }
  		
-        String localSmtpUser = this.smtpUser;
-        String localSmtpPassword = this.smtpPassword;
+        String localSmtpUser = this.senderAddress;
+        String localSmtpPassword = this.senderPassword;
         
         session = Session.getInstance(properties, new Authenticator() {
         	@Override
@@ -103,15 +135,19 @@ public class MailUtil {
                 return new PasswordAuthentication(localSmtpUser, localSmtpPassword);
             }
         });
-        session.setDebug(debug);
+        session.setDebug(debug );
 	}
 	public boolean send(String to, String subject, String message) throws MessagingException
 	{
- 		return this.send(to, subject, message, this.smtpUser);
+ 		return this.send(to, subject, message, this.senderAddress);
 	}
 	
 	public boolean send(String to, String subject, String message, String from) throws MessagingException
 	{
+		if(this.session == null)
+		{
+			this.init();
+		}
 		boolean sent = false;
 
         // Create a default MimeMessage object.
@@ -120,7 +156,7 @@ public class MailUtil {
 		mimeMessage.setFrom(new InternetAddress(from, false));
 
         // Set From: header field of the header.
-        mimeMessage.setFrom(new InternetAddress(this.smtpUser));
+        mimeMessage.setFrom(new InternetAddress(this.senderAddress));
 
         // Set To: header field of the header.
         mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
@@ -208,5 +244,109 @@ public class MailUtil {
 		sent = true;
 		return sent;
 	}
+
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getSenderAddress() {
+		return senderAddress;
+	}
+
+
+	public void setSenderAddress(String senderAddress) {
+		this.senderAddress = senderAddress;
+	}
+
+
+	public String getSenderPassword() {
+		return senderPassword;
+	}
+
+
+	public void setSenderPassword(String senderPassword) {
+		this.senderPassword = senderPassword;
+	}
+
+
+	public String getSenderName() {
+		return senderName;
+	}
+
+
+	public void setSenderName(String senderName) {
+		this.senderName = senderName;
+	}
+
+
+	public boolean isAuth() {
+		return auth;
+	}
+
+
+	public void setAuth(boolean auth) {
+		this.auth = auth;
+	}
+
+
+	public String getHost() {
+		return host;
+	}
+
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+
+	public int getPort() {
+		return port;
+	}
+
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+
+	public boolean isStartTLS() {
+		return startTLS;
+	}
+
+
+	public void setStartTLS(boolean startTLS) {
+		this.startTLS = startTLS;
+	}
+
+
+	public boolean isSsl() {
+		return ssl;
+	}
+
+
+	public void setSsl(boolean ssl) {
+		this.ssl = ssl;
+	}
+
+
+	public boolean isActive() {
+		return active;
+	}
+
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	
+	
+	
+	
+	
 	
 }

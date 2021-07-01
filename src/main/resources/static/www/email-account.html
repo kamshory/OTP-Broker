@@ -54,7 +54,7 @@
                       <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                        <li class=""><a href="general-setting.html">General Setting</a></li>
+                          <li class=""><a href="general-setting.html">General Setting</a></li>
                           <li class=""><a href="admin.html">Administrator Setting</a></li>
                           <li class=""><a href="api-setting.html">API Setting</a></li>
                           <li class=""><a href="api-user.html">API User</a></li>
@@ -62,7 +62,7 @@
                           <li class=""><a href="sms-setting.html">SMS Setting</a></li>
                           <li class=""><a href="block-list.html">Block List</a></li>
                           <li class=""><a href="modem.html">Modem</a></li>
-                          <li class="active"><a href="email-setting.html">Email Setting</a></li>
+                          <li class="active"><a href="email-account.html">Email Account</a></li>
                           <li class=""><a href="network-setting.html">Network Setting</a></li>
 				  <li class=""><a href="firewall.html">Firewall</a></li>
                           <li class=""><a href="keystore.html">Keystore</a></li>
@@ -86,86 +86,63 @@
             <!--/.container-fluid -->
         </nav>
         <div class="phone-page">
-            <h3>Email Setting</h3>
-            <form action="email-setting.html" method="post">
-                <table class="config-table config-table-connection">
+            <h3>Email Account</h3>
+            <style>
+                @media screen and (max-width: 600px) {
+                  .row-table tr td:nth-child(4){
+                    display: none;
+                  }
+                }
+              </style>
+            <form action="" method="post">
+                <table class="row-table" border="1" data-file="admin.html">
+                    <thead>
+                        <tr>
+                            <td width="16"><input type="checkbox" class="check-all"></td>
+                            <td>Host</td>
+                            <td>Port</td>
+                            <td>Account</td>
+                            <td width="60" align="center">Active</td>
+                        </tr>
+                    </thead>
+
                     <tbody>
-                        <tr>
-                            <td>SMTP Host</td>
-                            <td><input type="text" name="smtp_host" id="smtp_host" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>SMTP Port</td>
-                            <td><input type="number" name="smtp_port" id="smtp_port" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>SSL Enable</td>
-                            <td><label><input type="checkbox" name="ssl" id="ssl" value="1"> Enable</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TLS</td>
-                            <td><label><input type="checkbox" name="start_tls" id="start_tls" value="1"> Start TLS Before Send</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Authentication</td>
-                            <td><label><input type="checkbox" name="mail_auth" id="mail_auth" value="1"> Use Authentication</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Sender Account</td>
-                            <td><input type="email" name="sender_address" id="sender_address" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                        <td>Sender Password</td>
-                        <td><input type="password" name="sender_password" id="sender_password" value="">
-                        </td>
-                        </tr>
-                        <tr>
-                            <td>Active</td>
-                            <td><label><input type="checkbox" name="active" id="active" value="1"> Active</label>
-                            </td>
-                        </tr>
-                        
-                        
-                        <tr>
-                            <td></td>
-                            <td>
-                                <input type="submit" class="btn btn-success" name="save_email_setting"
-                                    id="save_email_setting" value="Save">
-                                <input type="button" class="btn btn-primary" id="test_send_email" onclick="window.location='send-email.html'"
-                                    value="Test Send Email">
-                                <input type="reset" class="btn btn-default" value="Reset">
-                            </td>
-                        </tr>
+
                     </tbody>
                 </table>
-
+                <div class="button-area">
+                    <input type="button" class="btn btn-primary" value="Add" onclick="window.location='email-account-add.html'">
+                    <input type="submit" class="btn btn-success" name="activate" value="Activate">
+                    <input type="submit" class="btn btn-warning" name="deactivate" value="Deactivate">
+                    <input type="submit" class="btn btn-danger" name="delete" value="Delete"
+                        onclick="return confirm('Are you sure you want to delete this record?')">
+                </div>
             </form>
             <script type="text/javascript">
-                $(document).ready(function (e) {
+                $(document).ready(function (e1) {
                     $.ajax({
                         type: "GET",
-                        url: "email-setting/get",
+                        url: "email-account/list",
                         dataType: "json",
                         success: function (data) {
-                            $('input[name="smtp_host"]').val(data.mailHost);
-                            $('input[name="smtp_port"]').val(data.mailPort);
-                            $('input[name="sender_address"]').val(data.mailSenderAddress);
-                            $('input[name="mail_auth"]').prop("checked", data.mailAuth);
-                            $('input[name="ssl"]').prop("checked", data.mailSSL);
-                            $('input[name="start_tls"]').prop("checked", data.mailStartTLS);
-                            $('input[name="active"]').prop("checked", data.mailActive);
+                            for (var i in data) {
+                                var item = data[i];
+                                var active = !item.active ? 'icon-cross' : 'icon-check';
+                                $('.row-table tbody').append(
+                                    '<tr data-pk-id="' + item.id + '">\r\n' +
+                                    '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +
+                                    '	<td><a href="email-account-update.html?id=' + encodeURIComponent(item.id) + '">' + item.host + '</a></td>\r\n' +
+                                    '	<td><a href="email-account-update.html?id=' + encodeURIComponent(item.id) + '">' + item.port + '</a></td>\r\n' +
+                                    '	<td><a href="email-account-update.html?id=' + encodeURIComponent(item.id) + '">' + item.senderAddress + '</a></td>\r\n' +
+                                    '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
+                                    '</tr>\r\n'
+                                );
+                            }
                         }
                     });
                 });
+                
             </script>
-
-
         </div>
         <!-- /container -->
     </div>

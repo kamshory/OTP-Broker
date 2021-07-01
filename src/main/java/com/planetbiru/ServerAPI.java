@@ -210,13 +210,6 @@ public class ServerAPI {
 	private void loadConfigEmail()
 	{
 		Config.setEmailSettingPath(emailSettingPath);
-		ConfigEmail.setMailSenderAddress(mailSenderAddress);
-		ConfigEmail.setMailSenderPassword(mailSenderPassword);
-		ConfigEmail.setMailAuth(mailAuth);
-		ConfigEmail.setMailSSL(mailSSL);
-		ConfigEmail.setMailStartTLS(mailStartTLS);
-		ConfigEmail.setMailHost(mailHost);
-		ConfigEmail.setMailPort(mailPort);	
 		
 		/**
 		 * Override email setting if exists
