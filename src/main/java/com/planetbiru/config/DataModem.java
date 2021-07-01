@@ -15,7 +15,7 @@ public class DataModem {
 	private int maxPerTimeRange = 0;
 	private String provider = "";
 	private String imei = "";
-	private String iccid = "";
+	private String msisdn = "";
 	private String imsi = "";
 	private String recipientPrefix = "";
 	private String simCardPIN = "";
@@ -38,7 +38,7 @@ public class DataModem {
 		this.maxPerTimeRange = jsonObject.optInt("maxPerTimeRange", 0);
 		this.provider = jsonObject.optString("provider", "");
 		this.imei = jsonObject.optString("imei", "");
-		this.iccid = jsonObject.optString("iccid", "");
+		this.msisdn = jsonObject.optString("msisdn", "");
 		this.imsi = jsonObject.optString("imsi", "");
 		this.setRecipientPrefix(jsonObject.optString("recipientPrefix", ""));
 		this.simCardPIN = jsonObject.optString("simCardPIN", "");
@@ -60,7 +60,7 @@ public class DataModem {
 		jsonObject.put("maxPerTimeRange", this.maxPerTimeRange);
 		jsonObject.put("provider", this.provider);
 		jsonObject.put("imei", this.imei);
-		jsonObject.put("iccid", this.iccid);
+		jsonObject.put("msisdn", this.msisdn);
 		jsonObject.put("imsi", this.imsi);
 		jsonObject.put("recipientPrefix", this.getRecipientPrefix());
 		jsonObject.put("simCardPIN", this.simCardPIN);
@@ -144,12 +144,12 @@ public class DataModem {
 		this.imei = imei;
 	}
 
-	public String getIccid() {
-		return iccid;
+	public String getMsisdn() {
+		return msisdn;
 	}
 
-	public void setIccid(String iccid) {
-		this.iccid = iccid;
+	public void setMsisdn(String msisdn) {
+		this.msisdn = msisdn;
 	}
 
 	public String getImsi() {

@@ -2997,7 +2997,7 @@ public class ServerWebManager {
 		int baudRate = Utility.atoi(baudRateS);
 
 		String imei = queryPairs.getOrDefault("imei", "").trim();
-		String iccid = queryPairs.getOrDefault("iccid", "").trim();
+		String msisdn = queryPairs.getOrDefault("msisdn", "").trim();
 		String imsi = queryPairs.getOrDefault("imsi", "").trim();
 		String name = queryPairs.getOrDefault("name", "").trim();
 		String recipientPrefix = queryPairs.getOrDefault("recipient_prefix", "").trim();
@@ -3053,7 +3053,7 @@ public class ServerWebManager {
 		modem.setTimeRange(timeRange);
 		modem.setMaxPerTimeRange(maxPerTimeRange);
 		modem.setImei(imei);
-		modem.setIccid(iccid);
+		modem.setMsisdn(msisdn);
 		modem.setImsi(imsi);
 		modem.setRecipientPrefix(recipientPrefix);
 		if(!simCardPIN.isEmpty())

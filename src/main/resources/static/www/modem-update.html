@@ -107,8 +107,8 @@
                             <td><input type="tel" class="form-control" name="imei" value=""></td>
                         </tr>
                         <tr>
-                            <td>ICCID</td>
-                            <td><input type="text" class="form-control" name="iccid" value=""></td>
+                            <td>MSISDN</td>
+                            <td><input type="text" class="form-control" name="msisdn" value=""></td>
                         </tr>
                         <tr>
                             <td>IMSI</td>
@@ -127,7 +127,7 @@
                             <td><input type="number" class="form-control" name="baud_rate"></td>
                         </tr>
                         <tr>
-                            <td>Raity Bit</td>
+                            <td>Parity Bit</td>
                             <td><select name="parity_bit" class="form-control">
                                 <option value="N">Nome</option>
                                 <option value="O">Odd</option>
@@ -181,7 +181,7 @@
                                 $('input[name="connection_type"]').val(data.connectionType);
                                 $('input[name="sms_center"]').val(data.smsCenter);
                                 $('input[name="imei"]').val(data.imei);
-                                $('input[name="iccid"]').val(data.iccid);
+                                $('input[name="msisdn"]').val(data.msisdn);
                                 $('input[name="imsi"]').val(data.imsi);
                                 $('[name="recipient_prefix"]').val(data.recipientPrefix);
                                 $('input[name="baud_rate"]').val(data.baudRate);
