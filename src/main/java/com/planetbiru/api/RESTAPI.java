@@ -19,6 +19,7 @@ import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.mail.MailUtil;
+import com.planetbiru.mail.NoEmailAccountException;
 import com.planetbiru.util.Utility;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -129,7 +130,7 @@ public class RESTAPI {
 			{
 				MailUtil.send(receiver, subject, textMessage);
 			} 
-			catch (MessagingException e) 
+			catch (MessagingException | NoEmailAccountException e) 
 			{
 				/**
 				 * Do nothing
@@ -253,10 +254,10 @@ public class RESTAPI {
 			responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
 			responseJSON.put(JsonKey.MESSAGE, result);
 		} 
-		catch (MessagingException e) 
+		catch (MessagingException | NoEmailAccountException e) 
 		{
 			result = e.getMessage();
-			responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.SUCCESS);
+			responseJSON.put(JsonKey.RESPONSE_CODE, ResponseCode.FAILED);
 			responseJSON.put(JsonKey.MESSAGE, result);
 		}	
 		responseJSON.put(JsonKey.COMMAND, command);

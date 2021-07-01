@@ -30,50 +30,33 @@ public class ConfigBlocking {
 	{
 		
 	}
-	public static String canonical(String msisdn) throws GSMException
-	{
-		if(msisdn.isEmpty())
-		{
-			throw new GSMException("MSISDN can not be null or empty");
-		}
-		msisdn = msisdn.trim();
-		if(msisdn.startsWith("+"))
-		{
-			msisdn = msisdn.substring(1);
-		}
-		if(msisdn.startsWith("0"))
-		{
-			msisdn = ConfigBlocking.getCountryCode() + msisdn.substring(1);
-		}
-		return msisdn;
-	}
 	
 	public static void block(String msisdn) throws GSMException {
-		msisdn = ConfigBlocking.canonical(msisdn);
+		msisdn = Utility.canonicalMSISDN(msisdn);
 		ConfigBlocking.blockList.put(msisdn, Boolean.valueOf(true));
 	}
 	
 	public static void unblock(String msisdn) throws GSMException {
-		msisdn = ConfigBlocking.canonical(msisdn);
+		msisdn = Utility.canonicalMSISDN(msisdn);
 		ConfigBlocking.blockList.put(msisdn, Boolean.valueOf(false));
 	}
 	
 	public static void block(String msisdn, boolean block) throws GSMException {
-		msisdn = ConfigBlocking.canonical(msisdn);
+		msisdn = Utility.canonicalMSISDN(msisdn);
 		ConfigBlocking.blockList.put(msisdn, Boolean.valueOf(block));
 	}
 	
 	public static void add(String msisdn) throws GSMException {
 		if(!msisdn.isEmpty())
 		{
-			msisdn = ConfigBlocking.canonical(msisdn);
+			msisdn = Utility.canonicalMSISDN(msisdn);
 			ConfigBlocking.blockList.put(msisdn, Boolean.valueOf(true));
 		}
 	}
 	
 	public static Boolean isBlocked(String msisdn) throws GSMException
 	{
-		msisdn = ConfigBlocking.canonical(msisdn);
+		msisdn = Utility.canonicalMSISDN(msisdn);
 		return ConfigBlocking.blockList.getOrDefault(msisdn, Boolean.valueOf(false));
 	}
 	

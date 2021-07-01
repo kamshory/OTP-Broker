@@ -94,6 +94,10 @@
                 </td>
               </tr>
               <tr>
+                <td>Recipent Prefix Length</td>
+                <td><input type="number" min="2" max="8" name="recipient_prefix_length" class="form-control" value="5"></td>
+              </tr>
+              <tr>
                 <td>Send Incomming SMS</td>
                 <td><label><input type="checkbox" name="send_incomming_sms" id="send_incomming_sms" value="1">	Yes</label>
                 </td>
@@ -136,6 +140,7 @@
                       $('input[name="country_code"]').val(data.countryCode);
                       $('input[name="time_range"]').val(data.timeRange+"");
                       $('input[name="max_per_time_range"]').val(data.maxPerTimeRange+"");
+                      $('[name="recipient_prefix_length"]').val(data.recipientPrefixLength);
                     }
                 });
             });

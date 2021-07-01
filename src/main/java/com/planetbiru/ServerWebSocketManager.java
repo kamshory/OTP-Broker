@@ -29,7 +29,7 @@ import com.planetbiru.config.ConfigAPI;
 import com.planetbiru.config.ConfigFeederAMQP;
 import com.planetbiru.config.ConfigFeederWS;
 import com.planetbiru.config.ConfigModem;
-import com.planetbiru.config.GeneralConfig;
+import com.planetbiru.config.PropertyLoader;
 import com.planetbiru.constant.JsonKey;
 import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.user.WebUserAccount;
@@ -101,7 +101,7 @@ public class ServerWebSocketManager {
 		Config.setModemSettingPath(modemSettingPath);
 		
 		ConfigModem.load(Config.getModemSettingPath());
-		GeneralConfig.load(Config.getMimeSettingPath());
+		PropertyLoader.load(Config.getMimeSettingPath());
     	WebUserAccount.load(Config.getUserSettingPath());
     }
     

@@ -17,15 +17,16 @@ public class ConfigGeneral {
 	private static String configPath = "";
 	private static Date nextValid = new Date();
 	private static Logger logger = LogManager.getLogger(ConfigGeneral.class);
-	private ConfigGeneral()
-	{
-		
-	}
-
+	
 	private static String deviceName = "";
 	private static String deviceTimeZone = "";
 	private static String ntpServer = "";
 	private static String ntpUpdateInterval = "";
+
+	private ConfigGeneral()
+	{
+		
+	}
 
 	public static void load(String path) {
 		ConfigGeneral.configPath = path;
@@ -46,18 +47,17 @@ public class ConfigGeneral {
 				{
 					JSONObject json = new JSONObject(text);
 
-					ConfigGeneral.setDeviceName(json.optString("deviceName", "").trim());
-					ConfigGeneral.setDeviceTimeZone(json.optString("deviceTimeZone", "").trim());
-					ConfigGeneral.setNtpServer(json.optString("ntpServer", "").trim());
-					ConfigGeneral.setNtpUpdateInterval(json.optString("ntpUpdateInterval", "").trim());
+					ConfigGeneral.deviceName = json.optString("deviceName", "").trim();
+					ConfigGeneral.deviceTimeZone = json.optString("deviceTimeZone", "").trim();
+					ConfigGeneral.ntpServer = json.optString("ntpServer", "").trim();
+					ConfigGeneral.ntpUpdateInterval = json.optString("ntpUpdateInterval", "").trim();
 				}
 			}
 		} 
 		catch (FileNotFoundException | JSONException e) 
 		{
 			logger.error(e.getMessage());
-		}
-		
+		}		
 	}	
 
 	public static void save() {
@@ -108,10 +108,10 @@ public class ConfigGeneral {
 	
 	public static JSONObject getJSONObject() {
 		JSONObject config = new JSONObject();
-		config.put("deviceName", ConfigGeneral.getDeviceName());
-		config.put("deviceTimeZone", ConfigGeneral.getDeviceTimeZone());
-		config.put("ntpServer", ConfigGeneral.getNtpServer());
-		config.put("ntpUpdateInterval", ConfigGeneral.getNtpUpdateInterval());
+		config.put("deviceName", ConfigGeneral.deviceName);
+		config.put("deviceTimeZone", ConfigGeneral.deviceTimeZone);
+		config.put("ntpServer", ConfigGeneral.ntpServer);
+		config.put("ntpUpdateInterval", ConfigGeneral.ntpUpdateInterval);
 		return config;
 	}
 
@@ -158,6 +158,5 @@ public class ConfigGeneral {
 	public static void setNextValid(Date nextValid) {
 		ConfigGeneral.nextValid = nextValid;
 	}
-	
 	
 }

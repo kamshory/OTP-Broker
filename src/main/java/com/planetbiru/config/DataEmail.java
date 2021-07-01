@@ -142,6 +142,7 @@ public class DataEmail {
  		return this.send(to, subject, message, this.senderAddress);
 	}
 	
+	
 	public boolean send(String to, String subject, String message, String from) throws MessagingException
 	{
 		if(this.session == null)

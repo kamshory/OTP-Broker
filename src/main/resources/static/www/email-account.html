@@ -89,7 +89,7 @@
             <h3>Email Account</h3>
             <style>
                 @media screen and (max-width: 600px) {
-                  .row-table tr td:nth-child(4){
+                  .row-table tr td:nth-child(3), .row-table tr td:nth-child(4){
                     display: none;
                   }
                 }
@@ -99,15 +99,13 @@
                     <thead>
                         <tr>
                             <td width="16"><input type="checkbox" class="check-all"></td>
+                            <td>Account</td>
                             <td>Host</td>
                             <td>Port</td>
-                            <td>Account</td>
                             <td width="60" align="center">Active</td>
                         </tr>
                     </thead>
-
                     <tbody>
-
                     </tbody>
                 </table>
                 <div class="button-area">
@@ -131,9 +129,9 @@
                                 $('.row-table tbody').append(
                                     '<tr data-pk-id="' + item.id + '">\r\n' +
                                     '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +
+                                    '	<td><a href="email-account-update.html?id=' + encodeURIComponent(item.id) + '">' + item.senderAddress + '</a></td>\r\n' +
                                     '	<td><a href="email-account-update.html?id=' + encodeURIComponent(item.id) + '">' + item.host + '</a></td>\r\n' +
                                     '	<td><a href="email-account-update.html?id=' + encodeURIComponent(item.id) + '">' + item.port + '</a></td>\r\n' +
-                                    '	<td><a href="email-account-update.html?id=' + encodeURIComponent(item.id) + '">' + item.senderAddress + '</a></td>\r\n' +
                                     '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
                                     '</tr>\r\n'
                                 );
