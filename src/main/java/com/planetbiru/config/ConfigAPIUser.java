@@ -110,10 +110,7 @@ public class ConfigAPIUser {
 		String userData = ConfigAPIUser.toJSONObject().toString();
 		try 
 		{
-			if(userData.length() > 20)
-			{
-				FileUtil.write(fileName, userData.getBytes());
-			}
+			FileUtil.write(fileName, userData.getBytes());
 		} 
 		catch (IOException e) 
 		{
