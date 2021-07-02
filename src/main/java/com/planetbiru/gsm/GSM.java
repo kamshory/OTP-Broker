@@ -40,13 +40,13 @@ public class GSM {
     public boolean connect(String portName) throws InvalidPortException
     {
     	this.setReady(false);
-    	boolean open = false;
+    	boolean isOpen = false;
     	logger.info("INIT port : {}", portName);
     	try
     	{
 	   		setSerialPort(SerialPort.getCommPort(portName));
-	    	open = this.serialPort.openPort();
-	        if(open)
+	    	isOpen = this.serialPort.openPort();
+	        if(isOpen)
 	    	{		
 	    		this.serialPort.addDataListener(new SerialPortDataListener() 
 	            {
@@ -102,7 +102,7 @@ public class GSM {
 	//            executeAT("AT^CURC=0", 1);
 	    		this.connected = true;
 	    		this.ready = true;
-	    		open = true;
+	    		isOpen = true;
 	        } 
 	        else 
 	        {       	
@@ -110,22 +110,22 @@ public class GSM {
 	        	{
 		        	this.connected = true;
 		        	this.ready = true;
-		            open = true;
+		            isOpen = true;
 	        	}
 	        	else
 	        	{
 	        		this.connected = false;
 		        	this.ready = false;
-		            open = false;
+		            isOpen = false;
 	        	}
 	        	logger.info("FAILED....");
 	        }
     	}
     	catch(SerialPortInvalidPortException e)
     	{
-    		throw new InvalidPortException(e);
+    		throw new InvalidPortException(e.getMessage());
     	}
-    	return open;
+    	return isOpen;
     }
     /**
      * Execute AT command
@@ -446,6 +446,5 @@ public class GSM {
 	public void setReady(boolean ready) {
 		this.ready = ready;
 	}
-
 	
 }

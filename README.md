@@ -1,4 +1,5 @@
 
+
 # OTP Broker
 
 OTP atau `One Time Password` adalah sebuah password satu kali pakai yang memiliki masa berlaku tertentu. Umumnya masa berlaku dibuat sangat singkat dan hanya memberikan kesempatan kepada penerimanya untuk memasukkannya ke dalam aplikasi dan mengirimkannya ke server aplikasi yang memerlukannya. OTP bersifat sangat rahasia sehingga `clear text` dari OTP tidak boleh disimpan oleh pihak manapun. Bahkan, server aplikasi hanya menyimpan `hash` atau `token` yang cocok dengan OTP tersebut. `Clear text` hanya dibuat lalu dikirim ke penerima. Dengan kata lain, `clear text` hanya diketahui oleh penerima OTP saja.
@@ -138,6 +139,40 @@ Bloking list adalah daftar nomor telepon yang diblokir. Nomor yang diblokir tida
 OTP Broker mendukung multiple email account. Email account adalah konfigurasi yang berisi alamat SMTP Server, port SMTP server, username, password, dan konfigurasi lainnya.
 
 SMTP Server digunakan untuk mengirimkan OTP ke alamat email dan dapat digunakan untuk melakukan reset password.
+
+Penggunaan banyak akun email lebih direkomendasikan karena jumlah email yang dikirim oleh setiap akun email akan berkurang. Sebagai contoh: sebuah SMTP server membatasi 500 email perhari. Dengan menggunakan 20 akun email, OTP Broker dapat mengirim hingga 10.000 email perhari.
+
+Untuk menggunakan SMTP Gmail, gunakan konfigurasi berikut:
+
+**Use Port 587**
+
+| Field | Value |
+| --- | ------ |
+| SMTP Host | smtp.gmail.com |
+| SMTP Port | 587 |
+| SSL Enable | No |
+| Start TLS Before Send | Yes |
+| Authentication | Yes |
+| Sender Account | Gmail Account
+| Sender Password | Gmail Password |
+| Active | Yes |
+
+**Use Port 465**
+
+| Field | Value |
+| --- | ------ |
+| SMTP Host | smtp.gmail.com |
+| SMTP Port | 465 |
+| SSL Enable | Yes |
+| Start TLS Before Send | Yes |
+| Authentication | Yes |
+| Sender Account | Gmail Account
+| Sender Password | Gmail Password |
+| Active | Yes |
+
+## Local SMTP Server
+
+OPT Broker dilengkapi dengan local SMTP server untuk mengirim email. Dengan adanya local SMTP server ini, pengguna dapat mengirimkan email tanpa memerlukan external SMTP serve. Meskipun demikian, local SMTP server tidak direkomendasikan karena mail server tujuan dapat saja memblokir email yang dikirim dari local SMTP server. 
 
 ## DDNS Record
 

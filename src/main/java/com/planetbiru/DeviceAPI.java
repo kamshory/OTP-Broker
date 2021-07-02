@@ -79,7 +79,8 @@ public class DeviceAPI {
 		    /**
 		     * URL : https://www.thegeekstuff.com/2013/08/hwclock-examples/
 		     */
-		    String command = "hwclock --set --date \""+Utility.date("MM/dd/yyyy HH:mm:ss", date)+"\"";
+			String currentTime = Utility.date("MM/dd/yyyy HH:mm:ss", date);
+		    String command = "hwclock --set --date \""+currentTime+"\"";
 		    DeviceAPI.exec(command);	
 		} 
 		catch (IOException e) 
@@ -116,7 +117,8 @@ public class DeviceAPI {
 		DeviceAPI.exec(command);
 	}
 
-	public static void cleanup() {
+	public static void cleanup() 
+	{
 		DeviceAPI.exec(Config.getCleanupCommand());		
 	}
 	

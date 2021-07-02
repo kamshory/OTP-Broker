@@ -75,7 +75,8 @@ public class Config {
 	private static boolean showTraffic = true;
 	private static int portManager = 8888;
 	private static String firewallSettingPath = "";
-	private static boolean debugModem = true; 
+	private static boolean debugModem = true;
+	private static String storageDir = ""; 
 	
 	private Config()
 	{
@@ -97,8 +98,6 @@ public class Config {
 	public static void setSecretKey(String secretKey) {
 		Config.secretKey = secretKey;
 	}
-
-	
 
 	public static String getDefaultFile() {
 		return defaultFile;
@@ -642,6 +641,14 @@ public class Config {
 
 	public static void setDebugModem(boolean debugModem) {
 		Config.debugModem = debugModem;
+	}
+
+	public static String getStorageDir() {
+		return storageDir;
+	}
+
+	public static void setStorageDir(String storageDir) {
+		Config.storageDir = storageDir;
 	}
 	
 }

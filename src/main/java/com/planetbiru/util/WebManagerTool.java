@@ -125,6 +125,10 @@ public class WebManagerTool {
 	{
 		JSONObject newMetaObj = new JSONObject();
 		JSONArray keys = ((JSONObject) object).names();
+		if(keys == null)
+		{
+			return newMetaObj;
+		}
 		for (int i = 0; i < keys.length (); ++i) 
 		{
 		   String key = keys.getString(i); 
@@ -160,8 +164,7 @@ public class WebManagerTool {
 		if(dir.endsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
-		}
-		
+		}	
 		return WebManagerTool.fixFileName(dir+path);
 	}
 	public static String fixFileName(String fileName) {

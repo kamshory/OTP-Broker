@@ -1,6 +1,7 @@
 package com.planetbiru;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -146,7 +147,10 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.log.dir}")
 	private String logDir;	
-	
+
+	@Value("${otpbroker.storage.dir}")
+	private String storageDir;	
+
 	@Value("${otpbroker.server.hmac}")
 	private String hmac;
 	
@@ -198,6 +202,8 @@ public class ServerWebManager {
 		Config.setMimeSettingPath(mimeSettingPath);
 		
 		Config.setLogDir(logDir);
+		Config.setStorageDir(storageDir);
+		
 		Config.setShowTraffic(showTraffic);
 		
 		Config.setPortManager(portManager);
@@ -747,6 +753,40 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				File directory = new File(Config.getLogDir());
+				JSONArray list = FileUtil.listFile(directory);
+				responseBody = list.toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@GetMapping(path="/storage/content")
+	public ResponseEntity<byte[]> handleLogStorage(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				System.out.println(Config.getStorageDir());
+				File directory = new File(Config.getStorageDir());
 				JSONArray list = FileUtil.listFile(directory);
 				responseBody = list.toString().getBytes();
 			}
@@ -2263,6 +2303,10 @@ public class ServerWebManager {
 				{
 					this.processFirewall(requestBody);
 				}
+				if(path.equals("/logs.html"))
+				{
+					this.processDeleteLog(requestBody);
+				}
 			}
 		} 
 		catch (NoUserRegisteredException e) 
@@ -2270,6 +2314,31 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+		}
+	}
+	private void processDeleteLog(String requestBody) {
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey(JsonKey.DELETE))
+		{
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					String dir = Config.getLogDir();
+					String fileName = FileConfigUtil.fixFileName(dir+"/"+value);
+					File file = new File(fileName);
+					try 
+					{
+						FileConfigUtil.deleteDirectoryWalkTree(file.toPath());
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 	

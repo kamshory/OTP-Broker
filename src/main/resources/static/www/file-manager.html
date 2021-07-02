@@ -65,7 +65,7 @@
                                 <li class=""><a href="modem.html">Modem</a></li>
                                 <li class=""><a href="email-account.html">Email Account</a></li>
                                 <li class=""><a href="network-setting.html">Network Setting</a></li>
-				  <li class=""><a href="firewall.html">Firewall</a></li>
+				                <li class=""><a href="firewall.html">Firewall</a></li>
                                 <li class=""><a href="keystore.html">Keystore</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="dropdown-header">DDNS Setting</li>
@@ -88,41 +88,36 @@
         <link rel="stylesheet" href="lib.assets/css/filemanager.css">
         <div class="phone-page">
 
-            <div class="file-manager" data-source="log/list">          
-                <form action="" method="post">
-                    <div class="dir-select">
-                        <select class="input-select select-path">
-                        </select>
-                    </div>
-                    <div class="file-manager-body">
-                        <div class="dir">
-                            <ul class="parentdir"></ul>
-                        </div>
-                        <div class="file">
-                            <div class="file-container">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <td width="16"><input type="checkbox" class="check-all"></td>
-                                            <td width="16"><span class="icon icon-dir"></span></td>
-                                            <td>Name</td>
-                                            <td width="50" align="right">Size</td>
-                                            <td width="160" class="file-modify">Modified</td>
-                                            <td width="50">Type</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+            <div class="file-manager" data-source="storage/content">          
 
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="button-area">
-                            <input type="submit" class="btn btn-danger" name="delete" value="Delete" onclick="return confirm('Are you sure you want to delete selected file?')">
+                <div class="dir-select">
+                    <select class="input-select select-path">
+                    </select>
+                </div>
+                <div class="file-manager-body">
+                    <div class="dir">
+                        <ul class="parentdir"></ul>
+                    </div>
+                    <div class="file">
+                        <div class="file-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td width="16"><input type="checkbox" class="check-all"></td>
+                                        <td width="16"><span class="icon icon-dir"></span></td>
+                                        <td>Name</td>
+                                        <td width="50" align="right">Size</td>
+                                        <td width="160" class="file-modify">Modified</td>
+                                        <td width="50">Type</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </form>
-                
+                </div>
             </div>
             <script src="lib.assets/js/filemanager.js"></script>
         </div>
