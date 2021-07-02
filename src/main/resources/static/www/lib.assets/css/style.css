@@ -125,8 +125,6 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-
-
 .three-col {
     display:flex;
     flex-direction:row;
@@ -153,7 +151,7 @@ input[type=number] {
 .phone-page{
   padding: 0px;
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
 
 button span.number{

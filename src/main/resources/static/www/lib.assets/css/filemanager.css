@@ -78,7 +78,7 @@
         border: 1px solid #DDDDDD;
         background: white;
         background-color: white;
-        height: calc( 100vh - 210px );
+        height: calc( 100vh - 180px );
         width: calc( 25% - 10px );
         padding: 10px;
         position: relative;
@@ -89,7 +89,7 @@
         border: 1px solid #DDDDDD;
         background: white;
         background-color: white;
-        height: calc( 100vh - 210px );
+        height: calc( 100vh - 180px );
         width: calc( 75% - 10px );
         padding: 10px;
         position: relative;
@@ -101,7 +101,7 @@
         display: none;
     }
     .file-manager-body .file{
-        height: calc( 100vh - 235px );
+        max-height: calc( 100vh - 200px );
         overflow: auto;
     }
     .dir-select{
@@ -110,10 +110,13 @@
     .file-modify{
         display: none;
     }
+    .file-manager .button-area{
+        padding-top: 10px;
+    }
 }
 .file-manager-body .file table tbody td a{
     display: block;
 }
 .file-manager .button-area{
-    padding-top: 10px;
+    padding: 10px 0 0 0;
 }
