@@ -22,6 +22,7 @@ public class ConfigDDNS {
 	private static Logger logger = LogManager.getLogger(ConfigDDNS.class);
 	private static Map<String, DDNSRecord> records = new HashMap<>();
 	private static String configPath = "";
+	
 	private ConfigDDNS()
 	{
 		
@@ -48,14 +49,12 @@ public class ConfigDDNS {
 					ConfigDDNS.setRecords(new HashMap<>());
 					
 					JSONArray keys = list.names ();
-					for (int i = 0; i < keys.length (); ++i) 
+					for(int i = 0; i < keys.length (); ++i) 
 					{
-						String key = keys.getString (i); 
-					    if ( list.get(key) instanceof JSONObject ) 
+						String key = keys.getString(i); 
+					    if (list.get(key) instanceof JSONObject) 
 					    {
-
-					    	JSONObject json = list.getJSONObject(key);
-							
+					    	JSONObject json = list.getJSONObject(key);						
 							String lID = json.optString("id", "").trim();
 							String lZone = json.optString("zone", "").trim();
 							String lRecordName = json.optString("recordName", "").trim();
@@ -164,24 +163,20 @@ public class ConfigDDNS {
 	}
 
 	public static void deleteRecord(String value) {
-		ConfigDDNS.records.remove(value);
-		
+		ConfigDDNS.records.remove(value);	
 	}
 
 	public static void deactivate(String value) {
-		((DDNSRecord) ConfigDDNS.records.getOrDefault(value, new DDNSRecord())).setActive(false);
-		
+		((DDNSRecord) ConfigDDNS.records.getOrDefault(value, new DDNSRecord())).setActive(false);	
 	}
 
 	public static void activate(String value) {
-		((DDNSRecord) ConfigDDNS.records.getOrDefault(value, new DDNSRecord())).setActive(true);
-		
+		((DDNSRecord) ConfigDDNS.records.getOrDefault(value, new DDNSRecord())).setActive(true);	
 	}
 
 	public static void updateRecord(DDNSRecord record) {
 		String id = record.getId();
-		ConfigDDNS.records.put(id, record);
-		
+		ConfigDDNS.records.put(id, record);		
 	}
 
 	public static void proxied(String value) {
@@ -189,8 +184,7 @@ public class ConfigDDNS {
 		
 	}
 	public static void unproxied(String value) {
-		((DDNSRecord) ConfigDDNS.records.getOrDefault(value, new DDNSRecord())).setProxied(false);
-		
+		((DDNSRecord) ConfigDDNS.records.getOrDefault(value, new DDNSRecord())).setProxied(false);		
 	}
 
 	public static JSONObject toJSONObject()

@@ -31,7 +31,6 @@ public class WebSocketClient extends Thread
 	public WebSocketClient(WebSocketTool webSocketTool) {
 		this.webSocketTool = webSocketTool;
 	}
-
 	
 	@Override
 	public void run()
@@ -136,10 +135,10 @@ public class WebSocketClient extends Thread
 		String protocol = "";
 		String host = ConfigFeederWS.getFeederWsAddress();
 		String port = "";
-		String path = ConfigFeederWS.getFeederWsPath();
-		if(!path.startsWith("/"))
+		String contextPath = ConfigFeederWS.getFeederWsPath();
+		if(!contextPath.startsWith("/"))
 		{
-			path = "/"+path;
+			contextPath = "/"+contextPath;
 		}
 		if(ConfigFeederWS.isFeederWsSSL())
 		{
@@ -157,9 +156,8 @@ public class WebSocketClient extends Thread
 				port = ":"+ConfigFeederWS.getFeederWsPort();
 			}
 		}	
-		return String.format("%s%s%s%s", protocol, host, port, path);
+		return String.format("%s%s%s%s", protocol, host, port, contextPath);
 	}
-
 
 	public void close() {
 		try 
@@ -175,7 +173,6 @@ public class WebSocketClient extends Thread
 			 */
 		}		
 	}
-	
 	
 	private static void wait4TerminateSignal()
 	{

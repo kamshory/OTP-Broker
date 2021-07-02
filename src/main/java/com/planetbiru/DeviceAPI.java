@@ -19,7 +19,7 @@ public class DeviceAPI {
 	{
 		
 	}
-	
+		
 	public static String exec(String command)
 	{
 		String result = "";

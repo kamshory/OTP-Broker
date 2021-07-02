@@ -1,8 +1,9 @@
 var tree = [];
 $(document).ready(function(e){
+    var source = $('.file-manager').attr('data-source');
     $.ajax({
         'type': 'GET',
-        'url': 'log/list',
+        'url': source,
         'dataType':'json',
         success: function (data) {
             tree = data;
