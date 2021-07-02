@@ -28,8 +28,9 @@ public class GSM {
     public GSM()
     {
     	logger.info("Constructor GSM called");
-    }  
-   
+    }
+    
+    
     /**
      * Initialize the connection
      *

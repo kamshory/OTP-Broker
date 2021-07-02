@@ -2316,6 +2316,8 @@ public class ServerWebManager {
 			 */
 		}
 	}
+	
+	
 	private void processDeleteLog(String requestBody) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		if(queryPairs.containsKey(JsonKey.DELETE))
@@ -2326,8 +2328,9 @@ public class ServerWebManager {
 				String value = entry.getValue();
 				if(key.startsWith("id["))
 				{
+					String path = FileConfigUtil.removeParentWithDot("/"+value);
 					String dir = Config.getLogDir();
-					String fileName = FileConfigUtil.fixFileName(dir+"/"+value);
+					String fileName = FileConfigUtil.fixFileName(dir+path);
 					File file = new File(fileName);
 					try 
 					{

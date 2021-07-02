@@ -62,6 +62,13 @@ public class FileConfigUtil {
 			 throw new IOException(ex);
 		 }
 	}
+	
+	public static String removeParentWithDot(String path) {
+		path = path.replace("/../", "/");
+		path = path.replace("\\..\\", "\\");
+		return path;
+	}
+	
 	public static String fixFileName(String fileName) {
 		if(OSUtil.getOS().equals(OS.WINDOWS))
 		{
@@ -106,7 +113,8 @@ public class FileConfigUtil {
 	
 			@Override
 			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-				if (exc != null) {
+				if (exc != null) 
+				{
 					throw exc;
 				}
 				Files.delete(dir);
@@ -115,4 +123,5 @@ public class FileConfigUtil {
 		};
 		Files.walkFileTree(path, visitor);
 	}
+
 }
