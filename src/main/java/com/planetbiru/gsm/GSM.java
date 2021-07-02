@@ -446,6 +446,5 @@ public class GSM {
 	public void setReady(boolean ready) {
 		this.ready = ready;
 	}
-
 	
 }

@@ -33,9 +33,7 @@ public class WebManagerTool {
 				meta = WebManagerTool.fixMeta(meta);
 				try
 				{
-					System.out.println(meta);
 					JSONObject metaObj = XML.toJSONObject(meta);
-					//JSONObject metaObj = new JSONObject();
 					JSONObject metaObjFixed = WebManagerTool.lowerCaseJSONKey(metaObj);
 					if(requireLogin(metaObjFixed))
 					{
@@ -166,8 +164,7 @@ public class WebManagerTool {
 		if(dir.endsWith("/"))
 		{
 			dir = dir.substring(0, dir.length() - 1);
-		}
-		
+		}	
 		return WebManagerTool.fixFileName(dir+path);
 	}
 	public static String fixFileName(String fileName) {

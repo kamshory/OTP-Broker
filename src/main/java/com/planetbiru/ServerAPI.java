@@ -191,7 +191,6 @@ public class ServerAPI {
 		GSMUtil.getCallerType().put(Utility.getClassName(RabbitMQReceiver.class.toString()), "amqp");
 		GSMUtil.getCallerType().put(Utility.getClassName(WebSocketEndpoint.class.toString()), "ws");
 		GSMUtil.getCallerType().put(Utility.getClassName(RESTAPI.class.toString()), "rest");
-		
 	}
 	
 	private void loadConfigAPI() {

@@ -1,6 +1,7 @@
 package com.planetbiru;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -2302,6 +2303,10 @@ public class ServerWebManager {
 				{
 					this.processFirewall(requestBody);
 				}
+				if(path.equals("/logs.html"))
+				{
+					this.processDeleteLog(requestBody);
+				}
 			}
 		} 
 		catch (NoUserRegisteredException e) 
@@ -2309,6 +2314,31 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+		}
+	}
+	private void processDeleteLog(String requestBody) {
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey(JsonKey.DELETE))
+		{
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					String dir = Config.getLogDir();
+					String fileName = FileConfigUtil.fixFileName(dir+"/"+value);
+					File file = new File(fileName);
+					try 
+					{
+						FileConfigUtil.deleteDirectoryWalkTree(file.toPath());
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 	
