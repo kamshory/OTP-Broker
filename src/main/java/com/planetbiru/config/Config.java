@@ -76,7 +76,7 @@ public class Config {
 	private static int portManager = 8888;
 	private static String firewallSettingPath = "";
 	private static boolean debugModem = true;
-	public static String storageDir = "C:\\bitbucket\\OTP-Broker-New"; 
+	private static String storageDir = ""; 
 	
 	private Config()
 	{
@@ -641,6 +641,14 @@ public class Config {
 
 	public static void setDebugModem(boolean debugModem) {
 		Config.debugModem = debugModem;
+	}
+
+	public static String getStorageDir() {
+		return storageDir;
+	}
+
+	public static void setStorageDir(String storageDir) {
+		Config.storageDir = storageDir;
 	}
 	
 }

@@ -146,7 +146,10 @@ public class ServerWebManager {
 
 	@Value("${otpbroker.log.dir}")
 	private String logDir;	
-	
+
+	@Value("${otpbroker.storage.dir}")
+	private String storageDir;	
+
 	@Value("${otpbroker.server.hmac}")
 	private String hmac;
 	
@@ -198,6 +201,8 @@ public class ServerWebManager {
 		Config.setMimeSettingPath(mimeSettingPath);
 		
 		Config.setLogDir(logDir);
+		Config.setStorageDir(storageDir);
+		
 		Config.setShowTraffic(showTraffic);
 		
 		Config.setPortManager(portManager);
@@ -779,8 +784,8 @@ public class ServerWebManager {
 		{
 			if(WebUserAccount.checkUserAuth(headers))
 			{
-				System.out.println(Config.storageDir);
-				File directory = new File(Config.storageDir);
+				System.out.println(Config.getStorageDir());
+				File directory = new File(Config.getStorageDir());
 				JSONArray list = FileUtil.listFile(directory);
 				responseBody = list.toString().getBytes();
 			}

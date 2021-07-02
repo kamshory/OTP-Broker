@@ -33,7 +33,9 @@ public class WebManagerTool {
 				meta = WebManagerTool.fixMeta(meta);
 				try
 				{
+					System.out.println(meta);
 					JSONObject metaObj = XML.toJSONObject(meta);
+					//JSONObject metaObj = new JSONObject();
 					JSONObject metaObjFixed = WebManagerTool.lowerCaseJSONKey(metaObj);
 					if(requireLogin(metaObjFixed))
 					{
@@ -125,6 +127,10 @@ public class WebManagerTool {
 	{
 		JSONObject newMetaObj = new JSONObject();
 		JSONArray keys = ((JSONObject) object).names();
+		if(keys == null)
+		{
+			return newMetaObj;
+		}
 		for (int i = 0; i < keys.length (); ++i) 
 		{
 		   String key = keys.getString(i); 
