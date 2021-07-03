@@ -7,8 +7,6 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -67,8 +65,6 @@ public class ClientReceiverAMQP {
 		ConfigFeederAMQP.load(Config.getFeederAMQPSettingPath());
     }
 	
-	private Logger logger = LogManager.getLogger(ClientReceiverAMQP.class);
-	
 	@Bean
 	MessageListenerContainer messageListenerContainer() {
 		boolean lEnable = this.enable;
@@ -79,7 +75,6 @@ public class ClientReceiverAMQP {
 		
 		if(lEnable)
 		{
-			logger.info("LOADING RABBITMQ CONFIG");
 			boolean test = this.canConnect();
 			if(!test)
 			{
@@ -113,12 +108,15 @@ public class ClientReceiverAMQP {
 	ApplicationRunner runner(ConnectionFactory cf) {
 	    return args -> {
 	        boolean open = false;
-	        while(!open) {
-	            try {
+	        while(!open) 
+	        {
+	            try 
+	            {
 	                cf.createConnection().close();
 	                open = true;
 	            }
-	            catch (Exception e) {
+	            catch (Exception e) 
+	            {
 	                Thread.sleep(5000);
 	            }
 	        }
@@ -147,8 +145,7 @@ public class ClientReceiverAMQP {
 		if(ConfigFeederAMQP.isLoaded() && !ConfigFeederAMQP.getFeederAmqpAddress().isEmpty() && ConfigFeederAMQP.getFeederAmqpPort() > 0)
 		{
 			lEnable = ConfigFeederAMQP.isFeederAmqpEnable();
-		}
-		
+		}		
 		if(lEnable)
 		{
 			boolean ssl = this.rabbitMQSSL;
@@ -169,18 +166,20 @@ public class ClientReceiverAMQP {
 			if(ssl)
 			{
 				SSLContext sslContext;		
-	    		try {
+	    		try 
+	    		{
 	    			sslContext = SSLContext.getInstance("TLS");
 	    			sslContext.init(null,null,null);
 	    			SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();    	  		
 	    			rabbitmqConnectionfactory.setSocketFactory(sslSocketFactory); 		
-	    		} catch (Exception e) {
+	    		} 
+	    		catch(Exception e) 
+	    		{
 	    			/**
 	    			 * Do nothing
 	    			 */
 	    		}
-			}
-			
+			}			
 			rabbitmqConnectionfactory.setHost(lRabbitMQHost);
 			rabbitmqConnectionfactory.setPort(lRabbitMQPort);
 			rabbitmqConnectionfactory.setUsername(lUsername);

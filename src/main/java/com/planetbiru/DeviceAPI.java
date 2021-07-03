@@ -70,7 +70,9 @@ public class DeviceAPI {
 		        offset  = timeInfo.getOffset();
 		    }
 
-		    // Calculate the remote server NTP time
+		    /**
+		     * Calculate the remote server NTP time
+		     */
 		    long currentTimeMils = System.currentTimeMillis();
 		    TimeStamp atomicNtpTime = TimeStamp.getNtpTime(currentTimeMils + offset);
 

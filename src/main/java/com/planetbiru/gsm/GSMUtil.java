@@ -19,7 +19,6 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.util.Utility;
 
 public class GSMUtil {
-	
 	private static final String NO_DEVICE_CONNECTED = "No device connected";
 	private static final String MODEM_ID = "modemID";
 	private static final String RESULT = "result";
@@ -72,6 +71,7 @@ public class GSMUtil {
 		GSMUtil.initialized = true;
 		GSMUtil.updateConnectedDevice();
 	}
+	
 
 	public static void connect(String modemID) throws GSMException, InvalidPortException
 	{

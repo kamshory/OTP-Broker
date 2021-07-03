@@ -50,6 +50,7 @@ import com.planetbiru.config.ConfigNetWLAN;
 import com.planetbiru.config.ConfigVendorNoIP;
 import com.planetbiru.config.DataEmail;
 import com.planetbiru.config.ConfigSMS;
+import com.planetbiru.config.ConfigSMTP;
 import com.planetbiru.config.PropertyLoader;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
@@ -130,6 +131,9 @@ public class ServerWebManager {
 	@Value("${otpbroker.path.setting.general}")
 	private String generalSettingPath;
 
+	@Value("${otpbroker.path.setting.smtp}")
+	private String smtpSettingPath;
+
 	@Value("${otpbroker.path.base.setting}")
 	private String baseDirConfig;
 	
@@ -195,6 +199,7 @@ public class ServerWebManager {
 		Config.setDynuSettingPath(dynuSettingPath);
 		Config.setAfraidSettingPath(afraidSettingPath);
 		Config.setGeneralSettingPath(generalSettingPath);
+		Config.setSmtpSettingPath(smtpSettingPath);
 		
 		Config.setRestartCommand(restartCommand);
 		Config.setCleanupCommand(cleanupCommand);
@@ -626,6 +631,7 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	
 	@GetMapping(path="/logout.html")
 	public ResponseEntity<byte[]> handleLogout(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -688,6 +694,39 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				String list = ConfigGeneral.toJSONObject().toString();
+				responseBody = list.getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	
+	@GetMapping(path="/smtp-setting/get")
+	public ResponseEntity<byte[]> handleSMTPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				String list = ConfigSMTP.toJSONObject().toString();
 				responseBody = list.getBytes();
 			}
 			else
@@ -2137,8 +2176,7 @@ public class ServerWebManager {
 	public ResponseEntity<byte[]> serveDocumentRoot(HttpHeaders headers, HttpServletRequest request)
 	{
 		HttpHeaders responseHeaders = new HttpHeaders();
-		HttpStatus statusCode = HttpStatus.OK;
-		
+		HttpStatus statusCode = HttpStatus.OK;		
 		String fileName = WebManagerTool.getFileName(request);
 		byte[] responseBody = "".getBytes();
 		try 
@@ -2156,7 +2194,9 @@ public class ServerWebManager {
 				} 
 				catch (FileNotFoundException e1) 
 				{
-					logger.error(e1.getMessage());
+					/**
+					 * Do nothing
+					 */
 				}
 			}
 		}
@@ -2307,6 +2347,10 @@ public class ServerWebManager {
 				{
 					this.processDeleteLog(requestBody);
 				}
+				if(path.equals("/smtp-setting.html"))
+				{
+					this.processSMTPSetting(requestBody);
+				}
 			}
 		} 
 		catch (NoUserRegisteredException e) 
@@ -2314,6 +2358,26 @@ public class ServerWebManager {
 			/**
 			 * Do nothing
 			 */
+		}
+	}
+	
+	private void processSMTPSetting(String requestBody) {
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey("update"))
+		{
+			ConfigSMTP.load(Config.getSmtpSettingPath());
+			String softwareName = queryPairs.getOrDefault("software_name", "").trim();
+			String serverName = queryPairs.getOrDefault("server_name", "").trim();
+			String serverAddress = queryPairs.getOrDefault("server_address", "").trim();
+			String port = queryPairs.getOrDefault("server_port", "0").trim();
+			int serverPort = Utility.atoi(port);
+			boolean active = queryPairs.getOrDefault("active", "").trim().equals("1");
+			ConfigSMTP.setSoftwareName(softwareName);
+			ConfigSMTP.setServerName(serverName);
+			ConfigSMTP.setServerAddress(serverAddress);
+			ConfigSMTP.setServerPort(serverPort);
+			ConfigSMTP.setActive(active);
+			ConfigSMTP.save();
 		}
 	}
 	

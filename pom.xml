@@ -179,6 +179,13 @@
 		    <artifactId>sshd-core</artifactId>
 		    <version>2.5.1</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>org.subethamail</groupId>
+            <artifactId>subethasmtp</artifactId>
+            <version>3.1.7</version>
+        </dependency>
+        
     </dependencies>
     <build>
         <plugins>
