@@ -67,7 +67,6 @@ public class ServerWebSocketManager {
 	@Value("${otpbroker.path.setting.modem}")
 	private String modemSettingPath;
 
-
 	private Session session;
 	private String clientIP = "";
 	private Map<String, List<String>> requestHeader = new HashMap<>();

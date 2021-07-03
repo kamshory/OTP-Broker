@@ -43,8 +43,7 @@ public class RESTAPI {
 			/**
 			 * Do nothing
 			 */
-		}
-		
+		}		
 		JSONArray data = new JSONArray();
 		requestJSON.put(JsonKey.DATA, data);
 		requestJSON.put(JsonKey.COMMAND, command);

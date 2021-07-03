@@ -631,6 +631,7 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	
 	@GetMapping(path="/logout.html")
 	public ResponseEntity<byte[]> handleLogout(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -2376,10 +2377,10 @@ public class ServerWebManager {
 			ConfigSMTP.setServerAddress(serverAddress);
 			ConfigSMTP.setServerPort(serverPort);
 			ConfigSMTP.setActive(active);
-			
 			ConfigSMTP.save();
 		}
 	}
+	
 	
 	private void processDeleteLog(String requestBody) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
