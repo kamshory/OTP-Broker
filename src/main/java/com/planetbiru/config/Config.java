@@ -33,14 +33,6 @@ public class Config {
 	private static String keystoreDataSettingPath = "";
 	private static String blockingSettingPath = "";
 
-	private static String defaultSMTPHost = "localhost";
-	private static String defaultSMTPPort = "25";
-	private static String defaultSMTPUsername = "";
-	private static String defaultSMTPPassword = "";
-	private static String defaultSMTPAuth = "false";
-	private static String defaultSMTPEnable = "false";
-	private static String defaultStarttlsEnable = "false";
-	private static String defaultSMTPSSLEnable = "false";
 	private static String userAPISettingPath = "";
 	private static String dhcpSettingPathDefault = "";
 	private static String wlanSettingPathDefault = "";
@@ -76,7 +68,9 @@ public class Config {
 	private static int portManager = 8888;
 	private static String firewallSettingPath = "";
 	private static boolean debugModem = true;
-	private static String storageDir = ""; 
+	private static String storageDir = "";
+	public static boolean printMailConsole = true;
+	private static String smtpSettingPath = ""; 
 	
 	private Config()
 	{
@@ -305,70 +299,6 @@ public class Config {
 
 	public static void setBlockingSettingPath(String blockingSettingPath) {
 		Config.blockingSettingPath = blockingSettingPath;
-	}
-
-	public static String getDefaultSMTPHost() {
-		return defaultSMTPHost;
-	}
-
-	public static void setDefaultSMTPHost(String defaultSMTPHost) {
-		Config.defaultSMTPHost = defaultSMTPHost;
-	}
-
-	public static String getDefaultSMTPPort() {
-		return defaultSMTPPort;
-	}
-
-	public static void setDefaultSMTPPort(String defaultSMTPPort) {
-		Config.defaultSMTPPort = defaultSMTPPort;
-	}
-
-	public static String getDefaultSMTPUsername() {
-		return defaultSMTPUsername;
-	}
-
-	public static void setDefaultSMTPUsername(String defaultSMTPUsername) {
-		Config.defaultSMTPUsername = defaultSMTPUsername;
-	}
-
-	public static String getDefaultSMTPPassword() {
-		return defaultSMTPPassword;
-	}
-
-	public static void setDefaultSMTPPassword(String defaultSMTPPassword) {
-		Config.defaultSMTPPassword = defaultSMTPPassword;
-	}
-
-	public static String getDefaultSMTPAuth() {
-		return defaultSMTPAuth;
-	}
-
-	public static void setDefaultSMTPAuth(String defaultSMTPAuth) {
-		Config.defaultSMTPAuth = defaultSMTPAuth;
-	}
-
-	public static String getDefaultSMTPEnable() {
-		return defaultSMTPEnable;
-	}
-
-	public static void setDefaultSMTPEnable(String defaultSMTPEnable) {
-		Config.defaultSMTPEnable = defaultSMTPEnable;
-	}
-
-	public static String getDefaultStarttlsEnable() {
-		return defaultStarttlsEnable;
-	}
-
-	public static void setDefaultStarttlsEnable(String defaultStarttlsEnable) {
-		Config.defaultStarttlsEnable = defaultStarttlsEnable;
-	}
-
-	public static String getDefaultSMTPSSLEnable() {
-		return defaultSMTPSSLEnable;
-	}
-
-	public static void setDefaultSMTPSSLEnable(String defaultSMTPSSLEnable) {
-		Config.defaultSMTPSSLEnable = defaultSMTPSSLEnable;
 	}
 
 	public static String getUserAPISettingPath() {
@@ -649,6 +579,14 @@ public class Config {
 
 	public static void setStorageDir(String storageDir) {
 		Config.storageDir = storageDir;
+	}
+
+	public static String getSmtpSettingPath() {
+		return smtpSettingPath;
+	}
+
+	public static void setSmtpSettingPath(String smtpSettingPath) {
+		Config.smtpSettingPath = smtpSettingPath;
 	}
 	
 }

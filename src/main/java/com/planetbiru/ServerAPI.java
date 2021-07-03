@@ -99,28 +99,6 @@ public class ServerAPI {
 	@Value("${otpbroker.api.path.unblock}")
 	private String unblockinPath;
 	
-	@Value("${otpbroker.default.smtp.host}")
-	private String defaultSMTPHost;
-	
-	@Value("${otpbroker.default.smtp.port}")
-	private String defaultSMTPPort;
-	
-	@Value("${otpbroker.default.smtp.user}")
-	private String defaultSMTPUsername;
-
-	@Value("${otpbroker.default.smtp.password}")
-	private String defaultSMTPPassword;
-
-	@Value("${otpbroker.default.smtp.auth}")
-	private String defaultSMTPAuth;
-
-	@Value("${otpbroker.default.smtp.ssl}")
-	private String defaultSMTPSSLEnable;
-
-	@Value("${otpbroker.default.smtp.starttls}")
-	private String defaultStarttlsEnable;
-
-
 	@Value("${otpbroker.path.setting.blocking}")
 	private String blockingSettingPath;
 	
@@ -159,14 +137,6 @@ public class ServerAPI {
 		ConfigAPIUser.load(Config.getUserAPISettingPath());
 		Config.setBlockingSettingPath(blockingSettingPath);
 
-		Config.setDefaultSMTPHost(defaultSMTPHost);
-		Config.setDefaultSMTPPort(defaultSMTPPort);
-		Config.setDefaultSMTPUsername(defaultSMTPUsername);
-		Config.setDefaultSMTPPassword(defaultSMTPPassword);
-		Config.setDefaultSMTPAuth(defaultSMTPAuth);
-		Config.setDefaultSMTPSSLEnable(defaultSMTPSSLEnable);
-		Config.setDefaultStarttlsEnable(defaultStarttlsEnable);
-		Config.setKeystoreDataSettingPath(keystoreDataSettingPath);
 		Config.setKeystoreSettingPath(keystoreSettingPath);
 		Config.setRestartCommand(restartCommand);
 		Config.setModemSettingPath(modemSettingPath);

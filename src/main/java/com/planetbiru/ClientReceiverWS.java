@@ -60,6 +60,7 @@ public class ClientReceiverWS {
 		 * This configuration must be loaded first
 		 */
 		Config.setBaseDirConfig(baseDirConfig);
+		Config.setFeederWSSettingPath(feederWSSettingPath);
 
 		ConfigFeederWS.setFeederWsEnable(feederWsEnable);
 		ConfigFeederWS.setFeederWsSSL(feederWsSSL);
@@ -71,11 +72,10 @@ public class ClientReceiverWS {
 		ConfigFeederWS.setFeederWsChannel(feederWsChannel);
 		ConfigFeederWS.setFeederWsTimeout(feederWsTimeout);
 		ConfigFeederWS.setFeederWsReconnectDelay(feederWsReconnectDelay);
-		ConfigFeederWS.setFeederWsRefresh(feederWsRefresh);
-		
-		Config.setFeederWSSettingPath(feederWSSettingPath);
+		ConfigFeederWS.setFeederWsRefresh(feederWsRefresh);		
 
 		ConfigFeederWS.load(Config.getFeederWSSettingPath());
+		
 		this.tool = new WebSocketTool(ConfigFeederWS.getFeederWsReconnectDelay());
 		this.tool.start();
 	}

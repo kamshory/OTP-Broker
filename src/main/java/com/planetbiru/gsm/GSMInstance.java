@@ -8,6 +8,7 @@ import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 
 public class GSMInstance {
+	
 	private GSM gsm;
 	private String id = "";
 	public GSMInstance(DataModem modem)

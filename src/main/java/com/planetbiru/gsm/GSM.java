@@ -42,6 +42,7 @@ public class GSM {
     {
     	this.setReady(false);
     	boolean isOpen = false;
+    	
     	logger.info("INIT port : {}", portName);
     	try
     	{

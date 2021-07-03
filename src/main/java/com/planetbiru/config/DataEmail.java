@@ -108,22 +108,6 @@ public class DataEmail {
  			properties.put("mail.smtp.port", Integer.toString(this.port));	
 	        properties.put("mail.smtp.socketFactory.port", this.port+"");
         }
-        else
-        {
-        	properties.put("mail.smtp.host", Config.getDefaultSMTPHost());
-	        properties.put("mail.smtp.port", Config.getDefaultSMTPPort());
-	        properties.put("mail.smtp.auth", Config.getDefaultSMTPAuth());        
-	        if(this.ssl)
- 			{
-	        	properties.put("mail.smtp.ssl.enable", Config.getDefaultSMTPSSLEnable());
- 			}
-	        if(Config.getDefaultStarttlsEnable().equals("true"))
-	        {
-	        	properties.put("mail.smtp.starttls.enable", Config.getDefaultStarttlsEnable());        
-	        }
-	        this.senderAddress = Config.getDefaultSMTPUsername();
-	        this.senderPassword = Config.getDefaultSMTPPassword();     
-        }
  		
         String localSmtpUser = this.senderAddress;
         String localSmtpPassword = this.senderPassword;
