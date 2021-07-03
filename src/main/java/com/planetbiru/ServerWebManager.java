@@ -568,7 +568,7 @@ public class ServerWebManager {
 		itemData.put(JsonKey.ID, uuid);
 		itemData.put(JsonKey.MESSAGE, message);
 		data.put(itemData);
-		messageJSON.put("data", data);		
+		messageJSON.put(JsonKey.DATA, data);		
 		ServerWebSocketManager.broadcast(messageJSON.toString(4));	
 	}
 	
@@ -2381,7 +2381,6 @@ public class ServerWebManager {
 		}
 	}
 	
-	
 	private void processDeleteLog(String requestBody) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		if(queryPairs.containsKey(JsonKey.DELETE))
@@ -2629,7 +2628,7 @@ public class ServerWebManager {
 				data.put("fileExtension", fileExtension);
 				data.put("filePassword", filePassword);
 				data.put(JsonKey.ACTIVE, active);
-				byte[] binaryData = Utility.base64DecodeRaw(queryPairs.getOrDefault("data", ""));
+				byte[] binaryData = Utility.base64DecodeRaw(queryPairs.getOrDefault(JsonKey.DATA, ""));
 				data.put("fileSize", binaryData.length);
 				
 				String fn = id + "." + fileExtension;
