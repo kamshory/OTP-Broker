@@ -176,7 +176,7 @@ OPT Broker dilengkapi dengan local SMTP server untuk mengirim email. Dengan adan
 
 ## DDNS Record
 
-DDNS Record adalah data untuk melakukan pengaturan DNS secara dinamis. DDNS atau Dymanic Domain Name Server adalah sebuah mekanisme pengaturan DNS yang dilakukan secara berulang-ulang disebabkan karena alamat IP publik dari server yang selalu berubah-ubah.
+DDNS Record adalah data untuk melakukan pengaturan DNS secara dinamis. DDNS atau Dymanic Domain Name System adalah sebuah mekanisme pengaturan DNS yang dilakukan secara berulang-ulang disebabkan karena alamat IP publik dari server yang selalu berubah-ubah.
 
 OTP Broker menyediakan pengaturan DDNS menggunakan vendor DDNS. Beberapa vendor DDNS yang didukung adalah sebagai berikut:
 
@@ -275,7 +275,7 @@ Pada skenario ini, App Server dapat langsung mengirimkan OTP ke OTP Broker melal
 
 ![OTP Broker Topology Skenario 1](https://raw.githubusercontent.com/kamshory/OTP-Broker/main/src/main/resources/static/www/lib.assets/images/topology-1.png)
 
-Pengguna dapat menggunakan sebuah domain murah dan menggunakan Dynamic Domain Name Server gratis. Dengan penggunaan port forwarding pada router, OTP Broker dapat diakses dari manapun dengan menggunakan domain atau subdomain. Dalam skenario ini, pengguna membutuhkan:
+Pengguna dapat menggunakan sebuah domain murah dan menggunakan Dynamic Domain Name System gratis. Dengan penggunaan port forwarding pada router, OTP Broker dapat diakses dari manapun dengan menggunakan domain atau subdomain. Dalam skenario ini, pengguna membutuhkan:
 
 1. OTP Broker
 2. Koneksi internet fix dengan IP public (statis atau dinamis)
