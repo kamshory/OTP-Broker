@@ -172,7 +172,7 @@ Untuk menggunakan SMTP Gmail, gunakan konfigurasi berikut:
 
 ## Local SMTP Server
 
-OPT Broker dilengkapi dengan local SMTP server untuk mengirim email. Dengan adanya local SMTP server ini, pengguna dapat mengirimkan email tanpa memerlukan external SMTP serve. Meskipun demikian, local SMTP server tidak direkomendasikan karena mail server tujuan dapat saja memblokir email yang dikirim dari local SMTP server. 
+OPT Broker dilengkapi dengan local SMTP server untuk mengirim email. Dengan adanya local SMTP server ini, pengguna dapat mengirimkan email tanpa memerlukan external SMTP server. Meskipun demikian, local SMTP server tidak direkomendasikan karena mail server tujuan dapat saja memblokir email yang dikirim dari local SMTP server. 
 
 ## DDNS Record
 
