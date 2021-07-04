@@ -103,6 +103,10 @@
                 </td>
               </tr>
               <tr>
+                <td>Log Outgoing SMS</td>
+                <td><label><input type="checkbox" name="log_sms" value="1"> Yes</label></td>
+              </tr>
+              <tr>
                 <td>Minimum Interval (Second)</td>
                 <td><input type="number" name="incomming_interval" id="incomming_interval" value="">	
                 </td>
@@ -117,6 +121,7 @@
                 <td><input type="number" name="max_per_time_range" id="max_per_time_range" value="">	
                 </td>
               </tr>
+
               <tr>
                 <td></td>
                 <td>
@@ -136,6 +141,7 @@
                     dataType:"json",
                     success:function(data){
                       $('input[name="send_incomming_sms"]').prop("checked", data.sendIncommingSMS);
+                      $('input[name="log_sms"]').prop("checked", data.logSMS);
                       $('input[name="incomming_interval"]').val(data.incommingInterval+"");
                       $('input[name="country_code"]').val(data.countryCode);
                       $('input[name="time_range"]').val(data.timeRange+"");

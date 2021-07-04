@@ -752,11 +752,12 @@
                             $('[name="ntp_update_interval"]').val(data.ntpUpdateInterval);
                         }
                     });
-                    
+                    var today = new Date();
+                    var str = dateFormat(today);                     
+                    $('[name="device_time"]').val(str);
                     setInterval(function(e2){
                         var today = new Date();
                         var str = dateFormat(today);                     
-
                         $('[name="device_time"]').val(str);
                     }, 1000);
                 });
