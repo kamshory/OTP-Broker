@@ -9,7 +9,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.net.ssl.KeyManagerFactory;
@@ -35,6 +34,7 @@ import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataKeystore;
 import com.planetbiru.gsm.GSMUtil;
+import com.planetbiru.gsm.SMSLogger;
 import com.planetbiru.receiver.amqp.RabbitMQReceiver;
 import com.planetbiru.receiver.ws.WebSocketEndpoint;
 import com.planetbiru.util.ServiceHTTP;
@@ -123,6 +123,10 @@ public class ServerAPI {
 	@Value("${otpbroker.debug.modem}")
 	private boolean debugModem;
 
+	
+	@Value("${otpbroker.path.log.sms}")
+	private String smsLogPath;
+	
 	@PostConstruct
 	public void init()
 	{
@@ -141,7 +145,7 @@ public class ServerAPI {
 		Config.setRestartCommand(restartCommand);
 		Config.setModemSettingPath(modemSettingPath);
 		Config.setDebugModem(debugModem);
-
+		Config.setSmsLogPath(smsLogPath);
 		
 		this.loadConfigAPI();
 		this.loadConfigEmail();
@@ -156,6 +160,11 @@ public class ServerAPI {
 		ConfigBlocking.load(Config.getBlockingSettingPath());
 
 		ConfigModem.load(Config.getModemSettingPath());
+		if(ConfigSMS.isLogSMS())
+		{
+			SMSLogger.setPath(Config.getSmsLogPath());
+		}
+		
 		GSMUtil.init();	
 		
 		GSMUtil.getCallerType().put(Utility.getClassName(RabbitMQReceiver.class.toString()), "amqp");

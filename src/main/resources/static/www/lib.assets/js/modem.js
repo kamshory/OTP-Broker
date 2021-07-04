@@ -12,7 +12,6 @@ $(document).ready(function (e1) {
                     var cls = '';
                     cls += (item.active?' enable':' disable');
                     cls += (item.connected?' connected':' disconnected');
-
                     var service = $('<div class="service-item service-modem'+cls+'">\r\n'+
                         '<div class="service-label"></div>\r\n'+
                         '<div class="service-button">\r\n'+
@@ -22,7 +21,6 @@ $(document).ready(function (e1) {
                         '</div>');
                     service.attr('data-id', item.id);
                     service.find('.service-label').text(item.name+ ' via '+item.connectionType);
-
                     $('.service-wrapper').append(service);
                     $('.row-table tbody').append(
                         '<tr data-pk-id="' + item.id + '">\r\n' +

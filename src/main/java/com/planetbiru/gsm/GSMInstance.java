@@ -1,9 +1,11 @@
 package com.planetbiru.gsm;
 
+import java.util.Date;
 import java.util.List;
 
 import com.fazecast.jSerialComm.SerialPortInvalidPortException;
 import com.planetbiru.config.Config;
+import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
 
@@ -44,7 +46,16 @@ public class GSMInstance {
 			throw new GSMException(ConstantString.SERIAL_PORT_NULL);
 		}
 		this.waitUntilReady();
-		return this.gsm.sendSMS(receiver, message);
+		Date date = new Date();
+		String result = this.gsm.sendSMS(receiver, message);
+		this.logSendSMS(receiver, date, message.length());
+		return result;
+	}
+	private void logSendSMS(String receiver, Date date, int length) {
+		if(ConfigSMS.isLogSMS())
+		{
+			SMSLogger.add(date, this.id, receiver, length);	
+		}
 	}
 	private void waitUntilReady() {
 		long maxWaith = Config.getMaxWaitModemReady();

@@ -1,6 +1,7 @@
 package com.planetbiru.config;
 
 public class Config {
+	private static String smsLogPath = "";
 	private static String generalSettingPath = "";
 	private static String otpSalt = "IJUjhrfytR^&r7jkjojO";
 	private static String secretKey = "planetsecret";
@@ -587,6 +588,14 @@ public class Config {
 
 	public static void setSmtpSettingPath(String smtpSettingPath) {
 		Config.smtpSettingPath = smtpSettingPath;
+	}
+
+	public static String getSmsLogPath() {
+		return smsLogPath;
+	}
+
+	public static void setSmsLogPath(String smsLogPath) {
+		Config.smsLogPath = smsLogPath;
 	}
 	
 }

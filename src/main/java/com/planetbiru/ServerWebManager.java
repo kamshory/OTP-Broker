@@ -813,6 +813,7 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
+	
 	@GetMapping(path="/storage/content")
 	public ResponseEntity<byte[]> handleLogStorage(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -861,6 +862,87 @@ public class ServerWebManager {
 			if(WebUserAccount.checkUserAuth(headers))
 			{
 				String fullname = Config.getLogDir() + "/" + path;
+				fullname = FileConfigUtil.fixFileName(fullname);	
+				byte[] list = "".getBytes();
+				try 
+				{
+					list = FileUtil.readResource(fullname);
+					responseBody = list;
+					String contentType = this.getMIMEType(path);
+					String baseName = this.getBaseName(path);
+					responseHeaders.add(ConstantString.CONTENT_TYPE, contentType);
+					responseHeaders.add("Content-disposition", "attachment; filename=\""+baseName+"\"");
+				} 
+				catch (FileNotFoundException e) 
+				{
+					statusCode = HttpStatus.NOT_FOUND;
+				}
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	@GetMapping(path="/report/sms/list")
+	public ResponseEntity<byte[]> handleSMSLog(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				System.out.println(Config.getSmsLogPath());
+				File directory = new File(Config.getSmsLogPath());
+				JSONArray list = FileUtil.listFile(directory);
+				responseBody = list.toString().getBytes();
+			}
+			else
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;			
+			}
+		}
+		catch(NoUserRegisteredException e)
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		cookie.saveSessionData();
+		cookie.putToHeaders(responseHeaders);
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	
+	@GetMapping(path="/report/sms/download/**")
+	public ResponseEntity<byte[]> handleDownloadReportFile(@RequestHeader HttpHeaders headers, HttpServletRequest request)
+	{
+		String path = request.getServletPath();
+		path = path.substring("/report/sms/download".length());
+		HttpHeaders responseHeaders = new HttpHeaders();
+		CookieServer cookie = new CookieServer(headers, Config.getSessionName(), Config.getSessionLifetime());
+		byte[] responseBody = "".getBytes();
+		HttpStatus statusCode = HttpStatus.OK;
+		try
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				String fullname = Config.getSmsLogPath() + "/" + path;
 				fullname = FileConfigUtil.fixFileName(fullname);	
 				byte[] list = "".getBytes();
 				try 
@@ -2347,6 +2429,10 @@ public class ServerWebManager {
 				{
 					this.processDeleteLog(requestBody);
 				}
+				if(path.equals("/sms-report.html"))
+				{
+					this.processDeleteReport(requestBody);
+				}
 				if(path.equals("/smtp-setting.html"))
 				{
 					this.processSMTPSetting(requestBody);
@@ -2393,6 +2479,33 @@ public class ServerWebManager {
 				{
 					String path = FileConfigUtil.removeParentWithDot("/"+value);
 					String dir = Config.getLogDir();
+					String fileName = FileConfigUtil.fixFileName(dir+path);
+					File file = new File(fileName);
+					try 
+					{
+						FileConfigUtil.deleteDirectoryWalkTree(file.toPath());
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
+	private void processDeleteReport(String requestBody) {
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		if(queryPairs.containsKey(JsonKey.DELETE))
+		{
+			for (Map.Entry<String, String> entry : queryPairs.entrySet()) 
+			{
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key.startsWith("id["))
+				{
+					String path = FileConfigUtil.removeParentWithDot("/"+value);
+					String dir = Config.getSmsLogPath();
 					String fileName = FileConfigUtil.fixFileName(dir+path);
 					File file = new File(fileName);
 					try 
@@ -2658,7 +2771,7 @@ public class ServerWebManager {
 			String countryCode = queryPairs.getOrDefault("country_code", "").trim();
 			String prefix = queryPairs.getOrDefault("recipient_prefix_length", "0").trim();
 			int recipientPrefixLength = Utility.atoi(prefix);
-
+			boolean logSMS = queryPairs.getOrDefault("log_sms", "").trim().equals("1");
 			
 			ConfigSMS.setCountryCode(countryCode);
 			ConfigSMS.setSendIncommingSMS(lSendIncommingSMS);
@@ -2666,6 +2779,7 @@ public class ServerWebManager {
 			ConfigSMS.setTimeRange(lTimeRange);
 			ConfigSMS.setMaxPerTimeRange(lMaxPerTimeRange);
 			ConfigSMS.setRecipientPrefixLength(recipientPrefixLength);
+			ConfigSMS.setLogSMS(logSMS);
 			
 			ConfigSMS.save();
 		}	
@@ -2988,8 +3102,7 @@ public class ServerWebManager {
 			if(dataEmail == null)
 			{
 				dataEmail = new DataEmail();
-			}
-			
+			}		
 			
 			boolean auth = queryPairs.getOrDefault("mail_auth", "").trim().equals("1");
 			String host = queryPairs.getOrDefault("smtp_host", "").trim();
@@ -3051,8 +3164,7 @@ public class ServerWebManager {
 		
 			ConfigEmail.add(dataEmail);
 			ConfigEmail.save();
-		}
-		
+		}	
 	}
 	
 	private void processModemSetting(String requestBody) {
@@ -3136,9 +3248,6 @@ public class ServerWebManager {
 		String name = queryPairs.getOrDefault("name", "").trim();
 		String recipientPrefix = queryPairs.getOrDefault("recipient_prefix", "").trim();
 		
-		/**
-		 * Fixing recipientPrefix
-		 */
 		if(!recipientPrefix.isEmpty())
 		{
 			recipientPrefix = recipientPrefix.replace("\n", "\r\n");
@@ -3180,6 +3289,7 @@ public class ServerWebManager {
 			id = Utility.md5(String.format("%d", System.nanoTime()));
 			modem.setId(id);
 		}
+		
 		modem.setName(name);
 		modem.setConnectionType(connectionType);
 		modem.setSmsCenter(smsCenter);
@@ -3423,8 +3533,7 @@ public class ServerWebManager {
 					}
 				}
 			}
-			WebUserAccount.save();
-			
+			WebUserAccount.save();		
 		}
 		if(queryPairs.containsKey("unblock"))
 		{
@@ -3844,6 +3953,4 @@ public class ServerWebManager {
 		}
 		return webContent;
 	}
-	
-	
 }

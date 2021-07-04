@@ -159,8 +159,7 @@ public class GSMUtil {
 			throw new GSMException(GSMUtil.NO_DEVICE_CONNECTED);
 		}
 		int index = GSMUtil.getModemIndex(receiver);		
-		GSMInstance instance = GSMUtil.gsmInstance.get(index);
-		
+		GSMInstance instance = GSMUtil.gsmInstance.get(index);	
 		
 		String result = instance.sendSMS(receiver, message);
 		DataModem modemData = ConfigModem.getModemData(instance.getId());      

@@ -170,7 +170,23 @@
                 </table>
             </form>
             <script type="text/javascript">
-                $(document).ready(function (e) {
+                var setting = {};
+                $(document).ready(function(e){
+                    $.ajax({
+                        type:"GET",
+                        url:"sms-setting/get",
+                        dataType:"json",
+                        success:function(data){
+                            setting = data;
+                            applyTag();
+                        }
+                    });
+                    
+                    $(document).on('blur', '[name="recipient_prefix"]', function(e2){
+                        applyTag();
+                    });
+            
+
                     var urlParams = new URLSearchParams(window.location.search);
                     var id = urlParams.get('id') || '';
                     if (id.length > 0) {
@@ -194,14 +210,35 @@
                                 $('input[name="stop_bits"]').val(data.stopBits);
                                 $('input[name="default_modem"]').prop('checked', data.defaultModem);
                                 $('input[name="active"]').prop('checked', data.active);
+                                applyTag();
                             }
                         });
                     }
-                    else {
-                        //window.location = "odem.html";
+                    else 
+                    {
+                        window.location = "modem.html";
                     }
                 });
+                function applyTag()
+                {
+                    if(setting.countryCode != '' && setting.recipientPrefixLength > 0)
+                    {
+                        var value = $('[name="recipient_prefix"]').val();
+                        var arr = value.split(',');
+                        for(i in arr)
+                        {
+                            arr[i] = arr[i].trim();
+                            if(arr[i].indexOf('0') == 0 && arr[i].length > 1)
+                            {
+                                arr[i] = setting.countryCode + arr[i].substring(1);
+                            }
+                        }
+                        value = arr.join(', ');
+                        $('[name="recipient_prefix"]').val(value);
+                    }
+                }
             </script>
+
         </div>
         <!-- /container -->
     </div>
