@@ -3219,7 +3219,7 @@ public class ServerWebManager {
 			this.processModemUpdate(queryPairs, JsonKey.UPDATE);
 		}
 		GSMUtil.updateConnectedDevice();
-	}	
+	}
 	
 	private void processModemUpdate(Map<String, String> queryPairs, String action) {		
 		
