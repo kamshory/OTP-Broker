@@ -149,7 +149,7 @@ input[type=number] {
 }
 
 .phone-page{
-  padding: 0px;
+  padding: 0px 0px 10px 0px;
   position: relative;
   margin-bottom: 0px;
 }

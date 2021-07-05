@@ -6,6 +6,7 @@ import java.util.List;
 public class ModemRouter {
 	private int currentIndex = -1;
 	private List<Integer> modemIndex = new ArrayList<>();
+	
 	public ModemRouter(int index) {
 		modemIndex.add(Integer.valueOf(index));
 	}
@@ -20,11 +21,11 @@ public class ModemRouter {
 		modemIndex.add(Integer.valueOf(index));
 	}
 
-	public int getIndex() throws InvalidGSMRouterException
+	public int getIndex() throws InvalidModemRouterException
 	{
 		if(this.modemIndex.isEmpty())
 		{
-			throw new InvalidGSMRouterException("Invalid GSM router");
+			throw new InvalidModemRouterException("Invalid GSM router");
 		}
 		this.currentIndex++;
 		if(this.currentIndex >= this.modemIndex.size())

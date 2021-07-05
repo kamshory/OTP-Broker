@@ -26,6 +26,7 @@ public class SMSLogger {
 			prepareFile(date);
 		}	
 	}
+	
 	private static void prepareDir(String fileName) {
 		File file = new File(fileName);
 		String directory1 = file.getParent();
@@ -71,18 +72,20 @@ public class SMSLogger {
 				 */
 			}
 		}
-	}
+	}	
 
 	private static void prepareFile(Date date) {
 		String baseName = Utility.date("yyyy-MM-dd", date)+".csv";
 		SMSLogger.baseName = baseName;
-		SMSLogger.fileName = FileConfigUtil.fixFileName(path + "/" + baseName);	
+		SMSLogger.fileName = FileConfigUtil.fixFileName(SMSLogger.path + "/" + baseName);	
 		SMSLogger.prepareDir(SMSLogger.fileName);
 	}
+	
 	private static boolean dirCreated(Date date) {
 		String dt = Utility.date("yyyy-MM-dd", date)+".csv";
 		return SMSLogger.baseName.equals(dt);
 	}
+	
 	private static String mask(String receiver) {
 		int maskLength = 3;
 		String masked = "";
