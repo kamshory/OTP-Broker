@@ -55,18 +55,18 @@ OTP Broker memungkinkan pengguna mengatur pengiriman SMS. Sebagai contoh: penggu
 3. Modem 3 dengan SIM Card dari Operator Telekomunikasi 3
 4. Modem 4 dengan SIM Card dari Operator Telekomunikasi 4
 
-Operator Telekomunikasi 1 menerapkan biaya Rp 50 untuk nomor dengan prefix 0871 dan 0872 dan menerapkan biaya Rp 350 untuk nomor selain itu.
-Operator Telekomunikasi 2 menerapkan biaya Rp 100 untuk nomor dengan prefix 0835, 0856, dan 0837 dan menerapkan biaya Rp 350 untuk nomor selain itu.
-Operator Telekomunikasi 3 menerapkan biaya Rp 60 untuk nomor dengan prefix 0845 dan menerapkan biaya Rp 250 untuk nomor selain itu.
-Operator Telekomunikasi 4 menerapkan biaya Rp 90 untuk nomor dengan prefix 0848 dan 0849 dan menerapkan biaya Rp 200 untuk nomor selain itu.
+Operator Telekomunikasi 1 menerapkan biaya Rp 50 untuk nomor dengan prefix 62871 dan 62872 dan menerapkan biaya Rp 350 untuk nomor selain itu.
+Operator Telekomunikasi 2 menerapkan biaya Rp 100 untuk nomor dengan prefix 62835, 62856, dan 62837 dan menerapkan biaya Rp 350 untuk nomor selain itu.
+Operator Telekomunikasi 3 menerapkan biaya Rp 60 untuk nomor dengan prefix 62845 dan menerapkan biaya Rp 250 untuk nomor selain itu.
+Operator Telekomunikasi 4 menerapkan biaya Rp 90 untuk nomor dengan prefix 62848 dan 62849 dan menerapkan biaya Rp 200 untuk nomor selain itu.
 
-Dari kasus di atas, biaya paling rendah untuk operator lain adalah Rp 200. Pengguna dapat mengatur modem 4 sebagai modem default. Semua SMS selain dari prefix 0871, 0872, 0835, 0856, 0837 dan 0845 akan menggunakan modem ini dan dikirim melalui Operator Telekomunikasi 4. Semua SMS untuk nomor dengan prefix 0871 dan 0872 menggunakan modem 1 dan dikirim melalui Operator Telekomunikasi 1. Semua SMS untuk nomor dengan prefix 0835, 0856, dan 0837 menggunakan modem 2 dan dikirim melalui Operator Telekomunikasi 2. Semua SMS untuk nomor dengan prefix 0845 menggunakan modem 3 dan dikirim melalui Operator Telekomunikasi 3. Dengan demikian, biaya pengiriman SMS akan dapat ditekan. 
+Dari kasus di atas, biaya paling rendah untuk operator lain adalah Rp 200. Pengguna dapat mengatur modem 4 sebagai modem default. Semua SMS selain dari prefix 62871, 62872, 62835, 62856, 62837 dan 62845 akan menggunakan modem ini dan dikirim melalui Operator Telekomunikasi 4. Semua SMS untuk nomor dengan prefix 62871 dan 62872 menggunakan modem 1 dan dikirim melalui Operator Telekomunikasi 1. Semua SMS untuk nomor dengan prefix 62835, 62856, dan 62837 menggunakan modem 2 dan dikirim melalui Operator Telekomunikasi 2. Semua SMS untuk nomor dengan prefix 62845 menggunakan modem 3 dan dikirim melalui Operator Telekomunikasi 3. Dengan demikian, biaya pengiriman SMS akan dapat ditekan. 
 
 Pengguna dapat menggunakan 2 atau lebih SIM Card dari satu operator yang sama. Modem akan digunakan secara bergantian dengan algoritma Round-Robin saat OTP Broker mengirimkan SMS ke nomor dengan prefix yang sama.
 
 Biaya pengiriman SMS akan lebih murah lagi ketika pengguna memanfaatkan promo dari operator telekomunikasi yang bersangkutan. Beberapa operator akan menerapkan biaya pengiriman SMS yang sangat rendah setelah pengguna mengirimkan beberapa SMS dengan ketentuan tertentu.
 
-Pengaturan prefix menggunakan MSISDN atau IMSI. Dengan demikian, pada contoh di atas, saat pengguna di Indonesia mengatur prefix 0871, maka yang tersimpan adalah 62871. Dengan demikian, pengguna harus menggunakan panjang prefix 5 alih-alih 4.
+Pengaturan prefix menggunakan MSISDN. Dengan demikian, pada contoh di atas, saat pengguna di Indonesia mengatur prefix 0871, maka yang tersimpan adalah 62871. Dengan demikian, pengguna harus menggunakan panjang prefix 5 alih-alih 4.
 
 ## USSD Support
 
