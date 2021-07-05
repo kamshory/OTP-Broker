@@ -714,7 +714,6 @@ public class ServerWebManager {
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
 	
-	
 	@GetMapping(path="/smtp-setting/get")
 	public ResponseEntity<byte[]> handleSMTPSetting(@RequestHeader HttpHeaders headers, HttpServletRequest request)
 	{
@@ -905,7 +904,6 @@ public class ServerWebManager {
 		{
 			if(WebUserAccount.checkUserAuth(headers))
 			{
-				System.out.println(Config.getSmsLogPath());
 				File directory = new File(Config.getSmsLogPath());
 				JSONArray list = FileUtil.listFile(directory);
 				responseBody = list.toString().getBytes();
@@ -927,7 +925,6 @@ public class ServerWebManager {
 		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
 		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
 	}
-	
 	
 	@GetMapping(path="/report/sms/download/**")
 	public ResponseEntity<byte[]> handleDownloadReportFile(@RequestHeader HttpHeaders headers, HttpServletRequest request)
@@ -3227,6 +3224,7 @@ public class ServerWebManager {
 		String connectionType = queryPairs.getOrDefault("connection_type", "").trim();
 		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");	
 		boolean defaultModem = queryPairs.getOrDefault("default_modem", "").trim().equals("1");
+		boolean smsAPI = queryPairs.getOrDefault("sms_api", "").trim().equals("1");
 
 		String smsCenter = queryPairs.getOrDefault("sms_center", "").trim();		
 		
@@ -3308,6 +3306,7 @@ public class ServerWebManager {
 		modem.setParityBit(parityBit);
 		modem.setStartBits(startBits);
 		modem.setStopBits(stopBits);
+		modem.setSmsAPI(smsAPI);
 		modem.setDefaultModem(defaultModem);
 		modem.setActive(active);
 

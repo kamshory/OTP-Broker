@@ -23,6 +23,7 @@ public class DataModem {
 	private String parityBit = "";
 	private String startBits = "";
 	private String stopBits = "";
+	private boolean smsAPI = false;
 	private boolean defaultModem = false;
 	private boolean active = false;
 
@@ -47,6 +48,7 @@ public class DataModem {
 		this.parityBit = jsonObject.optString("parityBit", "");
 		this.startBits = jsonObject.optString("startBits", "");
 		this.stopBits = jsonObject.optString("stopBits", "");
+		this.smsAPI = jsonObject.optBoolean("smsAPI", false);
 		this.defaultModem = jsonObject.optBoolean("defaultModem", false);
 		this.active = jsonObject.optBoolean("active", false);
 	}
@@ -70,6 +72,7 @@ public class DataModem {
 		jsonObject.put("parityBit", this.parityBit);
 		jsonObject.put("startBits", this.startBits);
 		jsonObject.put("stopBits", this.stopBits);
+		jsonObject.put("smsAPI", this.smsAPI);
 		jsonObject.put("defaultModem", this.defaultModem);
 		jsonObject.put("active", this.active);
 		return jsonObject;
@@ -203,6 +206,14 @@ public class DataModem {
 		this.stopBits = stopBits;
 	}
 
+	public boolean isSmsAPI() {
+		return smsAPI;
+	}
+
+	public void setSmsAPI(boolean smsAPI) {
+		this.smsAPI = smsAPI;
+	}
+
 	public boolean isDefaultModem() {
 		return defaultModem;
 	}
@@ -243,7 +254,6 @@ public class DataModem {
 		}
 		return perfixes;
 	}
-	
 	
 	
 }

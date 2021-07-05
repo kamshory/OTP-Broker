@@ -73,7 +73,8 @@ public class WebSocketEndpoint extends Endpoint {
 		}
 	}
 	
-	private void sendSMS(JSONObject data) {
+	private void sendSMS(JSONObject data) 
+	{
 		if(data != null)
 		{
 			String receiver = data.optString("receiver", "");
@@ -88,10 +89,12 @@ public class WebSocketEndpoint extends Endpoint {
 			}
 		}
 	}
-	private void sendSMS(String receiver, String textMessage) throws GSMException {
-		GSMUtil.sendSMS(receiver, textMessage);
-		
+	
+	private void sendSMS(String receiver, String textMessage) throws GSMException 
+	{
+		GSMUtil.sendSMS(receiver, textMessage);	
 	}
+	
 	private void login() throws IOException {
 		String text = "";	
 		JSONObject requestJSON = new JSONObject();
@@ -102,10 +105,12 @@ public class WebSocketEndpoint extends Endpoint {
 		this.sendText(text);
 		
 	}
+	
 	public void sendText(String text) throws IOException
 	{
 		this.session.getBasicRemote().sendText(text);		
 	}
+	
 	@Override
 	public void onError(Session session, Throwable throwable)
 	{
@@ -114,7 +119,8 @@ public class WebSocketEndpoint extends Endpoint {
 	}
 	
 	@Override
-	public void onClose(Session ses, CloseReason closeReason) {
+	public void onClose(Session ses, CloseReason closeReason) 
+	{
 		ServerInfo.sendWSStatus(false, closeReason.getReasonPhrase());
 		this.webSocketClient.getWebSocketTool().restartThread();
     }

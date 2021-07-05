@@ -295,6 +295,9 @@ public class GSMUtil {
 		return ConfigModem.getModemData(modemID).getRecipientPrefix().length() > 0;
 	}
 	
+	/**
+	 * Update Connected Device
+	 */
 	public static void updateConnectedDevice() {
 		GSMUtil.reindexInstantce();
 		GSMUtil.hasPrefix = false;
@@ -305,10 +308,16 @@ public class GSMUtil {
 		{
 			if(GSMUtil.isConnected(i))
 			{
-				connectedDev.add(i);
+				
 				String modemID = GSMUtil.gsmInstance.get(i).getId();
 				DataModem modemData = ConfigModem.getModemData(modemID);
-				if(modemData.isDefaultModem())
+				
+				if(modemData.isSmsAPI())
+				{
+					connectedDev.add(i);
+				}
+				
+				if(modemData.isDefaultModem() && modemData.isSmsAPI())
 				{
 					connectedDefaultDev.add(i);
 				}
@@ -348,7 +357,8 @@ public class GSMUtil {
 			{
 				return GSMUtil.getRouterIndex(receiver);
 			} 
-			catch (GSMException | InvalidGSMRouterException e) {
+			catch (GSMException | InvalidGSMRouterException e) 
+			{
 				return GSMUtil.getModemIndex();
 			}
 		}
