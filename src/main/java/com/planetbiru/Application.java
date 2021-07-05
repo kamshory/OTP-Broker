@@ -105,8 +105,7 @@ public class Application {
 		Config.setRebootCommand(rebootCommand);
 		
 		resetConfig();
-	}
-	
+	}	
 	
 	private static void resetConfig() 
 	{
@@ -131,13 +130,14 @@ public class Application {
 			ConfigNetDHCP.apply(Config.getOsDHCPConfigPath());
 			ConfigNetWLAN.apply(Config.getOsWLANConfigPath(), Config.getOsWLANConfigPath());
 			ConfigNetEthernet.apply(Config.getOsEthernetConfigPath());
-		}
-		
+		}		
 	}
 	
-	private static boolean usbPluged() {
+	private static boolean usbPluged() 
+	{
 		return false;
 	}
+	
 	
 }
 

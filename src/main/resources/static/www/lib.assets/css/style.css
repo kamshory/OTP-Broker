@@ -674,6 +674,9 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
     background-position: center;
     background-repeat: no-repeat;
 }
+.phone-page form:last-child{
+  margin-bottom: 20px !important;
+}
 .setting .tile-icon{
   background-image: url(../images/icon/setting.png);
 }
@@ -739,6 +742,12 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
 }
 .report .tile-icon{
   background-image: url(../images/icon/report.png);
+}
+.keystore .tile-icon{
+  background-image: url(../images/icon/keystore.png);
+}
+.user-account .tile-icon{
+  background-image: url(../images/icon/user-account.png);
 }
 .tile-icon > a{
     width: 60px;

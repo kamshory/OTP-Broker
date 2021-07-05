@@ -1,6 +1,7 @@
 var tree = [];
+var source = '';
 $(document).ready(function(e){
-    var source = $('.file-manager').attr('data-source');
+    source = $('.file-manager').attr('data-source');
     $.ajax({
         'type': 'GET',
         'url': source,
@@ -174,7 +175,7 @@ function renderRowFile(data, parentDir, no)
             modified = modified.substring(0, 19);
             modified = modified.replace('T', ' ');
             var size = Math.ceil(data[i].size/1024);
-            var pathDownload = 'log/download/'+path;
+            var pathDownload = getParentDir(source)+'/download/'+path;
             tr = $('<tr><td><input type="checkbox" class="check-all" name="id[]" value="'+path+'"></td>'+
             '<td><span class="icon icon-file"></span></td>'+
             '<td><a href="'+pathDownload+'">'+data[i].name+'</a></td>'+
