@@ -59,7 +59,7 @@ public class SMSLogger {
 		}
 		if(!SMSLogger.fileName.isEmpty())
 		{
-			String data = date.getTime()+","+id+","+SMSLogger.mask(receiver)+","+length+"\r\n";
+			String data = date.getTime()+","+id+","+sender+","+SMSLogger.mask(receiver)+","+length+"\r\n";
 			try(FileOutputStream fos = new FileOutputStream(SMSLogger.fileName, true))
 			{
 				fos.write(data.getBytes());
