@@ -158,11 +158,11 @@ public class GSMUtil {
 			GSMUtil.sendTraffic(receiver, ste);
 			throw new GSMException(GSMUtil.NO_DEVICE_CONNECTED);
 		}
-		int index = GSMUtil.getModemIndex(receiver);		
+		int index = GSMUtil.getModemIndex(receiver);
 		GSMInstance instance = GSMUtil.gsmInstance.get(index);	
 		
 		DataModem modemData = ConfigModem.getModemData(instance.getId());      
-		String result = instance.sendSMS(receiver, message);
+		String result = instance.sendSMS(receiver, message, modemData);
 		if(Config.isShowTraffic())
 		{
 			GSMUtil.sendTraffic(receiver, ste, modemData);
@@ -419,11 +419,11 @@ public class GSMUtil {
 
 	private static int getModemIndex() throws GSMException {
 		GSMUtil.counter++;
-		if(GSMUtil.counter >= GSMUtil.countConnected())
+		if(GSMUtil.counter >= GSMUtil.connectedDevices.size())
 		{
 			GSMUtil.counter = 0;
 		}
-		if(!GSMUtil.connectedDevices.isEmpty() && GSMUtil.connectedDevices.size() >= (GSMUtil.counter -1))
+		if(!GSMUtil.connectedDevices.isEmpty() && GSMUtil.connectedDevices.size() >= (GSMUtil.counter - 1))
 		{
 			return GSMUtil.connectedDevices.get(GSMUtil.counter);
 		}
