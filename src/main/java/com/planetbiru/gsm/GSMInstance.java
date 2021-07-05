@@ -46,15 +46,18 @@ public class GSMInstance {
 			throw new GSMException(ConstantString.SERIAL_PORT_NULL);
 		}
 		this.waitUntilReady();
-		Date date = new Date();
-		String result = this.gsm.sendSMS(receiver, message);
-		this.logSendSMS(receiver, date, message.length());
-		return result;
+		return this.gsm.sendSMS(receiver, message);
 	}
-	private void logSendSMS(String receiver, Date date, int length) {
+	public String sendSMS(String receiver, String message, DataModem modemData) throws GSMException {
+		Date date = new Date();
+		String sender = modemData.getMsisdn();
+		this.logSendSMS(sender, receiver, date, message.length());
+		return this.sendSMS(receiver, message);
+	}
+	private void logSendSMS(String sender, String receiver, Date date, int length) {
 		if(ConfigSMS.isLogSMS())
 		{
-			SMSLogger.add(date, this.id, receiver, length);	
+			SMSLogger.add(date, this.id, sender, receiver, length);	
 		}
 	}
 	private void waitUntilReady() {
@@ -111,5 +114,6 @@ public class GSMInstance {
 			Thread.currentThread().interrupt();
 		}		
 	}
+	
 
 }

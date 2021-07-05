@@ -93,7 +93,7 @@
                         <tr>
                             <td width="16"><input type="checkbox" class="check-all"></td>
                             <td>Port</td>
-                            <td>Protocol</td>
+                            <td>Prtcl</td>
                             <td>Last Update</td>
                             <td width="60" align="center">Open</td>
                         </tr>
@@ -126,7 +126,7 @@
                                     var active = !item.active ? 'icon-cross' : 'icon-check';
                                     var update = new Date();
                                     update.setTime(item.lastUpdate);
-                                    var lastUpdate = dateFormat(update);
+                                    var lastUpdate = dateFormat(update).substring(0, 16);
                                     $('.row-table tbody').append(
                                         '<tr data-pk-id="' + item.id + '">\r\n' +
                                         '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +

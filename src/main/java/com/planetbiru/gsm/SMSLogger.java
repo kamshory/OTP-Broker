@@ -51,7 +51,8 @@ public class SMSLogger {
 			d1.mkdir();
 		}		
 	}
-	public static void add(Date date, String id, String receiver, int length) {
+	
+	public static void add(Date date, String id, String sender, String receiver, int length) {
 		if(!dirCreated(date))
 		{
 			prepareFile(date);

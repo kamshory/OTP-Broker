@@ -161,8 +161,8 @@ public class GSMUtil {
 		int index = GSMUtil.getModemIndex(receiver);		
 		GSMInstance instance = GSMUtil.gsmInstance.get(index);	
 		
-		String result = instance.sendSMS(receiver, message);
 		DataModem modemData = ConfigModem.getModemData(instance.getId());      
+		String result = instance.sendSMS(receiver, message);
 		if(Config.isShowTraffic())
 		{
 			GSMUtil.sendTraffic(receiver, ste, modemData);
