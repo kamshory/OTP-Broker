@@ -140,7 +140,7 @@ SMS Setting adalah konfigurasi pengiriman SMS oleh OTP Broker.
 | SMS Center | SMS center |
 | IMEI | Modem IMEI |
 | MSISDN | MSISDN of the SIM Card used |
-| IMSI | IMSI of the SIM Card use |
+| IMSI | IMSI of the SIM Card used |
 | Recipient Prefix | Recipient prefix that will receive SMS from this modem. See _Prefix-Based Routing_ secton |
 | SIM Card PIN | SIM Card PIN if exists |
 | Baud Rate | Modem baud rate |
