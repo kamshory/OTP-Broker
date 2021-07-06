@@ -64,11 +64,11 @@ public class ServerSMTPLocal {
 
         try
         {
-            server.start();
+            this.server.start();
         }
         catch (Exception e)
         {
-            logger.error("Could not start MockMock. Maybe port {} is already in use?\r\n{}", this.port, e.getMessage());
+            logger.error("Could not start SMTP. Maybe port {} is already in use?\r\n{}", this.port, e.getMessage());
         }
     }
 }
