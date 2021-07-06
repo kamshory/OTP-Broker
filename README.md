@@ -1,6 +1,3 @@
-
-
-
 # OTP Broker
 
 OTP atau `One Time Password` adalah sebuah password satu kali pakai yang memiliki masa berlaku tertentu. Umumnya masa berlaku dibuat sangat singkat dan hanya memberikan kesempatan kepada penerimanya untuk memasukkannya ke dalam aplikasi dan mengirimkannya ke server aplikasi yang memerlukannya. OTP bersifat sangat rahasia sehingga `clear text` dari OTP tidak boleh disimpan oleh pihak manapun. Bahkan, server aplikasi hanya menyimpan `hash` atau `token` yang cocok dengan OTP tersebut. `Clear text` hanya dibuat lalu dikirim ke penerima. Dengan kata lain, `clear text` hanya diketahui oleh penerima OTP saja.
@@ -150,7 +147,6 @@ SMS Setting adalah konfigurasi pengiriman SMS oleh OTP Broker.
 | Send SMS from API | Flag that the modem will be used to send SMS from API or not. If it set to `false`, modem will not send incomming SMS from API but user can send SMS manualy from the management web. |
 | Default Modem | Flag that the modem is default or not. The default modem will be used to send SMS that the prefix is not exists on `Recipient Prefix` of the other modems. |
 | Active | Flag for the modem that will be used or not |
-
 
 
 ## Blocking List
@@ -572,9 +568,7 @@ Pada skenario ini, pengguna tidak memerlukan IP public. Pengguna hanya memerluka
 
 Server WSMessageBroker berbasis menggunakan protokol WebSocket dan PHP. Silakan download WSMessageBroker di https://github.com/kamshory/WSMessageBrocker 
 
-
-
-
+Client untuk mengirimkan SMS ke WSMessageBroker dapat didownload di https://github.com/kamshory/WSClient
 
 ## Pengujian Modul
 

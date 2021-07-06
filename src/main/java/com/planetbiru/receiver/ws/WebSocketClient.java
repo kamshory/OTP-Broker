@@ -131,11 +131,13 @@ public class WebSocketClient extends Thread
 		} 
 	}
 	
+	
 	private String createWSEndpoint() {
 		String protocol = "";
 		String host = ConfigFeederWS.getFeederWsAddress();
 		String port = "";
 		String contextPath = ConfigFeederWS.getFeederWsPath();
+		String channel = Utility.urlEncode(ConfigFeederWS.getFeederWsChannel());
 		if(!contextPath.startsWith("/"))
 		{
 			contextPath = "/"+contextPath;
@@ -156,7 +158,7 @@ public class WebSocketClient extends Thread
 				port = ":"+ConfigFeederWS.getFeederWsPort();
 			}
 		}	
-		return String.format("%s%s%s%s", protocol, host, port, contextPath);
+		return String.format("%s%s%s%s?channel=%s", protocol, host, port, contextPath, channel);
 	}
 
 	public void close() {
