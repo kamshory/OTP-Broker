@@ -41,6 +41,7 @@ public class User {
 		jsonObject.put("active", this.active);		
 		return jsonObject;
 	}
+	
 	public String toString()
 	{
 		return this.toJSONObject().toString(4);

@@ -64,26 +64,25 @@ public class DeviceAPI {
 			InetAddress inetAddress = InetAddress.getByName(ntpServer);
 		    TimeInfo timeInfo = client.getTime(inetAddress);
 		    timeInfo.computeDetails();
-		    Long offset = Long.getLong("0");
+		    Long offset;
 			if (timeInfo.getOffset() != null) 
 		    {
 		        offset  = timeInfo.getOffset();
+		        /**
+			     * Calculate the remote server NTP time
+			     */
+			    long currentTimeMils = System.currentTimeMillis();
+			    TimeStamp atomicNtpTime = TimeStamp.getNtpTime(currentTimeMils + offset);
+
+			    Date date = new Date(atomicNtpTime.getTime());
+			
+			    /**
+			     * URL : https://www.thegeekstuff.com/2013/08/hwclock-examples/
+			     */
+				String currentTime = Utility.date("MM/dd/yyyy HH:mm:ss", date);
+			    String command = "hwclock --set --date \""+currentTime+"\"";
+			    DeviceAPI.exec(command);	
 		    }
-
-		    /**
-		     * Calculate the remote server NTP time
-		     */
-		    long currentTimeMils = System.currentTimeMillis();
-		    TimeStamp atomicNtpTime = TimeStamp.getNtpTime(currentTimeMils + offset);
-
-		    Date date = new Date(atomicNtpTime.getTime());
-		
-		    /**
-		     * URL : https://www.thegeekstuff.com/2013/08/hwclock-examples/
-		     */
-			String currentTime = Utility.date("MM/dd/yyyy HH:mm:ss", date);
-		    String command = "hwclock --set --date \""+currentTime+"\"";
-		    DeviceAPI.exec(command);	
 		} 
 		catch (IOException e) 
 		{

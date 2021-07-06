@@ -109,6 +109,9 @@
             #phoneled{
                 animation:blink 0.1s infinite alternate;
             }
+            #chipled{
+                animation:blink 0.1s infinite alternate;
+            }
             @keyframes blink {
                 0%{
                     fill: #ffffff;
@@ -199,6 +202,17 @@
                             <line x1="221" y1="448" x2="221" y2="440" stroke="#053310" />
                             <rect x="181" y="448" width="80" height="30" fill="#ffffff" stroke="#000000" pointer-events="all"/>
                            <text x="221" y="463" width="80" dominant-baseline="middle" text-anchor="middle" text-anchor="middle" font-family="Tahoma" font-size="10px">RabbitMQ</text>
+                        </g>
+
+                        <g>
+                            <line x1="136" y1="402" x2="136" y2="368" stroke="#053310" />
+                            <line x1="152" y1="402" x2="152" y2="368" stroke="#053310" />
+                            <line x1="136" y1="402" x2="140" y2="402" stroke="#053310" />
+                            <line x1="152" y1="402" x2="148" y2="402" stroke="#053310" />
+                            <rect stroke="none" pointer-events="all" y="400" x="140" width="8" height="4" fill="#999999"></rect>
+                            <rect id="chipled" stroke="none" pointer-events="all" display="none" y="400" x="140" width="8" height="4" fill="#ffdd00"></rect>
+                            <animate xlink:href="#chipled" attributeType="auto" attributeName="fill"/>
+                            <animate attributeType="CSS" attributeName="fill" from="#ff0000" to="#ffffff" dur="0.1s" repeatCount="indefinite" />
                         </g>
                     
                         <circle cx="11" cy="282" r="5" stroke="#ff8c00" stroke-width="2" fill="#ffffff" />

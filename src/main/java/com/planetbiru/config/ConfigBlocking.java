@@ -23,7 +23,6 @@ public class ConfigBlocking {
 	
 	private static String countryCode = "62";
 	private static Map<String, Boolean> blockList = new LinkedHashMap<>();
-
 	private static String configPath = "";
 	
 	private ConfigBlocking()
@@ -77,10 +76,8 @@ public class ConfigBlocking {
 				String text = new String(data);
 				if(text.length() > 7)
 				{
-					ConfigBlocking.blockList = new LinkedHashMap<>();
-					
+					ConfigBlocking.blockList = new LinkedHashMap<>();					
 					JSONObject json = new JSONObject(text);
-
 					JSONArray keys = json.names();
 					for(int i = 0; i<keys.length(); i++)
 					{

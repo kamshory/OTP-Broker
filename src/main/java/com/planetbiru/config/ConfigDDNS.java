@@ -79,10 +79,12 @@ public class ConfigDDNS {
 			logger.error(e.getMessage());
 		}	
 	}	
+	
 	public static void save()
 	{
 		ConfigDDNS.save(ConfigDDNS.configPath);
 	}
+	
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);

@@ -146,7 +146,6 @@ public class WebUserAccount {
 		}		
 	}
 	
-	
 	public static void load(String path)
 	{
 		WebUserAccount.configPath = path;
