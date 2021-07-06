@@ -147,7 +147,6 @@ public class ConfigFeederAMQP {
 				ConfigFeederAMQP.feederAmqpChannel = setting.optString("feederAmqpChannel", "");
 				ConfigFeederAMQP.feederAmqpTimeout = setting.optInt("feederAmqpTimeout", 0);
 				ConfigFeederAMQP.feederAmqpRefresh = setting.optInt("feederAmqpRefresh", 0);
-
 			}
 			catch(JSONException e)
 			{
@@ -278,9 +277,4 @@ public class ConfigFeederAMQP {
 	public static void setFactory(ConnectionFactory factory) {
 		ConfigFeederAMQP.factory = factory;
 	}
-
-
-	
-	
-	
 }

@@ -20,10 +20,10 @@ public class ConfigAPI {
 		
 	}
 
-	private static int httpPort = 587;
-	private static int httpsPort = 587;
+	private static int httpPort = 80;
+	private static int httpsPort = 443;
 	private static boolean httpEnable = true;	
-	private static boolean httpsEnable = true;	
+	private static boolean httpsEnable = false;	
 	private static String messagePath = "/";
 	private static String blockingPath = "/";
 	private static String unblockingPath = "/";
@@ -54,13 +54,11 @@ public class ConfigAPI {
 					String lMessagePath = json.optString("messagePath", "");
 					String lBlockingPath = json.optString("blockingPath", "");
 					String lUnblockingPath = json.optString("unblockingPath", "");
-
 					
 					ConfigAPI.httpPort = lHttpPort;
 					ConfigAPI.httpsPort = lHttpsPort;
 					ConfigAPI.httpEnable = lHttpEnable;
-					ConfigAPI.httpsEnable = lHttpsEnable;
-					
+					ConfigAPI.httpsEnable = lHttpsEnable;					
 					ConfigAPI.messagePath = lMessagePath;
 					ConfigAPI.blockingPath = lBlockingPath;
 					ConfigAPI.unblockingPath = lUnblockingPath;

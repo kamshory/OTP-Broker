@@ -28,20 +28,21 @@ public class ConfigAPIUser {
 	{
 		
 	}
+	
 	public static void deleteUser(String value) {
 		if(ConfigAPIUser.users.containsKey(value))
 		{
 			ConfigAPIUser.users.remove(value);
-		}
-		
+		}		
 	}
+	
 	public static void activate(String value) {
 		if(ConfigAPIUser.users.containsKey(value))
 		{
 			ConfigAPIUser.users.get(value).setActive(true);
-		}
-		
+		}		
 	}
+	
 	public static void deactivate(String value) {
 		if(ConfigAPIUser.users.containsKey(value))
 		{
@@ -49,6 +50,7 @@ public class ConfigAPIUser {
 		}
 		
 	}
+	
 	public static void block(String value) {
 		if(ConfigAPIUser.users.containsKey(value))
 		{
@@ -56,13 +58,14 @@ public class ConfigAPIUser {
 		}
 		
 	}
+	
 	public static void unblock(String value) {
 		if(ConfigAPIUser.users.containsKey(value))
 		{
 			ConfigAPIUser.users.get(value).setBlocked(false);
-		}
-		
+		}	
 	}
+	
 	public static void load(String path)
 	{
 		ConfigAPIUser.configPath = path;
@@ -95,10 +98,12 @@ public class ConfigAPIUser {
 			 */
 		}
 	}
+	
 	public static void save()
 	{
 		ConfigAPIUser.save(ConfigAPIUser.configPath);
 	}
+	
 	public static void save(String path)
 	{
 		String dir = Utility.getBaseDir();
@@ -139,11 +144,13 @@ public class ConfigAPIUser {
 			d1.mkdir();
 		}		
 	}
+	
 	public static void updateUser(User user) {
 		String username = user.getUsername();
 		ConfigAPIUser.users.put(username, user);
 		
 	}	
+	
 	public static void update(String text) {
 		if(text != null)
 		{
@@ -157,6 +164,7 @@ public class ConfigAPIUser {
 			}
 		}	
 	}
+	
 	public static void addUser(User user)
 	{
 		ConfigAPIUser.users.put(user.getUsername(), user);

@@ -33,8 +33,7 @@ public class ServerSMTPLocal {
 	public void init()
 	{
 		Config.setSmtpSettingPath(smtpSettingPath);
-		ConfigSMTP.load(Config.getSmtpSettingPath());
-		
+		ConfigSMTP.load(Config.getSmtpSettingPath());		
 		if(ConfigSMTP.isActive())
 		{
 			this.port = ConfigSMTP.getServerPort();
@@ -61,14 +60,13 @@ public class ServerSMTPLocal {
         this.server.setHostName(this.serverAddress);
         this.server.setSoftwareName(this.softwareName);
         this.server.setPort(this.port);
-
         try
         {
-            server.start();
+            this.server.start();
         }
         catch (Exception e)
         {
-            logger.error("Could not start MockMock. Maybe port {} is already in use?\r\n{}", this.port, e.getMessage());
+            logger.error("Could not start SMTP. Maybe port {} is already in use?\r\n{}", this.port, e.getMessage());
         }
     }
 }

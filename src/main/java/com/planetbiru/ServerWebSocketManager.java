@@ -113,11 +113,11 @@ public class ServerWebSocketManager {
         Map<String, List<String>> responseHdr = (Map<String, List<String>>) config.getUserProperties().get("response_header");
         Map<String, List<String>> param = (Map<String, List<String>>) config.getUserProperties().get("parameter");       
         
-        List<String> path = param.getOrDefault("path", new ArrayList<>());
+        List<String> localPath = param.getOrDefault("path", new ArrayList<>());
         String pathStr = "";
-		if(!path.isEmpty())
+		if(!localPath.isEmpty())
         {
-        	pathStr = path.get(0);
+        	pathStr = localPath.get(0);
         }
 	    this.path = pathStr;         
         this.requestHeader = requestHdr;
@@ -143,7 +143,8 @@ public class ServerWebSocketManager {
 		}
 	}
 	
-    private String createSessionID() {
+    private String createSessionID() 
+    {
     	return Utility.sha1(""+System.currentTimeMillis()+rand.nextInt(1000000000));
 	}
 
@@ -213,7 +214,8 @@ public class ServerWebSocketManager {
 	}
 
     @OnMessage 
-    public void onMessage(String messageReceived) {	
+    public void onMessage(String messageReceived) 
+    {	
     	broadcast(messageReceived, this.sessionID);
     }
 
@@ -250,8 +252,7 @@ public class ServerWebSocketManager {
             	listeners.remove(listener);
 			}
         }
-    }
-    
+    } 
     
     public static void broadcast(String message, String senderID, String path) 
     {

@@ -1,6 +1,6 @@
 package com.planetbiru.gsm;
 
-public class InvalidGSMRouterException extends Exception {
+public class InvalidModemRouterException extends Exception {
 	/**
 	 * 
 	 */
@@ -8,7 +8,7 @@ public class InvalidGSMRouterException extends Exception {
 	/**
 	 * Default constructor
 	 */
-	public InvalidGSMRouterException() 
+	public InvalidModemRouterException() 
 	{ 
 		super(); 
 	}
@@ -16,7 +16,7 @@ public class InvalidGSMRouterException extends Exception {
 	 * Constructor with the message
 	 * @param message Message
 	 */
-	public InvalidGSMRouterException(String message) 
+	public InvalidModemRouterException(String message) 
 	{ 
 		super(message); 
 	}
@@ -25,7 +25,7 @@ public class InvalidGSMRouterException extends Exception {
 	 * @param message Message
 	 * @param cause Cause
 	 */
-	public InvalidGSMRouterException(String message, Throwable cause) 
+	public InvalidModemRouterException(String message, Throwable cause) 
 	{ 
 		super(message, cause); 
 	}
@@ -33,7 +33,7 @@ public class InvalidGSMRouterException extends Exception {
 	 * Constructor with cause
 	 * @param cause Cause
 	 */
-	public InvalidGSMRouterException(Throwable cause) 
+	public InvalidModemRouterException(Throwable cause) 
 	{ 
 		super(cause); 
 	}

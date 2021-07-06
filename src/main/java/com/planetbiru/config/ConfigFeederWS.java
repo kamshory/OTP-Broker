@@ -26,7 +26,6 @@ public class ConfigFeederWS {
 	private static long feederWsTimeout = 0;
 	private static long feederWsReconnectDelay = 0;
 	private static long feederWsRefresh = 0;
-	
 	private static boolean connected = false;
 
 	private static String configPath = "";
