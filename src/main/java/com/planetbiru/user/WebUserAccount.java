@@ -25,10 +25,12 @@ public class WebUserAccount {
 	{
 		
 	}
+	
 	public static void addUser(User user)
 	{
 		WebUserAccount.users.put(user.getUsername(), user);
 	}
+	
 	public static void addUser(String username, JSONObject jsonObject) 
 	{
 		User user = new User(jsonObject);
@@ -46,7 +48,6 @@ public class WebUserAccount {
 		{
 			throw new NoUserRegisteredException("No user registered");
 		}
-	
 		return WebUserAccount.users.getOrDefault(username, new User());
 	}
 	
@@ -226,8 +227,6 @@ public class WebUserAccount {
 		return json;
 	}
 	
-	
-	
 	public static User getUserByPhone(String userID) {
 		for (Map.Entry<String, User> entry : WebUserAccount.users.entrySet())
 		{
@@ -238,6 +237,7 @@ public class WebUserAccount {
 		}
 		return new User();
 	}
+	
 	public static User getUserByEmail(String userID) {
 		for (Map.Entry<String, User> entry : WebUserAccount.users.entrySet())
 		{
@@ -248,6 +248,7 @@ public class WebUserAccount {
 		}
 		return new User();
 	}
+	
 	public static boolean isEmpty() {
 		return WebUserAccount.users.isEmpty();
 	}
