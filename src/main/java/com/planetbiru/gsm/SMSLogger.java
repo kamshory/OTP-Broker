@@ -60,7 +60,7 @@ public class SMSLogger {
 		}
 		if(!SMSLogger.fileName.isEmpty())
 		{
-			String data = date.getTime()+","+id+","+sender+","+SMSLogger.mask(receiver)+","+length+"\r\n";
+			String data = date.getTime()+","+id+","+sender+","+receiver+","+length+"\r\n";
 			try(FileOutputStream fos = new FileOutputStream(SMSLogger.fileName, true))
 			{
 				fos.write(data.getBytes());
@@ -86,25 +86,6 @@ public class SMSLogger {
 		return SMSLogger.baseName.equals(dt);
 	}
 	
-	private static String mask(String receiver) {
-		int maskLength = 3;
-		String masked = "";
-		if(receiver.length() > maskLength)
-		{
-			masked = receiver.substring(0, receiver.length() - maskLength);
-			StringBuilder bld = new StringBuilder();
-			bld.append(masked);
-			for(int i = 0; i<maskLength; i++)
-			{
-				bld.append("X");
-			}
-			masked = bld.toString();
-			return masked;
-		}
-		else
-		{
-			return receiver;
-		}
-	}
+	
 
 }

@@ -25,7 +25,7 @@ public class ConfigSMS {
 	private static int maxPerTimeRange = 0;
 	private static String imei = "";
 	private static String simCardPIN = "";
-	private static boolean sendIncommingSMS = false;
+	private static boolean monitorSMS = false;
 	private static String countryCode = "62";
 	private static int recipientPrefixLength = 5;
 	private static boolean logSMS = false;
@@ -45,7 +45,7 @@ public class ConfigSMS {
 		smsSetting.put(JsonKey.MAX_PER_TIME_RANGE, ConfigSMS.maxPerTimeRange);
 		smsSetting.put(JsonKey.IMEI, ConfigSMS.imei);
 		smsSetting.put(JsonKey.SIM_CARD_PIN, ConfigSMS.simCardPIN);
-		smsSetting.put(JsonKey.SEND_INCOMMING_SMS, ConfigSMS.sendIncommingSMS);
+		smsSetting.put(JsonKey.MONITOR_SMS, ConfigSMS.monitorSMS);
 		smsSetting.put(JsonKey.COUNTRY_CODE, ConfigSMS.countryCode);
 		smsSetting.put(JsonKey.RECIPIENT_PREFIX_LENGTH, ConfigSMS.getRecipientPrefixLength());
 		smsSetting.put("logSMS", logSMS);
@@ -127,7 +127,7 @@ public class ConfigSMS {
 				ConfigSMS.incommingInterval = smsSetting.optInt(JsonKey.INCOMMING_INTERVAL, 0);
 				ConfigSMS.timeRange = smsSetting.optInt(JsonKey.TIME_RANGE, 0);
 				ConfigSMS.maxPerTimeRange = smsSetting.optInt(JsonKey.MAX_PER_TIME_RANGE, 0);
-				ConfigSMS.sendIncommingSMS = smsSetting.optBoolean(JsonKey.SEND_INCOMMING_SMS, false);
+				ConfigSMS.monitorSMS = smsSetting.optBoolean(JsonKey.MONITOR_SMS, false);
 				ConfigSMS.countryCode = smsSetting.optString(JsonKey.COUNTRY_CODE, "");
 				ConfigSMS.logSMS = smsSetting.optBoolean("logSMS", false);
 				ConfigSMS.setRecipientPrefixLength(smsSetting.optInt("recipientPrefixLength", 0));
@@ -216,12 +216,12 @@ public class ConfigSMS {
 		ConfigSMS.simCardPIN = simCardPIN;
 	}
 
-	public static boolean isSendIncommingSMS() {
-		return sendIncommingSMS;
+	public static boolean isMonitorSMS() {
+		return monitorSMS;
 	}
 
-	public static void setSendIncommingSMS(boolean sendIncommingSMS) {
-		ConfigSMS.sendIncommingSMS = sendIncommingSMS;
+	public static void setMonitorSMS(boolean sendIncommingSMS) {
+		ConfigSMS.monitorSMS = sendIncommingSMS;
 	}
 
 	public static String getCountryCode() {

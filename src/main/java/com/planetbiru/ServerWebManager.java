@@ -209,8 +209,6 @@ public class ServerWebManager {
 		Config.setLogDir(logDir);
 		Config.setStorageDir(storageDir);
 		
-		Config.setShowTraffic(showTraffic);
-		
 		Config.setPortManager(portManager);
 		Config.setFirewallSettingPath(firewallSettingPath);
 		
@@ -2756,7 +2754,7 @@ public class ServerWebManager {
 		if(queryPairs.containsKey("save_sms_setting"))
 		{
 			ConfigSMS.load(Config.getSmsSettingPath());
-			boolean lSendIncommingSMS = queryPairs.getOrDefault("send_incomming_sms", "").trim().equals("1");
+			boolean lmonitorSMS = queryPairs.getOrDefault("monitor_sms", "").trim().equals("1");
 			String v1 = queryPairs.getOrDefault("incomming_interval", "0").trim();
 			int lIncommingInterval = Utility.atoi(v1);
 			
@@ -2771,7 +2769,7 @@ public class ServerWebManager {
 			boolean logSMS = queryPairs.getOrDefault("log_sms", "").trim().equals("1");
 			
 			ConfigSMS.setCountryCode(countryCode);
-			ConfigSMS.setSendIncommingSMS(lSendIncommingSMS);
+			ConfigSMS.setMonitorSMS(lmonitorSMS);
 			ConfigSMS.setIncommingInterval(lIncommingInterval);
 			ConfigSMS.setTimeRange(lTimeRange);
 			ConfigSMS.setMaxPerTimeRange(lMaxPerTimeRange);

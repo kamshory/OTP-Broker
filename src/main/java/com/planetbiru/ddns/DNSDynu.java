@@ -1,6 +1,7 @@
 package com.planetbiru.ddns;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -42,11 +43,11 @@ public class DNSDynu extends DNS {
 	{
 		JSONObject res = new JSONObject();
 		HttpMethod method = HttpMethod.GET;
-		Map<String, String> params = new HashMap<>();		
-		params.put("hostname", ddnsRecord.getRecordName());
-		params.put("username", this.username);
-		params.put("password", Utility.md5(this.password));
-		params.put("myip", ipAddress);
+		Map<String, List<String>> params = new HashMap<>();		
+		params.put("hostname", Utility.asList(ddnsRecord.getRecordName()));
+		params.put("username", Utility.asList(this.username));
+		params.put("password", Utility.asList(Utility.md5(this.password)));
+		params.put("myip", Utility.asList(ipAddress));
 		String base = this.getBase();
 		String queryString = Utility.buildQuery(params);
 		String url = String.format("%s?%s", base, queryString);

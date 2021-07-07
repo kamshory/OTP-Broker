@@ -8,6 +8,7 @@ import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.constant.ConstantString;
+import com.planetbiru.util.Utility;
 
 public class GSMInstance {
 	
@@ -55,14 +56,14 @@ public class GSMInstance {
 	public String sendSMS(String receiver, String message, DataModem modemData) throws GSMException {
 		Date date = new Date();
 		String sender = modemData.getMsisdn();
-		this.logSendSMS(sender, receiver, date, message.length());
+		this.logSendSMS(sender, Utility.maskMSISDN(receiver), date, message.length());
 		return this.sendSMS(receiver, message);
 	}
 	
 	private void logSendSMS(String sender, String receiver, Date date, int length) {
 		if(ConfigSMS.isLogSMS())
 		{
-			SMSLogger.add(date, this.id, sender, receiver, length);	
+			SMSLogger.add(date, this.id, sender, Utility.maskMSISDN(receiver), length);	
 		}
 	}
 	
