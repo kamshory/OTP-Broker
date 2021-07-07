@@ -101,7 +101,7 @@ public class WebSocketEndpoint extends Endpoint {
 		requestJSON.put("command", "receive-message");
 		requestJSON.put("channel", "sms");
 		requestJSON.put("data", new JSONObject());
-		text = requestJSON.toString(4);
+		text = requestJSON.toString();
 		this.sendText(text);
 		
 	}

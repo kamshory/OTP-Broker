@@ -2,6 +2,7 @@ package com.planetbiru.receiver.ws;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,8 @@ public class WebSocketClient extends Thread
 		this.container = null;
 		try
 		{
-			String url = this.createWSEndpoint();
+			String endpoint = this.createWSEndpoint();
+			endpoint = this.fixWSEndpoint(endpoint);
 			setContainer(ContainerProvider.getWebSocketContainer()); 	
 			
 			ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
@@ -105,7 +107,7 @@ public class WebSocketClient extends Thread
 			});
 			ClientEndpointConfig clientConfig = configBuilder.build();
 			
-			this.session = getContainer().connectToServer(new WebSocketEndpoint(this), clientConfig, URI.create(url)); 
+			this.session = getContainer().connectToServer(new WebSocketEndpoint(this), clientConfig, URI.create(endpoint)); 
 			ConfigFeederWS.setConnected(true);
 			ServerInfo.sendWSStatus(true);
 			wait4TerminateSignal();
@@ -132,12 +134,42 @@ public class WebSocketClient extends Thread
 	}
 	
 	
+	private String fixWSEndpoint(String endpoint) {
+		String channel = Utility.urlEncode(ConfigFeederWS.getFeederWsChannel());
+		if(endpoint.contains("?"))
+		{
+			String[] arr = endpoint.split("\\?", 2);
+			if(arr.length > 1)
+			{
+				Map<String, String> params;
+				try 
+				{
+					params = Utility.splitQuery(arr[1]);
+					if(params.containsKey("channel"))
+					{
+						params.remove("channel");
+					}
+					params.put("channel", channel);
+					String query = Utility.buildQuery(params);
+					endpoint = arr[0]+"?"+query;
+				} 
+				catch (UnsupportedEncodingException e) 
+				{
+					/**
+					 * Do nothing
+					 */
+				}
+				
+			}
+		}
+		return endpoint;	
+	}
+
 	private String createWSEndpoint() {
 		String protocol = "";
 		String host = ConfigFeederWS.getFeederWsAddress();
 		String port = "";
 		String contextPath = ConfigFeederWS.getFeederWsPath();
-		String channel = Utility.urlEncode(ConfigFeederWS.getFeederWsChannel());
 		if(!contextPath.startsWith("/"))
 		{
 			contextPath = "/"+contextPath;
@@ -158,7 +190,7 @@ public class WebSocketClient extends Thread
 				port = ":"+ConfigFeederWS.getFeederWsPort();
 			}
 		}	
-		return String.format("%s%s%s%s?channel=%s", protocol, host, port, contextPath, channel);
+		return String.format("%s%s%s%s", protocol, host, port, contextPath);
 	}
 
 	public void close() {
