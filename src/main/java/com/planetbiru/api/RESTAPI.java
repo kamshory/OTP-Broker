@@ -263,7 +263,7 @@ public class RESTAPI {
 		return responseJSON;	
 	}
 	
-	private static JSONObject blockMSISDN( String command, String msisdn) throws GSMException {
+	public static JSONObject blockMSISDN(String command, String msisdn) throws GSMException {
 		ConfigBlocking.block(msisdn);
 		ConfigBlocking.save();
 		JSONObject responseJSON = new JSONObject();
@@ -272,7 +272,7 @@ public class RESTAPI {
 		return responseJSON;	
 	}
 	
-	private static JSONObject unblockMSISDN(String command, String msisdn) throws GSMException {
+	public static JSONObject unblockMSISDN(String command, String msisdn) throws GSMException {
 		ConfigBlocking.unblock(msisdn);
 		ConfigBlocking.save();
 		JSONObject responseJSON = new JSONObject();

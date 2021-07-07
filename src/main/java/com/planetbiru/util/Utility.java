@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -608,16 +609,26 @@ public class Utility {
 	 * @return Map contains query parsed
 	 * @throws UnsupportedEncodingException if character encoding is not supported
 	 */
-	public static Map<String, String> splitQuery(String query) throws UnsupportedEncodingException 
+	public static Map<String, List<String>> splitQuery(String query) throws UnsupportedEncodingException 
 	{
-	    Map<String, String> queryPairs = new LinkedHashMap<>();
+	    Map<String, List<String>> queryPairs = new LinkedHashMap<>();
 	    String[] pairs = query.split("&");
 	    for (String pair : pairs) 
 	    {
 	        int idx = pair.indexOf('=');
 	        String key = URLDecoder.decode(pair.substring(0, idx), ConstantString.UTF8);
 	        String value = URLDecoder.decode(pair.substring(idx + 1), ConstantString.UTF8);
-	        queryPairs.put(key, value);
+	        
+	        if(queryPairs.containsKey(key))
+	        {
+	        	queryPairs.get(key).add(value);	
+	        }
+	        else
+	        {
+	        	List<String> val = new ArrayList<>();
+	        	val.add(value);
+	        	queryPairs.put(key, val);
+	        }
 	    }
 	    return queryPairs;
 	}
@@ -698,30 +709,51 @@ public class Utility {
     	result = bld.toString();
     	return result;
     }
+    public static String maskMSISDN(String receiver) {
+		int maskLength = 3;
+		String masked = "";
+		if(receiver.length() > maskLength)
+		{
+			masked = receiver.substring(0, receiver.length() - maskLength);
+			StringBuilder bld = new StringBuilder();
+			bld.append(masked);
+			for(int i = 0; i<maskLength; i++)
+			{
+				bld.append("X");
+			}
+			masked = bld.toString();
+			return masked;
+		}
+		else
+		{
+			return receiver;
+		}
+	}
     /**
      * Build query
      * @param query Map string
      * @return Query string on GET URL
      * @throws NullPointerException if any null pointer
      */
-    public static String buildQuery(Map<String, String> query)
+    public static String buildQuery(Map<String, List<String>> query)
     {
     	String result = "";
-    	int i = 0;
     	String key = "";
-    	String value = "";
+    	List<String> value;
     	StringBuilder bld = new StringBuilder();
-    	for(Map.Entry<String, String> entry : query.entrySet())
+    	for(Entry<String, List<String>> entry : query.entrySet())
     	{
-    	    if(i > 0)
-    	    {
-    	    	bld.append("&");
-    	    }
-    	    key = entry.getKey();
-    	    value = entry.getValue();
-    	    value = Utility.urlEncode(value);
-    	    bld.append(key+"="+value);
-    	    i++;
+       	    value = entry.getValue();
+       	    for(int j = 0; j <value.size(); j++)
+       	    {
+       	    	if(!bld.toString().isEmpty())
+      	    	{
+       	    		bld.append("&");
+      	    	}
+      	        key = entry.getKey();
+	    	    String val = Utility.urlEncode(value.get(j));
+	    	    bld.append(key+"="+val);
+       	    }
     	}
     	result = bld.toString();
     	return result;

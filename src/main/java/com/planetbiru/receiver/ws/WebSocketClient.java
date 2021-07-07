@@ -4,6 +4,7 @@ package com.planetbiru.receiver.ws;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.websocket.ClientEndpointConfig;
@@ -136,12 +137,15 @@ public class WebSocketClient extends Thread
 	
 	private String fixWSEndpoint(String endpoint) {
 		String channel = Utility.urlEncode(ConfigFeederWS.getFeederWsChannel());
+		String path = endpoint;
+		Map<String, List<String>> params = new HashMap<>();
+		String query = "";
 		if(endpoint.contains("?"))
 		{
 			String[] arr = endpoint.split("\\?", 2);
 			if(arr.length > 1)
 			{
-				Map<String, String> params;
+				path = arr[0];
 				try 
 				{
 					params = Utility.splitQuery(arr[1]);
@@ -149,9 +153,8 @@ public class WebSocketClient extends Thread
 					{
 						params.remove("channel");
 					}
-					params.put("channel", channel);
-					String query = Utility.buildQuery(params);
-					endpoint = arr[0]+"?"+query;
+					
+					
 				} 
 				catch (UnsupportedEncodingException e) 
 				{
@@ -161,6 +164,10 @@ public class WebSocketClient extends Thread
 				}				
 			}
 		}
+		params.put("channel", Utility.asList(channel));
+		query = Utility.buildQuery(params);
+		
+		endpoint = path + "?"+query;
 		return endpoint;	
 	}
 

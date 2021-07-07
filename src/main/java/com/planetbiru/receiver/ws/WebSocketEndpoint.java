@@ -10,10 +10,10 @@ import javax.websocket.Session;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.planetbiru.api.RESTAPI;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.util.ServerInfo;
@@ -32,41 +32,17 @@ public class WebSocketEndpoint extends Endpoint {
 		this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message) {
-            	onReceiveMessage(message);
+            	onReceiveMessage(message);       	
             }
         });
-		try 
-		{
-			this.login();
-			ServerInfo.sendWSStatus(true);
-		}
-		catch (IOException e) 
-		{
-			/**
-			 * Do nothing
-			 */
-		}
+		ServerInfo.sendWSStatus(true);
 	}
 	public void onReceiveMessage(String message)
 	{
 		try
 		{
 			JSONObject requestJSON = new JSONObject(message);
-			String command = requestJSON.optString("command", "");
-			if(command.equals("send-message"))
-			{
-				JSONArray data = requestJSON.optJSONArray("data");
-				if(data != null && !data.isEmpty())
-				{
-					int length = data.length();
-					int i;
-					for(i = 0; i<length; i++)
-					{
-						this.sendSMS(data.getJSONObject(i));
-						
-					}
-				}
-			}
+			this.processRequest(requestJSON);			
 		}
 		catch(JSONException e)
 		{
@@ -74,37 +50,71 @@ public class WebSocketEndpoint extends Endpoint {
 		}
 	}
 	
-	private void sendSMS(JSONObject data) 
+	
+	private void processRequest(JSONObject jsonObj) 
 	{
-		if(data != null)
+		if(jsonObj != null && !jsonObj.isEmpty())
 		{
-			String receiver = data.optString("receiver", "");
-			String textMessage = data.optString("message", "");
-			try 
+			String command = jsonObj.optString("command", "");
+			if(command.equals("send-sms"))
 			{
-				this.sendSMS(receiver, textMessage);
-			} 
-			catch (GSMException e) 
-			{
-				logger.error(e.getMessage());
+				this.sendSMS(jsonObj);
 			}
+			else if(command.equals("block-msisdn"))
+			{
+				this.blockMSISDN(jsonObj);
+			}
+			else if(command.equals("unblock-msisdn"))
+			{
+				this.unblockMSISDN(jsonObj);
+			}
+			
 		}
 	}
 	
+	private void blockMSISDN(JSONObject jsonObj) {
+		String command = jsonObj.optString("command", "");
+		JSONObject data = jsonObj.optJSONObject("data");
+		String msisdn = data.optString("msisdn", "");
+		try 
+		{
+			RESTAPI.blockMSISDN(command, msisdn);
+		} 
+		catch (GSMException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	private void unblockMSISDN(JSONObject jsonObj) {
+		String command = jsonObj.optString("command", "");
+		JSONObject data = jsonObj.optJSONObject("data");
+		String msisdn = data.optString("msisdn", "");
+		try 
+		{
+			RESTAPI.unblockMSISDN(command, msisdn);
+		} 
+		catch (GSMException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	private void sendSMS(JSONObject jsonObj) {
+		JSONObject data = jsonObj.optJSONObject("data");
+		String msisdn = data.optString("msisdn", "");
+		String message = data.optString("message", "");
+		try 
+		{
+			this.sendSMS(msisdn, message);
+		} 
+		catch (GSMException e) 
+		{
+			e.printStackTrace();
+		}
+		
+	}
 	private void sendSMS(String receiver, String textMessage) throws GSMException 
 	{
 		GSMUtil.sendSMS(receiver, textMessage);	
-	}
-	
-	private void login() throws IOException {
-		String text = "";	
-		JSONObject requestJSON = new JSONObject();
-		requestJSON.put("command", "receive-message");
-		requestJSON.put("channel", "sms");
-		requestJSON.put("data", new JSONObject());
-		text = requestJSON.toString();
-		this.sendText(text);
-		
 	}
 	
 	public void sendText(String text) throws IOException

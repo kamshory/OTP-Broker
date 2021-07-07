@@ -98,30 +98,13 @@
                 <td><input type="number" min="2" max="8" name="recipient_prefix_length" class="form-control" value="5"></td>
               </tr>
               <tr>
-                <td>Send Incomming SMS</td>
-                <td><label><input type="checkbox" name="send_incomming_sms" id="send_incomming_sms" value="1">	Yes</label>
-                </td>
-              </tr>
-              <tr>
                 <td>Log Outgoing SMS</td>
                 <td><label><input type="checkbox" name="log_sms" value="1"> Yes</label></td>
               </tr>
               <tr>
-                <td>Minimum Interval (Second)</td>
-                <td><input type="number" name="incomming_interval" id="incomming_interval" value="">	
-                </td>
+                <td>Monitor SMS Traffic</td>
+                <td><label><input type="checkbox" name="monitor_sms" value="1"> Yes</label></td>
               </tr>
-              <tr>
-                <td>Time Range (Second)</td>
-                <td><input type="number" name="time_range" id="time_range" value="">	
-                </td>
-              </tr>
-              <tr>
-                <td>Maximum Per Time Range</td>
-                <td><input type="number" name="max_per_time_range" id="max_per_time_range" value="">	
-                </td>
-              </tr>
-
               <tr>
                 <td></td>
                 <td>
@@ -140,12 +123,9 @@
                     url:"sms-setting/get",
                     dataType:"json",
                     success:function(data){
-                      $('input[name="send_incomming_sms"]').prop("checked", data.sendIncommingSMS);
-                      $('input[name="log_sms"]').prop("checked", data.logSMS);
-                      $('input[name="incomming_interval"]').val(data.incommingInterval+"");
-                      $('input[name="country_code"]').val(data.countryCode);
-                      $('input[name="time_range"]').val(data.timeRange+"");
-                      $('input[name="max_per_time_range"]').val(data.maxPerTimeRange+"");
+                      $('[name="country_code"]').val(data.countryCode);
+                      $('[name="log_sms"]').prop("checked", data.logSMS);
+                      $('[name="monitor_sms"]').prop("checked", data.monitorSMS);
                       $('[name="recipient_prefix_length"]').val(data.recipientPrefixLength);
                     }
                 });

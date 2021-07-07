@@ -65,7 +65,6 @@ public class Config {
 	private static boolean validDevice = false;
 	private static String restartCommand = "";
 	private static String cleanupCommand = "";
-	private static boolean showTraffic = true;
 	private static int portManager = 8888;
 	private static String firewallSettingPath = "";
 	private static boolean debugModem = true;
@@ -556,14 +555,6 @@ public class Config {
 
 	public static void setFirewallSettingPath(String firewallSettingPath) {
 		Config.firewallSettingPath = firewallSettingPath;
-	}
-
-	public static boolean isShowTraffic() {
-		return showTraffic;
-	}
-
-	public static void setShowTraffic(boolean showTraffic) {
-		Config.showTraffic = showTraffic;
 	}
 
 	public static boolean isDebugModem() {

@@ -15,6 +15,7 @@ import org.springframework.http.HttpMethod;
 
 import com.planetbiru.constant.ConstantString;
 import com.planetbiru.util.ResponseEntityCustom;
+import com.planetbiru.util.Utility;
 
 public class DNSCloudflare extends DNS{
 	
@@ -45,7 +46,7 @@ public class DNSCloudflare extends DNS{
 	*
 	* @return mixed
 	*/
-	public ResponseEntityCustom request(HttpMethod method, String endpoint, Map<String, String> params, String contentType)
+	public ResponseEntityCustom request(HttpMethod method, String endpoint, Map<String, List<String>> params, String contentType)
 	{
 		int timeout = 10000;
 		HttpHeaders headers = this.createRequestHeader(contentType);
@@ -225,7 +226,7 @@ public class DNSCloudflare extends DNS{
 	}
 
 
-	public JSONObject getZoneDnsRecords(String zoneId, Map<String, String> params)
+	public JSONObject getZoneDnsRecords(String zoneId, Map<String, List<String>> params)
 	{
 		ResponseEntityCustom response = this.get(DDNSKey.ZONES + zoneId + "/dns_records", params, ConstantString.URL_ENCODE);
 		JSONObject resp = new JSONObject();
@@ -280,8 +281,8 @@ public class DNSCloudflare extends DNS{
 			boolean proxied = ddnsRecord.isProxied();
 			if(!recordName.isEmpty())
 			{
-				Map<String, String> params1 = new HashMap<>();
-				params1.put(DDNSKey.NAME, recordName);
+				Map<String, List<String>> params1 = new HashMap<>();
+				params1.put(DDNSKey.NAME, Utility.asList(recordName));
 				JSONObject records = this.getZoneDnsRecords(zoneId, params1);
 				
 				if(this.isRecordExists(records, recordName))
@@ -341,27 +342,27 @@ public class DNSCloudflare extends DNS{
 
 	
 
-	public ResponseEntityCustom get(String path, Map<String, String> params, String contentType)
+	public ResponseEntityCustom get(String path, Map<String, List<String>> params, String contentType)
 	{
 		String url = this.endpoint + path;
 		return this.request(HttpMethod.GET, url, params, contentType);
 	}
-	public ResponseEntityCustom post(String path, Map<String, String> params, String contentType)
+	public ResponseEntityCustom post(String path, Map<String, List<String>> params, String contentType)
 	{
 		String url = this.endpoint + path;
 		return this.request(HttpMethod.POST, url, params, contentType);
 	}
-	public ResponseEntityCustom put(String path, Map<String, String> params, String contentType)
+	public ResponseEntityCustom put(String path, Map<String, List<String>> params, String contentType)
 	{
 		String url = this.endpoint + path;
 		return this.request(HttpMethod.PUT, url, params, contentType);
 	}
-	public ResponseEntityCustom patch(String path, Map<String, String> params, String contentType)
+	public ResponseEntityCustom patch(String path, Map<String, List<String>> params, String contentType)
 	{
 		String url = this.endpoint + path;
 		return this.request(HttpMethod.PATCH, url, params, contentType);
 	}
-	public ResponseEntityCustom delete(String path, Map<String, String> params, String contentType)
+	public ResponseEntityCustom delete(String path, Map<String, List<String>> params, String contentType)
 	{
 		String url = this.endpoint + path;
 		return this.request(HttpMethod.DELETE, url, params, contentType);
@@ -369,7 +370,7 @@ public class DNSCloudflare extends DNS{
 	public ResponseEntityCustom delete(String path, String contentType)
 	{
 		String url = this.endpoint + path;
-		Map<String, String> params = new HashMap<>();
+		Map<String, List<String>> params = new HashMap<>();
 		return this.request(HttpMethod.DELETE, url, params, contentType);
 	}
 	
@@ -418,8 +419,8 @@ public class DNSCloudflare extends DNS{
 		{
 			throw new DDNSException("SSL type not allowed. valid types are " + allowedTypes.toString());
 		}
-		Map<String, String> params = new HashMap<>();
-		params.put(DDNSKey.VALUE, type);
+		Map<String, List<String>> params = new HashMap<>();
+		params.put(DDNSKey.VALUE, Utility.asList(type));
 	
 		ResponseEntityCustom response = this.patch(DDNSKey.ZONES + zoneId + "/settings/ssl", params, ConstantString.URL_ENCODE);
 		JSONObject resp = new JSONObject(response.getBody());
@@ -437,8 +438,8 @@ public class DNSCloudflare extends DNS{
 			throw new DDNSException("Cache type not allowed. valid types are " + allowedTypes.toString());
 		}
 	
-		Map<String, String> params = new HashMap<>();
-		params.put(DDNSKey.VALUE, type);
+		Map<String, List<String>> params = new HashMap<>();
+		params.put(DDNSKey.VALUE, Utility.asList(type));
 	
 		ResponseEntityCustom response = this.patch(DDNSKey.ZONES + zoneId + "/settings/cache_level", params, ConstantString.URL_ENCODE);
 		JSONObject resp = new JSONObject(response.getBody());
@@ -447,15 +448,15 @@ public class DNSCloudflare extends DNS{
 
 	public ResponseEntityCustom clearZoneCache(String zoneId)
 	{
-		Map<String, String> params = new HashMap<>();
-		params.put("purge_everything", Boolean.toString(true));
+		Map<String, List<String>> params = new HashMap<>();
+		params.put("purge_everything", Utility.asList(Boolean.toString(true)));
 		return this.delete(DDNSKey.ZONES + zoneId + "/purge_cache", params, ConstantString.URL_ENCODE);
 	}
 
 	public ResponseEntityCustom setDnsZoneMinify(String zoneId, String settings)
 	{
-		Map<String, String> params = new HashMap<>();
-		params.put(DDNSKey.VALUE, settings);
+		Map<String, List<String>> params = new HashMap<>();
+		params.put(DDNSKey.VALUE, Utility.asList(settings));
 		return this.patch(DDNSKey.ZONES + zoneId + "/settings/minify", params, ConstantString.URL_ENCODE);
 	}
 

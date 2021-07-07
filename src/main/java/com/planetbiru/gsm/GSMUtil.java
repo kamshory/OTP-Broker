@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.planetbiru.ServerWebSocketManager;
-import com.planetbiru.config.Config;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataModem;
@@ -132,7 +131,7 @@ public class GSMUtil {
 			throw new GSMException(GSMUtil.NO_DEVICE_CONNECTED);
 		}				
 		DataModem modemData = ConfigModem.getModemData(modemID);
-		if(Config.isShowTraffic())
+		if(ConfigSMS.isMonitorSMS())
 		{
 			GSMUtil.sendTraffic(receiver, ste, modemData);
 		}		
@@ -163,7 +162,7 @@ public class GSMUtil {
 		
 		DataModem modemData = ConfigModem.getModemData(instance.getId());      
 		String result = instance.sendSMS(receiver, message, modemData);
-		if(Config.isShowTraffic())
+		if(ConfigSMS.isMonitorSMS())
 		{
 			GSMUtil.sendTraffic(receiver, ste, modemData);
 		}
@@ -199,7 +198,7 @@ public class GSMUtil {
         data.put(GSMUtil.MODEM_NAME, modemName);
         data.put(GSMUtil.MODEM_IMEI, modemIMEI);
         data.put(GSMUtil.SENDER_TYPE, GSMUtil.getSenderType(callerClass));
-        data.put(GSMUtil.RECEIVER, receiver);
+        data.put(GSMUtil.RECEIVER, Utility.maskMSISDN(receiver));
         monitor.put(JsonKey.COMMAND, GSMUtil.SMS_TRAFFIC);
         monitor.put(JsonKey.DATA, data);      
         ServerWebSocketManager.broadcast(monitor.toString(), "", GSMUtil.MONITOR_PATH);
@@ -332,6 +331,7 @@ public class GSMUtil {
 		GSMUtil.connectedDevices = connectedDev;
 		GSMUtil.connectedDefaultDevices = connectedDefaultDev;
 	}
+	
 	
 	private static void addRecipientPrefix(List<String> prefixes, int index) {
 		for(int i = 0; i<prefixes.size(); i++)

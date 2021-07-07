@@ -91,6 +91,7 @@ public class JsonKey {
 	public static final String MSISDN                        = "msisdn";
 	public static final String CONNECTED                     = "connected";
 	public static final String RECIPIENT_PREFIX_LENGTH       = "recipientPrefixLength";
+	public static final String MONITOR_SMS                   = "monitorSMS";
 	
 	private JsonKey()
 	{

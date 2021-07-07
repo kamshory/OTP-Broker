@@ -132,7 +132,7 @@ public class DNS {
 		return restTemplate;
 	}
 
-	public String buildQuery(Map<String, String> params) 
+	public String buildQuery(Map<String, List<String>> params) 
 	{
 		return Utility.buildQuery(params);
 	}
