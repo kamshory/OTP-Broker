@@ -34,7 +34,7 @@ public class DeviceAPI {
 						Config.getSshPort(), 
 						Config.getSshUsername(), 
 						Config.getSshPassword() 
-						);
+					);
 			} 
 			catch (JSchException e) 
 			{

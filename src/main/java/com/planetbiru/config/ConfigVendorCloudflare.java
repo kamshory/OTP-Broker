@@ -14,10 +14,6 @@ import com.planetbiru.util.Utility;
 
 public class ConfigVendorCloudflare {
 	private static Logger logger = LogManager.getLogger(ConfigVendorCloudflare.class);
-	private ConfigVendorCloudflare()
-	{
-		
-	}
 	private static String endpoint = "";
 	private static String accountId = "";
 	private static String authEmail = "";
@@ -25,6 +21,11 @@ public class ConfigVendorCloudflare {
 	private static String authToken = "";
 	private static String configPath = "";
 	
+	private ConfigVendorCloudflare()
+	{
+		
+	}
+
 	public static void load(String path) {
 		ConfigVendorCloudflare.configPath = path;
 		String dir = Utility.getBaseDir();

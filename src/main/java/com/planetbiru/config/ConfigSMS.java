@@ -247,8 +247,5 @@ public class ConfigSMS {
 	public static void setRecipientPrefixLength(int recipientPrefixLength) {
 		ConfigSMS.recipientPrefixLength = recipientPrefixLength;
 	}
-
-	
-
 	
 }

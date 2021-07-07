@@ -21,6 +21,7 @@ public class GSMInstance {
 		this.id = modem.getId();
 		this.gsm = new GSM();
 	}
+	
 	public boolean connect(String port) throws GSMException, InvalidPortException 
 	{
 		try
@@ -32,6 +33,7 @@ public class GSMInstance {
 			throw new GSMException(e);
 		}
 	}
+	
 	public void disconnect() throws GSMException {
 		if(this.gsm.getSerialPort() == null)
 		{
@@ -39,6 +41,7 @@ public class GSMInstance {
 		}
 		this.gsm.closePort();
 	}
+	
 	public String sendSMS(String receiver, String message) throws GSMException
 	{
 		if(this.gsm.getSerialPort() == null)
@@ -48,18 +51,21 @@ public class GSMInstance {
 		this.waitUntilReady();
 		return this.gsm.sendSMS(receiver, message);
 	}
+	
 	public String sendSMS(String receiver, String message, DataModem modemData) throws GSMException {
 		Date date = new Date();
 		String sender = modemData.getMsisdn();
 		this.logSendSMS(sender, receiver, date, message.length());
 		return this.sendSMS(receiver, message);
 	}
+	
 	private void logSendSMS(String sender, String receiver, Date date, int length) {
 		if(ConfigSMS.isLogSMS())
 		{
 			SMSLogger.add(date, this.id, sender, receiver, length);	
 		}
 	}
+	
 	private void waitUntilReady() {
 		long maxWaith = Config.getMaxWaitModemReady();
 		long ellapsed = 0;

@@ -137,8 +137,6 @@ public class ConfigFirewall {
 	public static void deactivate(String id)
 	{
 		JSONObject record = ConfigFirewall.get(id);
-		System.out.println(id);
-		System.out.println(record.toString(4));
 		List<Integer> servicePorts = ConfigFirewall.getServicePorts();
 		if(!servicePorts.contains(record.optInt("port")))
 		{
@@ -154,7 +152,6 @@ public class ConfigFirewall {
 			}
 			ConfigFirewall.get(id).put("active", false);
 			ConfigFirewall.get(id).put("lastUpdate", System.currentTimeMillis());
-			System.out.println(ConfigFirewall.get(id).toString(4));
 
 		}
 	}
@@ -230,11 +227,5 @@ public class ConfigFirewall {
 	public static void setRecords(JSONArray records) {
 		ConfigFirewall.records = records;
 	}
-
-	
-
-	
-	
-	
 
 }

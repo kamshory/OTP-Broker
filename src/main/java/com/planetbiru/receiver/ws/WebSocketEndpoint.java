@@ -22,6 +22,7 @@ public class WebSocketEndpoint extends Endpoint {
 	private static Logger logger = LogManager.getLogger(WebSocketEndpoint.class);
 	private WebSocketClient webSocketClient;
 	private Session session;
+	
 	public WebSocketEndpoint(WebSocketClient webSocketClient) {
 		this.webSocketClient = webSocketClient;
 	}

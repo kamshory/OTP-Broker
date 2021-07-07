@@ -25,6 +25,7 @@ import com.planetbiru.util.Utility;
 
 public class CookieServer {
 	private static final Logger logger = LoggerFactory.getLogger(CookieServer.class);
+	
 	private String sessionName = "SMSSESSID";
 	private String sessionID = Utility.md5(System.currentTimeMillis()+"");
 	private Map<String, CookieItem> cookieItem = new HashMap<>();
@@ -44,6 +45,7 @@ public class CookieServer {
 		this.parseCookie(headers);
 		this.updateSessionID();
 	}
+	
 	public CookieServer(HttpHeaders headers, String sessionName, long sessionLifetime)
 	{
 		this.sessionLifetime = sessionLifetime;
@@ -51,17 +53,20 @@ public class CookieServer {
 		this.parseCookie(headers);
 		this.updateSessionID();
 	}
+	
 	public CookieServer(String rawCookie)
 	{
 		this.parseCookie(rawCookie);
 		this.updateSessionID();
 	}
+	
 	public CookieServer(String rawCookie, String sessionName)
 	{
 		this.sessionName = sessionName;
 		this.parseCookie(rawCookie);
 		this.updateSessionID();
 	}
+	
 	private void updateSessionID() {
 		if(!this.cookieItem.containsKey(this.sessionName))
 		{
@@ -87,6 +92,7 @@ public class CookieServer {
 			 */
 		}
 	}
+	
 	private void parseCookie(String rawCookie) {
 		URLCodec urlCodec = new URLCodec();
 		Map<String, CookieItem> list = new HashMap<>();
@@ -245,6 +251,7 @@ public class CookieServer {
 			responseHeaders.add("Set-Cookie", ((CookieItem) entry.getValue()).toString());
 		}
 	}
+	
 	public void clearFile(File directory)
     {
         File[] list = directory.listFiles();
@@ -263,6 +270,7 @@ public class CookieServer {
 	        }
         }
     }
+	
 	public void deleteFile(File file)
 	{
 		long lasModifued = file.lastModified();

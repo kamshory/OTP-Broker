@@ -27,8 +27,8 @@ public class ConfigNetWLAN {
 	private static String gateway = "";
 	private static String dns1 = "";
 	
-	private static String osConfigPath = "/etc/sysconfig/network-scripts/ifcfg-wlan0";
-	private static String osConfigPathWPAPSK = "/etc/sysconfig/network-scripts/keys-wlan0";
+	private static String osConfigPath = "";
+	private static String osConfigPathWPAPSK = "";
 	private static String configPath = "";
 	
 	public static void load(String path) {

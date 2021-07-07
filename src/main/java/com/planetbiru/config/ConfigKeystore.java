@@ -22,7 +22,6 @@ public class ConfigKeystore {
 	private static Logger logger = LogManager.getLogger(ConfigKeystore.class);
 	
 	private static Map<String, DataKeystore> keystores = new HashMap<>();
-
 	
 	private ConfigKeystore()
 	{
@@ -63,9 +62,7 @@ public class ConfigKeystore {
 				if(text.length() > 7)
 				{
 					ConfigKeystore.keystores = new HashMap<>();
-					
 					JSONObject json = new JSONObject(text);
-
 					JSONArray keys = json.names();
 					for(int i = 0; i<keys.length(); i++)
 					{
@@ -86,6 +83,7 @@ public class ConfigKeystore {
 	{
 		ConfigKeystore.save(ConfigKeystore.configPath);
 	}
+	
 	public static void save(String path) {
 		JSONObject config = getJSONObject();
 		save(path, config);
@@ -199,10 +197,5 @@ public class ConfigKeystore {
 	    }
 		throw new KeyStoreException("No active keystore found");
 	}
-
-	
-	
-	
-	
 	
 }

@@ -14,17 +14,17 @@ import com.planetbiru.util.Utility;
 
 public class ConfigVendorAfraid {
 	private static Logger logger = LogManager.getLogger(ConfigVendorAfraid.class);
-	private ConfigVendorAfraid()
-	{
-		
-	}
-	
 	private static String endpoint = "";
 	private static String username = "";
 	private static String email = "";
 	private static String password = "";
 	private static String company = "";
 	private static String configPath = "";
+	
+	private ConfigVendorAfraid()
+	{
+		
+	}
 	
 	public static void load(String path) {
 		ConfigVendorAfraid.configPath = path;

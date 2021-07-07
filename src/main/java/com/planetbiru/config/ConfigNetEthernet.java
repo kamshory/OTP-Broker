@@ -22,7 +22,7 @@ public class ConfigNetEthernet {
 	private static String dns1 = "";
 	private static String dns2 = "";
 	
-	private static String osConfigPath = "/etc/sysconfig/ifcfg-eth0";
+	private static String osConfigPath = "";
 
 	private static String configPath = "";
 	
