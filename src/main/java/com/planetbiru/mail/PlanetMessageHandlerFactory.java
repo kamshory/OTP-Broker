@@ -49,15 +49,6 @@ public class PlanetMessageHandlerFactory implements MessageHandlerFactory
         public void from(String from) throws RejectException
         {
             this.mockMail.setFrom(from);
-
-            if(Config.printMailConsole)
-            {
-                System.out.println("FROM:" + from);
-            }
-            else
-            {
-                System.out.println("Email from " + from + " received.");
-            }
         }
 
         /**
@@ -70,11 +61,6 @@ public class PlanetMessageHandlerFactory implements MessageHandlerFactory
         public void recipient(String recipient) throws RejectException
         {
             this.mockMail.setTo(recipient);
-
-            if(Config.printMailConsole)
-            {
-                System.out.println("RECIPIENT:" + recipient);
-            }
         }
 
         /**
@@ -124,7 +110,6 @@ public class PlanetMessageHandlerFactory implements MessageHandlerFactory
                 else if(messageContent instanceof String)
                 {
                     String contentType = message.getContentType();
-
                     if(contentType.matches("text/plain.*"))
                     {
                         mockMail.setBody(messageContent.toString());
@@ -140,7 +125,7 @@ public class PlanetMessageHandlerFactory implements MessageHandlerFactory
                 e.printStackTrace();
             }
 
-            if(Config.printMailConsole)
+            if(Config.isPrintMailConsole())
             {
                 System.out.println("MAIL DATA");
                 System.out.println("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
@@ -152,15 +137,8 @@ public class PlanetMessageHandlerFactory implements MessageHandlerFactory
         @Override
         public void done()
         {
-
             // set the received date
             mockMail.setReceivedTime(System.currentTimeMillis());
-
-            if(Config.printMailConsole)
-            {
-                System.out.println("Finished");
-            }
-
         }
 
         /**

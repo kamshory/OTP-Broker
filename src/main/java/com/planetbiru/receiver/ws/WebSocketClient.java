@@ -38,8 +38,7 @@ public class WebSocketClient extends Thread
 	{
 		this.container = null;
 		this.session = null;
-		this.stoped = false;
-		
+		this.stoped = false;	
 		boolean connected = false;
 		do
 		{
@@ -71,10 +70,12 @@ public class WebSocketClient extends Thread
 		}
 		while(!connected && !isStoped());
 	}
+	
 	public void stopThreade()
 	{
 		this.stoped = true;
 	}
+	
 	public static void sleep(long interval)
 	{
 		try 
@@ -133,7 +134,6 @@ public class WebSocketClient extends Thread
 		} 
 	}
 	
-	
 	private String fixWSEndpoint(String endpoint) {
 		String channel = Utility.urlEncode(ConfigFeederWS.getFeederWsChannel());
 		if(endpoint.contains("?"))
@@ -158,8 +158,7 @@ public class WebSocketClient extends Thread
 					/**
 					 * Do nothing
 					 */
-				}
-				
+				}				
 			}
 		}
 		return endpoint;	

@@ -11,26 +11,20 @@ import com.planetbiru.config.ConfigVendorNoIP;
 
 public class DDNSUpdater extends Thread{
 	
+	@SuppressWarnings("unused")
 	private static Logger logger = LogManager.getLogger(DDNSUpdater.class);   
 
 	private DDNSRecord ddnsRecord;
-	private String prevFireTimeStr;
-	private String currentTimeStr;
-	private String nextValidTimeAfterStr;
-
 	public DDNSUpdater(DDNSRecord ddnsRecord, String prevFireTimeStr, String currentTimeStr, String nextValidTimeAfterStr) {
 		this.ddnsRecord = ddnsRecord;
-		this.prevFireTimeStr = prevFireTimeStr;
-		this.currentTimeStr = currentTimeStr;
-		this.nextValidTimeAfterStr = nextValidTimeAfterStr;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void run()
 	{
 		if(this.ddnsRecord.getProvider().equals("cloudflare"))
 		{
-			logger.info("Executing update DDNS");
 			DNSCloudflare ddns = new DNSCloudflare();
 			
 			String endpoint = ConfigVendorCloudflare.getEndpoint();
@@ -43,24 +37,11 @@ public class DDNSUpdater extends Thread{
 			if(this.ddnsRecord.isForceCreateZone())
 			{
 				JSONObject res1 = ddns.createZoneIfNotExists(ddnsRecord);
-				logger.info("RECORD                  : {}", ddnsRecord.toJSONObject().toString(4));
-				if(res1 != null)
-				{
-					logger.info("res1                    : {}", res1.toString(4));
-				}
-				logger.info("prevFireTimeStr         : {}", prevFireTimeStr);
-				logger.info("currentTimeStr          : {}", currentTimeStr);
-				logger.info("nextValidTimeAfterStr   : {}", nextValidTimeAfterStr);
 			}
 			JSONObject res2 = ddns.update(ddnsRecord);		
-			if(res2 != null)
-			{
-				logger.info("res2                    : {}", res2.toString(4));
-			}
 		}
 		else if(this.ddnsRecord.getProvider().equals("noip"))
 		{
-			logger.info("Executing update DDNS");
 			DNSNoIP ddns = new DNSNoIP();
 			
 			String endpoint = ConfigVendorNoIP.getEndpoint();
@@ -72,14 +53,9 @@ public class DDNSUpdater extends Thread{
 			ddns.setConfig(endpoint, username, password, email, company);
 
 			JSONObject res2 = ddns.update(ddnsRecord);		
-			if(res2 != null)
-			{
-				logger.info("res2                    : {}", res2.toString(4));
-			}
 		}
 		else if(this.ddnsRecord.getProvider().equals("afraid"))
 		{
-			logger.info("Executing update DDNS");
 			DNSAfraid ddns = new DNSAfraid();
 			
 			String endpoint = ConfigVendorAfraid.getEndpoint();
@@ -91,14 +67,9 @@ public class DDNSUpdater extends Thread{
 			ddns.setConfig(endpoint, username, password, email, company);
 
 			JSONObject res2 = ddns.update(ddnsRecord);		
-			if(res2 != null)
-			{
-				logger.info("res2                    : {}", res2.toString(4));
-			}
 		}
 		else if(this.ddnsRecord.getProvider().equals("dynu"))
 		{
-			logger.info("Executing update DDNS");
 			DNSDynu ddns = new DNSDynu();
 			
 			String endpoint = ConfigVendorDynu.getEndpoint();
@@ -110,10 +81,6 @@ public class DDNSUpdater extends Thread{
 			ddns.setConfig(endpoint, username, password, email, company);
 
 			JSONObject res2 = ddns.update(ddnsRecord);		
-			if(res2 != null)
-			{
-				logger.info("res2                    : {}", res2.toString(4));
-			}
 		}
 	}
 }

@@ -70,7 +70,7 @@ public class Config {
 	private static String firewallSettingPath = "";
 	private static boolean debugModem = true;
 	private static String storageDir = "";
-	public static boolean printMailConsole = true;
+	private static boolean printMailConsole = true;
 	private static String smtpSettingPath = ""; 
 	
 	private Config()
@@ -596,6 +596,14 @@ public class Config {
 
 	public static void setSmsLogPath(String smsLogPath) {
 		Config.smsLogPath = smsLogPath;
+	}
+
+	public static boolean isPrintMailConsole() {
+		return printMailConsole;
+	}
+
+	public static void setPrintMailConsole(boolean printMailConsole) {
+		Config.printMailConsole = printMailConsole;
 	}
 	
 }
