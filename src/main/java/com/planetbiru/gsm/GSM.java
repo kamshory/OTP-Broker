@@ -161,7 +161,6 @@ public class GSM {
 	            } 
 	            catch (InterruptedException e) 
 	            {
-	                logger.error(e.getMessage());
 	                Thread.currentThread().interrupt();
 	            }
 	        }

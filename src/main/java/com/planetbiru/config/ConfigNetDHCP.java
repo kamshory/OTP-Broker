@@ -17,10 +17,6 @@ import com.planetbiru.util.Utility;
 
 public class ConfigNetDHCP {
     private static Logger logger = LogManager.getLogger(ConfigNetDHCP.class);   
-	private ConfigNetDHCP()
-	{
-		
-	}
 	
 	private static String domainName = "";
 	private static JSONArray domainNameServers = new JSONArray();
@@ -32,9 +28,14 @@ public class ConfigNetDHCP {
 	private static String maxLeaseTime = "";	
 	private static JSONArray ranges = new JSONArray();
 	
-	private static String osConfigPath = "/etc/modem/modemd.conf";
+	private static String osConfigPath = "";
 	private static String configPath = "";
 	
+	private ConfigNetDHCP()
+	{
+		
+	}
+
 	public static void load(String path) {
 		ConfigNetDHCP.configPath = path;
 		String dir = Utility.getBaseDir();
