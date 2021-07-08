@@ -149,6 +149,4 @@ public class DialUtil {
 		FileConfigUtil.write(fileName, configStr.getBytes());
 	}
 
-
-
 }
