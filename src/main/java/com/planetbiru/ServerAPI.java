@@ -240,11 +240,13 @@ public class ServerAPI {
 				} 
 				catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException | UnrecoverableKeyException e) 
 				{
+					logger.error("HTTPS Error : {}", e.getMessage());
 					started = false;
 				}			
 			} 
 			catch (KeyStoreException e2) 
 			{
+				logger.error("HTTPS Error : {}", e2.getMessage());
 				started = false;
 			}
 			if(!started)
@@ -272,7 +274,7 @@ public class ServerAPI {
 			} 
 			catch (IOException e) 
 			{
-				logger.error(e.getMessage());
+				logger.error("HTTP Error : {}", e.getMessage());
 			}
 		}		
 	}
@@ -280,13 +282,16 @@ public class ServerAPI {
 	@PreDestroy
 	public void destroy()
 	{
-		if(ConfigAPI.isHttpsEnable() && ServiceHTTP.getHttpServer() != null)
+		if(ServiceHTTP.getHttpServer() != null)
 		{
 			ServiceHTTP.getHttpServer().stop(0);
 		}
-		if(ConfigAPI.isHttpsEnable() && ServiceHTTP.getHttpsServer() != null)
+		if(ServiceHTTP.getHttpsServer() != null)
 		{
 			ServiceHTTP.getHttpsServer().stop(0);
 		}
 	}
+	
+	
+	
 }

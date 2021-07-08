@@ -22,6 +22,7 @@ import com.planetbiru.util.FileUtil;
 import com.planetbiru.util.Utility;
 
 public class ConfigModem {
+	
 	private static String configPath = "";
 	private static Logger logger = LogManager.getLogger(ConfigModem.class);
     private static Map<String, DataModem> modemData = new HashMap<>();
@@ -115,7 +116,6 @@ public class ConfigModem {
 		DataModem modem = new DataModem(jsonObject);
 		ConfigModem.modemData.put(jsonObject.optString(JsonKey.ID, ""), modem);
 	}
-	
 	
 	public static DataModem geDataModem(String id)
 	{		
