@@ -3219,10 +3219,11 @@ public class ServerWebManager {
 	private void processModemUpdate(Map<String, String> queryPairs, String action) {		
 		
 		String id = queryPairs.getOrDefault("id", "").trim();		
-		String connectionType = queryPairs.getOrDefault("connection_type", "").trim();
+		String port = queryPairs.getOrDefault("port", "").trim();
 		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");	
 		boolean defaultModem = queryPairs.getOrDefault("default_modem", "").trim().equals("1");
 		boolean smsAPI = queryPairs.getOrDefault("sms_api", "").trim().equals("1");
+		boolean internetAccess = queryPairs.getOrDefault("internet_access", "").trim().equals("1");
 
 		String smsCenter = queryPairs.getOrDefault("sms_center", "").trim();		
 		
@@ -3287,7 +3288,7 @@ public class ServerWebManager {
 		}
 		
 		modem.setName(name);
-		modem.setConnectionType(connectionType);
+		modem.setPort(port);
 		modem.setSmsCenter(smsCenter);
 		modem.setIncommingInterval(incommingInterval);
 		modem.setTimeRange(timeRange);
@@ -3304,6 +3305,7 @@ public class ServerWebManager {
 		modem.setParityBit(parityBit);
 		modem.setStartBits(startBits);
 		modem.setStopBits(stopBits);
+		modem.setInternetAccess(internetAccess);
 		modem.setSmsAPI(smsAPI);
 		modem.setDefaultModem(defaultModem);
 		modem.setActive(active);
@@ -3312,7 +3314,6 @@ public class ServerWebManager {
 		ConfigModem.save();	
 	}
 
-	
 	private void processFeederSetting(String requestBody) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		if(queryPairs.containsKey("save_feeder_ws_setting"))

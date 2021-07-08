@@ -55,7 +55,7 @@ public class GSMUtil {
 		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
 		{
 			DataModem modem = entry.getValue();
-			String port = modem.getConnectionType();			
+			String port = modem.getPort();			
 			GSMInstance instance = new GSMInstance(modem);
 			try 
 			{
@@ -80,7 +80,7 @@ public class GSMUtil {
 			GSMInstance instance =  GSMUtil.gsmInstance.get(i);
 			if(instance.getId().equals(modemID))
 			{
-				instance.connect(modem.getConnectionType());
+				instance.connect(modem.getPort());
 			}
 		}
 		GSMUtil.updateConnectedDevice();
