@@ -14,7 +14,8 @@ public class DialUtil {
 	
 	private static Map<String, Boolean> internetAccess = new HashMap<>();
 	private static String configPath = "";
-	private static String wvdialCommand = "";
+	private static String wvdialCommandConnect = "";
+	private static String wvdialCommandDisconnect = "";
 	
 	private DialUtil()
 	{
@@ -22,15 +23,15 @@ public class DialUtil {
 	}
 	
 
-	public static void init(String path, String wvdialCommand) {
+	public static void init(String path, String wvdialCommandConnect, String wvdialCommandDisconnect) {
 		DialUtil.configPath = path;
-		DialUtil.wvdialCommand = wvdialCommand;
+		DialUtil.wvdialCommandConnect = wvdialCommandConnect;
+		DialUtil.wvdialCommandDisconnect = wvdialCommandDisconnect;
 		for (Map.Entry<String, DataModem> entry : ConfigModem.getModemData().entrySet())
 		{
 			String modemID = entry.getKey();
 			boolean connected = true;
 			connected = connect(modemID);
-			DialUtil.internetAccess.put(modemID, connected);
 			if(connected)
 			{
 				break;
@@ -58,13 +59,38 @@ public class DialUtil {
 			e.printStackTrace();
 			return false;
 		}
-		try {
-			CommandLineExecutor.execSSH(wvdialCommand, 500);
-			return true;
-		} catch (JSchException e) {
+		boolean ret = false;
+		try 
+		{
+			CommandLineExecutor.execSSH(wvdialCommandConnect, 500);
+			ret = true;
+		} 
+		catch (JSchException e) 
+		{
 			e.printStackTrace();
+			ret = true;
 		}
-		return true;
+		DialUtil.internetAccess.put(modemID, ret);
+		GSMUtil.updateConnectedDevice();
+		return ret;
+	}
+	
+	public static boolean disconnect(String modemID)
+	{
+		boolean ret = false;
+		try 
+		{
+			DialUtil.internetAccess.remove(modemID);
+			CommandLineExecutor.execSSH(wvdialCommandDisconnect, 500);
+			ret = true;
+		} 
+		catch (JSchException e) 
+		{
+			e.printStackTrace();
+			ret = false;
+		}
+		GSMUtil.updateConnectedDevice();
+		return ret;
 	}
 
 	public static boolean isConnected(String modemID) {

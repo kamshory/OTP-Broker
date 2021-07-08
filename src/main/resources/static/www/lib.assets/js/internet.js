@@ -21,7 +21,7 @@ $(document).ready(function (e1) {
                             '</div>\r\n' +
                             '</div>');
                         service.attr('data-id', item.id);
-                        service.find('.service-label').text(item.name + ' via ' + item.connectionType);
+                        service.find('.service-label').text(item.name + ' via ' + item.port);
                         $('.service-wrapper').append(service);
                     }
                 }

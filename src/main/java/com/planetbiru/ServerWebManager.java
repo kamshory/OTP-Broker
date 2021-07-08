@@ -58,6 +58,7 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
+import com.planetbiru.gsm.DialUtil;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.gsm.InvalidPortException;
@@ -260,6 +261,50 @@ public class ServerWebManager {
 						 */
 						this.broardcastWebSocket(e.getMessage());
 					}
+				}
+			} 
+			else 
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;
+				responseJSON = RESTAPI.unauthorized(requestBody);					
+			}
+		} 
+		catch (NoUserRegisteredException e) 
+		{
+			statusCode = HttpStatus.UNAUTHORIZED;
+			responseJSON = RESTAPI.unauthorized(requestBody);					
+		}
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		String responseBody = responseJSON.toString(4);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@PostMapping(path="/api/internet-dial/**")
+	public ResponseEntity<String> internetConnect(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		HttpHeaders responseHeaders = new HttpHeaders();
+		HttpStatus statusCode;
+		JSONObject responseJSON = new JSONObject();
+		statusCode = HttpStatus.OK;
+		try 
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				String action = queryPairs.getOrDefault("action", "");
+				String modemID = queryPairs.getOrDefault("id", "");
+				if(!modemID.isEmpty())
+				{
+					if(action.equals("connect"))
+					{
+						DialUtil.connect(modemID);						
+					}
+					else
+					{
+						DialUtil.disconnect(modemID);
+					} 
+					ServerInfo.sendModemStatus();
 				}
 			} 
 			else 

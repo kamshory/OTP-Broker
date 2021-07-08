@@ -131,8 +131,11 @@ public class ServerAPI {
 	@Value("${otpbroker.path.wvdial}")
 	private String wvdialSettingPath;
 	
-	@Value("${otpbroker.wvdial.command}")
-	private String wvdialCommand;
+	@Value("${otpbroker.wvdial.command.connect}")
+	private String wvdialCommandConnect;
+
+	@Value("${otpbroker.wvdial.command.disconnect}")
+	private String wvdialCommandDisconnect;
 	
 	@PostConstruct
 	public void init()
@@ -172,7 +175,7 @@ public class ServerAPI {
 			SMSLogger.setPath(Config.getSmsLogPath());
 		}
 		GSMUtil.init();	
-		DialUtil.init(wvdialSettingPath, wvdialCommand);
+		DialUtil.init(wvdialSettingPath, wvdialCommandConnect, wvdialCommandDisconnect);
 		
 		GSMUtil.getCallerType().put(Utility.getClassName(RabbitMQReceiver.class.toString()), "amqp");
 		GSMUtil.getCallerType().put(Utility.getClassName(WebSocketEndpoint.class.toString()), "ws");
