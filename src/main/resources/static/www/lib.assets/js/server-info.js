@@ -1,8 +1,33 @@
+function waitingForServerUp()
+{
+  $('.waiting-server-up').css({'display':'block'});
+}
+function updateDashboard(message)
+{
+  $('.waiting-server-up').css({'display':'none'});
+}
 $(document).ready(function(e){
     loadData();
     setInterval(function(e2){
       reloadData();
     }, 30000);
+  $(document).on('click', '.tile.reboot a', function(e){
+    if(confirm('Are you sure you want to reboot the OS?'))
+    {
+      $.ajax({
+        url:'api/reboot', 
+        type:'POST',
+        data:{'confirm':'yes'},
+        dataType:'json',
+        success:function(data){
+          waitingForServerUp();
+        },
+        error:function(err){
+          waitingForServerUp();
+        }
+      });
+    }
+  })
   $(document).on('click', '.tile.restart a', function(e){
     if(confirm('Are you sure you want to restart the service?'))
     {
@@ -12,7 +37,10 @@ $(document).ready(function(e){
         data:{'confirm':'yes'},
         dataType:'json',
         success:function(data){
-          console.log('DATA : '+JSON.stringify(data));
+          waitingForServerUp();
+        },
+        error:function(err){
+          waitingForServerUp();
         }
       });
     }
@@ -33,20 +61,7 @@ $(document).ready(function(e){
     }
   });
 
-  $(document).on('click', '.tile.reboot a', function(e){
-  if(confirm('Are you sure you want to reboot the OS?'))
-  {
-    $.ajax({
-      url:'api/reboot', 
-      type:'POST',
-      data:{'confirm':'yes'},
-      dataType:'json',
-      success:function(data){
-        console.log('DATA : '+JSON.stringify(data));
-      }
-    });
-  }
-})
+  
 });
   
 function loadData()
@@ -72,6 +87,7 @@ function reloadData()
     url: "server-info/get",
     dataType: "json",
     success: function (data) {
+      $('.waiting-server-up').css({'display':'none'});
       updateCPUUsage(data);
       updateRAMStatus(data);
       updateSWAPStatus(data);
