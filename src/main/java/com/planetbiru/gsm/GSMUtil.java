@@ -55,17 +55,20 @@ public class GSMUtil {
 		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
 		{
 			DataModem modem = entry.getValue();
-			String port = modem.getPort();			
-			GSMInstance instance = new GSMInstance(modem);
-			try 
+			if(modem.isActive() && !modem.isInternetAccess())
 			{
-				instance.connect(port);
-				GSMUtil.gsmInstance.add(instance);
-			} 
-			catch (GSMException | InvalidPortException e) 
-			{
-				logger.error(e.getMessage());
-			}			
+				String port = modem.getPort();			
+				GSMInstance instance = new GSMInstance(modem);
+				try 
+				{
+					instance.connect(port);
+					GSMUtil.gsmInstance.add(instance);
+				} 
+				catch (GSMException | InvalidPortException e) 
+				{
+					logger.error(e.getMessage());
+				}
+			}
 		}
 		GSMUtil.initialized = true;
 		GSMUtil.updateConnectedDevice();
