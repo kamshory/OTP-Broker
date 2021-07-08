@@ -73,6 +73,10 @@ OTP Broker memungkinkan pengguna melakukan perintah USSD pada masing-masing mode
 
 Manual SMS digunakan untuk menguji apakah masing-masing modem dapat mengirimkan SMS. 
 
+## Internet Mobile
+
+OTP Broker dapat terhubung ke internet menggunakan modem mobile. Dengan demikian, pengguna tidak perlu menghubungkan OTP Broker dengan internet kabel atau optik. Ini memberikan alternatif bagi pengguna dalam memilih koneksi internet.
+
 ## Administrator Setting
 
 Administrator Setting adalah menu untuk melakukan konfigurasi administrator. Perangkat OTP Broker baru belum memiliki administrator. Pengguna harus membuat administrator terlebih dahulu sebelum menggunakannya. Silakan masuk ke akses poin OTP Broker sesuai dengan SSID dan password yang tertera pada brosur dan pindai QR Code pada brosur menggunakan smartphone.

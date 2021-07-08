@@ -4,13 +4,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.jcraft.jsch.JSchException;
+import com.planetbiru.ServerScheduler;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.util.CommandLineExecutor;
 import com.planetbiru.util.FileConfigUtil;
 
 public class DialUtil {
+	
+	private static Logger logger = LogManager.getLogger(ServerScheduler.class);
 	
 	private static Map<String, Boolean> internetAccess = new HashMap<>();
 	private static String configPath = "";
@@ -56,8 +62,7 @@ public class DialUtil {
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
-			return false;
+			logger.error(e.getMessage());
 		}
 		boolean ret = false;
 		try 
@@ -67,7 +72,7 @@ public class DialUtil {
 		} 
 		catch (JSchException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
 			ret = true;
 		}
 		DialUtil.internetAccess.put(modemID, ret);

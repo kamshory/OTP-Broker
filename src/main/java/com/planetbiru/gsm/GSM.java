@@ -27,7 +27,6 @@ public class GSM {
     
     public GSM()
     {
-    	logger.info("Constructor GSM called");
     }
     
     
@@ -43,7 +42,6 @@ public class GSM {
     	this.setReady(false);
     	boolean isOpen = false;
     	
-    	logger.info("INIT port : {}", portName);
     	try
     	{
 	   		setSerialPort(SerialPort.getCommPort(portName));
@@ -120,7 +118,6 @@ public class GSM {
 		        	this.ready = false;
 		            isOpen = false;
 	        	}
-	        	logger.info("FAILED....");
 	        }
     	}
     	catch(SerialPortInvalidPortException e)
