@@ -8,15 +8,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.jcraft.jsch.JSchException;
-import com.planetbiru.ServerScheduler;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.DataModem;
 import com.planetbiru.util.CommandLineExecutor;
 import com.planetbiru.util.FileConfigUtil;
+import com.planetbiru.util.ServerInfo;
 
 public class DialUtil {
 	
-	private static Logger logger = LogManager.getLogger(ServerScheduler.class);
+	private static Logger logger = LogManager.getLogger(DialUtil.class);
 	
 	private static Map<String, Boolean> internetAccess = new HashMap<>();
 	private static String configPath = "";
@@ -27,7 +27,6 @@ public class DialUtil {
 	{
 		
 	}
-	
 
 	public static void init(String path, String wvdialCommandConnect, String wvdialCommandDisconnect) {
 		DialUtil.configPath = path;
@@ -36,13 +35,17 @@ public class DialUtil {
 		for (Map.Entry<String, DataModem> entry : ConfigModem.getModemData().entrySet())
 		{
 			String modemID = entry.getKey();
-			boolean connected = true;
-			connected = connect(modemID);
-			if(connected)
+			DataModem modemData = entry.getValue();
+			if(modemData.isInternetAccess() && modemData.isActive())
 			{
-				break;
+				boolean connected = DialUtil.connect(modemID);
+				if(connected)
+				{
+					break;
+				}
 			}
 		}
+		ServerInfo.sendModemStatus();
 	}
 	
 	public static boolean connect(String modemID)
@@ -50,11 +53,16 @@ public class DialUtil {
 		DataModem modemData = ConfigModem.getModemData(modemID);
 		try 
 		{
-			GSMUtil.disconnect(modemID);
+			if(GSMUtil.isConnected(modemID))
+			{
+				GSMUtil.disconnect(modemID);
+			}
 		} 
 		catch (GSMException e) 
 		{
-			e.printStackTrace();
+			/**
+			 * Do nothing
+			 */
 		}
 		try 
 		{
@@ -76,7 +84,6 @@ public class DialUtil {
 			ret = true;
 		}
 		DialUtil.internetAccess.put(modemID, ret);
-		GSMUtil.updateConnectedDevice();
 		return ret;
 	}
 	
@@ -94,7 +101,6 @@ public class DialUtil {
 			e.printStackTrace();
 			ret = false;
 		}
-		GSMUtil.updateConnectedDevice();
 		return ret;
 	}
 
@@ -111,25 +117,6 @@ public class DialUtil {
 	}
 
 	private static void apply(DataModem modemData) throws IOException {
-		/**
-		 * [Dialer Defaults]
-			Modem = /dev/ttyS2
-			Baud = 57600
-			Init = ATZ
-			Init2 = AT S11=50
-			Phone = 555-4242
-			Username = apenwarr
-			Password = my-password
-			
-			[Dialer phone2]
-			Phone = 555-4243
-			
-			[Dialer shh]
-			Init3 = ATM0
-			
-			[Dialer pulse]
-			Dial Command = ATDP
-		 */
 		
 		String configStr = ""
 				+ "[Dialer Defaults]\r\n"
@@ -153,5 +140,6 @@ public class DialUtil {
 		String fileName = FileConfigUtil.fixFileName(DialUtil.configPath);
 		FileConfigUtil.write(fileName, configStr.getBytes());
 	}
+	
 
 }

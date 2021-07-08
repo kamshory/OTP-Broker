@@ -10,6 +10,7 @@ $(document).ready(function (e1) {
                     var internetAccess = item.internetAccess;
                     if(internetAccess)
                     {
+                        console.log(item);
                         var cls = '';
                         cls += (item.active ? ' enable' : ' disable');
                         cls += (item.internetConnected ? ' connected' : ' disconnected');
@@ -65,10 +66,12 @@ function updateModemUI(modemData) {
             var id = i;
             $('.service-modem').filter('[data-id="' + id + '"]').removeClass('disconnected');
             $('.service-modem').filter('[data-id="' + id + '"]').removeClass('connected')
-            if (modemData[i].internetConnected) {
+            if (modemData[i].internetConnected) 
+            {
                 $('.service-modem').filter('[data-id="' + id + '"]').addClass('connected');
             }
-            else {
+            else 
+            {
                 $('.service-modem').filter('[data-id="' + id + '"]').addClass('disconnected');
             }
         }
