@@ -749,6 +749,9 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
 .user-account .tile-icon{
   background-image: url(../images/icon/user-account.png);
 }
+.internet .tile-icon{
+  background-image: url(../images/icon/internet.png);
+}
 .tile-icon > a{
     width: 60px;
     height: 60px;

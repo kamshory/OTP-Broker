@@ -58,6 +58,7 @@ import com.planetbiru.constant.JsonKey;
 import com.planetbiru.constant.ResponseCode;
 import com.planetbiru.cookie.CookieServer;
 import com.planetbiru.ddns.DDNSRecord;
+import com.planetbiru.gsm.DialUtil;
 import com.planetbiru.gsm.GSMException;
 import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.gsm.InvalidPortException;
@@ -260,6 +261,50 @@ public class ServerWebManager {
 						 */
 						this.broardcastWebSocket(e.getMessage());
 					}
+				}
+			} 
+			else 
+			{
+				statusCode = HttpStatus.UNAUTHORIZED;
+				responseJSON = RESTAPI.unauthorized(requestBody);					
+			}
+		} 
+		catch (NoUserRegisteredException e) 
+		{
+			statusCode = HttpStatus.UNAUTHORIZED;
+			responseJSON = RESTAPI.unauthorized(requestBody);					
+		}
+		responseHeaders.add(ConstantString.CONTENT_TYPE, ConstantString.APPLICATION_JSON);
+		responseHeaders.add(ConstantString.CACHE_CONTROL, ConstantString.NO_CACHE);
+		String responseBody = responseJSON.toString(4);
+		return (new ResponseEntity<>(responseBody, responseHeaders, statusCode));	
+	}
+	
+	@PostMapping(path="/api/internet-dial/**")
+	public ResponseEntity<String> internetConnect(@RequestHeader HttpHeaders headers, @RequestBody String requestBody, HttpServletRequest request)
+	{
+		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
+		HttpHeaders responseHeaders = new HttpHeaders();
+		HttpStatus statusCode;
+		JSONObject responseJSON = new JSONObject();
+		statusCode = HttpStatus.OK;
+		try 
+		{
+			if(WebUserAccount.checkUserAuth(headers))
+			{
+				String action = queryPairs.getOrDefault("action", "");
+				String modemID = queryPairs.getOrDefault("id", "");
+				if(!modemID.isEmpty())
+				{
+					if(action.equals("connect"))
+					{
+						DialUtil.connect(modemID);						
+					}
+					else
+					{
+						DialUtil.disconnect(modemID);
+					} 
+					ServerInfo.sendModemStatus();
 				}
 			} 
 			else 
@@ -3219,10 +3264,11 @@ public class ServerWebManager {
 	private void processModemUpdate(Map<String, String> queryPairs, String action) {		
 		
 		String id = queryPairs.getOrDefault("id", "").trim();		
-		String connectionType = queryPairs.getOrDefault("connection_type", "").trim();
+		String port = queryPairs.getOrDefault("port", "").trim();
 		boolean active = queryPairs.getOrDefault(JsonKey.ACTIVE, "").trim().equals("1");	
 		boolean defaultModem = queryPairs.getOrDefault("default_modem", "").trim().equals("1");
 		boolean smsAPI = queryPairs.getOrDefault("sms_api", "").trim().equals("1");
+		boolean internetAccess = queryPairs.getOrDefault("internet_access", "").trim().equals("1");
 
 		String smsCenter = queryPairs.getOrDefault("sms_center", "").trim();		
 		
@@ -3279,6 +3325,15 @@ public class ServerWebManager {
 		String startBits = queryPairs.getOrDefault("start_bits", "").trim();
 		String stopBits = queryPairs.getOrDefault("stop_bits", "").trim();
 
+		String apnUsername = queryPairs.getOrDefault("apn_username", "").trim();
+		String apnPassword = queryPairs.getOrDefault("apn_password", "").trim();
+		String dialNumner = queryPairs.getOrDefault("dial_number", "").trim();
+		String initDial1 = queryPairs.getOrDefault("init_dial_1", "").trim();
+		String initDial2 = queryPairs.getOrDefault("init_dial_2", "").trim();
+		String initDial3 = queryPairs.getOrDefault("init_dial_3", "").trim();
+		String dialCommand = queryPairs.getOrDefault("dial_command", "").trim();
+		
+
 		DataModem modem = ConfigModem.getModemData(id);
 		if(action.equals(JsonKey.ADD) || id.isEmpty())
 		{
@@ -3287,7 +3342,7 @@ public class ServerWebManager {
 		}
 		
 		modem.setName(name);
-		modem.setConnectionType(connectionType);
+		modem.setPort(port);
 		modem.setSmsCenter(smsCenter);
 		modem.setIncommingInterval(incommingInterval);
 		modem.setTimeRange(timeRange);
@@ -3304,15 +3359,23 @@ public class ServerWebManager {
 		modem.setParityBit(parityBit);
 		modem.setStartBits(startBits);
 		modem.setStopBits(stopBits);
+		modem.setInternetAccess(internetAccess);
 		modem.setSmsAPI(smsAPI);
 		modem.setDefaultModem(defaultModem);
 		modem.setActive(active);
+		
+		modem.setApnUsername(apnUsername);
+		modem.setApnPassword(apnPassword);
+		modem.setDialNumner(dialNumner);
+		modem.setInitDial1(initDial1);
+		modem.setInitDial2(initDial2);
+		modem.setInitDial3(initDial3);
+		modem.setDialCommand(dialCommand);
 
 		ConfigModem.update(id, modem);
 		ConfigModem.save();	
 	}
 
-	
 	private void processFeederSetting(String requestBody) {
 		Map<String, String> queryPairs = Utility.parseURLEncoded(requestBody);
 		if(queryPairs.containsKey("save_feeder_ws_setting"))

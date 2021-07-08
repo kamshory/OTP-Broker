@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import com.planetbiru.ServerWebSocketManager;
 import com.planetbiru.constant.JsonKey;
+import com.planetbiru.gsm.DialUtil;
 import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.util.FileConfigUtil;
 import com.planetbiru.util.FileNotFoundException;
@@ -162,7 +163,7 @@ public class ConfigModem {
 	public static JSONObject toJSONObject()
 	{
 		JSONObject json = new JSONObject();
-		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
+		for (Map.Entry<String, DataModem> entry : ConfigModem.modemData.entrySet())
 		{
 			String id = entry.getKey();
 			JSONObject modem = ((DataModem) entry.getValue()).toJSONObject();
@@ -173,23 +174,25 @@ public class ConfigModem {
 	
 	public static JSONObject getStatus() {
 		JSONObject json = new JSONObject();
-		for (Map.Entry<String, DataModem> entry : modemData.entrySet())
+		for (Map.Entry<String, DataModem> entry : ConfigModem.modemData.entrySet())
 		{
 			String id = entry.getKey();
 			JSONObject modem = new JSONObject();
-			modem.put("connected", GSMUtil.isConnected(id));
-			modem.put("name", entry.getValue().getName());
-			modem.put("imei", entry.getValue().getImei());
-			modem.put("active", entry.getValue().isActive());
+			DataModem value = entry.getValue();
 			modem.put("id", id);
-			modem.put("connectionType", entry.getValue().getConnectionType());
-			modem.put("smsCenter", entry.getValue().getSmsCenter());
-			modem.put("defaultModem", entry.getValue().isDefaultModem());
+			modem.put("connected", GSMUtil.isConnected(id));
+			modem.put("internetAccess", value.isInternetAccess());
+			modem.put("internetConnected", DialUtil.isConnected(id));
+			modem.put("name", value.getName());
+			modem.put("imei", value.getImei());
+			modem.put("active", value.isActive());
+			modem.put("port", value.getPort());
+			modem.put("smsCenter", value.getSmsCenter());
+			modem.put("defaultModem", value.isDefaultModem());
 			json.put(id, modem);
 		}
 		return json;
 	}
-	
 	
 	public static String getConfigPath() {
 		return configPath;

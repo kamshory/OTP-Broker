@@ -87,6 +87,11 @@
         </nav>
         <div class="phone-page">
             <h3>Modem</h3>
+            <style>
+                .tr-dial{
+                    display: none;
+                }
+            </style>
             <form action="modem.html" method="post">
                 <table class="config-table config-table-connection">
                     <tbody>
@@ -95,8 +100,8 @@
                             <td><input type="text" class="form-control" name="name" value=""></td>
                         </tr>
                         <tr>
-                            <td>Connection Type</td>
-                            <td><input type="text" class="form-control" name="connection_type" value=""></td>
+                            <td>Port</td>
+                            <td><input type="text" class="form-control" name="port" value=""></td>
                         </tr>
                         <tr>
                             <td>SMS Center</td>
@@ -144,6 +149,46 @@
                             <td>Stop Bits</td>
                             <td><input type="text" class="form-control" name="stop_bits"></td>
                         </tr>
+                        <tr>
+                            <td>Internet Access</td>
+                            <td><label><input type="checkbox" name="internet_access" value="1"> Yes</label></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>APN Username</td>
+                            <td><input type="text" class="form-control" name="apn_username"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>APN Password</td>
+                            <td><input type="text" class="form-control" name="apn_password"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Dial Number</td>
+                            <td><input type="text" class="form-control" name="dial_number"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Init Dial 1</td>
+                            <td><input type="text" class="form-control" name="init_dial_1"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Init Dial 2</td>
+                            <td><input type="text" class="form-control" name="init_dial_2"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Init Dial 3</td>
+                            <td><input type="text" class="form-control" name="init_dial_3"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Dial Command</td>
+                            <td><input type="text" class="form-control" name="dial_command"></td>
+                        </tr>
+
                         <tr>
                             <td>Send SMS from API</td>
                             <td><label><input type="checkbox" name="sms_api" value="1"> Yes</label></td>
@@ -201,7 +246,7 @@
                                 console.log(data)
                                 $('input[name="id"]').val(data.id);
                                 $('input[name="name"]').val(data.name);
-                                $('input[name="connection_type"]').val(data.connectionType);
+                                $('input[name="port"]').val(data.port);
                                 $('input[name="sms_center"]').val(data.smsCenter);
                                 $('input[name="imei"]').val(data.imei);
                                 $('input[name="msisdn"]').val(data.msisdn);
@@ -211,6 +256,16 @@
                                 $('[name="parity_bit"]').val(data.parityBit);
                                 $('input[name="start_bits"]').val(data.startBits);
                                 $('input[name="stop_bits"]').val(data.stopBits);
+                                $('input[name="internet_access"]').prop('checked', data.internetAccess);
+
+                                $('input[name="apn_username"]').val(data.apnUsername);
+                                $('input[name="apn_password"]').val(data.apnPassword);
+                                $('input[name="dial_number"]').val(data.dialNumner);
+                                $('input[name="init_dial_1"]').val(data.initDial1);
+                                $('input[name="init_dial_2"]').val(data.initDial2);
+                                $('input[name="init_dial_3"]').val(data.initDial3);
+                                $('input[name="dial_command"]').val(data.dialCommand);
+
                                 $('input[name="sms_api"]').prop('checked', data.smsAPI);
                                 $('input[name="default_modem"]').prop('checked', data.defaultModem);
                                 $('input[name="active"]').prop('checked', data.active);
@@ -222,6 +277,18 @@
                     {
                         window.location = "modem.html";
                     }
+
+                    $(document).on('change', '[name="internet_access"]', function(e2){
+                        if($(this).prop('checked'))
+                        {
+                            $('.tr-dial').css('display', 'table-row');
+                        }
+                        else
+                        {
+                            $('.tr-dial').css('display', 'none');
+                        }
+                    });
+                    $('.tr-dial').css('display', 'table-row');
                 });
                 function applyTag()
                 {

@@ -33,6 +33,7 @@ import com.planetbiru.config.ConfigKeystore;
 import com.planetbiru.config.ConfigModem;
 import com.planetbiru.config.ConfigSMS;
 import com.planetbiru.config.DataKeystore;
+import com.planetbiru.gsm.DialUtil;
 import com.planetbiru.gsm.GSMUtil;
 import com.planetbiru.gsm.SMSLogger;
 import com.planetbiru.receiver.amqp.RabbitMQReceiver;
@@ -126,6 +127,15 @@ public class ServerAPI {
 	
 	@Value("${otpbroker.path.log.sms}")
 	private String smsLogPath;
+
+	@Value("${otpbroker.path.wvdial}")
+	private String wvdialSettingPath;
+	
+	@Value("${otpbroker.wvdial.command.connect}")
+	private String wvdialCommandConnect;
+
+	@Value("${otpbroker.wvdial.command.disconnect}")
+	private String wvdialCommandDisconnect;
 	
 	@PostConstruct
 	public void init()
@@ -134,13 +144,12 @@ public class ServerAPI {
 		 * This configuration must be loaded first
 		 */
 		Config.setBaseDirConfig(baseDirConfig);
-
 		Config.setApiSettingPath(apiSettingPath);
 		Config.setUserAPISettingPath(userAPISettingPath);
-
+		
 		ConfigAPIUser.load(Config.getUserAPISettingPath());
+		
 		Config.setBlockingSettingPath(blockingSettingPath);
-
 		Config.setKeystoreSettingPath(keystoreSettingPath);
 		Config.setRestartCommand(restartCommand);
 		Config.setModemSettingPath(modemSettingPath);
@@ -164,8 +173,8 @@ public class ServerAPI {
 		{
 			SMSLogger.setPath(Config.getSmsLogPath());
 		}
-		
 		GSMUtil.init();	
+		DialUtil.init(wvdialSettingPath, wvdialCommandConnect, wvdialCommandDisconnect);
 		
 		GSMUtil.getCallerType().put(Utility.getClassName(RabbitMQReceiver.class.toString()), "amqp");
 		GSMUtil.getCallerType().put(Utility.getClassName(WebSocketEndpoint.class.toString()), "ws");
@@ -181,8 +190,7 @@ public class ServerAPI {
 		ConfigAPI.setHttpsEnable(httpsEnable);	
 		ConfigAPI.setMessagePath(messagePath);
 		ConfigAPI.setBlockingPath(blockinPath);
-		ConfigAPI.setUnblockingPath(unblockinPath);
-		
+		ConfigAPI.setUnblockingPath(unblockinPath);		
 		ConfigAPI.load(Config.getApiSettingPath());
 	}
 

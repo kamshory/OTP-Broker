@@ -8,7 +8,7 @@ import org.json.JSONObject;
 public class DataModem {
 	private String id = "";
 	private String name = "";
-	private String connectionType = "";
+	private String port = "";
 	private String smsCenter = "";
 	private int incommingInterval = 0;
 	private int timeRange = 0;
@@ -23,17 +23,27 @@ public class DataModem {
 	private String parityBit = "";
 	private String startBits = "";
 	private String stopBits = "";
+	private boolean internetAccess = false;
 	private boolean smsAPI = false;
 	private boolean defaultModem = false;
 	private boolean active = false;
+	
+	private String apnUsername = "";
+	private String apnPassword = "";
+	private String dialNumner = "";
+	private String initDial1 = "";
+	private String initDial2 = "";
+	private String initDial3 = "";
+	private String dialCommand = "";
 
 	public DataModem() {
+		
 	}
 	
 	public DataModem(JSONObject jsonObject) {
 		this.id = jsonObject.optString("id", "");
 		this.name = jsonObject.optString("name", "");
-		this.connectionType = jsonObject.optString("connectionType", "");
+		this.port = jsonObject.optString("port", "");
 		this.smsCenter = jsonObject.optString("smsCenter", "");
 		this.incommingInterval = jsonObject.optInt("incommingInterval", 0);
 		this.timeRange = jsonObject.optInt("timeRange", 0);
@@ -48,16 +58,24 @@ public class DataModem {
 		this.parityBit = jsonObject.optString("parityBit", "");
 		this.startBits = jsonObject.optString("startBits", "");
 		this.stopBits = jsonObject.optString("stopBits", "");
+		this.internetAccess = jsonObject.optBoolean("internetAccess", false);
 		this.smsAPI = jsonObject.optBoolean("smsAPI", false);
 		this.defaultModem = jsonObject.optBoolean("defaultModem", false);
 		this.active = jsonObject.optBoolean("active", false);
+		this.apnUsername = jsonObject.optString("apnUsername", "");
+		this.apnPassword = jsonObject.optString("apnPassword", "");
+		this.dialNumner = jsonObject.optString("dialNumner", "");
+		this.initDial1 = jsonObject.optString("initDial1", "");
+		this.initDial2 = jsonObject.optString("initDial2", "");
+		this.initDial3 = jsonObject.optString("initDial3", "");
+		this.dialCommand = jsonObject.optString("dialCommand", "");
 	}
 	
 	public JSONObject toJSONObject() {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("id", this.id);
 		jsonObject.put("name", this.name);
-		jsonObject.put("connectionType", this.connectionType);
+		jsonObject.put("port", this.port);
 		jsonObject.put("smsCenter", this.smsCenter);
 		jsonObject.put("incommingInterval", this.incommingInterval);
 		jsonObject.put("timeRange", this.timeRange);
@@ -72,9 +90,19 @@ public class DataModem {
 		jsonObject.put("parityBit", this.parityBit);
 		jsonObject.put("startBits", this.startBits);
 		jsonObject.put("stopBits", this.stopBits);
+		jsonObject.put("internetAccess", this.internetAccess);
 		jsonObject.put("smsAPI", this.smsAPI);
 		jsonObject.put("defaultModem", this.defaultModem);
 		jsonObject.put("active", this.active);
+		
+		jsonObject.put("apnUsername", this.apnUsername);
+		jsonObject.put("apnPassword", this.apnPassword);
+		jsonObject.put("dialNumner", this.dialNumner);
+		jsonObject.put("initDial1", this.initDial1);
+		jsonObject.put("initDial2", this.initDial2);
+		jsonObject.put("initDial3", this.initDial3);
+		jsonObject.put("dialCommand", this.dialCommand);
+
 		return jsonObject;
 	}
 
@@ -94,12 +122,12 @@ public class DataModem {
 		this.name = name;
 	}
 
-	public String getConnectionType() {
-		return connectionType;
+	public String getPort() {
+		return port;
 	}
 
-	public void setConnectionType(String connectionType) {
-		this.connectionType = connectionType;
+	public void setPort(String port) {
+		this.port = port;
 	}
 
 	public String getSmsCenter() {
@@ -205,6 +233,14 @@ public class DataModem {
 	public void setStopBits(String stopBits) {
 		this.stopBits = stopBits;
 	}
+	
+	public boolean isInternetAccess() {
+		return internetAccess;
+	}
+
+	public void setInternetAccess(boolean internetAccess) {
+		this.internetAccess = internetAccess;
+	}
 
 	public boolean isSmsAPI() {
 		return smsAPI;
@@ -236,6 +272,65 @@ public class DataModem {
 
 	public void setRecipientPrefix(String recipientPrefix) {
 		this.recipientPrefix = recipientPrefix;
+	}
+	
+	
+
+	public String getApnUsername() {
+		return apnUsername;
+	}
+
+	public void setApnUsername(String apnUsername) {
+		this.apnUsername = apnUsername;
+	}
+
+	public String getApnPassword() {
+		return apnPassword;
+	}
+
+	public void setApnPassword(String apnPassword) {
+		this.apnPassword = apnPassword;
+	}
+
+	
+	public String getDialNumner() {
+		return dialNumner;
+	}
+
+	public void setDialNumner(String dialNumner) {
+		this.dialNumner = dialNumner;
+	}
+
+	public String getInitDial1() {
+		return initDial1;
+	}
+
+	public void setInitDial1(String initDial1) {
+		this.initDial1 = initDial1;
+	}
+
+	public String getInitDial2() {
+		return initDial2;
+	}
+
+	public void setInitDial2(String initDial2) {
+		this.initDial2 = initDial2;
+	}
+
+	public String getInitDial3() {
+		return initDial3;
+	}
+
+	public void setInitDial3(String initDial3) {
+		this.initDial3 = initDial3;
+	}
+
+	public String getDialCommand() {
+		return dialCommand;
+	}
+
+	public void setDialCommand(String dialCommand) {
+		this.dialCommand = dialCommand;
 	}
 
 	public List<String> getRecipientPrefixList() {

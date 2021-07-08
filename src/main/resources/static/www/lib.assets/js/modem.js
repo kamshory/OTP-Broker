@@ -26,7 +26,7 @@ $(document).ready(function (e1) {
                         '<tr data-pk-id="' + item.id + '">\r\n' +
                         '	<td><input type="checkbox" class="check-all" name="id[]" value="' + item.id + '"></td>\r\n' +
                         '	<td><a href="modem-update.html?id=' + encodeURIComponent(item.id) + '">' + item.name + '</a></td>\r\n' +
-                        '	<td><a href="modem-update.html?id=' + encodeURIComponent(item.id) + '">' + item.connectionType + '</a></td>\r\n' +
+                        '	<td><a href="modem-update.html?id=' + encodeURIComponent(item.id) + '">' + item.port + '</a></td>\r\n' +
                         '	<td align="center"><span class="icon ' + def + '"></span></td>\r\n' +
                         '	<td align="center"><span class="icon ' + active + '"></span></td>\r\n' +
                         '</tr>\r\n'

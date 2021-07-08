@@ -85,6 +85,11 @@
             </div>
             <!--/.container-fluid -->
         </nav>
+        <style>
+            .tr-dial{
+                display: none;
+            }
+        </style>
         <div class="phone-page">
             <h3>Modem</h3>
             <form action="modem.html" method="post">
@@ -95,8 +100,8 @@
                             <td><input type="text" class="form-control" name="name" value=""></td>
                         </tr>
                         <tr>
-                            <td>Connection Type</td>
-                            <td><input type="text" class="form-control" name="connection_type" value=""></td>
+                            <td>Port</td>
+                            <td><input type="text" class="form-control" name="port" value=""></td>
                         </tr>
                         <tr>
                             <td>SMS Center</td>
@@ -145,6 +150,46 @@
                             <td><input type="text" class="form-control" name="stop_bits"></td>
                         </tr>
                         <tr>
+                            <td>Internet Access</td>
+                            <td><label><input type="checkbox" name="internet_access" value="1"> Yes</label></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>APN Username</td>
+                            <td><input type="text" class="form-control" name="apn_username"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>APN Password</td>
+                            <td><input type="text" class="form-control" name="apn_password"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Dial Phone</td>
+                            <td><input type="text" class="form-control" name="dial_phone"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Init Dial 1</td>
+                            <td><input type="text" class="form-control" name="init_dial_1"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Init Dial 2</td>
+                            <td><input type="text" class="form-control" name="init_dial_2"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Init Dial 3</td>
+                            <td><input type="text" class="form-control" name="init_dial_3"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Dial Command</td>
+                            <td><input type="text" class="form-control" name="dial_command"></td>
+                        </tr>
+
+                        <tr>
                             <td>Send SMS from API</td>
                             <td><label><input type="checkbox" name="sms_api" value="1"> Yes</label></td>
                         </tr>
@@ -175,36 +220,46 @@
             <script type="text/javascript">
 
             var setting = {};
-                $(document).ready(function(e){
-                    $.ajax({
-                        type:"GET",
-                        url:"sms-setting/get",
-                        dataType:"json",
-                        success:function(data){
-                            setting = data;
-                        }
-                    });
-                    
-                    $(document).on('blur', '[name="recipient_prefix"]', function(e2){
-                        console.log('blur1')
-                        if(setting.countryCode != '' && setting.recipientPrefixLength > 0)
+            $(document).ready(function(e){
+                $.ajax({
+                    type:"GET",
+                    url:"sms-setting/get",
+                    dataType:"json",
+                    success:function(data){
+                        setting = data;
+                    }
+                });
+                
+                $(document).on('blur', '[name="recipient_prefix"]', function(e2){
+                    console.log('blur1')
+                    if(setting.countryCode != '' && setting.recipientPrefixLength > 0)
+                    {
+                        var value = $(this).val();
+                        console.log('blur2', value)
+                        var arr = value.split(',');
+                        for(i in arr)
                         {
-                            var value = $(this).val();
-                            console.log('blur2', value)
-                            var arr = value.split(',');
-                            for(i in arr)
+                            arr[i] = arr[i].trim();
+                            if(arr[i].indexOf('0') == 0 && arr[i].length > 1)
                             {
-                                arr[i] = arr[i].trim();
-                                if(arr[i].indexOf('0') == 0 && arr[i].length > 1)
-                                {
-                                    arr[i] = setting.countryCode + arr[i].substring(1);
-                                }
+                                arr[i] = setting.countryCode + arr[i].substring(1);
                             }
-                            value = arr.join(', ');
-                            $(this).val(value);
                         }
-                    });
-                })
+                        value = arr.join(', ');
+                        $(this).val(value);
+                    }
+                });
+                $(document).on('change', '[name="internet_access"]', function(e2){
+                    if($(this).prop('checked'))
+                    {
+                        $('.tr-dial').css('display', 'table-row');
+                    }
+                    else
+                    {
+                        $('.tr-dial').css('display', 'none');
+                    }
+                });
+            })
             </script>
         </div>
         <!-- /container -->
