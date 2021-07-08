@@ -30,6 +30,7 @@ public class DataModem {
 	
 	private String apnUsername = "";
 	private String apnPassword = "";
+	private String dialNumner = "";
 	private String initDial1 = "";
 	private String initDial2 = "";
 	private String initDial3 = "";
@@ -61,6 +62,13 @@ public class DataModem {
 		this.smsAPI = jsonObject.optBoolean("smsAPI", false);
 		this.defaultModem = jsonObject.optBoolean("defaultModem", false);
 		this.active = jsonObject.optBoolean("active", false);
+		this.apnUsername = jsonObject.optString("apnUsername", "");
+		this.apnPassword = jsonObject.optString("apnPassword", "");
+		this.dialNumner = jsonObject.optString("dialNumner", "");
+		this.initDial1 = jsonObject.optString("initDial1", "");
+		this.initDial2 = jsonObject.optString("initDial2", "");
+		this.initDial3 = jsonObject.optString("initDial3", "");
+		this.dialCommand = jsonObject.optString("dialCommand", "");
 	}
 	
 	public JSONObject toJSONObject() {
@@ -86,6 +94,15 @@ public class DataModem {
 		jsonObject.put("smsAPI", this.smsAPI);
 		jsonObject.put("defaultModem", this.defaultModem);
 		jsonObject.put("active", this.active);
+		
+		jsonObject.put("apnUsername", this.apnUsername);
+		jsonObject.put("apnPassword", this.apnPassword);
+		jsonObject.put("dialNumner", this.dialNumner);
+		jsonObject.put("initDial1", this.initDial1);
+		jsonObject.put("initDial2", this.initDial2);
+		jsonObject.put("initDial3", this.initDial3);
+		jsonObject.put("dialCommand", this.dialCommand);
+
 		return jsonObject;
 	}
 
@@ -273,6 +290,15 @@ public class DataModem {
 
 	public void setApnPassword(String apnPassword) {
 		this.apnPassword = apnPassword;
+	}
+
+	
+	public String getDialNumner() {
+		return dialNumner;
+	}
+
+	public void setDialNumner(String dialNumner) {
+		this.dialNumner = dialNumner;
 	}
 
 	public String getInitDial1() {

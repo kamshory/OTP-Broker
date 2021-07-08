@@ -3325,6 +3325,15 @@ public class ServerWebManager {
 		String startBits = queryPairs.getOrDefault("start_bits", "").trim();
 		String stopBits = queryPairs.getOrDefault("stop_bits", "").trim();
 
+		String apnUsername = queryPairs.getOrDefault("apn_username", "").trim();
+		String apnPassword = queryPairs.getOrDefault("apn_password", "").trim();
+		String dialNumner = queryPairs.getOrDefault("dial_number", "").trim();
+		String initDial1 = queryPairs.getOrDefault("init_dial_1", "").trim();
+		String initDial2 = queryPairs.getOrDefault("init_dial_2", "").trim();
+		String initDial3 = queryPairs.getOrDefault("init_dial_3", "").trim();
+		String dialCommand = queryPairs.getOrDefault("dial_command", "").trim();
+		
+
 		DataModem modem = ConfigModem.getModemData(id);
 		if(action.equals(JsonKey.ADD) || id.isEmpty())
 		{
@@ -3354,6 +3363,14 @@ public class ServerWebManager {
 		modem.setSmsAPI(smsAPI);
 		modem.setDefaultModem(defaultModem);
 		modem.setActive(active);
+		
+		modem.setApnUsername(apnUsername);
+		modem.setApnPassword(apnPassword);
+		modem.setDialNumner(dialNumner);
+		modem.setInitDial1(initDial1);
+		modem.setInitDial2(initDial2);
+		modem.setInitDial3(initDial3);
+		modem.setDialCommand(dialCommand);
 
 		ConfigModem.update(id, modem);
 		ConfigModem.save();	

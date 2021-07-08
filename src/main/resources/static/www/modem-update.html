@@ -165,8 +165,8 @@
                         </tr>
 
                         <tr class="tr-dial">
-                            <td>Dial Phone</td>
-                            <td><input type="text" class="form-control" name="dial_phone"></td>
+                            <td>Dial Number</td>
+                            <td><input type="text" class="form-control" name="dial_number"></td>
                         </tr>
 
                         <tr class="tr-dial">
@@ -257,6 +257,15 @@
                                 $('input[name="start_bits"]').val(data.startBits);
                                 $('input[name="stop_bits"]').val(data.stopBits);
                                 $('input[name="internet_access"]').prop('checked', data.internetAccess);
+
+                                $('input[name="apn_username"]').val(data.apnUsername);
+                                $('input[name="apn_password"]').val(data.apnPassword);
+                                $('input[name="dial_number"]').val(data.dialNumner);
+                                $('input[name="init_dial_1"]').val(data.initDial1);
+                                $('input[name="init_dial_2"]').val(data.initDial2);
+                                $('input[name="init_dial_3"]').val(data.initDial3);
+                                $('input[name="dial_command"]').val(data.dialCommand);
+
                                 $('input[name="sms_api"]').prop('checked', data.smsAPI);
                                 $('input[name="default_modem"]').prop('checked', data.defaultModem);
                                 $('input[name="active"]').prop('checked', data.active);

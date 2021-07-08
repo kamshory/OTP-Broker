@@ -144,13 +144,12 @@ public class ServerAPI {
 		 * This configuration must be loaded first
 		 */
 		Config.setBaseDirConfig(baseDirConfig);
-
 		Config.setApiSettingPath(apiSettingPath);
 		Config.setUserAPISettingPath(userAPISettingPath);
-
+		
 		ConfigAPIUser.load(Config.getUserAPISettingPath());
+		
 		Config.setBlockingSettingPath(blockingSettingPath);
-
 		Config.setKeystoreSettingPath(keystoreSettingPath);
 		Config.setRestartCommand(restartCommand);
 		Config.setModemSettingPath(modemSettingPath);
@@ -191,8 +190,7 @@ public class ServerAPI {
 		ConfigAPI.setHttpsEnable(httpsEnable);	
 		ConfigAPI.setMessagePath(messagePath);
 		ConfigAPI.setBlockingPath(blockinPath);
-		ConfigAPI.setUnblockingPath(unblockinPath);
-		
+		ConfigAPI.setUnblockingPath(unblockinPath);		
 		ConfigAPI.load(Config.getApiSettingPath());
 	}
 
