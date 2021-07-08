@@ -14,7 +14,7 @@ $(document).ready(function (e1) {
                         var cls = '';
                         cls += (item.active ? ' enable' : ' disable');
                         cls += (item.internetConnected ? ' connected' : ' disconnected');
-                        var service = $('<div class="service-item service-modem' + cls + '">\r\n' +
+                        var service = $('<div class="service-item service-modem-internet service-modem' + cls + '">\r\n' +
                             '<div class="service-label"></div>\r\n' +
                             '<div class="service-button">\r\n' +
                             '<button class="btn btn-sm btn-success connect">Connect</button>\r\n' +

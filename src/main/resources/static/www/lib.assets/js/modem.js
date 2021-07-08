@@ -10,8 +10,11 @@ $(document).ready(function (e1) {
                     var active = !item.active ? 'icon-cross' : 'icon-check';
                     var def = !item.defaultModem ? 'icon-cross' : 'icon-check';
                     var cls = '';
+                    var connected = item.connected || item.internetConnected;
+                    console.log(connected);
                     cls += (item.active?' enable':' disable');
-                    cls += (item.connected?' connected':' disconnected');
+                    cls += (connected?' connected':' disconnected');
+                    cls += (item.internetAccess?' service-modem-internet':' service-modem-sms');
                     var service = $('<div class="service-item service-modem'+cls+'">\r\n'+
                         '<div class="service-label"></div>\r\n'+
                         '<div class="service-button">\r\n'+
@@ -21,6 +24,8 @@ $(document).ready(function (e1) {
                         '</div>');
                     service.attr('data-id', item.id);
                     service.find('.service-label').text(item.name+ ' via '+item.port);
+
+
                     $('.service-wrapper').append(service);
                     $('.row-table tbody').append(
                         '<tr data-pk-id="' + item.id + '">\r\n' +
@@ -36,7 +41,7 @@ $(document).ready(function (e1) {
         }
     });
 
-    $(document).on('click', '.service-wrapper .connect', function(e2){
+    $(document).on('click', '.service-modem-sms .connect', function(e2){
         var modemID = $(this).closest('.service-item').attr('data-id');
         $.ajax({
             url:'api/device/',
@@ -51,10 +56,40 @@ $(document).ready(function (e1) {
             }
         });
     });
-    $(document).on('click', '.service-wrapper .disconnect', function(e2){
+    $(document).on('click', '.service-modem-internet .connect', function(e2){
+        var modemID = $(this).closest('.service-item').attr('data-id');
+        $.ajax({
+            url:'api/internet-dial/',
+            type:'POST',
+            dataType: 'json',
+            data:{action:'connect', id:modemID},
+            success:function(data)
+            {
+                /**
+                do nothing
+                */
+            }
+        });
+    });
+    $(document).on('click', '.service-modem-sms .disconnect', function(e2){
         var modemID = $(this).closest('.service-item').attr('data-id');
         $.ajax({
             url:'api/device/',
+            type:'POST',
+            dataType: 'json',
+            data:{action:'disconnect', id:modemID},
+            success:function(data)
+            {
+                /**
+                do nothing
+                */
+            }
+        });
+    });
+    $(document).on('click', '.service-modem-internet .disconnect', function(e2){
+        var modemID = $(this).closest('.service-item').attr('data-id');
+        $.ajax({
+            url:'api/internet-dial/',
             type:'POST',
             dataType: 'json',
             data:{action:'disconnect', id:modemID},
@@ -77,7 +112,7 @@ function updateModemUI(modemData)
             var id = i;
             $('.service-modem').filter('[data-id="'+id+'"]').removeClass('disconnected');
             $('.service-modem').filter('[data-id="'+id+'"]').removeClass('connected')
-            if(modemData[i].connected)
+            if(modemData[i].connected || modemData[i].internetConnected)
             {
                 $('.service-modem').filter('[data-id="'+id+'"]').addClass('connected');
             }
