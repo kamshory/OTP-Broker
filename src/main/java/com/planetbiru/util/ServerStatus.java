@@ -156,9 +156,6 @@ public class ServerStatus {
 	}
 	
 	
-	
-	
-	
 	private static void prepareDir(String fileName) {
 		File file = new File(fileName);
 		String directory1 = file.getParent();

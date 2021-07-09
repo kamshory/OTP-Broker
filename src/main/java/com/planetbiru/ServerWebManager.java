@@ -223,7 +223,7 @@ public class ServerWebManager {
 		
 		PropertyLoader.load(Config.getMimeSettingPath());
 		
-		Config.setValidDevice(ServerInfo.cpuSerialNumberHmac().equals(hmac));
+		Config.setValidDevice(true);
 	}
 	
 	@PostMapping(path="/api/device/**")
@@ -2319,6 +2319,7 @@ public class ServerWebManager {
 					/**
 					 * Do nothing
 					 */
+					e.printStackTrace();
 				}
 			}
 		}
