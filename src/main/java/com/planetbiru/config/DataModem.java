@@ -28,12 +28,15 @@ public class DataModem {
 	private boolean defaultModem = false;
 	private boolean active = false;
 	
+	private String apn = "";
 	private String apnUsername = "";
 	private String apnPassword = "";
 	private String dialNumner = "";
 	private String initDial1 = "";
 	private String initDial2 = "";
 	private String initDial3 = "";
+	private String initDial4 = "";
+	private String initDial5 = "";
 	private String dialCommand = "";
 
 	public DataModem() {
@@ -62,12 +65,15 @@ public class DataModem {
 		this.smsAPI = jsonObject.optBoolean("smsAPI", false);
 		this.defaultModem = jsonObject.optBoolean("defaultModem", false);
 		this.active = jsonObject.optBoolean("active", false);
+		this.apn = jsonObject.optString("apn", "");
 		this.apnUsername = jsonObject.optString("apnUsername", "");
 		this.apnPassword = jsonObject.optString("apnPassword", "");
 		this.dialNumner = jsonObject.optString("dialNumner", "");
 		this.initDial1 = jsonObject.optString("initDial1", "");
 		this.initDial2 = jsonObject.optString("initDial2", "");
 		this.initDial3 = jsonObject.optString("initDial3", "");
+		this.initDial4 = jsonObject.optString("initDial4", "");
+		this.initDial5 = jsonObject.optString("initDial5", "");
 		this.dialCommand = jsonObject.optString("dialCommand", "");
 	}
 	
@@ -95,12 +101,15 @@ public class DataModem {
 		jsonObject.put("defaultModem", this.defaultModem);
 		jsonObject.put("active", this.active);
 		
+		jsonObject.put("apn", this.apn);
 		jsonObject.put("apnUsername", this.apnUsername);
 		jsonObject.put("apnPassword", this.apnPassword);
 		jsonObject.put("dialNumner", this.dialNumner);
 		jsonObject.put("initDial1", this.initDial1);
 		jsonObject.put("initDial2", this.initDial2);
 		jsonObject.put("initDial3", this.initDial3);
+		jsonObject.put("initDial4", this.initDial4);
+		jsonObject.put("initDial5", this.initDial5);
 		jsonObject.put("dialCommand", this.dialCommand);
 
 		return jsonObject;
@@ -276,6 +285,14 @@ public class DataModem {
 	
 	
 
+	public String getApn() {
+		return apn;
+	}
+
+	public void setApn(String apn) {
+		this.apn = apn;
+	}
+
 	public String getApnUsername() {
 		return apnUsername;
 	}
@@ -323,6 +340,22 @@ public class DataModem {
 
 	public void setInitDial3(String initDial3) {
 		this.initDial3 = initDial3;
+	}
+
+	public String getInitDial4() {
+		return initDial4;
+	}
+
+	public void setInitDial4(String initDial4) {
+		this.initDial4 = initDial4;
+	}
+
+	public String getInitDial5() {
+		return initDial5;
+	}
+
+	public void setInitDial5(String initDial5) {
+		this.initDial5 = initDial5;
 	}
 
 	public String getDialCommand() {

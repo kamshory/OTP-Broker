@@ -35,6 +35,7 @@ OTP Broker adalah server untuk mengirimkan SMS melalui protokol HTTP, WebSocket 
 
 # Feature
 
+
 ## Multiple Device
 
 Modem adalah daftar modem yang terpasang pada OTP Broker. Modem diberi nama berdasarkan merek dan model perangkat serta koneksi yang digunakan. Modem dapat diaktifkan dan dinonaktirkan kapan saja. Modem yang tidak aktif tidak akan digunakan untuk mengirimkan SMS meskipun secara fisik terpasang pada OTP Broker dan menerima aliran daya.
@@ -159,6 +160,18 @@ SMS Setting adalah konfigurasi pengiriman SMS oleh OTP Broker.
 | Send SMS from API | Flag that the modem will be used to send SMS from API or not. If it set to `false`, modem will not send incomming SMS from API but user can send SMS manualy from the management web. |
 | Default Modem | Flag that the modem is default or not. The default modem will be used to send SMS that the prefix is not exists on `Recipient Prefix` of the other modems. |
 | Active | Flag for the modem that will be used or not |
+
+
+### APN Setting
+
+| Operator | APN | Username | Password | Dial UP |
+| -- | -- | -- | -- | -- |
+| Telkmonsel | internet | | | *99# |
+| XL | internet | | | *99# |
+| Three | 3data | 3data | 3data | *99# |
+| Smartfren | smart | smart | smart | #777 |
+| Indosat Ooredoo | indosatgprs | | | *99# |
+| Axis | axis | axis | 123456 | *99# |
 
 
 ## Blocking List
