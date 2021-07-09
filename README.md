@@ -150,19 +150,22 @@ SMS Setting adalah konfigurasi pengiriman SMS oleh OTP Broker.
 | Start Bits | Modem start bits |
 | Stop Bits | Modem stop bits |
 | Internet Access | Use modem to connect to the internet |
+| APN | Access Point Name |
 | APN Username | Username of the APN to connect to the internet |
 | APN Password | Password of the APN to connect to the internet |
 | Dial Number | Number to be dialed to connect to the internet |
 | Init Dial 1 | Initial AT command to be executed to connect to the internet |
 | Init Dial 2 | Initial AT command to be executed to connect to the internet |
 | Init Dial 3 | Initial AT command to be executed to connect to the internet |
+| Init Dial 4 | Initial AT command to be executed to connect to the internet |
+| Init Dial 5 | Initial AT command to be executed to connect to the internet |
 | Dial Command | Command to be executed to connect to the internet |
 | Send SMS from API | Flag that the modem will be used to send SMS from API or not. If it set to `false`, modem will not send incomming SMS from API but user can send SMS manualy from the management web. |
 | Default Modem | Flag that the modem is default or not. The default modem will be used to send SMS that the prefix is not exists on `Recipient Prefix` of the other modems. |
 | Active | Flag for the modem that will be used or not |
 
 
-### APN Setting
+### APN Setting for Indonesian Telco
 
 | Operator | APN | Username | Password | Dial UP |
 | -- | -- | -- | -- | -- |
@@ -172,7 +175,6 @@ SMS Setting adalah konfigurasi pengiriman SMS oleh OTP Broker.
 | Smartfren | smart | smart | smart | #777 |
 | Indosat Ooredoo | indosatgprs | | | *99# |
 | Axis | axis | axis | 123456 | *99# |
-
 
 ## Blocking List
 
