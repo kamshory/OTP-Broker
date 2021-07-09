@@ -3269,6 +3269,7 @@ public class ServerWebManager {
 		boolean defaultModem = queryPairs.getOrDefault("default_modem", "").trim().equals("1");
 		boolean smsAPI = queryPairs.getOrDefault("sms_api", "").trim().equals("1");
 		boolean internetAccess = queryPairs.getOrDefault("internet_access", "").trim().equals("1");
+		boolean autoreconnect = queryPairs.getOrDefault("autoreconnect", "").trim().equals("1");
 
 		String smsCenter = queryPairs.getOrDefault("sms_center", "").trim();		
 		
@@ -3334,8 +3335,7 @@ public class ServerWebManager {
 		String initDial3 = queryPairs.getOrDefault("init_dial_3", "").trim();
 		String initDial4 = queryPairs.getOrDefault("init_dial_4", "").trim();
 		String initDial5 = queryPairs.getOrDefault("init_dial_5", "").trim();
-		String dialCommand = queryPairs.getOrDefault("dial_command", "").trim();
-		
+		String dialCommand = queryPairs.getOrDefault("dial_command", "").trim();		
 
 		DataModem modem = ConfigModem.getModemData(id);
 		if(action.equals(JsonKey.ADD) || id.isEmpty())
@@ -3377,6 +3377,7 @@ public class ServerWebManager {
 		modem.setInitDial4(initDial4);
 		modem.setInitDial5(initDial5);
 		modem.setDialCommand(dialCommand);
+		modem.setAutoreconnect(autoreconnect);
 
 		ConfigModem.update(id, modem);
 		ConfigModem.save();	

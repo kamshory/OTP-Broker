@@ -204,6 +204,11 @@
                             <td><input type="text" class="form-control" name="dial_command"></td>
                         </tr>
 
+                        <tr class="tr-dial">
+                            <td>Autoreconnect</td>
+                            <td><label><input type="checkbox" name="autoreconnect" value="1"> Yes</label></td>
+                        </tr>
+
                         <tr>
                             <td>Send SMS from API</td>
                             <td><label><input type="checkbox" name="sms_api" value="1"> Yes</label></td>
@@ -283,6 +288,7 @@
                                 $('input[name="init_dial_4"]').val(data.initDial4);
                                 $('input[name="init_dial_5"]').val(data.initDial5);
                                 $('input[name="dial_command"]').val(data.dialCommand);
+                                $('input[name="autoreconnect"]').prop('checked', data.autoreconnect);
 
                                 $('input[name="sms_api"]').prop('checked', data.smsAPI);
                                 $('input[name="default_modem"]').prop('checked', data.defaultModem);

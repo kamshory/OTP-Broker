@@ -38,6 +38,7 @@ public class DataModem {
 	private String initDial4 = "";
 	private String initDial5 = "";
 	private String dialCommand = "";
+	private boolean autoreconnect = false;
 
 	public DataModem() {
 		
@@ -75,6 +76,7 @@ public class DataModem {
 		this.initDial4 = jsonObject.optString("initDial4", "");
 		this.initDial5 = jsonObject.optString("initDial5", "");
 		this.dialCommand = jsonObject.optString("dialCommand", "");
+		this.autoreconnect = jsonObject.optBoolean("autoreconnect", false);
 	}
 	
 	public JSONObject toJSONObject() {
@@ -111,6 +113,7 @@ public class DataModem {
 		jsonObject.put("initDial4", this.initDial4);
 		jsonObject.put("initDial5", this.initDial5);
 		jsonObject.put("dialCommand", this.dialCommand);
+		jsonObject.put("autoreconnect", this.autoreconnect);
 
 		return jsonObject;
 	}
@@ -364,6 +367,14 @@ public class DataModem {
 
 	public void setDialCommand(String dialCommand) {
 		this.dialCommand = dialCommand;
+	}
+
+	public boolean isAutoreconnect() {
+		return autoreconnect;
+	}
+
+	public void setAutoreconnect(boolean autoreconnect) {
+		this.autoreconnect = autoreconnect;
 	}
 
 	public List<String> getRecipientPrefixList() {
