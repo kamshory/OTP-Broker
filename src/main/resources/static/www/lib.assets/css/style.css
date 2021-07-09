@@ -754,26 +754,26 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
   background-image: url(../images/icon/internet.png);
 }
 .tile-icon > a{
-    width: 64px;
-    height: 64px;
-    display: block;
-    color: #555555;
-    text-decoration: none;
+  width: 64px;
+  height: 64px;
+  display: block;
+  color: #555555;
+  text-decoration: none;
 }
 .tile-title{
-    text-align: center;
-    width: 80px;
-    margin: auto;
-    padding: 4px 0;
-    font-size: 11px;
+  text-align: center;
+  width: 80px;
+  margin: auto;
+  padding: 4px 0;
+  font-size: 11px;
 }
 .tile-title a{
-    color: #555555;
-    text-decoration: none;
-    display: block;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
+  color: #555555;
+  text-decoration: none;
+  display: block;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 .service-modem-internet{
   background-image: url(../images/icon/modem-internet-32.png);
@@ -787,7 +787,6 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
   background-position-x: calc(100% - 10px);
   background-position-y: 10px;
 }
-
 
 .waiting-server-up {
   display: none;
@@ -813,73 +812,74 @@ display: inline-block; padding-top: 14px; padding-right: 10px; width: 62px;
   }
 
 .animation-pressure, .animation-pressure > span{
-position:relative;
-display:inline-block;
-height:12px;
-line-height:1;
+  position:relative;
+  display:inline-block;
+  height:12px;
+  line-height:1;
 }
 .animation-pressure > span{
-vertical-align:top;
+  vertical-align:top;
 }
 .animation-pressure{
-padding:0px 10px;
-vertical-align:middle;
+  padding:0px 10px;
+  vertical-align:middle;
 }
 .animation-pressure > span{
-padding:0px 8px;
+  padding:0px 8px;
 }
-.animation-pressure::before, .animation-pressure::after, .animation-pressure > span::before, .animation-pressure > span::after{
-content:"";
-width:6px;
-height:4px;
-position:absolute;
-top:4px;
-animation-name:anim;
-animation-duration:1.0s;
-animation-iteration-count:infinite;
-animation-timing-function: cubic-bezier(.45,.05,.55,.95);
+.animation-pressure::before, 
+.animation-pressure::after, 
+.animation-pressure > span::before, 
+.animation-pressure > span::after{
+  content:"";
+  width:6px;
+  height:4px;
+  position:absolute;
+  top:4px;
+  animation-name:anim;
+  animation-duration:1.0s;
+  animation-iteration-count:infinite;
+  animation-timing-function: cubic-bezier(.45,.05,.55,.95);
 }
 .animation-pressure::before, .animation-pressure > span::before{
-left:0;
+  left:0;
 }
 .animation-pressure::after, .animation-pressure > span::after{
-right:0;
+  right:0;
 }
 
 .animation-pressure::before{
-animation-delay:0;
-background-color: green;
+  animation-delay:0;
+  background-color: green;
 }
 .animation-pressure > span::before{
-animation-delay:0.12s;
-background-color: green;
+  animation-delay:0.12s;
+  background-color: green;
 }
 .animation-pressure > span::after{
-animation-delay:0.24s;
-background-color: green;
+  animation-delay:0.24s;
+  background-color: green;
 }
 .animation-pressure::after{
-animation-delay:0.36s;
-background-color: green;
+  animation-delay:0.36s;
+  background-color: green;
 }
 
 @keyframes anim{
-0%{
-  top:4px;
-  height:4px;
+  0%{
+    top:4px;
+    height:4px;
+  }
+  22%{
+    top:0px;
+    height:12px;
+  }
+  44%{
+    top:4px;
+    height:4px;
+  }
+  100%{
+    top:4px;
+    height:4px;
+  }
 }
-22%{
-  top:0px;
-  height:12px;
-}
-44%{
-  top:4px;
-  height:4px;
-}
-100%{
-  top:4px;
-  height:4px;
-}
-}
-
-

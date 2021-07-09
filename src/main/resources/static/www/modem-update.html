@@ -155,6 +155,11 @@
                         </tr>
 
                         <tr class="tr-dial">
+                            <td>APN</td>
+                            <td><input type="text" class="form-control" name="apn"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
                             <td>APN Username</td>
                             <td><input type="text" class="form-control" name="apn_username"></td>
                         </tr>
@@ -182,6 +187,16 @@
                         <tr class="tr-dial">
                             <td>Init Dial 3</td>
                             <td><input type="text" class="form-control" name="init_dial_3"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Init Dial 4</td>
+                            <td><input type="text" class="form-control" name="init_dial_4"></td>
+                        </tr>
+
+                        <tr class="tr-dial">
+                            <td>Init Dial 5</td>
+                            <td><input type="text" class="form-control" name="init_dial_5"></td>
                         </tr>
 
                         <tr class="tr-dial">
@@ -258,12 +273,15 @@
                                 $('input[name="stop_bits"]').val(data.stopBits);
                                 $('input[name="internet_access"]').prop('checked', data.internetAccess);
 
+                                $('input[name="apn"]').val(data.apn);
                                 $('input[name="apn_username"]').val(data.apnUsername);
                                 $('input[name="apn_password"]').val(data.apnPassword);
                                 $('input[name="dial_number"]').val(data.dialNumner);
                                 $('input[name="init_dial_1"]').val(data.initDial1);
                                 $('input[name="init_dial_2"]').val(data.initDial2);
                                 $('input[name="init_dial_3"]').val(data.initDial3);
+                                $('input[name="init_dial_4"]').val(data.initDial4);
+                                $('input[name="init_dial_5"]').val(data.initDial5);
                                 $('input[name="dial_command"]').val(data.dialCommand);
 
                                 $('input[name="sms_api"]').prop('checked', data.smsAPI);
