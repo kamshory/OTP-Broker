@@ -186,6 +186,12 @@
             <version>3.1.7</version>
         </dependency>
         
+        <dependency>
+		    <groupId>org.commonmark</groupId>
+		    <artifactId>commonmark</artifactId>
+		    <version>0.17.2</version>
+		</dependency>
+        
     </dependencies>
     <build>
         <plugins>

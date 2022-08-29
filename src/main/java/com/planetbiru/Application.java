@@ -12,6 +12,10 @@ import com.planetbiru.config.ConfigNetDHCP;
 import com.planetbiru.config.ConfigNetEthernet;
 import com.planetbiru.config.ConfigNetWLAN;
 
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+
 @SpringBootApplication
 @EnableAutoConfiguration
 @EnableConfigurationProperties
@@ -131,6 +135,11 @@ public class Application {
 			ConfigNetWLAN.apply(Config.getOsWLANConfigPath(), Config.getOsWLANConfigPath());
 			ConfigNetEthernet.apply(Config.getOsEthernetConfigPath());
 		}		
+		
+		Parser parser = Parser.builder().build();
+        Node document = parser.parse(markdown);
+        HtmlRenderer htmlRenderer = HtmlRenderer.builder().build();
+        return htmlRenderer.render(document);
 	}
 	
 	private static boolean usbPluged() 
