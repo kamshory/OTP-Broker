@@ -1,5 +1,7 @@
 # OTP Broker
 
+Repository ini tidak lagi diteruskan. Sebagai gantinya, gunakan https://github.com/kamshory/OTP-Pi 
+
 OTP atau `One Time Password` adalah sebuah password satu kali pakai yang memiliki masa berlaku tertentu. Umumnya masa berlaku dibuat sangat singkat dan hanya memberikan kesempatan kepada penerimanya untuk memasukkannya ke dalam aplikasi dan mengirimkannya ke server aplikasi yang memerlukannya. OTP bersifat sangat rahasia sehingga `clear text` dari OTP tidak boleh disimpan oleh pihak manapun. Bahkan, server aplikasi hanya menyimpan `hash` atau `token` yang cocok dengan OTP tersebut. `Clear text` hanya dibuat lalu dikirim ke penerima. Dengan kata lain, `clear text` hanya diketahui oleh penerima OTP saja.
 
 OTP yang paling populer dikirimkan melalui SMS atau Short Message Service. Penggunaan SMS memiliki kelebihan sebagai berikut:
